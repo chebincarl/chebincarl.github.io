@@ -108,20 +108,29 @@
 
 
 
-  <meta property="og:type" content="website">
-<meta property="og:title" content="车斌的博客">
-<meta property="og:url" content="http://yoursite.com/index.html">
+  <meta name="description" content="锁机制 在同一时刻,如果数据库仅仅为单个MySQL客户机提供服务,仅通过事务机制即可实现数据库的数据一致性。但更多时候,在同一时刻,多个并发用户往往需要同时访问(检索或者更新)数据库中的同一个数据,此时仅仅通过事务机制无法保证多用户同时访问同一数据的数据一致性,因此有必要引入另一种机制实现数据的多用户并发访问。锁机制是MySQL实现多用户并发问的基石。 锁机制的必要性   MySQL客户机A与My">
+<meta name="keywords" content="MySQL">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL锁机制">
+<meta property="og:url" content="http://yoursite.com/2018/11/26/MySQL锁机制/index.html">
 <meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="锁机制 在同一时刻,如果数据库仅仅为单个MySQL客户机提供服务,仅通过事务机制即可实现数据库的数据一致性。但更多时候,在同一时刻,多个并发用户往往需要同时访问(检索或者更新)数据库中的同一个数据,此时仅仅通过事务机制无法保证多用户同时访问同一数据的数据一致性,因此有必要引入另一种机制实现数据的多用户并发访问。锁机制是MySQL实现多用户并发问的基石。 锁机制的必要性   MySQL客户机A与My">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/2018/11/26/MySQL锁机制/10.png">
+<meta property="og:image" content="http://yoursite.com/2018/11/26/MySQL锁机制/11.png">
+<meta property="og:image" content="http://yoursite.com/2018/11/26/MySQL锁机制/12.png">
+<meta property="og:updated_time" content="2018-11-25T16:40:10.180Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="车斌的博客">
+<meta name="twitter:title" content="MySQL锁机制">
+<meta name="twitter:description" content="锁机制 在同一时刻,如果数据库仅仅为单个MySQL客户机提供服务,仅通过事务机制即可实现数据库的数据一致性。但更多时候,在同一时刻,多个并发用户往往需要同时访问(检索或者更新)数据库中的同一个数据,此时仅仅通过事务机制无法保证多用户同时访问同一数据的数据一致性,因此有必要引入另一种机制实现数据的多用户并发访问。锁机制是MySQL实现多用户并发问的基石。 锁机制的必要性   MySQL客户机A与My">
+<meta name="twitter:image" content="http://yoursite.com/2018/11/26/MySQL锁机制/10.png">
 
 
 
 
 
 
-  <link rel="canonical" href="http://yoursite.com/">
+  <link rel="canonical" href="http://yoursite.com/2018/11/26/MySQL锁机制/">
 
 
 
@@ -131,7 +140,7 @@
   };
 </script>
 
-  <title>车斌的博客</title>
+  <title>MySQL锁机制 | 车斌的博客</title>
   
 
 
@@ -180,8 +189,7 @@
     
   
 
-  <div class="container sidebar-position-left 
-  page-home">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 
     <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
@@ -218,7 +226,7 @@
         
         
           
-          <li class="menu-item menu-item-home menu-item-active">
+          <li class="menu-item menu-item-home">
 
     
     
@@ -280,9 +288,9 @@
           
           <div id="content" class="content">
             
-  <section id="posts" class="posts-expand">
+
+  <div id="posts" class="posts-expand">
     
-      
 
   
 
@@ -314,10 +322,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2018/11/26/MySQL锁机制/" class="post-title-link" itemprop="http://yoursite.com/index.html">MySQL锁机制</a>
+          <h1 class="post-title" itemprop="name headline">MySQL锁机制
               
             
           </h1>
@@ -380,9 +385,7 @@
       
 
       
-        
-          
-            <p>锁机制</p>
+        <p>锁机制</p>
 <p>在同一时刻,如果数据库仅仅为单个MySQL客户机提供服务,仅通过事务机制即可实现数据库的数据一致性。但更多时候,在同一时刻,多个并发用户往往需要同时访问(检索或者更新)数据库中的同一个数据,此时仅仅通过事务机制无法保证多用户同时访问同一数据的数据一致性,因此有必要引入另一种机制实现数据的多用户并发访问。锁机制是MySQL实现多用户并发问的基石。</p>
 <p>锁机制的必要性  </p>
 <p>MySQL客户机A与MySQL客户机B执行同一条SQL语句”select * from account;”时产生的结果截然不同,继而产生数据不一致问题。这种数据不一致问题产生的深层次原因在于,内存中的数据与外存中的数据不同步造成的(或者说是由内存中的表记录与外存中的表记录之间存在“同步延迟”造成的）。<br>MySQL客户机A访问数据时,如果能够对该数据“加锁”,阻塞(或者延迟)MySQL客户机B对该数据访问,直到MySQL客户机A数据访问结束,内存与外存中的数据同步后, MySQL客户机A对该数据“解锁”, “解锁”后,被阻塞的MySQL客户机B”被唤醒”,继而可以继续访问该数据,这样就可以实现多用户下数据的并发访问,如下图所示。  </p>
@@ -394,8 +397,6 @@
 <p> MySQL锁机制的基础知识<br>相对于其他数据库管理系统而言, MySQL的锁机制较为简单,但即便如此,由于MySQL锁机制涉及存储引擎、多用户并发访问、事务以及索引等知识,初学者全面掌握MySQL锁机制并非易事。简单地说, MySQL锁机制涉及的内容包括:锁的粒度、隐式锁与显式锁、锁的类型、锁的钥匙以及锁的生命周期等。<br>1.锁的粒度<br>    锁的粒度是指锁的作用范围。就像读者有了防盗门的钥匙就可以回到“家”中,有了卧室的钥匙就可以进到卧室,有了保险柜的钥匙就可以打开保险柜,每一种“资源”存在一个与之对应“粒度”的锁，数据库亦是如此。对于MySQL而言,锁的粒度可以分为服务器级锁(server-level locking)和存储引擎级锁(storage-engine-level locking)。<br>    服务器级锁是以服务器为单位进行加锁,它与表的存储引擎无关。在MySQL基础知识章节中讲解数据库备份时,为了保证数据备份过程中不会有新的数据写入,使用MySQL命令”flush tables with read lock,”锁定了当前MySQL服务实例,该锁是服务器级锁,并且是服务器级“读锁”。<br>也就是说, MySQL客户机A执行了MySQL命令”flush tables with read lock,”,锁定了当前MySQL服务实例后, MySQL客户机A针对服务器的写操作(例如insert, update, delete以及create等语句)抛出如下错误信息。<br>ERROR 1223 (HY000): Can’t execute the query because you have a conflicting read lock<br>其他MySQL客户机(例如MySQL客户机B)针对服务器的写操作(例如insert, update, delete以及create等语句）被阻塞。</p>
 <p>只有MySQL客户机A执行”unlock tables,”命令或者关闭MySQL客户机A的服务器连接,释放服务器级读锁后,才会“唤醒”MySQL客户机B的写操作, MySQL客户机B的写操作才能得以继续执行。MySQL客户机A施加的服务器级锁,只有MySQL客户机A才能解锁。<br>    例如,在MySQL客户机A上锁定了当前MySQL服务实例后,在MySQL客户机B上创建视图test view将被阻塞,而在MySQL客户机A上创建视图test view将产生错误信息(ERROR 1223)。MySQL客户机A解锁后, MySQL客户机B才能成功创建视图test view,如图9-19所示(注意图中的粗体字)。从执行结果可以看出, MySQL客户机A施加服务器级锁后,该锁对MySQL客户机A的后续操作以及对MySQL客户机B的后续操作产生的效果并不相同。<br><img src="/2018/11/26/MySQL锁机制/12.png"></p>
 
-          
-        
       
     </div>
 
@@ -416,448 +417,36 @@
 
     <footer class="post-footer">
       
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/25/Hash算法和数据库实现/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Che Bin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="车斌的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2018/11/25/Hash算法和数据库实现/" class="post-title-link" itemprop="http://yoursite.com/index.html">Hash算法和数据库实现</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2018-11-25 17:39:24" itemprop="dateCreated datePublished" datetime="2018-11-25T17:39:24+08:00">2018-11-25</time>
-            
-
-            
-          </span>
-
+        <div class="post-tags">
           
-
+            <a href="/tags/MySQL/" rel="tag"># MySQL</a>
           
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
         </div>
-      </header>
-    
+      
 
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
+      
       
       
 
       
-        
-          
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
             
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-       
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/24/MySQL的索引/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Che Bin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="车斌的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2018/11/24/MySQL的索引/" class="post-title-link" itemprop="http://yoursite.com/index.html">MySQL的索引</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2018-11-24 22:34:18" itemprop="dateCreated datePublished" datetime="2018-11-24T22:34:18+08:00">2018-11-24</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新于</span>
-                
-                <time title="修改时间：2018-11-26 00:24:42" itemprop="dateModified" datetime="2018-11-26T00:24:42+08:00">2018-11-26</time>
-              
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p>创建数据表时，初学者通常仅仅关注该表有哪些字段、字段的数据类型以及约束条件等信息，很容易忽视数据表中种的另一个重要的概念“索引”。</p>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/2018/11/24/MySQL的索引/#more" rel="contents">
-                阅读全文 &raquo;
+              <a href="/2018/11/25/Hash算法和数据库实现/" rel="next" title="Hash算法和数据库实现">
+                <i class="fa fa-chevron-left"></i> Hash算法和数据库实现
               </a>
-            </div>
-         
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-       
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/21/CentOS7安装GitLab/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Che Bin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="车斌的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2018/11/21/CentOS7安装GitLab/" class="post-title-link" itemprop="http://yoursite.com/index.html">CentOS7安装GitLab</a>
-              
             
-          </h1>
-        
+          </div>
 
-        <div class="post-meta">
-          <span class="post-time">
+          <span class="post-nav-divider"></span>
 
+          <div class="post-nav-prev post-nav-item">
             
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2018-11-21 22:25:27" itemprop="dateCreated datePublished" datetime="2018-11-21T22:25:27+08:00">2018-11-21</time>
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
+          </div>
         </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
       
 
       
-        
-          
-            
-          
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-       
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
       
     </footer>
   </div>
@@ -867,14 +456,15 @@
   </article>
 
 
-    
-  </section>
-
-  
+  </div>
 
 
           </div>
           
+
+  
+
+
 
         </div>
         
@@ -1081,6 +671,10 @@
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
 
   
 
