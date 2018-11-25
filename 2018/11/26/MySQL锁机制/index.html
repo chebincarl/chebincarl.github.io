@@ -108,21 +108,21 @@
 
 
 
-  <meta name="description" content="锁机制 在同一时刻,如果数据库仅仅为单个MySQL客户机提供服务,仅通过事务机制即可实现数据库的数据一致性。但更多时候,在同一时刻,多个并发用户往往需要同时访问(检索或者更新)数据库中的同一个数据,此时仅仅通过事务机制无法保证多用户同时访问同一数据的数据一致性,因此有必要引入另一种机制实现数据的多用户并发访问。锁机制是MySQL实现多用户并发问的基石。 锁机制的必要性   MySQL客户机A与My">
+  <meta name="description" content="锁机制 在同一时刻,如果数据库仅仅为单个MySQL客户机提供服务,仅通过事务机制即可实现数据库的数据一致性。但更多时候,在同一时刻,多个并发用户往往需要同时访问(检索或者更新)数据库中的同一个数据,此时仅仅通过事务机制无法保证多用户同时访问同一数据的数据一致性,因此有必要引入另一种机制实现数据的多用户并发访问。锁机制是MySQL实现多用户并发问的基石。">
 <meta name="keywords" content="MySQL">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MySQL锁机制">
 <meta property="og:url" content="http://yoursite.com/2018/11/26/MySQL锁机制/index.html">
 <meta property="og:site_name" content="车斌的博客">
-<meta property="og:description" content="锁机制 在同一时刻,如果数据库仅仅为单个MySQL客户机提供服务,仅通过事务机制即可实现数据库的数据一致性。但更多时候,在同一时刻,多个并发用户往往需要同时访问(检索或者更新)数据库中的同一个数据,此时仅仅通过事务机制无法保证多用户同时访问同一数据的数据一致性,因此有必要引入另一种机制实现数据的多用户并发访问。锁机制是MySQL实现多用户并发问的基石。 锁机制的必要性   MySQL客户机A与My">
+<meta property="og:description" content="锁机制 在同一时刻,如果数据库仅仅为单个MySQL客户机提供服务,仅通过事务机制即可实现数据库的数据一致性。但更多时候,在同一时刻,多个并发用户往往需要同时访问(检索或者更新)数据库中的同一个数据,此时仅仅通过事务机制无法保证多用户同时访问同一数据的数据一致性,因此有必要引入另一种机制实现数据的多用户并发访问。锁机制是MySQL实现多用户并发问的基石。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://yoursite.com/2018/11/26/MySQL锁机制/10.png">
 <meta property="og:image" content="http://yoursite.com/2018/11/26/MySQL锁机制/11.png">
 <meta property="og:image" content="http://yoursite.com/2018/11/26/MySQL锁机制/12.png">
-<meta property="og:updated_time" content="2018-11-25T16:40:10.180Z">
+<meta property="og:updated_time" content="2018-11-25T16:41:07.115Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="MySQL锁机制">
-<meta name="twitter:description" content="锁机制 在同一时刻,如果数据库仅仅为单个MySQL客户机提供服务,仅通过事务机制即可实现数据库的数据一致性。但更多时候,在同一时刻,多个并发用户往往需要同时访问(检索或者更新)数据库中的同一个数据,此时仅仅通过事务机制无法保证多用户同时访问同一数据的数据一致性,因此有必要引入另一种机制实现数据的多用户并发访问。锁机制是MySQL实现多用户并发问的基石。 锁机制的必要性   MySQL客户机A与My">
+<meta name="twitter:description" content="锁机制 在同一时刻,如果数据库仅仅为单个MySQL客户机提供服务,仅通过事务机制即可实现数据库的数据一致性。但更多时候,在同一时刻,多个并发用户往往需要同时访问(检索或者更新)数据库中的同一个数据,此时仅仅通过事务机制无法保证多用户同时访问同一数据的数据一致性,因此有必要引入另一种机制实现数据的多用户并发访问。锁机制是MySQL实现多用户并发问的基石。">
 <meta name="twitter:image" content="http://yoursite.com/2018/11/26/MySQL锁机制/10.png">
 
 
@@ -347,7 +347,7 @@
                 
               
 
-              <time title="创建时间：2018-11-26 00:13:46 / 修改时间：00:40:10" itemprop="dateCreated datePublished" datetime="2018-11-26T00:13:46+08:00">2018-11-26</time>
+              <time title="创建时间：2018-11-26 00:13:46 / 修改时间：00:41:07" itemprop="dateCreated datePublished" datetime="2018-11-26T00:13:46+08:00">2018-11-26</time>
             
 
             
@@ -387,6 +387,7 @@
       
         <p>锁机制</p>
 <p>在同一时刻,如果数据库仅仅为单个MySQL客户机提供服务,仅通过事务机制即可实现数据库的数据一致性。但更多时候,在同一时刻,多个并发用户往往需要同时访问(检索或者更新)数据库中的同一个数据,此时仅仅通过事务机制无法保证多用户同时访问同一数据的数据一致性,因此有必要引入另一种机制实现数据的多用户并发访问。锁机制是MySQL实现多用户并发问的基石。</p>
+<a id="more"></a>
 <p>锁机制的必要性  </p>
 <p>MySQL客户机A与MySQL客户机B执行同一条SQL语句”select * from account;”时产生的结果截然不同,继而产生数据不一致问题。这种数据不一致问题产生的深层次原因在于,内存中的数据与外存中的数据不同步造成的(或者说是由内存中的表记录与外存中的表记录之间存在“同步延迟”造成的）。<br>MySQL客户机A访问数据时,如果能够对该数据“加锁”,阻塞(或者延迟)MySQL客户机B对该数据访问,直到MySQL客户机A数据访问结束,内存与外存中的数据同步后, MySQL客户机A对该数据“解锁”, “解锁”后,被阻塞的MySQL客户机B”被唤醒”,继而可以继续访问该数据,这样就可以实现多用户下数据的并发访问,如下图所示。  </p>
 <img src="/2018/11/26/MySQL锁机制/10.png">
