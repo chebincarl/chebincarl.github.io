@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="事务机制事务通常包含一系列更新操作，这些更新操作是一个不可分割的逻辑工作单元。如果事务成功执行，那么该事务中所有的更新操作都会成功执行，并将执行结果提交到数据库文件中，成为数据库永久的组成部分。如果事务中某个更新操作执行失败，那么事务中的所有更新操作均被撤销。简言之：事务中的更新操作要么都执行，要么都不执行，这个特征叫做事务的原子性。 说明 本章所指的更新语句或更新操作主要是update、inse">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MySQL事务机制">
+<meta property="og:url" content="http://yoursite.com/2018/11/26/MySQL事务机制/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="事务机制事务通常包含一系列更新操作，这些更新操作是一个不可分割的逻辑工作单元。如果事务成功执行，那么该事务中所有的更新操作都会成功执行，并将执行结果提交到数据库文件中，成为数据库永久的组成部分。如果事务中某个更新操作执行失败，那么事务中的所有更新操作均被撤销。简言之：事务中的更新操作要么都执行，要么都不执行，这个特征叫做事务的原子性。 说明 本章所指的更新语句或更新操作主要是update、inse">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/2018/11/26/MySQL事务机制/1.png">
+<meta property="og:updated_time" content="2018-11-26T14:53:04.506Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MySQL事务机制">
+<meta name="twitter:description" content="事务机制事务通常包含一系列更新操作，这些更新操作是一个不可分割的逻辑工作单元。如果事务成功执行，那么该事务中所有的更新操作都会成功执行，并将执行结果提交到数据库文件中，成为数据库永久的组成部分。如果事务中某个更新操作执行失败，那么事务中的所有更新操作均被撤销。简言之：事务中的更新操作要么都执行，要么都不执行，这个特征叫做事务的原子性。 说明 本章所指的更新语句或更新操作主要是update、inse">
+<meta name="twitter:image" content="http://yoursite.com/2018/11/26/MySQL事务机制/1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/11/26/MySQL事务机制/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>MySQL事务机制 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/26/MySQL事务机制/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Che Bin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">MySQL事务机制
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-11-26 20:10:15 / 修改时间：22:53:04" itemprop="dateCreated datePublished" datetime="2018-11-26T20:10:15+08:00">2018-11-26</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="事务机制"><a href="#事务机制" class="headerlink" title="事务机制"></a>事务机制</h3><p>事务通常包含一系列更新操作，这些更新操作是一个不可分割的逻辑工作单元。如果事务成功执行，那么该事务中所有的更新操作都会成功执行，并将执行结果提交到数据库文件中，成为数据库永久的组成部分。如果事务中某个更新操作执行失败，那么事务中的所有更新操作均被撤销。简言之：事务中的更新操作要么都执行，要么都不执行，这个特征叫做事务的原子性。</p>
+<pre><code>说明
+</code></pre><p>本章所指的更新语句或更新操作主要是update、insert以及delete等语句。</p>
+<p>由于MyISAM存储引擎暂时不支持事务，因此，本章如果不作特殊说明，使用的存储引擎为InnoDB存储引擎。</p>
+<h3 id="事务机制的必要性"><a href="#事务机制的必要性" class="headerlink" title="事务机制的必要性"></a>事务机制的必要性</h3><p>对于银行系统而言，转账业务是银行最基本、最常用的业务，有必要将转账业务封装成存储过程，银行系统调用该存储过程后即可实现两个银行账户间的转账业务。<br>场景描述1：假设某个银行存在两个借记卡账户（account）甲与乙，并且要求这两个借记卡账户不能用于透支，即两个账户的余额（balance）不能小于零。</p>
+<p>步骤1：创建account账户表，并将其设置为InnoDB存储引擎。account_no字段是账户表的主键，其值由MySQL自动生成；account_name字段是账户名；balance字段是余额，由于余额不能为负数，将其定义为无符号数。<br>create table account(</p>
+<p>account_no int auto_increment primary key,</p>
+<p>account_name char(10) not null,</p>
+<p>balance int unsigned</p>
+<p>) engine=innodb;</p>
+<p>步骤2：添加测试数据。下面的SQL语句向账户account表中插入了“甲”和“乙”两条账户信息，余额都是1000元。</p>
+<p>insert into account values(null,’甲’,1000);</p>
+<p>insert into account values(null,’乙’,1000);</p>
+<p>步骤3：创建存储过程。下面的MySQL代码创建了transfer_proc()存储过程，将from_account账户的money金额转账到to_account账户中，继而实现两个账户之间的转账业务。</p>
+<p>delimiter $$<br>create procedure transfer_proc(in from_account int,in to_account int,in money int)</p>
+<p>modifies sql data</p>
+<p>begin</p>
+<p>update account set balance=balance+money where account_no=to_account;<br>update account set balance=balance-money where account_no=from_account;<br>end</p>
+<p>$$</p>
+<p>delimiter ;</p>
+<p>步骤4：测试存储过程。下面的MySQL代码首先调用了transfer_proc()存储过程，将账户“甲”的800元转账到了“乙”账户中。然后查询了账户表中的所有账户信息，执行结果如图9-1所示，此时两个账户的余额之和为2000元。</p>
+<p>call transfer_proc(1,2,800);</p>
+<p>select * from account;</p>
+<p>步骤5：再次测试存储过程。再次调用transfer_proc()存储过程，将账户“甲”的800 元转账到“乙”账户中。由于账户余额不能为负数，甲的账户余额200元减去800元，产生了错误代码<br>1690 对应的错误信息（稍后为该错误代码定义错误处理程序）。<br>1690 - BIGINT UNSIGNED value is out of range in ‘(<code>test</code>.<code>account</code>.<code>balance</code> - money@2)’</p>
+<p>然后查询账户表中的所有账户信息，<br>call transfer_proc(1,2,800);<br>select * from account;</p>
+<p>执行结果如下。<br>+————+————–+———+<br>| account_no | account_name | balance |<br>+————+————–+———+<br>|          1 | 甲           |     200 |<br>|          2 | 乙           |    2600 |<br>+————+————–+———+</p>
+<p>结论：甲账户的余额没有丝毫变化，但是乙账户的余额却凭空多出800元。甲、乙账户的余额之和由转账前2000元，变成了转账后的2800元，由此产生了数据不一致问题。<br>为了避免出现数据不一致问题，需要在存储过程中引入事务的概念，将transfer_proc()存储过程的两条update语句绑定到一起，让它们成为一个“原子性”的操作：两条update语句要么都执行，要么都不执行。</p>
+<h3 id="关闭MySQL自动提交"><a href="#关闭MySQL自动提交" class="headerlink" title="关闭MySQL自动提交"></a>关闭MySQL自动提交</h3><p>默认情况下，MySQL开启了自动提交（auto_increment），这就意味着，之前章节编写的任意一条更新语句，一旦发送到MySQL服务器，MySQL服务实例会立即解析、执行，并将更新结果提交到数据库文件中，成为数据库永久的组成部分。<br>以转账存储过程transfer_proc()为例，该存储过程包含两条update语句，第一条update语句执行“加法”运算，第二条 update 语句执行“减法”运算。由于 MySQL 默认情况下开启了自动提交，因此第二条update语句无论执行成功还是失败，都不会影响第一条update语句的成功执行。如果第一条update语句成功执行，而第二条update语句执行失败，最终将导致数据不一致问题的发生。可以这样理解：产生上述数据不一致问题的根源在于MySQL开启了自动提交，并且没有引入事务的概念。<br>因此，对于诸如银行转账的业务逻辑而言，首要步骤是关闭MySQL自动提交，只有当所有的更新语句成功执行后，才提交（commit）所有的更新语句，否则回滚（rollback）所有的更新语句。关闭自动提交的方法有两种：一种是显示地关闭自动提交；另一种是隐式地关闭自动提交。</p>
+<p>方法一：显示地关闭自动提交</p>
+<p>使用MySQL命令“show variables like ‘autocommit’;”可以查看MySQL是否开启了自动提交。系统变量@@autocommit的值为ON或者1时，表示MySQL开启自动提交，默认情况下，MySQL开启了自动提交，如图 9-3 所示。系统变量@@autocommit 的值为 OFF或者 0 时，表示 MySQL 关闭自动提交。使用 MySQL 命令“set autocommit=0;”可以显示地关闭MySQL自动提交。<br>说明</p>
+<p>系统变量@@autocommit是会话变量，MySQL客户机A对该系统会话变量的更改，不会影响到MySQL客户机B中该系统会话变量的值。</p>
+<p>方法二：隐式地关闭自动提交<br>使用MySQL命令“start transaction;”可以隐式地关闭自动提交。隐式地关闭自动提交不会修改系统会话变量@@autocommit的值。</p>
+<p>注意：对MyISAM存储引擎的表进行更新操作时，自动提交无论开启还是关闭，更新操作都将立即解析、执行，并将执行结果提交到数据库文件中，成为数据库永久的组成部分。</p>
+<h3 id="回滚"><a href="#回滚" class="headerlink" title="回滚"></a>回滚</h3><p>关闭MySQL自动提交后，数据库开发人员可以根据需要回滚（也叫撤销）更新操作。<br>场景描述2：接场景描述1的步骤，当甲、乙账户的余额分别变为200元以及2600元后，打开MySQL客户机A，然后输入下面的MySQL命令。该MySQL命令首先关闭MySQL的自动提交，接着修改乙账户（account_no=2）的余额（加800元），然后查询所有账户的余额。</p>
+<p>set autocommit=0;<br>update account set balance=balance+800 where account_no=2;</p>
+<p>select * from account;<br>结果为：<br>+————+————–+———+<br>| account_no | account_name | balance |<br>+————+————–+———+<br>|          1 | 甲           |     200 |<br>|          2 | 乙           |    3400 |<br>+————+————–+———+</p>
+<p>从运行结果可以看到，乙账户的余额已经从2600元修改为3400元，事实果真如此？打开另一个MySQL客户机B，选择当前的数据库为choose数据库，使用select语句再次查询所有账户的余额。<br>use choose;</p>
+<p>select * from account;<br>结果为：<br>+————+————–+———+<br>| account_no | account_name | balance |<br>+————+————–+———+<br>|          1 | 甲           |     200 |<br>|          2 | 乙           |    2600 |<br>+————+————–+———+</p>
+<p>从MySQL客户机B的执行结果可以看到乙的余额依然是2600元，并没有增加800元。对于这个问题，可以通过图9-6进行解释。从图中可以得知：MySQL客户机A的update操作影响的仅仅是内存中new记录的值，且该值并没有写入数据库文件；当MySQL客户机A执行select语句时，查询到的3400元实际上是MySQL服务器内存中new记录的字段值；MySQL客户机B执行select语句时，看到的2600元是外存数据2600在服务器内存的一个副本。</p>
+<img src="/2018/11/26/MySQL事务机制/1.png">
+<p>乙的最终余额究竟应该是多少元？这要取决于MySQL客户机A接下来的操作（可以分成两种情形：场景描述3与场景描述4）。<br>场景描述3：接场景描述2的步骤，在MySQL客户机A上执行MySQL命令“rollback;”，接着在MySQL客户机A、MySQL客户机B上执行select语句查询甲、乙账户的余额，两次执行结果相同（乙账户的余额均为2600），结果如下：<br>+————+————–+———+<br>| account_no | account_name | balance |<br>+————+————–+———+<br>|          1 | 甲           |     200 |<br>|          2 | 乙           |    2600 |<br>+————+————–+———+<br>可以这样理解：MySQL 客户机 A 关闭 MySQL 自动提交后，MySQL客户机A执行的所有更新操作，都会在MySQL服务器内存中产生若干条new记录。如果在MySQL客户机A上执行了rollback命令，MySQL服务器内存中，与MySQL客户机A对应的new记录将被丢弃，回滚了（也叫撤销了）MySQL客户机A执行的更新操作。</p>
+<p>说明</p>
+<p>insert语句产生new记录，delete语句产生old记录，update语句产生new记录以及old记录，关于这方面的知识请参看视图与触发器章节的内容。</p>
+<h3 id="提交"><a href="#提交" class="headerlink" title="提交"></a>提交</h3><p>MySQL 自动提交一旦关闭，数据库开发人员需要“提交”更新语句，才能将更新结果提交到数据库文件中，成为数据库永久的组成部分。自动提交关闭后，MySQL 的提交方式分为显示地提交与隐式地提交。<br>显示地提交：MySQL自动提交关闭后，使用MySQL命令“commit;”可以显示地提交更新语句。</p>
+<p>隐式地提交：MySQL自动提交关闭后，使用下面的MySQL语句，可以隐式地提交更新语句。begin、sset autocommit=1、start transaction、rename table、truncate table等语句；数据定义（create、alter、drop）语句，句，例如create database、create table、create index、create function、create procedure、alter table、alter function、alter procedure、drop database、drop table、drop function、drop index、drop procedure等语句；权限管理和账户管理语句（例如grant、revoke、set password、create user、drop user、rename user等语句）；锁语句（lock tables、unlock tables）。举例来说，MySQL 客户机A 关闭MySQL自动提交后，执行了若干条更新语句。此时如果MySQL客户机A执行了“create table test_commit(a int primary key);”语句，该语句成功创建test_commit表后，还会提交之前的所有更新语句。</p>
+<p>为了有效地提交事务，推荐数据库开发人员尽可能地使用显示地提交方式，尽量不要使用（或者避免使用）隐式地提交方式。</p>
+<p>场景描述4：重做场景描述2中的所有操作，在MySQL客户机A上执行MySQL命令“commit;”，接着在MySQL客户机A、MySQL客户机B上执行select语句查询甲、乙账户的余额，两次执行结果相同（乙账户的余额增加了800元，变为3400），如图9-8所示。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/26/MySQL锁机制/" rel="next" title="MySQL锁机制">
+                <i class="fa fa-chevron-left"></i> MySQL锁机制
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/11/26/状态设计模式/" rel="prev" title="状态设计模式">
+                状态设计模式 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Che Bin</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                    <span class="site-state-item-count">1</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#事务机制"><span class="nav-number">1.</span> <span class="nav-text">事务机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#事务机制的必要性"><span class="nav-number">2.</span> <span class="nav-text">事务机制的必要性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#关闭MySQL自动提交"><span class="nav-number">3.</span> <span class="nav-text">关闭MySQL自动提交</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#回滚"><span class="nav-number">4.</span> <span class="nav-text">回滚</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#提交"><span class="nav-number">5.</span> <span class="nav-text">提交</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Che Bin</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v6.5.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
