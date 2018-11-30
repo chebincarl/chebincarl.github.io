@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="持久化数据游戏中持久化数据一般可分为两种:第一种是静态数据,例如Excel数据表中由策划人员编辑的数据,其特点是运行期间程序只需要读取,不需要修改;另一种是游戏存档数据,例如记录玩家在游戏过程中的进度,其特点是运行期间既需要读取,也需要修改,并且在版本升级的时候需要考虑老数据是否需要删除或者重置。 Excel策划人员通常都会在Excel中配置静态数据,例如道具表,它由主键、道具名称、描述、功能和参">
+<meta name="keywords" content="Unity">
+<meta property="og:type" content="article">
+<meta property="og:title" content="持久化数据">
+<meta property="og:url" content="http://yoursite.com/2018/11/30/持久化数据/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="持久化数据游戏中持久化数据一般可分为两种:第一种是静态数据,例如Excel数据表中由策划人员编辑的数据,其特点是运行期间程序只需要读取,不需要修改;另一种是游戏存档数据,例如记录玩家在游戏过程中的进度,其特点是运行期间既需要读取,也需要修改,并且在版本升级的时候需要考虑老数据是否需要删除或者重置。 Excel策划人员通常都会在Excel中配置静态数据,例如道具表,它由主键、道具名称、描述、功能和参">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/2018/11/30/持久化数据/1.png">
+<meta property="og:image" content="http://yoursite.com/2018/11/30/持久化数据/2.png">
+<meta property="og:image" content="http://yoursite.com/2018/11/30/持久化数据/3.png">
+<meta property="og:image" content="http://yoursite.com/2018/11/30/持久化数据/4.png">
+<meta property="og:updated_time" content="2018-11-30T15:13:48.179Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="持久化数据">
+<meta name="twitter:description" content="持久化数据游戏中持久化数据一般可分为两种:第一种是静态数据,例如Excel数据表中由策划人员编辑的数据,其特点是运行期间程序只需要读取,不需要修改;另一种是游戏存档数据,例如记录玩家在游戏过程中的进度,其特点是运行期间既需要读取,也需要修改,并且在版本升级的时候需要考虑老数据是否需要删除或者重置。 Excel策划人员通常都会在Excel中配置静态数据,例如道具表,它由主键、道具名称、描述、功能和参">
+<meta name="twitter:image" content="http://yoursite.com/2018/11/30/持久化数据/1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/11/30/持久化数据/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>持久化数据 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/30/持久化数据/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Che Bin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">持久化数据
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-11-30 21:35:37 / 修改时间：23:13:48" itemprop="dateCreated datePublished" datetime="2018-11-30T21:35:37+08:00">2018-11-30</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="持久化数据"><a href="#持久化数据" class="headerlink" title="持久化数据"></a>持久化数据</h1><p>游戏中持久化数据一般可分为两种:第一种是静态数据,例如Excel数据表中由策划人员编辑的数据,其特点是运行期间程序只需要读取,不需要修改;另一种是游戏存档数据,例如记录玩家在游戏过程中的进度,其特点是运行期间既需要读取,也需要修改,并且在版本升级的时候需要考虑老数据是否需要删除或者重置。</p>
+<h2 id="Excel"><a href="#Excel" class="headerlink" title="Excel"></a>Excel</h2><p>策划人员通常都会在Excel中配置静态数据,例如道具表,它由主键、道具名称、描述、功能和参数等一系列数据组成。前后端使用道具主键来进行数据的通信,最终前端将主键所包含的整个数据信息展示在游戏中。</p>
+<h3 id="EPPlus"><a href="#EPPlus" class="headerlink" title="EPPlus"></a>EPPlus</h3><p>在Windows下,提供了很多解析Excel的方法。但是作为一个跨平台引擎,可能需要在多个平台都能解析Excel,所以我们需要引用一个第三方DLL库EPPlus来处理跨平台解析Excel,首先,需要从它的网站上将其下载下来,接着将DLL文件拖入Unity即可使用了。也可以直接NuGet安装，新建一个项目，然后工具-&gt;NuGet包管理器-&gt;管理解决方案的NuGet程序包，最后将项目路径\packages\EPPlus.4.5.2.1\lib\net35下的EPPlus.dll放进Assets/Plugins下。</p>
+<h3 id="读取Excel"><a href="#读取Excel" class="headerlink" title="读取Excel"></a>读取Excel</h3><p>首先,我们需要创建Excel文件。如下图所示,可以分别在不同的工作表中添加数据,接着在代码中读取这两个工作表中的所有数据。</p>
+<img src="/2018/11/30/持久化数据/1.png">   <img src="/2018/11/30/持久化数据/2.png">
+<p>如ExcelDemo.cs代码所示，根据Excel文件的路径得到FileStream,并且创建ExcelPackage对象,接着就可以用它对Excel进行读取了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">using System.Collections;</span><br><span class="line">using System.Collections.Generic;</span><br><span class="line">using UnityEngine;</span><br><span class="line">using UnityEditor;</span><br><span class="line">using System.IO;</span><br><span class="line">using OfficeOpenXml;</span><br><span class="line"></span><br><span class="line">public class ExcelDemo</span><br><span class="line">&#123;</span><br><span class="line">    [MenuItem(&quot;Excel/Load Excel&quot;)]</span><br><span class="line">    static void LoadExcel()</span><br><span class="line">    &#123;</span><br><span class="line">        string path = Application.dataPath + &quot;/Excel/test.xlsx&quot;;</span><br><span class="line">        // 读取Excel文件</span><br><span class="line">        using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))</span><br><span class="line">        &#123;</span><br><span class="line">            using (ExcelPackage excel = new ExcelPackage(fs))</span><br><span class="line">            &#123;</span><br><span class="line">                ExcelWorksheets workSheets = excel.Workbook.Worksheets;</span><br><span class="line">                // 遍历所有工作表</span><br><span class="line">                for (int i = 1; i &lt;= workSheets.Count; i++)</span><br><span class="line">                &#123;</span><br><span class="line">                    ExcelWorksheet workSheet = workSheets[i];</span><br><span class="line">                    int colCount = workSheet.Dimension.End.Column;</span><br><span class="line">                    // 获取当前工作表的名字</span><br><span class="line">                    Debug.LogFormat(&quot;Sheet &#123;0&#125;&quot;, workSheet.Name);</span><br><span class="line">                    for (int row = 1, count = workSheet.Dimension.End.Row; row &lt;= count; row++)</span><br><span class="line">                    &#123;</span><br><span class="line">                        for (int col = 1; col &lt;= colCount; col++)</span><br><span class="line">                        &#123;</span><br><span class="line">                        	// 读取每个单元格中的数据</span><br><span class="line">                            var text = workSheet.Cells[row, col].Text ?? &quot;&quot;;</span><br><span class="line">                            Debug.LogFormat(&quot;下标:&#123;0&#125;,&#123;1&#125; 内容:&#123;2&#125;&quot;, row, col, text);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在导航菜单栏中选择Excel-&gt;Load Excel命令,数据已经全部读取出来了,如下图所示。</p>
+<img src="/2018/11/30/持久化数据/3.png">
+<h3 id="写入Excel"><a href="#写入Excel" class="headerlink" title="写入Excel"></a>写入Excel</h3><p>首先,需要使用FileInfo来创建一个Excel文件,接着使用ExcelPackage来向Excel文件中写入数据，如下所示。<br>        A               B<br>1  Company name1    Address1<br>如代码所示,在ExcelPackage对象中添加worksheet后,即可调用worksheet.Cells对每个单元格的行、列赋值,最终保存即可。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">using System.Collections;</span><br><span class="line">using System.Collections.Generic;</span><br><span class="line">using UnityEngine;</span><br><span class="line">using UnityEditor;</span><br><span class="line">using System.IO;</span><br><span class="line">using OfficeOpenXml;</span><br><span class="line">using System;</span><br><span class="line"></span><br><span class="line">public class WriteExcel </span><br><span class="line">&#123;</span><br><span class="line">    [MenuItem(&quot;Excel/Write Excel&quot;)]</span><br><span class="line">    static void LoadExcel()</span><br><span class="line">    &#123;</span><br><span class="line">        //创建Excel文件</span><br><span class="line">        string path = Application.dataPath + &quot;/Excel/&quot; + DateTime.Now.ToString(&quot;yyyy-MM-dd--hh-mm-ss&quot;) + &quot;.xlsx&quot;;</span><br><span class="line">        var file = new FileInfo(path);</span><br><span class="line"></span><br><span class="line">        using (ExcelPackage excel = new ExcelPackage(file))</span><br><span class="line">        &#123;</span><br><span class="line">            //向表格中写入数据</span><br><span class="line">            ExcelWorksheet worksheet = excel.Workbook.Worksheets.Add(&quot;sheet1&quot;);</span><br><span class="line">            worksheet.Cells[1, 1].Value = &quot;Company name1&quot;;</span><br><span class="line">            worksheet.Cells[1, 2].Value = &quot;Address1&quot;;</span><br><span class="line"></span><br><span class="line">            worksheet = excel.Workbook.Worksheets.Add(&quot;sheet2&quot;);</span><br><span class="line">            worksheet.Cells[1, 1].Value = &quot;Company name2&quot;;</span><br><span class="line">            worksheet.Cells[1, 2].Value = &quot;Address2&quot;;</span><br><span class="line">			// 保存</span><br><span class="line">            excel.Save();</span><br><span class="line">        &#125;</span><br><span class="line">        AssetDatabase.Refresh();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>保存完单元格后,为了在Unity中立刻看到效果,需要调用AssetDatabase.Refresh()方法进行刷新。</p>
+<h2 id="JSON"><a href="#JSON" class="headerlink" title="JSON"></a>JSON</h2><p>游戏运行时,我们是无法通过EPPlus读取Excel的,不过我们可以将它保存成自定义格式,例如CSV、JSON和ScriptableObject等,使用的时候将它读取进来就可以了。Unity支持JSON的序列化和反序列化。需要注意的是,参与序列化的类必须在上方声明[Serializable]属性,并且支持类对象的相互嵌套。我们可以使用JsonUtility.ToJson()以及JsonUtility.FromJson<t>()来进行序列化以及反序列化。比较遗憾的是,它并不支持字典类型的序列化。<br>相关代码如代码清单8-3所示。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">using System.Collections;</span><br><span class="line">using System.Collections.Generic;</span><br><span class="line">using UnityEngine;</span><br><span class="line">using UnityEditor;</span><br><span class="line">using System;</span><br><span class="line"></span><br><span class="line">public class JsonDemo &#123;</span><br><span class="line"></span><br><span class="line">    [MenuItem(&quot;Excel/Json&quot;)]</span><br><span class="line">    static void LoadJson()</span><br><span class="line">    &#123;</span><br><span class="line">        Data data = new Data();</span><br><span class="line">        data.name = &quot;Data&quot;;</span><br><span class="line">        data.subData.Add(new SubData() &#123; intValue = 1, boolValue = true, floatValue = 0.1f, stringValue = &quot;one&quot; &#125;);</span><br><span class="line">        data.subData.Add(new SubData() &#123; intValue = 2, boolValue = true, floatValue = 0.1f, stringValue = &quot;two&quot; &#125;);</span><br><span class="line"></span><br><span class="line">        string json = JsonUtility.ToJson(data);</span><br><span class="line">        Debug.Log(json);</span><br><span class="line">        data = JsonUtility.FromJson&lt;Data&gt;(json);</span><br><span class="line">        Debug.LogFormat(&quot;name = &#123;0&#125;&quot;, data.name);</span><br><span class="line">        foreach (var item in data.subData) &#123;</span><br><span class="line">            Debug.LogFormat(&quot;intValue = &#123;0&#125; boolValue=&#123;0&#125; floatValue=&#123;0&#125; stringValue=&#123;0&#125;&quot;, item.intValue, item.boolValue, item.floatValue, item.stringValue);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    [Serializable]</span><br><span class="line">    public class Data</span><br><span class="line">    &#123;</span><br><span class="line">        public string name;</span><br><span class="line">        public List&lt;SubData&gt; subData = new List&lt;SubData&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    [Serializable]</span><br><span class="line">    public class SubData</span><br><span class="line">    &#123;</span><br><span class="line">        public int intValue;</span><br><span class="line">        public bool boolValue;</span><br><span class="line">        public float floatValue;</span><br><span class="line">        public string stringValue;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></t></p>
+<p>如下图所示,将数据对象转成JSON字符串,再从JSON字符串还原数据对象,并且将数据输出。</p>
+<img src="/2018/11/30/持久化数据/4.png">
+<h3 id="JSON支持字典"><a href="#JSON支持字典" class="headerlink" title="JSON支持字典"></a>JSON支持字典</h3><p>Unity的JSON是不支持字典的,不过可以继承ISerializationCallbackReceiver接口,间接地实现字典序列化,相关代码如下所示。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">using System.Collections;</span><br><span class="line">using System.Collections.Generic;</span><br><span class="line">using UnityEngine;</span><br><span class="line">using UnityEditor;</span><br><span class="line"></span><br><span class="line">public class DictionaryJson</span><br><span class="line">&#123;</span><br><span class="line">    [MenuItem(&quot;Excel/Load Dictionary&quot;)]</span><br><span class="line">    static void SerializableDictionary()</span><br><span class="line">    &#123;</span><br><span class="line">        SerializableDictionary&lt;int, string&gt; serializableDictionary = new SerializableDictionary&lt;int, string&gt;();</span><br><span class="line">        serializableDictionary[100] = &quot;车斌&quot;;</span><br><span class="line">        serializableDictionary[200] = &quot;好好学习&quot;;</span><br><span class="line">        serializableDictionary[300] = &quot;天天向上&quot;;</span><br><span class="line"></span><br><span class="line">        string json = JsonUtility.ToJson(serializableDictionary);</span><br><span class="line">        Debug.Log(json);</span><br><span class="line">            </span><br><span class="line">        serializableDictionary = JsonUtility.FromJson&lt;SerializableDictionary&lt;int, string&gt;&gt;(json);</span><br><span class="line">        Debug.Log(serializableDictionary[100]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如下SerializableDictionary.cs代码所示,序列化两个List元素来保存键和值,接着将C#的泛型传入,这样键和值就更加灵活了,在OnBeforeSerialize()和OnAfterDeserialize()进行序列化和反序列化赋值操作。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">using System.Collections;</span><br><span class="line">using System.Collections.Generic;</span><br><span class="line">using UnityEngine;</span><br><span class="line"></span><br><span class="line">public class SerializableDictionary&lt;K, V&gt; : ISerializationCallbackReceiver</span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">    [SerializeField]</span><br><span class="line">    private List&lt;K&gt; m_keys;</span><br><span class="line">    [SerializeField]</span><br><span class="line">    private List&lt;V&gt; m_values;</span><br><span class="line"></span><br><span class="line">    private Dictionary&lt;K, V&gt; m_Dictionary = new Dictionary&lt;K, V&gt;();</span><br><span class="line"></span><br><span class="line">    public V this[K key]</span><br><span class="line">    &#123;</span><br><span class="line">        get &#123;</span><br><span class="line">            if (!m_Dictionary.ContainsKey(key))</span><br><span class="line">            &#123;</span><br><span class="line">                return default(V);</span><br><span class="line">            &#125;</span><br><span class="line">            return m_Dictionary[key];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        set &#123;</span><br><span class="line">            m_Dictionary[key] = value;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void OnAfterDeserialize()</span><br><span class="line">    &#123;</span><br><span class="line">        int length = m_keys.Count;</span><br><span class="line">        m_Dictionary = new Dictionary&lt;K, V&gt;();</span><br><span class="line">        for (int i = 0;i&lt;length;i++)</span><br><span class="line">        &#123;</span><br><span class="line">            m_Dictionary[m_keys[i]] = m_values[i];</span><br><span class="line">        &#125;</span><br><span class="line">        m_keys = null;</span><br><span class="line">        m_values = null;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public void OnBeforeSerialize()</span><br><span class="line">    &#123;</span><br><span class="line">        m_keys = new List&lt;K&gt;();</span><br><span class="line">        m_values = new List&lt;V&gt;();</span><br><span class="line"></span><br><span class="line">        foreach (var item in m_Dictionary)</span><br><span class="line">        &#123;</span><br><span class="line">            m_keys.Add(item.Key);</span><br><span class="line">            m_values.Add(item.Value);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="文件读取与写入"><a href="#文件读取与写入" class="headerlink" title="文件读取与写入"></a>文件读取与写入</h2><p>游戏中有很多数据需要在运行期间读取或者写入,最典型的就是游戏存档功能。Unity自己也提供了一套存档的API,但是功能比较单一,只支持保存int、float和string这三种类型。不过C#支持文件的读写,我们可以灵活地扩展它。</p>
+<h3 id="PlayerPrefs"><a href="#PlayerPrefs" class="headerlink" title="PlayerPrefs"></a>PlayerPrefs</h3><p>PlayerPrefs是Unity自带的存档方法,它的优点是使用起来非常方便。引擎已经封装好GetKey以及SetKey的方法,并且还做保存数据的优化。由于保存数据可能是个耗时操作,频繁地保存可能会带来卡顿,所以Unity默认会在应用程序将切入后台时统一保存文件,开发者也可以强制调用PlayerPrefs.Save()来保存。<br>然而它的缺点就是,编辑模式下查看存档非常不方便, Windows的存档在HKCU\Software[company name][product name]注册表中。如下代码所示,我们使用PlayerPrefs对数据进行保存和读取操作。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">using System.Collections;</span><br><span class="line">using System.Collections.Generic;</span><br><span class="line">using UnityEngine;</span><br><span class="line"></span><br><span class="line">public class PlayerPrefsDemo : MonoBehaviour </span><br><span class="line">&#123;</span><br><span class="line">	void Start () </span><br><span class="line">	&#123;</span><br><span class="line">        PlayerPrefs.SetInt(&quot;MyInt&quot;, 100);</span><br><span class="line">        PlayerPrefs.SetFloat(&quot;MyFloat&quot;, 200f);</span><br><span class="line">        PlayerPrefs.SetString(&quot;MyString&quot;, &quot;车斌&quot;);</span><br><span class="line"></span><br><span class="line">        Debug.Log(PlayerPrefs.GetInt(&quot;MyInt&quot;, 0));</span><br><span class="line">        Debug.Log(PlayerPrefs.GetFloat(&quot;MyFloat&quot;, 0f));</span><br><span class="line">        Debug.Log(PlayerPrefs.GetString(&quot;MyString&quot;, &quot;没有返回默认值&quot;));</span><br><span class="line">		</span><br><span class="line">		// 判断是否有某个键</span><br><span class="line">        if (PlayerPrefs.HasKey(&quot;MyInt&quot;))</span><br><span class="line">        &#123;</span><br><span class="line">            Debug.Log(&quot;has MyInt&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">		// 删除某个键</span><br><span class="line">        PlayerPrefs.DeleteKey(&quot;MyInt&quot;);</span><br><span class="line">		// 删除所有键</span><br><span class="line">        PlayerPrefs.DeleteAll();</span><br><span class="line">		// 强制保存数据</span><br><span class="line">        PlayerPrefs.Save();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Unity/" rel="tag"># Unity</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/30/MySQL备份/" rel="next" title="MySQL备份">
+                <i class="fa fa-chevron-left"></i> MySQL备份
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Che Bin</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">2</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#持久化数据"><span class="nav-number">1.</span> <span class="nav-text">持久化数据</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Excel"><span class="nav-number">1.1.</span> <span class="nav-text">Excel</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#EPPlus"><span class="nav-number">1.1.1.</span> <span class="nav-text">EPPlus</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#读取Excel"><span class="nav-number">1.1.2.</span> <span class="nav-text">读取Excel</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#写入Excel"><span class="nav-number">1.1.3.</span> <span class="nav-text">写入Excel</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JSON"><span class="nav-number">1.2.</span> <span class="nav-text">JSON</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#JSON支持字典"><span class="nav-number">1.2.1.</span> <span class="nav-text">JSON支持字典</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#文件读取与写入"><span class="nav-number">1.3.</span> <span class="nav-text">文件读取与写入</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#PlayerPrefs"><span class="nav-number">1.3.1.</span> <span class="nav-text">PlayerPrefs</span></a></li></ol></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Che Bin</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v6.5.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
