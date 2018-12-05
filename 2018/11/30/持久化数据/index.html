@@ -122,7 +122,7 @@
 <meta property="og:image" content="http://yoursite.com/2018/11/30/持久化数据/5.png">
 <meta property="og:image" content="http://yoursite.com/2018/11/30/持久化数据/4.png">
 <meta property="og:image" content="http://yoursite.com/2018/11/30/持久化数据/6.png">
-<meta property="og:updated_time" content="2018-12-04T15:39:03.416Z">
+<meta property="og:updated_time" content="2018-12-05T14:16:44.578Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="持久化数据">
 <meta name="twitter:description" content="hljs.initHighlightingOnLoad();   持久化数据游戏中持久化数据一般可分为两种:第一种是静态数据,例如Excel数据表中由策划人员编辑的数据,其特点是运行期间程序只需要读取,不需要修改;另一种是游戏存档数据,例如记录玩家在游戏过程中的进度,其特点是运行期间既需要读取,也需要修改,并且在版本升级的时候需要考虑老数据是否需要删除或者重置。">
@@ -367,7 +367,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2018-12-04 23:39:03" itemprop="dateModified" datetime="2018-12-04T23:39:03+08:00">2018-12-04</time>
+                <time title="修改时间：2018-12-05 22:16:44" itemprop="dateModified" datetime="2018-12-05T22:16:44+08:00">2018-12-05</time>
               
             
           </span>
@@ -687,7 +687,7 @@ public class Script_08_06
     }
 }
 </code></pre>
-<h2 id="PlayerPrefs保存复杂结构"><a href="#PlayerPrefs保存复杂结构" class="headerlink" title="PlayerPrefs保存复杂结构"></a>PlayerPrefs保存复杂结构</h2><p>PlayerPrefs可以保存字符串,结合JSON的序列化和反序列功能,它就可以保存各种复杂的数据结构了。另外,保存存档取决于硬件当时的条件,完全有保存不上的情况,所以可以通过try…catch来捕获保存时的错误异常。<br>如下代码所示,使用Jsonttility.ToJson()方法将对象保存成JSON字符串,读取的时候再使用JsonUtility.FromJson将JSON字符串还原为类对象。</p>
+<h2 id="PlayerPrefs保存复杂结构"><a href="#PlayerPrefs保存复杂结构" class="headerlink" title="PlayerPrefs保存复杂结构"></a>PlayerPrefs保存复杂结构</h2><p>PlayerPrefs可以保存字符串,结合JSON的序列化和反序列功能,它就可以保存各种复杂的数据结构了。另外,保存存档取决于硬件当时的条件,完全有保存不上的情况,所以可以通过try…catch来捕获保存时的错误异常。<br>如下代码所示,使用JsonUtility.ToJson()方法将对象保存成JSON字符串,读取的时候再使用JsonUtility.FromJson将JSON字符串还原为类对象。</p>
 <pre><code class="cs">using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -1196,6 +1196,77 @@ id=2 username=车斌Carl password=123456
 <p>Unity就没有使用JSON或者XML来描述结构,采取的是YAML格式。如下所示,它的预览性以及编辑性都非常好,数据与变量通过冒号来连接。例如,游戏中一些服务器列表的配置,或者调试性的开关,不太方便配置在表格中的数据,或者修改比较频繁的数据都可以使用YAML来配置,随时用随时改。</p>
 <h2 id="YamlDotNet"><a href="#YamlDotNet" class="headerlink" title="YamlDotNet"></a>YamlDotNet</h2><p>YAML提供了.NET的类库,即YamlDotNet。Unity中直接提供了插件,它可以在Asset Store中免费下载到。YamlDotNet支持PC和移动端,下载后导入工程就可以使用了。</p>
 <h2 id="序列化和反序列化"><a href="#序列化和反序列化" class="headerlink" title="序列化和反序列化"></a>序列化和反序列化</h2><p>YamlDotNet提供了运行时序列化和反序列化的接口。这里需要注意的是,对于参与序列化的类中的变量,其属性必须设置成get或者set,不然无法序列化。在程序运行中,可以序列化和反序列化数据。使用Serialize()和Deserialize()方法就可以进行序列化和反序列化操作。</p>
+<pre><code class="cs">using System.Collections.Generic;
+using UnityEngine;
+using YamlDotNet.Serialization;
+
+public class Script_08_16 : MonoBehaviour
+{
+    private void Start()
+    {
+        //创建对象  
+        Data data = new Data();
+        data.name = &quot;车斌Carl&quot;;
+        data.password = &quot;123456&quot;;
+        data.list = new List&lt;string&gt;() { &quot;a&quot;, &quot;b&quot;, &quot;c&quot; };
+
+        //序列化YAML字符串  
+        Serializer serializer = new Serializer();
+        string yaml = serializer.Serialize(data);
+        Debug.LogFormat(&quot;serializer: {0}&quot;, yaml);
+
+        //反序列化成类对象  
+        Deserializer deserializer = new Deserializer();
+        Data data1 = deserializer.Deserialize&lt;Data&gt;(yaml);
+        Debug.LogFormat(&quot;deserializer : name={0} password={1}&quot;, data1.name, data1.password);
+    }
+}
+
+class Data
+{
+    public string name { get; set; }
+    public string password { get; set; }
+    public List&lt;string&gt; list { get; set; }
+}
+</code></pre>
+<h2 id="读取配置"><a href="#读取配置" class="headerlink" title="读取配置"></a>读取配置</h2><p>在游戏中,一些服务器列表或者一些临时调试的配置信息,可能需要频繁地添加、删除和修改等。由于这些测试数据都是临时性的,就不太适合配置在Excel表格中。当包打出来以后,直接修改配置文件就可以立即生效到游戏中。在YAML中,可以使用”#”符号来表示注释部分。<br>yaml.txt</p>
+<pre><code class="Yaml">#服务器列表
+ServerList : 192.168.1.1
+#服务器端口
+Port : 8080
+#是否启动调试
+Debug : true
+</code></pre>
+<pre><code class="cs">using System.Collections.Generic;
+using System.IO;
+using UnityEngine;
+using YamlDotNet.RepresentationModel;
+
+public class Script_08_17 : MonoBehaviour
+{
+    private IDictionary&lt;YamlNode, YamlNode&gt; m_MappingData;
+
+    private void Start()
+    {
+        //读取YAML字符串  
+        string document = File.ReadAllText(Path.Combine(Application.streamingAssetsPath, &quot;yaml.txt&quot;));
+        var input = new StringReader(document);
+        var yaml = new YamlStream();
+        yaml.Load(input);
+        //读取root 节点  
+        var mapping = (YamlMappingNode)yaml.Documents[0].RootNode;
+        m_MappingData = mapping.Children;
+    }
+
+    private void OnGUI()
+    {
+        GUILayout.Label(string.Format(&quot;&lt;size=50&gt;服务器列表: {0}&lt;/size&gt;&quot;, m_MappingData[&quot;ServerList&quot;]));
+        GUILayout.Label(string.Format(&quot;&lt;size=50&gt;服务器端口: {0}&lt;/size&gt;&quot;, m_MappingData[&quot;Port&quot;]));
+        GUILayout.Label(string.Format(&quot;&lt;size=50&gt;是否启动调试: {0}&lt;/size&gt;&quot;, m_MappingData[&quot;Debug&quot;]));
+    }
+}
+</code></pre>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>本章中,我们学习了游戏存档。存档可分为静态存档和动态存档。静态存档时,在游戏运行过程中,对它只能读取不能写入。这好比Excel表格数据,最终表格数据可在编辑模式下利用epplus程序可类型。动态存档应用得就更多了,它在玩游戏的过程中记录玩家游戏的进度,或者一些设置选项, Unity提供了Playererefs类来处理存档的读与写,我们也可以利用C#的File类来自行保存存档。</p>
 
       
     </div>
@@ -1368,7 +1439,7 @@ id=2 username=车斌Carl password=123456
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#持久化数据"><span class="nav-number">1.</span> <span class="nav-text">持久化数据</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Excel"><span class="nav-number">2.</span> <span class="nav-text">Excel</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#EPPlus"><span class="nav-number">2.1.</span> <span class="nav-text">EPPlus</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#读取Excel"><span class="nav-number">2.2.</span> <span class="nav-text">读取Excel</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#写入Excel"><span class="nav-number">2.3.</span> <span class="nav-text">写入Excel</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#JSON"><span class="nav-number">3.</span> <span class="nav-text">JSON</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#JSON支持字典"><span class="nav-number">3.1.</span> <span class="nav-text">JSON支持字典</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#文件读取与写入"><span class="nav-number">4.</span> <span class="nav-text">文件读取与写入</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#PlayerPrefs"><span class="nav-number">4.1.</span> <span class="nav-text">PlayerPrefs</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#EditorPrefs"><span class="nav-number">4.2.</span> <span class="nav-text">EditorPrefs</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PlayerPrefs保存复杂结构"><span class="nav-number">4.3.</span> <span class="nav-text">PlayerPrefs保存复杂结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TextAsset"><span class="nav-number">4.4.</span> <span class="nav-text">TextAsset</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#读写文本"><span class="nav-number">4.5.</span> <span class="nav-text">读写文本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#运行期读写文本"><span class="nav-number">4.6.</span> <span class="nav-text">运行期读写文本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PersistentDataPath目录"><span class="nav-number">4.7.</span> <span class="nav-text">PersistentDataPath目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#游戏存档"><span class="nav-number">4.8.</span> <span class="nav-text">游戏存档</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#XML"><span class="nav-number">5.</span> <span class="nav-text">XML</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建XML"><span class="nav-number">5.1.</span> <span class="nav-text">创建XML</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#读取与修改"><span class="nav-number">5.2.</span> <span class="nav-text">读取与修改</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#XML文件"><span class="nav-number">5.3.</span> <span class="nav-text">XML文件</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#YAML"><span class="nav-number">6.</span> <span class="nav-text">YAML</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#YamlDotNet"><span class="nav-number">6.1.</span> <span class="nav-text">YamlDotNet</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#序列化和反序列化"><span class="nav-number">6.2.</span> <span class="nav-text">序列化和反序列化</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#持久化数据"><span class="nav-number">1.</span> <span class="nav-text">持久化数据</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Excel"><span class="nav-number">2.</span> <span class="nav-text">Excel</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#EPPlus"><span class="nav-number">2.1.</span> <span class="nav-text">EPPlus</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#读取Excel"><span class="nav-number">2.2.</span> <span class="nav-text">读取Excel</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#写入Excel"><span class="nav-number">2.3.</span> <span class="nav-text">写入Excel</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#JSON"><span class="nav-number">3.</span> <span class="nav-text">JSON</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#JSON支持字典"><span class="nav-number">3.1.</span> <span class="nav-text">JSON支持字典</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#文件读取与写入"><span class="nav-number">4.</span> <span class="nav-text">文件读取与写入</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#PlayerPrefs"><span class="nav-number">4.1.</span> <span class="nav-text">PlayerPrefs</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#EditorPrefs"><span class="nav-number">4.2.</span> <span class="nav-text">EditorPrefs</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PlayerPrefs保存复杂结构"><span class="nav-number">4.3.</span> <span class="nav-text">PlayerPrefs保存复杂结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TextAsset"><span class="nav-number">4.4.</span> <span class="nav-text">TextAsset</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#读写文本"><span class="nav-number">4.5.</span> <span class="nav-text">读写文本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#运行期读写文本"><span class="nav-number">4.6.</span> <span class="nav-text">运行期读写文本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PersistentDataPath目录"><span class="nav-number">4.7.</span> <span class="nav-text">PersistentDataPath目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#游戏存档"><span class="nav-number">4.8.</span> <span class="nav-text">游戏存档</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#XML"><span class="nav-number">5.</span> <span class="nav-text">XML</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#创建XML"><span class="nav-number">5.1.</span> <span class="nav-text">创建XML</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#读取与修改"><span class="nav-number">5.2.</span> <span class="nav-text">读取与修改</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#XML文件"><span class="nav-number">5.3.</span> <span class="nav-text">XML文件</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#YAML"><span class="nav-number">6.</span> <span class="nav-text">YAML</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#YamlDotNet"><span class="nav-number">6.1.</span> <span class="nav-text">YamlDotNet</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#序列化和反序列化"><span class="nav-number">6.2.</span> <span class="nav-text">序列化和反序列化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#读取配置"><span class="nav-number">6.3.</span> <span class="nav-text">读取配置</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#小结"><span class="nav-number">7.</span> <span class="nav-text">小结</span></a></li></ol></div>
             
 
           </div>
