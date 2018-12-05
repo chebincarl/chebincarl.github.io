@@ -297,6 +297,172 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/05/资源加载与优化/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Che Bin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                
+                <a href="/2018/12/05/资源加载与优化/" class="post-title-link" itemprop="http://yoursite.com/index.html">资源加载与优化</a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-12-05 22:41:01 / 修改时间：22:50:02" itemprop="dateCreated datePublished" datetime="2018-12-05T22:41:01+08:00">2018-12-05</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <p>在游戏开发中,资源管理是非常重要的,管理不好,就容易导致内存溢出,引起闪退或者整体游戏卡顿的现象。Unity提供了强大的Profiler工具,它专门查看每一帧内存的占用以及加载的耗时。此外，它还提供了自定义接口,开发者也可以自行定义一个查看区间。另外,Unity还提供了Frame Debugger,它可以查看每一帧渲染的详细过程。如果DrawCall很多的话,可以参照它来想办法合并。另外,Unity也提供了丰富的资源加载接口,我们可以在编辑模式下加载资源,在运行模式下加载本地资源和下载资源。总之,管理好资源的加载以及优化,才能让游戏更加流畅。</p>
+<h1 id="编辑模式"><a href="#编辑模式" class="headerlink" title="编辑模式"></a>编辑模式</h1><p>编辑模式并非打包后的运行模式,而仅仅是在编辑器下运行。它可以访问加载到硬盘上的任意资源,这对拓展引擎内置的编辑器是非常好的。引擎可以读取任意资源来丰富编辑器。但是如果游戏发布后,就会有很多限制,比如编辑模式下可使用的大量代码在运行时无法使用。</p>
+<h2 id="加载资源"><a href="#加载资源" class="headerlink" title="加载资源"></a>加载资源</h2><p>编辑模式下的资源可分为两类:一类是引擎可识别的资源,例如Prefab、声音、视频、动画和UI等;另一类是引擎无法识别的资源,例如外部导入的资源,这类资源需要通过第三方工具将它的信息解析出来,最终组织成引擎内可识别资源才可以使用。  </p>
+<p>在编辑模式下,Unity提供了一个标志性的类AssetDatabase,它专门负责读取工程内的资源。需要保证所有资源必须放在项目的Assets目录下,不然AssetDatabase是无法读取的,只能使用File类或者其他第三辅助类来读取。</p>
+<p>接着,在编辑模式下实例化一个Prefab到Scene视图中。如图11-2所示,Prefab被实例化到了Main Camera节点下,但是为什么它不是“蓝色”的呢?并且坐标为什么没有回归原点呢?因为Gameobject.Instantiate()只能创建新对象,这样将丢失Prefab的引用。坐标没有回归原点是因为transform. SetParent会继承世界坐标。通过这段代码可以看出,只要提供一个Assets内的相对路径,使用AssetDatabase.LoadAssetAtPath()方法即可读取任意对象。</p>
+<pre><code class="cs">using UnityEngine;  
+using UnityEditor;
+
+public class Script_11_01
+{
+    [MenuItem(&quot;Assets/My Tools/Load&quot;, false, 2)]  
+    static void MyLoad()
+    {
+        if (Selection.activeTransform) {  
+            //读取Prefab  
+            GameObject prefab = AssetDatabase.LoadAssetAtPath&lt;GameObject&gt;(&quot;Assets/Cube.prefab&quot;);  
+            //实例化到Scene中  
+            GameObject go = GameObject.Instantiate&lt;GameObject&gt;(prefab);  
+            //设置它的父节点  
+            go.transform.SetParent(Selection.activeTransform);
+        }
+    }
+}
+</code></pre>
+<h2 id="实例化Prefab"><a href="#实例化Prefab" class="headerlink" title="实例化Prefab"></a>实例化Prefab</h2><p>在编辑模式下,实例化Prefab需要使用Prefabutility.InstantiatePrefab()方法。如下图所示,实例化后的Prefab已经变成了“蓝色”,并且Transform的坐标已经回归原点。此外,除了Prefab以外, FBX也属于一种特殊的引用关系的资源,它也可以使用这种方法,这样会保持它的一些引用关系。</p>
+
+          
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/30/MySQL系统函数/">
 
     <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
@@ -1685,166 +1851,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/11/25/Hash算法和数据库实现/">
-
-    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Che Bin">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="车斌的博客">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2018/11/25/Hash算法和数据库实现/" class="post-title-link" itemprop="http://yoursite.com/index.html">Hash算法和数据库实现</a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2018-11-25 17:39:24" itemprop="dateCreated datePublished" datetime="2018-11-25T17:39:24+08:00">2018-11-25</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新于</span>
-                
-                <time title="修改时间：2018-11-28 23:38:04" itemprop="dateModified" datetime="2018-11-28T23:38:04+08:00">2018-11-28</time>
-              
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <h2 id="Hash算法与数据库实现"><a href="#Hash算法与数据库实现" class="headerlink" title="Hash算法与数据库实现"></a>Hash算法与数据库实现</h2><p>Hash表( HashTable )又称散列表,通过把关键字Key映射到数组中的一个位置来访问记录,以加快查找的速度。这个映射函数称为Hash函数,存放记录的数组称为Hash表。<br>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/2018/11/25/Hash算法和数据库实现/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-         
-          <!--/noindex-->
-        
-      
-    </p></div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-       
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -1892,7 +1898,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">12</span>
+                    <span class="site-state-item-count">13</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
