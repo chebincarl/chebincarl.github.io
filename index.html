@@ -342,12 +342,24 @@
                 
               
 
-              <time title="创建时间：2018-12-05 22:41:01 / 修改时间：22:50:02" itemprop="dateCreated datePublished" datetime="2018-12-05T22:41:01+08:00">2018-12-05</time>
+              <time title="创建时间：2018-12-05 22:41:01" itemprop="dateCreated datePublished" datetime="2018-12-05T22:41:01+08:00">2018-12-05</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2018-12-06 22:42:16" itemprop="dateModified" datetime="2018-12-06T22:42:16+08:00">2018-12-06</time>
               
             
           </span>
@@ -407,6 +419,176 @@ public class Script_11_01
 }
 </code></pre>
 <h2 id="实例化Prefab"><a href="#实例化Prefab" class="headerlink" title="实例化Prefab"></a>实例化Prefab</h2><p>在编辑模式下,实例化Prefab需要使用Prefabutility.InstantiatePrefab()方法。如下图所示,实例化后的Prefab已经变成了“蓝色”,并且Transform的坐标已经回归原点。此外,除了Prefab以外, FBX也属于一种特殊的引用关系的资源,它也可以使用这种方法,这样会保持它的一些引用关系。</p>
+<p>将Prefab实例化到Hierarchy视图中。其中, Prefabutility.  InstantiatePrefab ()方法可以保持原有的引用关系,并非克隆一份新的。另外,给  transform. Set Parent ()的第二个参数传入false,表示它不被父坐标影响,所以就会回归  点。</p>
+<pre><code class="cs">using UnityEngine;  
+using UnityEditor;
+
+public class script_11_02
+{
+    MenuItem (&quot;Assets/My Tools/LoadPrefab&quot; , false,2) ]  
+    static void LoadPrefab()  (
+    if (Selection.activeTransform) 
+    {  
+    //读取Prefab  
+    ameobject prefab = AssetDatabase.LoadAssetAtPath&lt;GameObj ect  (&quot;Assets/Cube.prefab&quot;);  
+    //实例化到Scene 中  
+    //GameObject go = Gameobject.Instantiate&lt;Gameobject&gt; (prefab)  
+    GameObject go = Prefabutility.InstantiatePrefab (prefab) as  
+    //设置它的父节点  
+    //go.transform. SetParent (Selection.activeTransform);  
+    go.transform. SetParent (Selection.activeTransform, false);
+}
+</code></pre>
+<h2 id="创建Prefab"><a href="#创建Prefab" class="headerlink" title="创建Prefab"></a>创建Prefab</h2><p>使用PrefabUtility. CreatePrefab ()方法可以创建Prefab,此时需要提供保存的目录以及当前的游戏对象。其中,ReplacePrefaboptions.ConnectToPrefab表示创建Prefab的同时自动关联到创建它的这个游戏对象。  如代码清单11-3所示,在Hierarchy视图中选择任意游戏对象,并且选择Create Prefab菜单  项,在资源目录下创建Prefab,并将它关联到创建的这个游戏对象本身。</p>
+<pre><code class="cs">using UnityEngine;  
+using UnityEditor;
+
+public class Script_11_03
+{
+    [MenuItem (&quot;Assets/My Tools/Create Prefab&quot;, false, 3)]  
+    static void createPrefab()
+    {
+        if (Selection.activeTransform) 
+        {  
+            string path = &quot;Assets/Prefab.prefab&quot;;  
+            //如果文件已经存在,删除它  
+            if (AssetDatabase. LoadAssetAt Path&lt;GameObject&gt; (path) ) 
+            {  
+                AssetDatabase.DeleteAsset (path);
+                //创建新的Prefak  
+                Prefabutility.CreatePrefab (&quot;Assets/Prefab.prefab&quot;, Selection.  activeGameobject.  ReplacePrefabOptions. ConnectToPrefab);
+                //刷新Project视图目录  
+                AssetDatabase.Refresh();
+            }
+        }
+    }
+}
+</code></pre>
+<h2 id="更新Prefab"><a href="#更新Prefab" class="headerlink" title="更新Prefab"></a>更新Prefab</h2><p>使用prefabUtility. ReplacePrefab(1)方法可以更新Prefab。不过在更新前,需要判断Hierarchy选择的游戏对象是否为Prefab,如果不是Prefab,也可以考虑创建新的。相关代码如代  码清单11-4所示。</p>
+<pre><code class="cs">using UnityEngine;  
+using UnityEditor;
+
+public class Script_11_04
+{
+    [MenuItem (&quot;Assets/My Tools/Applay Prefab&quot;, false, 3)]  
+    static void ApplayPrefab()
+    {
+        if(Selection.activeTransform)
+        {
+            //确保Hierarchy视图中当前选择的是Prefab  
+            Object prefab = PrefabUtility.GetPrefabParent (Selection.activeGameObject);  
+            if (prefab) 
+            {  
+                //替换它  
+                Prefabutility.ReplacePrefab(Selection.activeGameObject, prefab,  ReplacePrefabOptions. ConnectToPrefab);
+                //刷新Project视图目录  
+                AssetDatabase. Refresh();
+            }
+        }
+    }
+}
+
+</code></pre>
+<p>在上述代码中，我们通过Prefabutinity.GetErefabParent()判断当前选择的是否为Prefab:如果是Prefab,则更新它;如果不是Prefab,则创建一个新的</p>
+<h2 id="卸载资源"><a href="#卸载资源" class="headerlink" title="卸载资源"></a>卸载资源</h2><p>在编辑模式下,只能使用Gameobject.DestroyImmediate()方法来卸载游戏对象。如果需要卸载游戏对象引用的资源,则第二个参数填true,其默认值是false.<br>如代码清单11-5所示,选择Hierarchy视图中的任意游戏对象,点击Delete菜单项即可删除它。</p>
+<pre><code class="cs">using UnityEngine;  
+using UnityEditor;
+
+public class Script_11_05
+{
+    [MenuItem (&quot;Assets/My Tools/Delete&quot; , false, 3)]  
+    static void Delete()
+    {
+        if (Selection. activeTransform){
+            //第二个参数表示是否卸载游戏对象引用的资源  
+            Gameobject. DestroyImmediate (Selection. activeGameObject, true);
+        }
+    }
+}
+
+</code></pre>
+<h2 id="游戏对象与资源的关系"><a href="#游戏对象与资源的关系" class="headerlink" title="游戏对象与资源的关系"></a>游戏对象与资源的关系</h2><p>游戏对象与资源是一种引用关系。例如一个模型是由贴图和Mesh组成,将它拖人场景中时,生成的游戏对象就会引用这两种资源。当程序调用Gamebject. Destroy )或者Cameobject.  DestroyImmediate()方法时,只会卸载掉它的对象,它身上引用的贴图和Mesh还在内存中。</p>
+<p>Unity这么做是有原因的:很多游戏对象的加载与卸载是很频繁的,如果每次卸载都将引用的资源清理掉,无疑会造成1O的阻塞。但是如果长时间不卸载这些资源,那么内存必然涨上去  所以Unity又提供了一个方法来自动卸载无用资源。其中,无用资源表示没有被别的对象或者代引用的资源。如代码清单11-6所示,调用Baitorutiity.UnloadnusedAssetstmmediate方法即可卸载编辑器下无用的资源了。在运行时也存在类似的资源,后面会讲到。</p>
+<pre><code class="cs">using UnityEngine;  
+using UnityEditor;
+
+public class script_11_06
+{
+    MenuItem (&quot;Assets/My Tools/UnloadUnusedAssetsImmediate&quot;, false, 3)]  
+    static void UnloadUnusedAssetsImmediate()
+    {
+        EditorUtility.UnloadUnusedAssetsImmediate();
+    }
+}
+</code></pre>
+<h1 id="版本管理"><a href="#版本管理" class="headerlink" title="版本管理"></a>版本管理</h1><p>多人同时开发游戏时,需要对项目的版本进行管理,通常会将整个工程上传SVN或者Gi,然而资源在导入Unity的时候,会自动生成很多中间资源,这些资源是不需要上传的。如图114  所示,只需要将Assets, ProjectSettings文件夹下的所有文件以及.meta文件上传即可。</p>
+<h2 id="meta文件"><a href="#meta文件" class="headerlink" title="meta文件"></a>meta文件</h2><p>meta文件是Unity自动生成的。每个游戏资源都会有一个对应的.meta文件,它会标记在引擎中的一些设置信息,我们可以在资源视图面板中重新设置这些资源的参数。此时me  件中将会保留这些参数。将资源拖入工程时,就会利用这些参数重新压缩资源。换句话说.在用户无感知的情况下被Unity优化了。如图11-5所示,首先需要在Editor Settings面设置显示.meta文件。</p>
+<p>接着,随便打开一张贴图对应的.meta文件,如图11-6所示。每个meta文件都会记录guia这个重要信息。guid就是用来关联资源与游戏对象的引用的。比如场景中有个模型,引用了这  贴图,那么模型对应Prefab的.meta文件中就会引用这个guid;如果模型不是Prefab,只是保持在场景中,那么场景的.meta文件就会引用这个guid。所以说, Unity中所有资源的引用关系  都是这样来计算的。  </p>
+<p>再回到这个贴图资源。引擎内可以设置每张贴图的压缩格式、大小和mipmap等,这些信息都会保存在.meta文件中,Unity会根据这些参数重新压缩这个贴图。最终呈现给玩家的贴图,已  经不是当初我们放入Unity中的了。所以说,开发者只需要设置一些参数, Unity就实现了无感  知的优化。  </p>
+<p>另外, .meta文件也一定要上传到SVN中,不然别人在更新到这个资源的时候,无法用它本  地的Unity对资源做正确的设置了。</p>
+<h2 id="多工程"><a href="#多工程" class="headerlink" title="多工程"></a>多工程</h2><p>游戏项目会多角色进行参与,如程序员、策划人员和美术人员等,如果不希望一部分代码i美术人员和策划人员看到,那么项目就需要分成两个工程了。分工程很容易,但是合并两个T就比较麻烦了。如图11-7所示,在Project视图中选择需要导出的资源,单击鼠标右键,从弹!的快捷菜单中选择Export Package命令,可导出一个包。打开新的工程,把刚刚导出的包导人  即可实现两个工程的同步。</p>
+<h2 id="同步文件"><a href="#同步文件" class="headerlink" title="同步文件"></a>同步文件</h2><p>首先,需要保证美术资源都放在一个最顶层的文件夹下。资源可以按子文件夹归类,但用关系只能在最顶层的文件夹中。同步文件其实就是同步目录,此时使用Expot Package命不太方便了,可以使用代码直接复制文件夹。这里可能有人有疑问:直接复制会赖的改变?其实是不会的。因为美术资源都放在同一个顶层文件  这样依赖  部文件夹下,即使复制出来以后,还会保留原有的依赖。如代码清单11-7所示,我们来实现  件夹的复制同步功能。</p>
+<pre><code class="cs">using UnityEngine;  
+using UnityEditor;  
+using System. IO;  
+
+public class Script_11_07
+{
+    11/&lt;summary&gt;  
+    11/复制目录  
+    11/&lt;/summary&gt;  
+    1/&lt;param name=&quot;raw&quot;&gt;Raw.&lt;/param&gt;  11/&lt;param name=&quot;copy&quot;&gt;Copy.&lt;/param&gt;  
+    static public void CopyFolder(string strSource,string strDestination)
+    {
+        clearFolder(strDestination);  
+        foreach (string from in Directory.GetFiles (strSource, &quot;*.*&quot;  Searchoption.AllDirectories)) 
+        {  
+            if (! from. Contains (&quot;.svn&quot;)) 
+            {  
+                CopyFile(from, from.Replace(strSource, strDestination));
+            }
+        }
+    }
+
+    1//&lt;summarys  
+    1//复制文件  
+    1//&lt;/summary&gt;  
+    11/&lt;param name=&quot;raw&quot;&gt;Raw.&lt;/param&gt;  
+    ///&lt;param name=&quot;coрy &quot;&gt;Coрy.&lt;/param&gt;  
+    static private void CopyFile(string raw, string copy)  
+    {
+        string extenision = Path.GetExtension(raw);  
+        if (extenision != &quot;.Ds_store&quot;) 
+        {  
+            if (File.Exists (copy)) 
+            {  
+                File. Delete (copy);
+            }
+।            if (File. Exists(raw)) 
+            {  
+                string path = Path.GetDirectoryName (copy);  
+                if (!Directory.Exists(path) ) 
+                {  
+                    Directory.createDirectory(path);
+।                      File. copy (raw, copy);
+                }
+            }
+        }
+    }
+
+    //&lt;summary&gt;  
+    ///清空文件央下的所有资源  
+    1//&lt;/summary&gt;  
+    1//&lt;param name=&quot;path&quot;&gt;Path.&lt;/param:  
+    static private void clearFolder(string path)
+    {
+        if (Directory. Exists (path)) [
+          Directory. Delete (path, true);  
+          AssetDatabase. Refresh() ;
+        }
+    }
+}
+</code></pre>
 
           
         
