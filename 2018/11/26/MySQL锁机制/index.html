@@ -123,7 +123,7 @@
 <meta property="og:image" content="http://yoursite.com/2018/11/26/MySQL锁机制/2.png">
 <meta property="og:image" content="http://yoursite.com/2018/11/26/MySQL锁机制/3.png">
 <meta property="og:image" content="http://yoursite.com/2018/11/26/MySQL锁机制/4.png">
-<meta property="og:updated_time" content="2018-12-09T12:35:33.214Z">
+<meta property="og:updated_time" content="2018-12-09T12:36:32.164Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="MySQL锁机制">
 <meta name="twitter:description" content="hljs.initHighlightingOnLoad();   锁机制在同一时刻,如果数据库仅仅为单个MySQL客户机提供服务,仅通过事务机制即可实现数据库的数据一致性。但更多时候,在同一时刻,多个并发用户往往需要同时访问(检索或者更新)数据库中的同一个数据,此时仅仅通过事务机制无法保证多用户同时访问同一数据的数据一致性,因此有必要引入另一种机制实现数据的多用户并发访问。锁机制是M">
@@ -368,7 +368,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2018-12-09 20:35:33" itemprop="dateModified" datetime="2018-12-09T20:35:33+08:00">2018-12-09</time>
+                <time title="修改时间：2018-12-09 20:36:32" itemprop="dateModified" datetime="2018-12-09T20:36:32+08:00">2018-12-09</time>
               
             
           </span>
@@ -453,8 +453,19 @@
 <p>MySQL客户机A为某个表加锁后，加锁期间MySQL客户机A对该表的后续操作，MySQL客户机B对该表的后续操作以及MySQL客户机B对该表加锁之间的关系如表9-1所示。</p>
 <img src="/2018/11/26/MySQL锁机制/4.png">
 <p>（3）MySQL客户机A使用lock tables命令可以同时为多个表施加表级锁（包括读锁或者写锁），并且加锁期间，MySQL客户机A不能对“没有锁定的表”进行更新及查询操作，否则将抛出“表未被锁定”的错误信息。例如，在MySQL客户机A上运行下面的MySQL代码，对account表施加读锁，加锁期间对book表的查询操作将抛出错误信息，如图9-23所示。读者可以自行分析，使用显式锁后，锁的生命周期是否延长。</p>
-<p>alter table account engine=MyISAM;<br>alter table book engine=MyISAM;<br>lock tables account read;<br>select <em> from account;<br>select </em> from book;<br>unlock tables;</p>
-<p>(4)如果需要为同一个表同时施加读锁与写锁,那么需要为该表起两个别名,以区分读锁与写锁。<br>例如,下面的MySQL代码首先将account表的存储引擎设置为MyISAM。然后向<br>account表同时施加读锁( account表的别名为a )以及写锁( account表的别名为b)。接着将account表重命名为a进行查询操作,将account表重命名为b进行查询操作。如果直接查询account表中的所有记录,则将抛出错误信息,原因是并没有为account表施加一个名字为account的锁,抛出错误信息”account表未被锁定”也在情理之中,执行结果如图9-24所示。读者可以自行分析,使用显式锁后,锁的生命周期是否延长。<br>alter table account engine=MyISAM;<br>lock tables account as a read,account as b writeselect <em> from account as aselect </em> from account as b<br>select * from account<br>unlock tables;</p>
+<pre><code class="sql">alter table account engine=MyISAM;
+alter table book engine=MyISAM;
+lock tables account read;
+select * from account;
+select * from book;
+unlock tables;
+</code></pre>
+<p>(4)如果需要为同一个表同时施加读锁与写锁,那么需要为该表起两个别名,以区分读锁与写锁。<br>例如,下面的MySQL代码首先将account表的存储引擎设置为MyISAM。然后向<br>account表同时施加读锁( account表的别名为a )以及写锁( account表的别名为b)。接着将account表重命名为a进行查询操作,将account表重命名为b进行查询操作。如果直接查询account表中的所有记录,则将抛出错误信息,原因是并没有为account表施加一个名字为account的锁,抛出错误信息”account表未被锁定”也在情理之中,执行结果如图9-24所示。读者可以自行分析,使用显式锁后,锁的生命周期是否延长。</p>
+<pre><code class="sql">alter table account engine=MyISAM;
+lock tables account as a read,account as b writeselect * from account as aselect * from account as b
+select * from account
+unlock tables;
+</code></pre>
 <p>说明<br>    为了便于理解,读者可以认为每个表的锁必须有锁名,且默认情况下锁名就是表名。<br>当某个表既存在读锁又存在写锁时,需要为表名起多个别名,且每个别名对应一个锁名。</p>
 <p>(5) read local与read选项之间的区别在于,如果MysQL客户机A使用read选项为<br>某个MyISAM表施加读锁,加锁期间, MySQL客户机A以及MySQL客户机B都不能对该表进行插入操作。如果MySQL客户机A使用read local选项为某个MyISAM表施加读锁,加锁期间,MySQL客户机B可以对该表进行插入操作,前提是新记录必须插入到表的末尾。对InnoDB表施加读锁时, read local选项与read选项的功能完全相同。</p>
 <p>场景描述8 : read local与read选项之间的区别。<br>首先在MySQL客户机A上执行下面的MySQL命令,并为account表施加local读锁。alter table account engine=MyISAM;<br>lock tables account read local;<br>    然后打开MysQL客户机B,在MysQL客户机B上执行下面的insert语句,向account表中添加一条记录,执行结果如图9-25所示。从执行结果可以看出,MysQL户机A为account表施加local读锁后, MysQL客户机B可以向account表中添加记录。local关键字使得MyISAM表最大限度地支持查询和插入的并发操作,<br>insert into account values(null, 丁’, 1000).<br>最后在MySQL客户机A上执行下面的MySQL命令,为account表解锁.<br>unlock tables;</p>
