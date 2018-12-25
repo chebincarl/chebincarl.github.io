@@ -108,13 +108,13 @@
 
 
 
-  <meta name="description" content="锁机制在同一时刻，如果数据库仅仅为单个MySQL客户机提供服务，仅通过事务机制即可实现数据库的数据一致性。但更多时候，在同一时刻，多个并发用户往往需要同时访问（检索或者更新）数据库中的同一个数据，此时仅仅通过事务机制无法保证多用户同时访问同一数据的数据一致性（参看场景描述2），因此有必要引入另一种机制实现数据的多用户并发访问。锁机制是MySQL实现多用户并发访问的基石。">
+  <meta name="description" content="在同一时刻，如果数据库仅仅为单个MySQL客户机提供服务，仅通过事务机制即可实现数据库的数据一致性。但更多时候，在同一时刻，多个并发用户往往需要同时访问（检索或者更新）数据库中的同一个数据，此时仅仅通过事务机制无法保证多用户同时访问同一数据的数据一致性（参看场景描述2），因此有必要引入另一种机制实现数据的多用户并发访问。锁机制是MySQL实现多用户并发访问的基石。">
 <meta name="keywords" content="MySQL">
 <meta property="og:type" content="article">
 <meta property="og:title" content="MySQL锁机制">
 <meta property="og:url" content="http://yoursite.com/2018/11/26/MySQL锁机制/index.html">
 <meta property="og:site_name" content="车斌的博客">
-<meta property="og:description" content="锁机制在同一时刻，如果数据库仅仅为单个MySQL客户机提供服务，仅通过事务机制即可实现数据库的数据一致性。但更多时候，在同一时刻，多个并发用户往往需要同时访问（检索或者更新）数据库中的同一个数据，此时仅仅通过事务机制无法保证多用户同时访问同一数据的数据一致性（参看场景描述2），因此有必要引入另一种机制实现数据的多用户并发访问。锁机制是MySQL实现多用户并发访问的基石。">
+<meta property="og:description" content="在同一时刻，如果数据库仅仅为单个MySQL客户机提供服务，仅通过事务机制即可实现数据库的数据一致性。但更多时候，在同一时刻，多个并发用户往往需要同时访问（检索或者更新）数据库中的同一个数据，此时仅仅通过事务机制无法保证多用户同时访问同一数据的数据一致性（参看场景描述2），因此有必要引入另一种机制实现数据的多用户并发访问。锁机制是MySQL实现多用户并发访问的基石。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://yoursite.com/2018/11/26/MySQL锁机制/10.png">
 <meta property="og:image" content="http://yoursite.com/2018/11/26/MySQL锁机制/11.png">
@@ -123,10 +123,10 @@
 <meta property="og:image" content="http://yoursite.com/2018/11/26/MySQL锁机制/2.png">
 <meta property="og:image" content="http://yoursite.com/2018/11/26/MySQL锁机制/3.png">
 <meta property="og:image" content="http://yoursite.com/2018/11/26/MySQL锁机制/4.png">
-<meta property="og:updated_time" content="2018-12-24T15:34:02.235Z">
+<meta property="og:updated_time" content="2018-12-25T15:32:36.756Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="MySQL锁机制">
-<meta name="twitter:description" content="锁机制在同一时刻，如果数据库仅仅为单个MySQL客户机提供服务，仅通过事务机制即可实现数据库的数据一致性。但更多时候，在同一时刻，多个并发用户往往需要同时访问（检索或者更新）数据库中的同一个数据，此时仅仅通过事务机制无法保证多用户同时访问同一数据的数据一致性（参看场景描述2），因此有必要引入另一种机制实现数据的多用户并发访问。锁机制是MySQL实现多用户并发访问的基石。">
+<meta name="twitter:description" content="在同一时刻，如果数据库仅仅为单个MySQL客户机提供服务，仅通过事务机制即可实现数据库的数据一致性。但更多时候，在同一时刻，多个并发用户往往需要同时访问（检索或者更新）数据库中的同一个数据，此时仅仅通过事务机制无法保证多用户同时访问同一数据的数据一致性（参看场景描述2），因此有必要引入另一种机制实现数据的多用户并发访问。锁机制是MySQL实现多用户并发访问的基石。">
 <meta name="twitter:image" content="http://yoursite.com/2018/11/26/MySQL锁机制/10.png">
 
 
@@ -368,7 +368,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2018-12-24 23:34:02" itemprop="dateModified" datetime="2018-12-24T23:34:02+08:00">2018-12-24</time>
+                <time title="修改时间：2018-12-25 23:32:36" itemprop="dateModified" datetime="2018-12-25T23:32:36+08:00">2018-12-25</time>
               
             
           </span>
@@ -401,28 +401,38 @@
       
 
       
-        <h1 id="锁机制"><a href="#锁机制" class="headerlink" title="锁机制"></a>锁机制</h1><p>在同一时刻，如果数据库仅仅为单个MySQL客户机提供服务，仅通过事务机制即可实现数据库的数据一致性。但更多时候，在同一时刻，多个并发用户往往需要同时访问（检索或者更新）数据库中的同一个数据，此时仅仅通过事务机制无法保证多用户同时访问同一数据的数据一致性（参看场景描述2），因此有必要引入另一种机制实现数据的多用户并发访问。锁机制是MySQL实现多用户并发访问的基石。</p>
+        <p>在同一时刻，如果数据库仅仅为单个MySQL客户机提供服务，仅通过事务机制即可实现数据库的数据一致性。但更多时候，在同一时刻，多个并发用户往往需要同时访问（检索或者更新）数据库中的同一个数据，此时仅仅通过事务机制无法保证多用户同时访问同一数据的数据一致性（参看场景描述2），因此有必要引入另一种机制实现数据的多用户并发访问。锁机制是MySQL实现多用户并发访问的基石。</p>
 <a id="more"></a>
-<h2 id="锁机制的必要性"><a href="#锁机制的必要性" class="headerlink" title="锁机制的必要性"></a>锁机制的必要性</h2><p>MySQL客户机A与MySQL客户机B执行同一条SQL语句”select * from account;”时产生的结果截然不同，继而产生数据不一致问题。<font color="red">这种数据不一致问题产生的深层次原因在于，内存中的数据与外存中的数据不同步造成的（或者说是由内存中的表记录与外存中的表记录之间存在“同步延迟”造成的）。</font><br>MySQL客户机A访问数据时，如果能够对该数据“加锁”，阻塞（或者延迟）MySQL客户机B对该数据访问，直到MySQL客户机A数据访问结束，内存与外存中的数据同步后，MySQL客户机A对该数据“解锁”，“解锁”后，被阻塞的MySQL客户机B”被唤醒”，继而可以继续访问该数据，这样就可以实现多用户下数据的并发访问，如下图所示。  </p>
+<h1 id="锁机制的必要性"><a href="#锁机制的必要性" class="headerlink" title="锁机制的必要性"></a>锁机制的必要性</h1><p>MySQL客户机A与MySQL客户机B执行同一条SQL语句”select * from account;”时产生的结果截然不同，继而产生数据不一致问题。这种数据不一致问题产生的深层次原因在于，内存中的数据与外存中的数据不同步造成的（或者说是由内存中的表记录与外存中的表记录之间存在“同步延迟”造成的）。</p>
+<p>MySQL客户机A访问数据时，如果能够对该数据“加锁”，阻塞（或者延迟）MySQL客户机B对该数据访问，直到MySQL客户机A数据访问结束，内存与外存中的数据同步后，MySQL客户机A对该数据“解锁”，“解锁”后，被阻塞的MySQL客户机B“被唤醒”，继而可以继续访问该数据，这样就可以实现多用户下数据的并发访问，如下图所示。  </p>
 <img src="/2018/11/26/MySQL锁机制/10.png">
-<font color="red">简言之，内存数据与外存数据之间的同步延迟，可以通过锁机制将“并发访问”延迟，进而实现数据的一致性访问以及并发访问。</font>当然，单条更新语句运行期间也会产生同步延迟。例如，场景描述2中，MySQL客户机A执行下面的update语句时，该update语句的执行过程可以简单描述为如下步骤，如下图所示。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">update</span> <span class="keyword">account</span> <span class="keyword">set</span> balance = balance + <span class="number">800</span> <span class="keyword">where</span> account_no = <span class="number">2</span>;</span><br></pre></td></tr></table></figure><br><br><img src="/2018/11/26/MySQL锁机制/11.png"><br><br>步骤1:使用索引查询是否存在”account_no=2”的账户信息。<br>步骤2:若存在，将该账户信息从外存加载到内存，在内存中生成old记录。<br>步骤3:修改old记录中的balance字段值，在内存中生成new记录。<br>步骤4:将内存中的new记录写入到外存，完成update操作。<br><br>上述每一个步骤的执行都需要一定的时间间隔（虽然短暂）。单个update语句运行期间，从步骤1运行到步骤4同样会产生延迟，这种延迟根本就无法避免，数据库开发人员也无需理会这种延迟，毕竟单条SQL语句运行期间会作为一个“原子”操作运行。数据库开发人员需要考虑的问题是:如何借助锁机制，解决<strong>多用户并发访问</strong>可能引起的数据不一致问题<br># 123<br>相对于其他数据库管理系统而言，MySQL的锁机制较为简单，但即便如此，由于MySQL锁机制涉及存储引擎、多用户并发访问、事务以及索引等知识，初学者全面掌握MySQL锁机制并非易事。简单地说，MySQL锁机制涉及的内容包括:锁的粒度、隐式锁与显式锁、锁的类型、锁的钥匙以及锁的生命周期等。<br><br>### 1、锁的粒度<br>锁的粒度是指锁的作用范围。就像读者有了防盗门的钥匙就可以回到“家”中，有了卧室的钥匙就可以进到卧室，有了保险柜的钥匙就可以打开保险柜，每一种“资源”存在一个与之对应“粒度”的锁，数据库亦是如此。<font color="red">对于MySQL而言，锁的粒度可以分为服务器级锁（server-level locking）和存储引擎级锁（storage-engine-level locking）。</font>
-
-<p>服务器级锁是以服务器为单位进行加锁，它与表的存储引擎无关。在MySQL基础知识章节中讲解数据库备份时，为了保证数据备份过程中不会有新的数据写入，使用MySQL命令”flush tables with read lock;”锁定了当前MySQL服务实例，该锁是服务器级锁，并且是服务器级“读锁”。</p>
-<p>也就是说， MySQL客户机A执行了MySQL命令”flush tables with read lock;”，锁定了当前MySQL服务实例后，MySQL客户机A针对服务器的写操作（例如insert， update， delete以及create等语句）抛出如下错误信息。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ERROR 1223 （HY000）: Can't <span class="keyword">execute</span> the <span class="keyword">query</span> because you have a conflicting <span class="keyword">read</span> <span class="keyword">lock</span></span><br></pre></td></tr></table></figure></p>
-<p>其他MySQL客户机（例如MySQL客户机B）针对服务器的写操作（例如insert， update， delete以及create等语句）被阻塞。</p>
-<p>只有MySQL客户机A执行”unlock tables;”命令或者关闭MySQL客户机A的服务器连接，释放服务器级读锁后，才会“唤醒”MySQL客户机B的写操作，MySQL客户机B的写操作才能得以继续执行。MySQL客户机A施加的服务器级锁，只有MySQL客户机A才能解锁。</p>
+<p>简言之，内存数据与外存数据之间的同步延迟，可以通过锁机制将“并发访问”延迟，进而实现数据的一致性访问以及并发访问。</p>
+<p>当然，单条更新语句运行期间也会产生同步延迟。例如，场景描述2中，MySQL客户机A执行下面的update语句时，该update语句的执行过程可以简单描述为如下步骤，如下图所示。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">update</span> <span class="keyword">account</span> <span class="keyword">set</span> balance = balance + <span class="number">800</span> <span class="keyword">where</span> account_no = <span class="number">2</span>;</span><br></pre></td></tr></table></figure></p>
+<img src="/2018/11/26/MySQL锁机制/11.png">
+<p>步骤1：使用索引查询是否存在“account_no=2”的账户信息。<br>步骤2：若存在，将该账户信息从外存加载到内存，在内存中生成old记录。<br>步骤3：修改old记录中的balance字段值，在内存中生成new记录。<br>步骤4：将内存中的new记录写入到外存，完成update操作。</p>
+<p>上述每一个步骤的执行都需要一定的时间间隔（虽然短暂）。单个update语句运行期间，从步骤1运行到步骤4同样会产生延迟，这种延迟根本就无法避免，数据库开发人员也无需理会这种延迟，毕竟单条SQL语句运行期间会作为一个“原子”操作运行。数据库开发人员需要考虑的问题是:如何借助锁机制，解决<strong>多用户并发访问</strong>可能引起的数据不一致问题？</p>
+<h1 id="MySQL锁机制的基础知识"><a href="#MySQL锁机制的基础知识" class="headerlink" title="MySQL锁机制的基础知识"></a>MySQL锁机制的基础知识</h1><p>简单地说，MySQL锁机制涉及的内容包括：锁的粒度、隐式锁与显式锁、锁的类型、锁的钥匙以及锁的生命周期等。</p>
+<h2 id="锁的粒度"><a href="#锁的粒度" class="headerlink" title="锁的粒度"></a>锁的粒度</h2><p>锁的粒度是指锁的作用范围。就像读者有了防盗门的钥匙就可以回到“家”中，有了卧室的钥匙就可以进到卧室，有了保险柜的钥匙就可以打开保险柜，每一种“资源”存在一个与之对应“粒度”的锁，数据库亦是如此。对于MySQL而言，锁的粒度可以分为服务器级锁（server-level locking）和存储引擎级锁（storage-engine-level locking）。</p>
+<p>服务器级锁是以服务器为单位进行加锁，它与表的存储引擎无关。在MySQL基础知识章节中讲解数据库备份时，为了保证数据备份过程中不会有新的数据写入，使用MySQL命令“flush tables with read lock;”锁定了当前MySQL服务实例，该锁是服务器级锁，并且是服务器级“读锁”。</p>
+<p>也就是说， MySQL客户机A执行了MySQL命令“flush tables with read lock;”，锁定了当前MySQL服务实例后，MySQL客户机A针对服务器的写操作（例如insert，update，delete以及create等语句）抛出如下错误信息。<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ERROR 1223（HY000）: Can't <span class="keyword">execute</span> the <span class="keyword">query</span> because you have a conflicting <span class="keyword">read</span> <span class="keyword">lock</span></span><br></pre></td></tr></table></figure></p>
+<p>其他MySQL客户机（例如MySQL客户机B）针对服务器的写操作（例如insert，update，delete以及create等语句）被阻塞。</p>
+<p>只有MySQL客户机A执行“unlock tables;”命令或者关闭MySQL客户机A的服务器连接，释放服务器级读锁后，才会“唤醒”MySQL客户机B的写操作，MySQL客户机B的写操作才能得以继续执行。MySQL客户机A施加的服务器级锁，只有MySQL客户机A才能解锁。</p>
 <p>例如，在MySQL客户机A上锁定了当前MySQL服务实例后，在MySQL客户机B上创建视图test view将被阻塞，而在MySQL客户机A上创建视图test view将产生错误信息（ERROR 1223）。MySQL客户机A解锁后，MySQL客户机B才能成功创建视图test view，如下图所示（注意图中的粗体字）。从执行结果可以看出，MySQL客户机A施加服务器级锁后，该锁对MySQL客户机A的后续操作以及对MySQL客户机B的后续操作产生的效果并不相同。</p>
 <img src="/2018/11/26/MySQL锁机制/12.png">
-<font color="red">存储引擎级锁分为表级锁以及行级锁。</font>表级锁是以表为单位进行加锁，MyISAM与InnoDB存储引擎的表都支持表级锁（稍后介绍）。行级锁是以记录为单位进行加锁，在MyISAM与InnoDB存储引擎中，只有InnoDB存储引擎支持行级锁。<br><br>小结：服务器级锁的粒度最大，表级锁的粒度次之，行级锁的粒度最小。<font color="red">锁粒度越小，并发访问性能就越高，越适合做并发更新操作（InnoDB表更适合做并发更新操作）；锁粒度越大，并发访问性能就越低，越适合做并发查询操作（MyISAM 表更适合做并发查询操作）。</font>另外，锁粒度越小，完成某个功能时所需要的加锁、解锁的次数就会越多，反而会消耗较多的服务器资源，甚至会出现资源的恶性竞争，甚至发生死锁问题。<br><br>对于“选课系统”而言，系统需要为上百名学生，甚至几百名学生同时提供选课、调课、退课服务。为了提高并发性能，“选课系统”将选用行级锁，这也是“选课系统”的各个数据库表使用InnoDB存储引擎的原因（InnoDB存储引擎支持行级锁）。<br><br>### 2、隐式锁与显式锁<br><br>MySQL锁分为隐式锁以及显式锁。多个MySQL客户机并发访问同一个数据时，为保证数据的一致性，数据库管理系统会自动地为该数据加锁、解锁，这种锁称为隐式锁。隐式锁无需数据库开发人员维护（包括粒度、加锁时机、解锁时机等）。<br><br>如果应用系统存在多用户并发访问数据的行为，有时单靠隐式锁无法实现数据的一致性访问要求（例如多个学生同时选修同一门课程），此时需要数据库开发人员手动地加锁、解锁，这种锁称为显式锁。对于显式锁而言，数据库开发人员不仅需要确定锁的粒度，还需要确定锁的加锁时机（何时加锁）、解锁时机（何时解锁）以及锁的类型。<br><br>### 3、锁的类型<br><br><font color="red">锁的类型包括读锁（read lock）和写锁（write lock），其中读锁也称为共享锁，写锁也称为排他锁或者独占锁。</font>
-
+<p>存储引擎级锁分为表级锁以及行级锁。表级锁是以表为单位进行加锁，MyISAM与InnoDB存储引擎的表都支持表级锁。行级锁是以记录为单位进行加锁，在MyISAM与InnoDB存储引擎中，只有InnoDB存储引擎支持行级锁。</p>
+<p>小结：服务器级锁的粒度最大，表级锁的粒度次之，行级锁的粒度最小。锁粒度越小，并发访问性能就越高，越适合做并发更新操作（InnoDB表更适合做并发更新操作）；锁粒度越大，并发访问性能就越低，越适合做并发查询操作（MyISAM 表更适合做并发查询操作）。另外，锁粒度越小，完成某个功能时所需要的加锁、解锁的次数就会越多，反而会消耗较多的服务器资源，甚至会出现资源的恶性竞争，甚至发生死锁问题。</p>
+<p>对于“选课系统”而言，系统需要为上百名学生，甚至几百名学生同时提供选课、调课、退课服务。为了提高并发性能，“选课系统”将选用行级锁，这也是“选课系统”的各个数据库表使用InnoDB存储引擎的原因（InnoDB存储引擎支持行级锁）。</p>
+<h2 id="隐式锁与显式锁"><a href="#隐式锁与显式锁" class="headerlink" title="隐式锁与显式锁"></a>隐式锁与显式锁</h2><p>MySQL锁分为隐式锁以及显式锁。多个MySQL客户机并发访问同一个数据时，为保证数据的一致性，数据库管理系统会自动地为该数据加锁、解锁，这种锁称为隐式锁。隐式锁无需数据库开发人员维护（包括粒度、加锁时机、解锁时机等）。</p>
+<p>如果应用系统存在多用户并发访问数据的行为，有时单靠隐式锁无法实现数据的一致性访问要求（例如多个学生同时选修同一门课程），此时需要数据库开发人员手动地加锁、解锁，这种锁称为显式锁。对于显式锁而言，数据库开发人员不仅需要确定锁的粒度，还需要确定锁的加锁时机（何时加锁）、解锁时机（何时解锁）以及锁的类型。</p>
+<h2 id="锁的类型"><a href="#锁的类型" class="headerlink" title="锁的类型"></a>锁的类型</h2><p>锁的类型包括读锁（read lock）和写锁（write lock），其中读锁也称为共享锁，写锁也称为排他锁或者独占锁。</p>
 <p>读锁（read lock）：如果MySQL客户机A对某个数据施加了读锁，加锁期间允许其他MySQL客户机（例如MySQL客户机B）对该数据施加读锁，但会阻塞其他MySQL客户机（例如MySQL客户机C）对该数据施加写锁，除非MySQL客户机A释放该数据的读锁。简言之，读锁允许其他MySQL客户机对数据同时“读”，但不允许其他MySQL客户机对数据任何“写”（如下图所示）。如果“数据”是表，则该读锁是表级读锁；如果“数据”是记录，则该读锁是行级读锁。</p>
 <img src="/2018/11/26/MySQL锁机制/1.png">
 <p>写锁（write lock）：如果MySQL客户机A对某个数据施加了写锁，加锁期间会阻塞其他MySQL客户机（例如MySQL客户机B）对该数据施加读锁以及写锁，除非MySQL客户机A释放该数据的写锁。简言之，写锁不允许其他MySQL客户机对数据同时“读”，也不允许其他MySQL客户机对数据同时“写”（见下图）。如果“数据”是表，则该写锁是表级写锁；如果“数据”是记录，则该写锁是行级写锁。</p>
 <img src="/2018/11/26/MySQL锁机制/2.png">
-<h3 id="4、锁的钥匙"><a href="#4、锁的钥匙" class="headerlink" title="4、锁的钥匙"></a>4、锁的钥匙</h3><p>多个MySQL客户机并发访问同一个数据时，如果MySQL客户机A对该数据成功地施加了锁，那么只有MySQL客户机A拥有这把锁的“钥匙”，也就是说，只有MySQL客户机A能够对该锁进行解锁操作。</p>
-<h3 id="5、锁的生命周期"><a href="#5、锁的生命周期" class="headerlink" title="5、锁的生命周期"></a>5、锁的生命周期</h3><p>锁的生命周期是指在同一个MySQL会话内，对数据加锁到解锁之间的时间间隔。锁的生命周期越长，并发访问性能就越低；锁的生命周期越短，并发访问性能就越高。另外，锁是数据库管理系统重要的数据库资源，需要耗费一定的服务器内存，锁的生命周期越长，该锁占用服务器内存的时间间隔就越长；锁的生命周期越短，该锁占用服务器内存的时间间隔就越短。因此为了节省服务器资源，数据库开发人员必须尽可能的缩短锁的生命周期，尽可能早地释放锁资源。</p>
+<h2 id="锁的钥匙"><a href="#锁的钥匙" class="headerlink" title="锁的钥匙"></a>锁的钥匙</h2><p>多个MySQL客户机并发访问同一个数据时，如果MySQL客户机A对该数据成功地施加了锁，那么只有MySQL客户机A拥有这把锁的“钥匙”，也就是说，只有MySQL客户机A能够对该锁进行解锁操作。</p>
+<h2 id="锁的生命周期"><a href="#锁的生命周期" class="headerlink" title="锁的生命周期"></a>锁的生命周期</h2><p>锁的生命周期是指在同一个MySQL会话内，对数据加锁到解锁之间的时间间隔。锁的生命周期越长，并发访问性能就越低；锁的生命周期越短，并发访问性能就越高。另外，锁是数据库管理系统重要的数据库资源，需要耗费一定的服务器内存，锁的生命周期越长，该锁占用服务器内存的时间间隔就越长；锁的生命周期越短，该锁占用服务器内存的时间间隔就越短。因此为了节省服务器资源，数据库开发人员必须尽可能的缩短锁的生命周期，尽可能早地释放锁资源。</p>
 <p>小结：不恰当的锁粒度、锁生命周期不仅会影响数据库的并发性能，还会造成锁资源的浪费。</p>
-<h2 id="MyISAM表的表级锁"><a href="#MyISAM表的表级锁" class="headerlink" title="MyISAM表的表级锁"></a>MyISAM表的表级锁</h2><p>对MyISAM存储引擎的表进行检索（select）操作时，select语句执行期间（时间间隔虽然短暂），MyISAM存储引擎会自动地给涉及到的MyISAM表施加“隐式读锁”；select语句执行完毕后，MyISAM存储引擎会自动地为这些表进行“解锁”。因此select语句的执行时间就是“隐式读锁”的生命周期。</p>
+<h1 id="MyISAM表的表级锁"><a href="#MyISAM表的表级锁" class="headerlink" title="MyISAM表的表级锁"></a>MyISAM表的表级锁</h1><p>对MyISAM存储引擎的表进行检索（select）操作时，select语句执行期间（时间间隔虽然短暂），MyISAM存储引擎会自动地给涉及到的MyISAM表施加“隐式读锁”；select语句执行完毕后，MyISAM存储引擎会自动地为这些表进行“解锁”。因此select语句的执行时间就是“隐式读锁”的生命周期。</p>
 <p>对MyISAM存储引擎的表进行更新（insert、update以及delete）操作时，更新语句（例如insert、update以及delete）执行期间（时间间隔虽然短暂），MyISAM存储引擎会自动地给涉及到的MyISAM表施加“隐式写锁”；更新语句执行完毕后，MyISAM存储引擎会自动地为这些表进行解锁，更新语句的执行时间就是“隐式写锁”的生命周期。</p>
 <p>可以看到，任何针对MyISAM表的查询操作或者更新操作，都会隐式地施加表级锁。隐式锁的生命周期非常短暂，且不受数据库开发人员的控制。</p>
 <p>有时，应用系统要求数据库开发人员延长MyISAM表级锁的生命周期，MySQL为数据库开发人员提供了显式地施加表级锁以及显式地解锁的MySQL命令，以便数据库开发人员能够控制MyISAM表级锁的生命周期，MySQL客户机A施加表级锁以及解锁的MySQL命令的语法格式如下图所示。</p>
@@ -444,7 +454,7 @@
 <p>（7）unlock tables用于解锁，它会解除当前MySQL服务器连接中所有MyISAM表的所有锁。</p>
 <p>（8）lock tables与unlock tables语句会引起事务的隐式提交。</p>
 <p>（9）MySQL客户机一旦关闭， unlock tables语句将会被隐式地执行。因此，如果要让表锁定生效就必须一直保持MySQL服务器连接。</p>
-<h2 id="InnoDB表的行级锁"><a href="#InnoDB表的行级锁" class="headerlink" title="InnoDB表的行级锁"></a>InnoDB表的行级锁</h2><p>InnoDB表的锁比MyISAM表的锁更为复杂，原因在于InnoDB表既支持表级锁，又支持行级锁，又存在意向锁，再把事务掺入其中，会给初学者的学习带来不少麻烦。使用lock tables命令为InnoDB表施加表级锁与使用lock tables命令为MyISAM表施加表级锁的用法基本相同，不再赘述，这里主要讨论InnoDB行级锁以及意向锁的用法。</p>
+<h1 id="InnoDB表的行级锁"><a href="#InnoDB表的行级锁" class="headerlink" title="InnoDB表的行级锁"></a>InnoDB表的行级锁</h1><p>InnoDB表的锁比MyISAM表的锁更为复杂，原因在于InnoDB表既支持表级锁，又支持行级锁，又存在意向锁，再把事务掺入其中，会给初学者的学习带来不少麻烦。使用lock tables命令为InnoDB表施加表级锁与使用lock tables命令为MyISAM表施加表级锁的用法基本相同，不再赘述，这里主要讨论InnoDB行级锁以及意向锁的用法。</p>
 <p>InnoDB提供了两种类型的行级锁，分别是共享锁（S）以及排他锁（X），其中共享锁也叫读锁，排他锁也叫写锁。InnoDB行级锁的粒度仅仅是受查询语句或者更新语句影响的那些记录。在查询（select）语句或者更新（ insert，update以及delete）语句中，为受影响的记录施加行级锁的方法也非常简单。</p>
 <p>方法1:在查询（select）语句中，为符合查询条件的记录施加共享锁，语法格式如下所示。<br>    select * from 表 where 条件语句 <strong>lock in share mode</strong>;</p>
 <p>方法2:在查询（select）语句中，为符合查询条件的记录施加排他锁，语法格式如下所示。<br>    select * from 表 where 条件语句 <strong>for update</strong>;</p>
@@ -458,7 +468,7 @@
 <p>结论:事务中的行级共享锁（S）以及行级排他锁（X）的生命周期从加锁开始，直到事务提交或者回滚，行级锁才会释放。<br>MySQL客户机A使用”select * from 表 where 条件语句 lock in share mode;”为InnoDB表中符合条件语句的记录施加共享锁后，加锁期间，MySQL客户机A可以对该表的所有记录进行查询以及更新操作。加锁期间，MySQL客户机B可以查询该表的所有记录（甚至施加共享锁），可以更新不符合条件语句的记录，然而为符合条件语句的记录施加排他锁时将被阻塞。</p>
 <p>MySQL客户机A使用”select * from 表 where 条件语句 for update;”或者更新语句（例如insert，update以及delete）为InnoDB表中符合条件语句的记录施加排他锁后，加锁期间，MySQL客户机A可以对该表的所有记录进行查询以及更新操作。加锁期间，MySQL客户机B可以查询该表的所有记录，可以更新不符合条件语句的记录，然而为符合条件语句的记录施加共享锁或者排他锁时将被阻塞。</p>
 <p>为了便于读者更好地理解共享锁以及排他锁之间的关系，可以参看表9-2所示的内容。</p>
-<h2 id="“选课系统”中的行级锁"><a href="#“选课系统”中的行级锁" class="headerlink" title="“选课系统”中的行级锁"></a>“选课系统”中的行级锁</h2><p>场景描述10 :实现调课功能的存储过程replace_course_proc（）存在功能缺陷。考虑这样的场景:张三与李四”同时”选择同一门目标课程，且目标课程就剩下一个席位（此时目标课程available的字段值为1）。张三以及李四为了实现调课功能，”同时”调用存储过程replace_course_proc（），假设两人“同时”执行存储过程中的select语句”查询目标课程available字段值”：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> available <span class="keyword">into</span> s <span class="keyword">from</span> course <span class="keyword">where</span> course_no=c_after;</span><br></pre></td></tr></table></figure></p>
+<h1 id="“选课系统”中的行级锁"><a href="#“选课系统”中的行级锁" class="headerlink" title="“选课系统”中的行级锁"></a>“选课系统”中的行级锁</h1><p>场景描述10 :实现调课功能的存储过程replace_course_proc（）存在功能缺陷。考虑这样的场景:张三与李四”同时”选择同一门目标课程，且目标课程就剩下一个席位（此时目标课程available的字段值为1）。张三以及李四为了实现调课功能，”同时”调用存储过程replace_course_proc（），假设两人“同时”执行存储过程中的select语句”查询目标课程available字段值”：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> available <span class="keyword">into</span> s <span class="keyword">from</span> course <span class="keyword">where</span> course_no=c_after;</span><br></pre></td></tr></table></figure></p>
 <p>张三以及李四可能都读取到available的值为1（大于零），最后的结果是张三与李四都选择了目标课程。</p>
 <p>可以看出，存储过程replace_course_proc（）读取课程的available字段值时，有必要为张三与李四选择相同的目标课程施加排他锁，避免多名学生同时读取同一门课程的available字段值。将存储过程replace_course_proc（）中的代码片段:<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> available <span class="keyword">into</span> s <span class="keyword">from</span> course <span class="keyword">where</span> course_no=c <span class="keyword">after</span>;</span><br></pre></td></tr></table></figure></p>
 <p>修改为如下的代码片段：<br><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">select</span> available <span class="keyword">into</span> s <span class="keyword">from</span> course <span class="keyword">where</span> course_no=c_after <span class="keyword">for</span> <span class="keyword">update</span>;</span><br></pre></td></tr></table></figure></p>
@@ -638,7 +648,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#锁机制"><span class="nav-number">1.</span> <span class="nav-text">锁机制</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#锁机制的必要性"><span class="nav-number">1.1.</span> <span class="nav-text">锁机制的必要性</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4、锁的钥匙"><span class="nav-number">1.1.1.</span> <span class="nav-text">4、锁的钥匙</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5、锁的生命周期"><span class="nav-number">1.1.2.</span> <span class="nav-text">5、锁的生命周期</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MyISAM表的表级锁"><span class="nav-number">1.2.</span> <span class="nav-text">MyISAM表的表级锁</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#InnoDB表的行级锁"><span class="nav-number">1.3.</span> <span class="nav-text">InnoDB表的行级锁</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#“选课系统”中的行级锁"><span class="nav-number">1.4.</span> <span class="nav-text">“选课系统”中的行级锁</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#锁机制的必要性"><span class="nav-number">1.</span> <span class="nav-text">锁机制的必要性</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#MySQL锁机制的基础知识"><span class="nav-number">2.</span> <span class="nav-text">MySQL锁机制的基础知识</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#锁的粒度"><span class="nav-number">2.1.</span> <span class="nav-text">锁的粒度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#隐式锁与显式锁"><span class="nav-number">2.2.</span> <span class="nav-text">隐式锁与显式锁</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#锁的类型"><span class="nav-number">2.3.</span> <span class="nav-text">锁的类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#锁的钥匙"><span class="nav-number">2.4.</span> <span class="nav-text">锁的钥匙</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#锁的生命周期"><span class="nav-number">2.5.</span> <span class="nav-text">锁的生命周期</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#MyISAM表的表级锁"><span class="nav-number">3.</span> <span class="nav-text">MyISAM表的表级锁</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#InnoDB表的行级锁"><span class="nav-number">4.</span> <span class="nav-text">InnoDB表的行级锁</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#“选课系统”中的行级锁"><span class="nav-number">5.</span> <span class="nav-text">“选课系统”中的行级锁</span></a></li></ol></div>
             
 
           </div>
