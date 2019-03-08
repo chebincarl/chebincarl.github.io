@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Unity中的游戏和世界可通过场景表达，其中场景表示为位于笛卡儿3D坐标系（定义了X、Y、Z轴）内的游戏对象集合。这里，场景单位采用Unity单位进行测算，在实际操作过程中，对应单位表示为米。通过Unity进行脚本设计时，应理解场景和对象的含义，以及对象间的交互方式。也就是说，需要了解场景中的单一、独立对象间的彼此通信方式，以使进程按照希望的方向发展。本章主要讨论本地Unity方法，进而通过优化方">
+<meta name="keywords" content="Unity">
+<meta property="og:type" content="article">
+<meta property="og:title" content="单例模式、静态模式、GameObject以及场景世界">
+<meta property="og:url" content="http://yoursite.com/2019/03/08/单例模式、静态模式、GameObject以及场景世界/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="Unity中的游戏和世界可通过场景表达，其中场景表示为位于笛卡儿3D坐标系（定义了X、Y、Z轴）内的游戏对象集合。这里，场景单位采用Unity单位进行测算，在实际操作过程中，对应单位表示为米。通过Unity进行脚本设计时，应理解场景和对象的含义，以及对象间的交互方式。也就是说，需要了解场景中的单一、独立对象间的彼此通信方式，以使进程按照希望的方向发展。本章主要讨论本地Unity方法，进而通过优化方">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-03-08T14:46:16.388Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="单例模式、静态模式、GameObject以及场景世界">
+<meta name="twitter:description" content="Unity中的游戏和世界可通过场景表达，其中场景表示为位于笛卡儿3D坐标系（定义了X、Y、Z轴）内的游戏对象集合。这里，场景单位采用Unity单位进行测算，在实际操作过程中，对应单位表示为米。通过Unity进行脚本设计时，应理解场景和对象的含义，以及对象间的交互方式。也就是说，需要了解场景中的单一、独立对象间的彼此通信方式，以使进程按照希望的方向发展。本章主要讨论本地Unity方法，进而通过优化方">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/03/08/单例模式、静态模式、GameObject以及场景世界/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>单例模式、静态模式、GameObject以及场景世界 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/08/单例模式、静态模式、GameObject以及场景世界/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Che Bin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">单例模式、静态模式、GameObject以及场景世界
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-03-08 21:46:47 / 修改时间：22:46:16" itemprop="dateCreated datePublished" datetime="2019-03-08T21:46:47+08:00">2019-03-08</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Unity中的游戏和世界可通过场景表达，其中场景表示为位于笛卡儿3D坐标系（定义了X、Y、Z轴）内的游戏对象集合。这里，场景单位采用Unity单位进行测算，在实际操作过程中，对应单位表示为米。通过Unity进行脚本设计时，应理解场景和对象的含义，以及对象间的交互方式。也就是说，需要了解场景中的单一、独立对象间的彼此通信方式，以使进程按照希望的方向发展。本章主要讨论本地Unity方法，进而通过优化方式搜索、引用并访问场景对象。除此之外，本章还将对相关方法进行逐一考察，并在具体应用环境中以及性能和效率方面对其予以评估。</p>
+<a id="more"></a>
+<h1 id="GameObject对象"><a href="#GameObject对象" class="headerlink" title="GameObject对象"></a>GameObject对象</h1><p>通常情况下，GameObject表示场景中的基本单元或实体，一般对应于常见场景中的某项“事物”。这里，具体的环境行为或者游戏中所需的实际对象并不重要，无论何种情形，用户仅需通过GameObject加以实现。GameObject对于游戏体验者而言不一定可见，例如声音、碰撞器以及管理类。另外，某些GameObject处于可见状态，其中包括网格、动画网格、精灵对象等。无论是否可见，GameObject通常在场景中作为相关组件集合予以实例化。实际上，<label style="color:red">组件表示为继承自MonoBehaviour的一个类</label>，并可绑定在场景中的GameObject上，进而调整其行为。各个GameObject至少包含一个组件且不可移除，即Transform组件（对于GUI对象则是RectTransform组件）。该组件记录对象的位置、旋转以及缩放状态。例如，如果在场景中创建了一个空游戏对象（通过应用菜单中的GameObject-&gt;Create Empty命令），场景中的新对象仅包含一个Transform组件。相应地，即使GameObject非空，但依然包含了空GameObject对象的组件，Transform组件用于维护其在场景中的物理位置。</p>
+<p>当然，GameObject可包含多个组件，对象的行为源自组件间的组合和交互结果。另外，用户还可通过Component菜单向对象添加更多的预置组件。通过将脚本拖曳至对象上，还可添加自定义组件。</p>
+<p>因此，GameObject由组件构成。在较高层次上，场景则由单一场景空间内的GameObject集合构成。进一步讲，对象自身彼此间存在着较为重要的关系，并通过层次结构加以定义。同时，对象还可能为其他对象的子对象，反之则称作父对象（即transform.parent）。对于对象的运动和转换方式，这一关系十分重要。简而言之，对象Transform组件的对应值向下级联，并添加至其子对象的转换中。通过该方式，子GameObject相对于其父对象偏移和转换；而父对象位置则表示为子对象位置的原点。然而，如果某一对象未包含父对象，则会相对于世界原点(0, 0, 0)进行转换。</p>
+<h1 id="组件间的交互方式"><a href="#组件间的交互方式" class="headerlink" title="组件间的交互方式"></a>组件间的交互方式</h1><p>如前所述，GameObject表示为组件的集合，关于组件间的交互和通信方式，需要考察其中的组织方式。其中，各个组件可高效地定义为自包含的脚本文件，且独立于其他组件，并与其他组件进行交互。特别地，用户常会访问变量，并在同一GameObject上调用其他组件中的函数，甚至会在每一帧中执行此类操作。本节将讨论这一类交互组件间的通信方式。</p>
+<p>一个对象绑定了10个CS文件。这10个文件间如何相互调用彼此的变量和方法？</p>
+<h2 id="SendMessage和BroadcastMessage"><a href="#SendMessage和BroadcastMessage" class="headerlink" title="SendMessage和BroadcastMessage"></a>SendMessage和BroadcastMessage</h2><p>一种调用其他组件函数的方法是使用SendMessage和BroadcastMessage，此类函数通常与类型无关。特别地，这一类方法可在脚本中的任意处调用，并通过与同一对象绑定的、其他组件中的名称调用相关方法，且无须考察具体的类型。也就是说，这一类函数并不关注组件的类型，因而便于使用。然而，该方案的问题也较为明显。</p>
+<p>缺点：</p>
+<p>首先，用户可能会通过其他组件上的名称调用某一函数，抑或根本不会采用这一方法。由于消息发送至全部组件中，因而用户无法对目标组件进行选取（SendMessage:Calls the method named methodName on every MonoBehaviour in this game object）。其次，SendMessage和BroadeastMessage方法在内部依赖于反射机制，因而频繁使用常会导致性能问题，例如在Update事件中调用此类函数，或者OnGUI事件（这将使情况变得更为糟糕）。因此，在实际操作过程中，应寻找相应的替代方案。</p>
+<h2 id="GetComponent函数"><a href="#GetComponent函数" class="headerlink" title="GetComponent函数"></a>GetComponent函数</h2><p>如果用户需要直接访问某一对象上的特定单一组件，且已知其数据类型，则可尝试使用GetComponent函数，如示例代码所示。该函数可访问与GameObject绑定的、首个匹配类型的组件。一旦获取其引用，则可像常规对象那样访问该组件，设置、获取其public变量，并调用其中的相关方法。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">MyCustomComponent</span> : <span class="title">MonoBehaviour</span> </span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// Reference to transform of object</span></span><br><span class="line">    <span class="keyword">private</span> Transform ThisTransform = <span class="literal">null</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span> (<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">    	<span class="comment">// Get cached reference to transform</span></span><br><span class="line">        ThisTransform = GetComponent&lt;Transform&gt;(); </span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>     &#123;</span><br><span class="line">        <span class="keyword">if</span> (ThisTransform != <span class="literal">null</span> ) </span><br><span class="line">        &#123;</span><br><span class="line">            ThisTransform.localPosition += Time.deltaTime * <span class="number">10.0f</span> * ThisTransform.forward; </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li><p>第7行和第12行代码：变量ThisTransform声明为private类型，该变量将赋予与GameObject绑定的、指向Transform组件的引用。该操作将通过函数GetComponent并在Start事件中完成。当访问Transform组件时，还需进一步使用到派生的转换属性，例如“ThisTransform=transform;”。</p>
+</li>
+<li><p>第20行代码：ThisTransform变量直接用于设置GameObject的localPosition。再次强调，对于Transform组件，还可采用transform.localPosition。然而，该方法（transform）将从内部调用额外的函数（属性其实就是一个方法）：成员transform定义为C#属性而非标准变量（如果是变量就直接返回了）。因此，在Start或Awake事件内采用GetComponet函数（获取指向private类变量（即第7行）的组件引用）通常被认为是访问外部组件的一种高效方法，当组件频繁被访问时尤其如此，例如Update函数。</p>
+</li>
+</ul>
+<p>Transform组件定义了两个主要的位置成员，即position和localPosition，并以特定方式调整对象的位置。相对于世界原点，位置成员一般定义了对象在世界空间内的位置。因此，在脚本中设置该变量并不会与实际数字对应<br>（位于Object Inspector中的Transform组件）。若对象表示为另一个对象的子对象，且后者并未位于世界原点处，则Unity将相对于父对象偏移对象的局部位置,进而将其设置于世界空间中。相比较而言，localPosition成员则直接对应于Object Inspector中Transform组件的位置值。特别地，对象位置表示为相对于父对象位置的偏移值；如果该对象不包含父对象，则表示相对于世界原点的偏移量。此时，成员position和localPosition彼此相等。</p>
+<h2 id="获取多个组件"><a href="#获取多个组件" class="headerlink" title="获取多个组件"></a>获取多个组件</h2><p>有些情况下，用户需要获取列表中的多个组件，即全部组件列表或者仅与特定类型匹配的列表，用户可通过GetComponents函数实现这一操作，如示例代码所示。用户可在单次事件中调用该函数，例如Start和Awake事件，而非Update事件。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">MyCustomComponent</span> : <span class="title">MonoBehaviour</span> </span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// Reference to all components as array</span></span><br><span class="line">    <span class="keyword">private</span> Component[] AllComponents = <span class="literal">null</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// Use this for initialization</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span> (<span class="params"></span>)</span> &#123;</span><br><span class="line">        <span class="comment">// Gets a list of all components attacted to this object</span></span><br><span class="line">        AllComponents = GetComponents&lt;Component&gt;();</span><br><span class="line"> </span><br><span class="line">        <span class="keyword">foreach</span> (Component C <span class="keyword">in</span> AllComponents)</span><br><span class="line">        &#123;</span><br><span class="line">            Debug.Log(C.ToString());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>关于GetComponent和GetComponents函数，Unity提供了相应的变化版本，并使用了对象间的通信机制，而非仅是同一对象中不同组件间的通信。这一类函数包括GetComponentsInChildren（获取子对象中全部组件的累计列表），以及GetComponentsInParent（获取父对象的全部组件）。</p>
+<h2 id="组件和消息"><a href="#组件和消息" class="headerlink" title="组件和消息"></a>组件和消息</h2><p>GetComponent函数族工作良好，可满足组件间通信的大多数要求，若使用得当，则优于SendMessage或BroadcastMessage方法。尽管如此，当给定GameObject后，在单一组件上基于SendMessage调用某一方法时依然十分有效，用户无须事先了解组件的类型。当前，用户可采用委托机制和接口在一定程度上实现这一行为。本节将考察SendMessage方案，对于可扩展行为的构建，该方案十分有效。例如，游戏中包含了大量的敌方角色，同时还保持着添加状态，并采用不同的方式予以实现。尽管其中存在差异，但保存游戏时全部敌方对象均需要将其数据保存至持久文件中，这对于随后的OnSave函数处理十分有用，并实现为特定的组件。然而，某些时候需要组件上的OnSave函数单独被SendMessage系统调用，且不希望被对象其他组件上的方法进行调用。简而言之，用户可通过Invoke方法对此予以实现，如示例代码所示。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">MyCustomComponent</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// Reference to component on which function must be called</span></span><br><span class="line">    <span class="keyword">public</span> MonoBehaviour Handler = <span class="literal">null</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">//Use this for initialization</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span> (<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">//Call function immediately</span></span><br><span class="line">        Handler.Invoke(<span class="string">"OnSave"</span>, <span class="number">0.0f</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>第7行代码：对应类中包含了public引用变量Handler。通过该字段，用户可通过Object Inspector将任意组件拖曳至Handler字段中，并以此表示消息发送的组件。需要注意的是，该类表示为MonoBehaviour类型或者继承自MonoBehaviour。这也意味着，用户无须事先了解具体的对象类型。</p>
+</li>
+<li><p>第14行代码：MonoBehaviour的Invoke方法被调用，进而运行名称匹配的对应方法。其中，第二个浮点参数定义了时间值（以秒计），此后，相关函数将被调用。相应地，0表示为即时调用。</p>
+</li>
+</ul>
+<h1 id="GameObject和场景世界"><a href="#GameObject和场景世界" class="headerlink" title="GameObject和场景世界"></a>GameObject和场景世界</h1><p>Unity中的另一项重要任务则是根据脚本搜索场景中的对象，尤其是运行期内实例化的对象，例如玩家对象。场景中的全部敌方对象，这对于相关操作十分重要，其中包括生成敌方角色、拾取能量棒、重定位玩家，以及检测对象间的碰撞。为了获取特定GameObject的引用，Unity提供了一系列与GameObject类相关的函数集。尽管有效，但函数开销较大，因而建议在单次事件中进行调用，例如Start和Awake函数。下面讨论与获取对象协同工作的其他技术和方法。</p>
+<h2 id="获取GameObject"><a href="#获取GameObject" class="headerlink" title="获取GameObject"></a>获取GameObject</h2><p>获取场景中的某一对象可通过GameObject.Find或GameObject.FindObjectWithTag函数实现。其中，出于性能考虑，这里建议使用GameObject.FindObjectWithTag函数。考虑到内容的完整性，下面首先考察GameObject.Find函数。该函数利用匹配名称搜索首次出现的对象所处的场景。此处，搜索名称应与Hierarchy面板中所呈现的名称匹配。对此，函数执行字符串比较操作并以此确定匹配结果，因而其执行速度较慢且相对烦琐。另外，该函数仅对包含唯一名称的对象有效，而某些时候，情况并非如此。尽管如此，若函数包含了适当的名称，GameObject.Find函数依然十分有效，如下所示。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Find Object with the name of player</span></span><br><span class="line">ObjPlayer = Gameobject.Find(<span class="string">"Player"</span>);</span><br></pre></td></tr></table></figure></p>
+<p>关于GameObject，读者可能会注意到Find函数定义为静态函数，因而无须执行GameObject的实例化操作以调用该函数。用户可通过GameObject.Find在源文件中实现随意调用。本章稍后将对静态和全局作用域予以介绍。</p>
+<p>GameObject.Find函数的执行速度较慢。对此，应在单次事件中使用该函数，例如Awake和Start事件。</p>
+<p>依据标签进行搜索可视为一种相对高效的方法。场景中的各个对象均包含一个标签成员，默认条件下设置为Untagged。该成员定义为唯一的标识符，用以标记独立对象或多个对象（整体形成一个集合）。总体而言，当采用标签搜索对象时，首先需要将标签显式地赋予某一对象中。用户可在脚本中利用GameObject.tag这一public成员实现这一行为。然而，通常情况下，用户多会使用Unity Editor，即单击Object Inspector中的Tag下拉菜单并选取一个标签。除此之外，用户还可选择Add Tag选项，进而创建新的自定义标签。其中，通用标签包括Player、Enemy、Weapon、Bonus、Prop、Environment、Light、Sound以及GameController等内容。</p>
+<p>当对一个或多个对象赋予了相应的标签后，用户可在代码中通过标签高效地搜索对象。对于包含匹配标签的对象，GameObject.FindGameObjectWithTag函数将搜索相应的场景，并返回首个对象（返回一个对象数组），如示例代码所示。需要注意的是，虽然GameObject.FindGameObjectWithTag函数使用字符串参数，但Unity在内部将该字符串转换为数值形式，进而提升标签的比较速度。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ObjectFinder</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// Tag name of objects to find</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span> TagName = <span class="string">"Enemy"</span>;</span><br><span class="line">    <span class="comment">// Array of found objects matching tag</span></span><br><span class="line">    <span class="keyword">public</span> Gameobject[] FoundObjects;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">//Use this for initialization</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span> (<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// Find objects of matching tag</span></span><br><span class="line">        FoundObjects = Gameobject.FindGameObjectsWithTag(TagName);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>某些时候,用户可能将多个标签赋予单一对象。然而, Unity目前尚不支持此项功能。当然,用户可绕开这一限定条件,将空游戏对象作为主对象的父对象,并将所需的标签赋予各个子对象中。当按照标签搜索对象时,应注意获取指向父对象的索引,即所需的实际对象。</p>
+<h2 id="对象比较"><a href="#对象比较" class="headerlink" title="对象比较"></a>对象比较</h2><pre><code>当针对特定对象搜索场景时, GameObject搜索函数较为有效,但在一些场合下,用户需要对已获取的两个对象进行比较。一般情况下,该操作涉及两个对象间的名称和标签的比较。对此,可通过CompareTag函数实现这一功能,如下所示。
+</code></pre>
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Unity/" rel="tag"># Unity</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/06/人工智能/" rel="next" title="人工智能">
+                <i class="fa fa-chevron-left"></i> 人工智能
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Che Bin</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">38</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">4</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#GameObject对象"><span class="nav-number">1.</span> <span class="nav-text">GameObject对象</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#组件间的交互方式"><span class="nav-number">2.</span> <span class="nav-text">组件间的交互方式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#SendMessage和BroadcastMessage"><span class="nav-number">2.1.</span> <span class="nav-text">SendMessage和BroadcastMessage</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GetComponent函数"><span class="nav-number">2.2.</span> <span class="nav-text">GetComponent函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#获取多个组件"><span class="nav-number">2.3.</span> <span class="nav-text">获取多个组件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#组件和消息"><span class="nav-number">2.4.</span> <span class="nav-text">组件和消息</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#GameObject和场景世界"><span class="nav-number">3.</span> <span class="nav-text">GameObject和场景世界</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#获取GameObject"><span class="nav-number">3.1.</span> <span class="nav-text">获取GameObject</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对象比较"><span class="nav-number">3.2.</span> <span class="nav-text">对象比较</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Che Bin</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v6.5.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
