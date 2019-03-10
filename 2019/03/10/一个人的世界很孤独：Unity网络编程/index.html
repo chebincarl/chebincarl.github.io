@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="在游戏开发中，网络模块是不可或缺的一部分。哪怕是一款单机游戏，也离不于网络。授权验证、收集玩家信息、实现玩家社交互动和玩家对战等等，都需要使用网络来实现。  目前在Unity中实现网络功能主要有三种方式，第一种是使用Unity新提供的网络引擎UNET，第二种是使用第三方的插件Photon，最后一种则是由开发者自行从底层开始设计和实现网络功能。   在本章的内容中，我们主要介绍前两种实现网络功能的方">
+<meta name="keywords" content="Unity">
+<meta property="og:type" content="article">
+<meta property="og:title" content="一个人的世界很孤独：Unity网络编程">
+<meta property="og:url" content="http://yoursite.com/2019/03/10/一个人的世界很孤独：Unity网络编程/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="在游戏开发中，网络模块是不可或缺的一部分。哪怕是一款单机游戏，也离不于网络。授权验证、收集玩家信息、实现玩家社交互动和玩家对战等等，都需要使用网络来实现。  目前在Unity中实现网络功能主要有三种方式，第一种是使用Unity新提供的网络引擎UNET，第二种是使用第三方的插件Photon，最后一种则是由开发者自行从底层开始设计和实现网络功能。   在本章的内容中，我们主要介绍前两种实现网络功能的方">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-03-10T13:59:14.615Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="一个人的世界很孤独：Unity网络编程">
+<meta name="twitter:description" content="在游戏开发中，网络模块是不可或缺的一部分。哪怕是一款单机游戏，也离不于网络。授权验证、收集玩家信息、实现玩家社交互动和玩家对战等等，都需要使用网络来实现。  目前在Unity中实现网络功能主要有三种方式，第一种是使用Unity新提供的网络引擎UNET，第二种是使用第三方的插件Photon，最后一种则是由开发者自行从底层开始设计和实现网络功能。   在本章的内容中，我们主要介绍前两种实现网络功能的方">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/03/10/一个人的世界很孤独：Unity网络编程/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>一个人的世界很孤独：Unity网络编程 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/10/一个人的世界很孤独：Unity网络编程/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Che Bin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">一个人的世界很孤独：Unity网络编程
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-03-10 21:21:12 / 修改时间：21:59:14" itemprop="dateCreated datePublished" datetime="2019-03-10T21:21:12+08:00">2019-03-10</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>在游戏开发中，网络模块是不可或缺的一部分。哪怕是一款单机游戏，也离不于网络。授权验证、收集玩家信息、实现玩家社交互动和玩家对战等等，都需要使用网络来实现。 </p>
+<p>目前在Unity中实现网络功能主要有三种方式，第一种是使用Unity新提供的网络引擎UNET，第二种是使用第三方的插件Photon，最后一种则是由开发者自行从底层开始设计和实现网络功能。  </p>
+<p>在本章的内容中，我们主要介绍前两种实现网络功能的方式，特别是第二种方式，它也是目前Unity项目中实现网络功能的主流解决方案。</p>
+<a id="more"></a>
+<h1 id="UNET简介"><a href="#UNET简介" class="headerlink" title="UNET简介"></a>UNET简介</h1><p>Unity 5.1版本提供了全新的网络工具–UNET（Unity Networking）。Unity根据开发者的实际需求将该工具的用户分为两类：</p>
+<ul>
+<li><p>1) 对网络相关的知识不太了解，需要借助网络快速实现相关功能的开发者。这类开发者应该使用High Level API(HLAPI)或者NetworkManager。  </p>
+</li>
+<li><p>2) 准备构建大型网络游戏，需要强大且足够灵活的网络工具。这类开发者应该使用NetworkTransport API(LLAPI)。  </p>
+</li>
+</ul>
+<p>开发者应当在项目构建初期就计划好网络需求，即需要使用哪些工具来实现哪些功能。有了具体规划后，再来了解相应的组件和概念，就可以节省大量的开发时间。</p>
+<p>UNET基于多人在线游戏的概念构建，并提供了相关功能，考虑到读者的需求和篇幅限制，本节将会重点介绍以下内容：</p>
+<ul>
+<li>1) 授权服务器和非授权服务器  </li>
+<li>2) High Level API(HLAPI)</li>
+<li>3) Transport Layer API  </li>
+<li>4) WebGL Support  </li>
+<li>5) Internet Services  </li>
+<li>6) NetWork View</li>
+</ul>
+<h2 id="UNET中的服务器"><a href="#UNET中的服务器" class="headerlink" title="UNET中的服务器"></a>UNET中的服务器</h2><p>UNET中存在两个重要的概念，授权服务器和非授权服务器，以下分别进行介绍。</p>
+<h3 id="授权服务器"><a href="#授权服务器" class="headerlink" title="授权服务器"></a>授权服务器</h3><p>在讲解授权服务器之前，有必要先了解客户端的概念。</p>
+<p>玩家从网上下载到的网络游戏即客户端，客户端本身不执行计算操作。它的作用是告诉服务器玩家将要做什么，比如释放一个技能、购买某件物品。游戏的判断逻辑和规则不在客户端执行，比如玩家释放技能的流程是这样的：玩家按下某个键，客户端将这个信息传输给服务器，服务器对该技能的伤害值进行判断，之后再将计算后的信息反馈给玩家。</p>
+<p>整个游戏的所有规则、数据和逻辑都由授权服务器处理。玩家在客户端上执行的任何操作，都会传输到授权服务器进行判定。比如在FPS游戏中，客户端只能告诉服务器“我射出了一发子弹”，而更具体的信息如子弹射中了谁、造成了多少伤害、还剩多少发子弹，这些都由授权服务器来判定。  </p>
+<p>从根本上来说，授权服务器将玩家操作与操作的结果隔离。可以把这个过程理解为：客户端将玩家当前的信息和操作发送到服务器-&gt;服务器处理接收到的信息-&gt;服务器将新的数据发送到各个客户端。</p>
+<p>这个机制的优点在于玩家无法在本地客户端上作弊，因为所有操作和数据的判定均由授权服务器来处理。</p>
+<h3 id="非授权服务器"><a href="#非授权服务器" class="headerlink" title="非授权服务器"></a>非授权服务器</h3><p>非授权服务器和授权服务器之间的不同在于，非授权服务器并不控制客户端上各个用户的操作。玩家的输入输出和游戏逻辑均由本地客户端处理，然后本地客户端将处理结果发送给非授权服务器，非授权服务器再将这些状态同步到游戏世界中。在整个过程中，非授权服务器扮演的角色类似于中转站，并不对信息进行判定，唯一职责就是将收到的信息同步到整个游戏世界中。而在授权服务器中，判断和同步都由授权服务器来处理。</p>
+<p>完成这种网络通信的方式有两种：远程过程调用和状态同步。  </p>
+<p>远程过程调用（Remote Procedure Calls，RPC）用来调用远程计算机上的某个方法。一方面可以从客户端调用服务器上的某个方法，另一方面则是从服务器上调用所有客户端或者指定客户端上的方法。  </p>
+<p>状态同步用于同步各个客户端中不断改变的数据。例如在MMORPG中，玩家可以看到身边别的玩家移动或者释放技能等。状态同步就是不断地将玩家的数据分发出去，这样每个客户端上的玩家都能同时知道别的玩家的所有状态。状态同步需要消耗大量带宽，所以开发人员应该尽量优化带宽数量。</p>
+<h2 id="High-Level-API"><a href="#High-Level-API" class="headerlink" title="High Level API"></a>High Level API</h2><p>High Level API(HLAPI)是在Unity中创建多人游戏的一个功能，构建于较低级别的实时通信层之上，用来处理许多多人游戏常用的任务。它可以同时作为客户端和服务器的一部分，所以不需要专门的服务器进程。  </p>
+<p>HLAPI使用了新的命名空间：UnityEngine.Networking。它是Unity中的一个全新网络系统，简单易用，并为多人游戏提供了大量实用的功能，例如：</p>
+<ul>
+<li>消息处理  </li>
+<li>通用高性能的序列化  </li>
+<li>分布式的对象管理  </li>
+<li>状态同步  </li>
+<li>网络类：Server、Client、Connection等  </li>
+</ul>
+<p>了解HLAPI之前，首先需要了解一下网络系统的基本概念。</p>
+<p>(1)服务器（Server）和主机（Host）</p>
+<p>在Unity中，一个游戏的网络系统通常是由一个服务器端和多个客户端组成的。如果没有专门的服务器端时，服务器端的角色将由某个客户端来扮演，通常称这个客户端为“Host”（主机），如下图所示。</p>
+<p>Host下有一个客户端和服务器端，host使用的客户端被称为Local Client，除此之外的客户端被称为Remote Client。Local Client和服务器通过直接的方法调用和消息队列进行通信，因为二者在同一个进程、同一个场景中。而Remote Client和服务器则是通过普通的网络连接进行通信<br>。</p>
+<p>(2)实例化（Instantiate）和生成（Spawn）</p>
+<p>GameObject.Instantiate方法可以创建新的游戏对象，但在网络系统中，对象必须还要被“生成”(spawned)。这个操作必须在服务器上进行，然后其他客户端上也会创建出该对象。对象一旦生成，生成系统（Spawning System）会使用分布式对象生命周期管理和同步状  态原则来管理这些对象。</p>
+<p>(3)玩家（Players）和本地玩家（Local Players）</p>
+<p>网络系统中的每一个玩家对象都是专有的，一个玩家不能控制另外一个玩家对象，因此就有了MyPlayer的概念。在添加一个玩家对象时，这个Player对象就成为该玩家客户端上的LocalPlayer。如下图所示。</p>
+<p>HLAPI中封装好了网络相关的Serve API，开发者可以直接使用，而不需要了解底层相关的细节。HLAPI的  主要功能如下：</p>
+<ul>
+<li>通过Network Manager来控制游戏的网络状态。</li>
+<li>发送和接收网络消息。</li>
+<li>将客户端上的网络命令发送到服务器。</li>
+<li>从服务器上对客户端进行远程过程调用。</li>
+<li>将服务器上的网络事件发送至客户端。</li>
+</ul>
+<h2 id="Transport-Layer-API"><a href="#Transport-Layer-API" class="headerlink" title="Transport Layer API"></a>Transport Layer API</h2><p>在某些项目的开发中，如果HLAPI提供的功能不足以满足网络需求，开发者还可以使用Unity提供的较低级别的传输层API（Transport Layer API），它允许开发者构建自己的网络系统。</p>
+<p>传输层API可以发送和接收消息，并以字节数组来表示，还提供了许多“服务端质量”选项以适应不同的使用场景。它侧重于灵活性和高性能，API暴露在UnityEngine.Networking.NetworkTransport中。</p>
+<p>传输层API支持基础的网络通信服务，包括：</p>
+<ul>
+<li>建立连接。  </li>
+<li>使用多种服务水平的通信。</li>
+<li>流量控制。  </li>
+<li>统计数据。  </li>
+<li>通过中继服务器或者本地发现的服务器进行通信。</li>
+</ul>
+<p>传输层API使用两种协议：通用通信UDP和用于WebGL的WebSockets。使用传输层API的常见工作流程如下。  </p>
+<ul>
+<li>初始化网络传输层。</li>
+<li>配置网络拓扑。</li>
+<li>创建服务端主机。</li>
+<li>开始通信（处理连接、发送/接收消息）。</li>
+</ul>
+<h1 id="Unity中的第三方网络插件：Photon"><a href="#Unity中的第三方网络插件：Photon" class="headerlink" title="Unity中的第三方网络插件：Photon"></a>Unity中的第三方网络插件：Photon</h1><p>虽然Unity提供了官方的UNET，但因为种种原因，当前版本的UNET并没有得到广泛的应用。在实际项目开发中，开发者要么选择自己从零构建网络系统，要么采用最为流行的第三方网络插件–Photon。</p>
+<p>我们将使用Photon For Unity(PUN)实现游戏的网络功能。PUN是根据“房间”的概念构建的服务器系统。每一个房间可以容纳最多10位玩家。玩家可以根据房间名或者随机加入某房间。</p>
+<h2 id="Photon的主要功能特性"><a href="#Photon的主要功能特性" class="headerlink" title="Photon的主要功能特性"></a>Photon的主要功能特性</h2><p>Photon插件的功能不仅仅是替代UNET，它还提供了一系列围绕网络服务的插件，具体包括：</p>
+<ul>
+<li><p>1) Photon Realtime：Photon Realtime是Exit Games架设在全世界各地区的服务器。通过Photon Realtime，即便是不同设备的玩家也可以同台竞技。</p>
+</li>
+<li><p>2) Photon Unity Networking(PUN)：针对于Unity平台的插件，支持Photon Realtime所提供的所有功能，并且支持Unity所支持的所有平台，与Unity完美整合。  </p>
+</li>
+<li><p>3) Photon TrueSync：通过TrueSync，客户端只需要处理用户输入，TrueSync会在服务端模拟物理效果，能够有效提升用户延迟高时的用户体验。  </p>
+</li>
+<li><p>4) Photon Bolt：用于构建游戏中的P2P模式，使用Photon Bolt能够快速开发出类似于英雄联盟、王者荣耀等游戏的匹配机制。  </p>
+</li>
+<li><p>5) Photon Chat：基于PUN的游戏内文字聊天系统。  </p>
+</li>
+<li>6) Photon Voice：基于PUN的游戏内语音聊天系统。</li>
+</ul>
+<p>以上功能如Photon Chat和Photon Voice都是基于PUN的功能。在使用PUN之前，让  我们先了解一下PUN的一些基本概念。  </p>
+<p>(1) AppId&amp;Game Version<br>PUN通过AppID区分不同的应用，只有AppID相同的客户端之间才能成功连接。除了AppID，还需要通过Game Version来区分游戏的不同版本，版本相同的客户端之间才可以互相连接，开发者可以手动设置游戏的Game Version。  </p>
+<p>(2) Lobby  当玩家成功登录游戏时，首先会进入游戏大厅（Lobby），在大厅中玩家可以获取游戏的房间列表，之后玩家可以选择加入哪个房间。如果没有勾选设置中的Auto-Join Lobby选项，则不会自动进入大厅，需要玩家手动进入。</p>
+<p>(3) Rooms<br>PUN是根据“房间”的概念构建的服务器系统。每一个房间最多10位玩家。玩家可以根据房间名或者随机加入某房间。</p>
+<h2 id="Photon-Cloud与Photon-Server"><a href="#Photon-Cloud与Photon-Server" class="headerlink" title="Photon Cloud与Photon Server"></a>Photon Cloud与Photon Server</h2><p>Photon本身提供了架设与全球各地区的服务器（Photon Cloud），如果开发者希望使用自己架设的服务器，则需要使用到Photon Server。</p>
+<p>Photon Server是一个本地部署（On-Premises，即On-Prem）的服务端应用，开发者可自行架设，同时开发者享有完全自定义服务器的权利。  </p>
+<p>而Photon Cloud是Saas（Software as a Service，软件即服务）的服务，开发者只需要专注于使用这些服务即可，其他所有细节都由Exit Games（开发Photon的公司）完成。  </p>
+<p>Photon Cloud运行于Photon Server之上，Photon Realtime、Photon Chat是运行于Photon Cloud之上的应用。</p>
+<h2 id="PUN、PUN-与UNET"><a href="#PUN、PUN-与UNET" class="headerlink" title="PUN、PUN+与UNET"></a>PUN、PUN+与UNET</h2><p>首先要说明一下，PUN是Photon Unity Networking的英文缩写。Unity提供了内置的网络系统–UNET，那么为什么此处笔者选择PUN呢？PUN相对于UNET的优势在何处呢？</p>
+<p>(1)房间模式  </p>
+<p>UNET是基于Server-client的，服务器是运行于某一个客户端之上的。PUN也是基于<br>Server-client的联网服务，但是有特定的服务器，不会因为某个客户端玩家离线而影响游戏体验。</p>
+<p>(2)连接</p>
+<p>由于UNET中，服务器托管于某一客户端之上，所以当客户端玩家网络出现问题时，与该客户端连接的所有玩家都会出现卡顿甚至掉线。而PUN是使用特定的服务器，所以只要玩家的网络没有问题，PUN就能充分保证网络连接的畅通性。</p>
+<p>(3)功能性</p>
+<p>前一节中已经提到，PUN提供了大量功能性插件，并且使用都非常简单，这是UNET完全不具备的。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Unity/" rel="tag"># Unity</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/10/有了光就有了一切：Enlighten/" rel="next" title="有了光就有了一切：Enlighten">
+                <i class="fa fa-chevron-left"></i> 有了光就有了一切：Enlighten
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Che Bin</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">45</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">4</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#UNET简介"><span class="nav-number">1.</span> <span class="nav-text">UNET简介</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#UNET中的服务器"><span class="nav-number">1.1.</span> <span class="nav-text">UNET中的服务器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#授权服务器"><span class="nav-number">1.1.1.</span> <span class="nav-text">授权服务器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#非授权服务器"><span class="nav-number">1.1.2.</span> <span class="nav-text">非授权服务器</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#High-Level-API"><span class="nav-number">1.2.</span> <span class="nav-text">High Level API</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Transport-Layer-API"><span class="nav-number">1.3.</span> <span class="nav-text">Transport Layer API</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Unity中的第三方网络插件：Photon"><span class="nav-number">2.</span> <span class="nav-text">Unity中的第三方网络插件：Photon</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Photon的主要功能特性"><span class="nav-number">2.1.</span> <span class="nav-text">Photon的主要功能特性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Photon-Cloud与Photon-Server"><span class="nav-number">2.2.</span> <span class="nav-text">Photon Cloud与Photon Server</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PUN、PUN-与UNET"><span class="nav-number">2.3.</span> <span class="nav-text">PUN、PUN+与UNET</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Che Bin</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v6.5.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
