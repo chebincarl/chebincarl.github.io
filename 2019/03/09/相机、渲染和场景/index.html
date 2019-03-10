@@ -116,7 +116,7 @@
 <meta property="og:description" content="layout： titletitle： 相机、渲染和场景date： 2019-03-09 12：54：32 tags： Unity本章主要讨论相机、渲染、场景及其各类组合效果。一般地讲，相机可表示为视见点并以此渲染场景，即3D空间内的一点，并以此产生场景视图，根据既定视角和视域，经捕捉后，将以像素形式光栅化至纹理中。此后，结合之前的渲染结果，渲染至屏幕上。因此，相机、渲染和场景均为关联紧密的处理">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://yoursite.com/2019/03/09/相机、渲染和场景/1.png">
-<meta property="og:updated_time" content="2019-03-09T06:23:27.358Z">
+<meta property="og:updated_time" content="2019-03-10T16:31:13.852Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="车斌的博客">
 <meta name="twitter:description" content="layout： titletitle： 相机、渲染和场景date： 2019-03-09 12：54：32 tags： Unity本章主要讨论相机、渲染、场景及其各类组合效果。一般地讲，相机可表示为视见点并以此渲染场景，即3D空间内的一点，并以此产生场景视图，根据既定视角和视域，经捕捉后，将以像素形式光栅化至纹理中。此后，结合之前的渲染结果，渲染至屏幕上。因此，相机、渲染和场景均为关联紧密的处理">
@@ -344,12 +344,24 @@
                 
               
 
-              <time title="创建时间：2019-03-09 12:54:32 / 修改时间：14:23:27" itemprop="dateCreated datePublished" datetime="2019-03-09T12:54:32+08:00">2019-03-09</time>
+              <time title="创建时间：2019-03-09 12:54:32" itemprop="dateCreated datePublished" datetime="2019-03-09T12:54:32+08:00">2019-03-09</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-03-11 00:31:13" itemprop="dateModified" datetime="2019-03-11T00:31:13+08:00">2019-03-11</time>
               
             
           </span>
@@ -385,6 +397,7 @@
         <hr>
 <p>layout： title<br>title： 相机、渲染和场景<br>date： 2019-03-09 12：54：32</p>
 <h2 id="tags：-Unity"><a href="#tags：-Unity" class="headerlink" title="tags： Unity"></a>tags： Unity</h2><p>本章主要讨论相机、渲染、场景及其各类组合效果。一般地讲，相机可表示为视见点并以此渲染场景，即3D空间内的一点，并以此产生场景视图，根据既定视角和视域，经捕捉后，将以像素形式光栅化至纹理中。此后，结合之前的渲染结果，渲染至屏幕上。因此，相机、渲染和场景均为关联紧密的处理过程。本章将讨论相机的动画、漫游实现方式，以及如何沿曲线路径移动相机；同时，本章还将分析对象是否可见以及何时处于可见状态。除此之外，本章还将对正交相机进行设置，并针对2D游戏以及图形用户界面渲染2D像素纹理。</p>
+<a id="more"></a>
 <h1 id="相机Gizmo"><a href="#相机Gizmo" class="headerlink" title="相机Gizmo"></a>相机Gizmo</h1><p>当相机在Scene选项卡中被选取，且开启Gizmo显示时，将根据某些属性，例如视域，显示视锥Gizmo，其中，可查看相机在场景中的位置，以及基于当前视图的相机视见内容。</p>
 <p>Gizmo对于所选相机的定位十分有用，并可据此获得最佳的场景视图。然而，某些时候，用户可能需要实现相反的情形。也就是说，在未被选择的相机中定位对象。特别地，用户需要在相机的视锥体内移动特定对象，并确保对象相对于该相机可见。这一实现过程在正常条件下可能十分枯燥，默认条件下，当相机处于未选取状态时，通常并不会显示其视锥Gizmo。这意味着，当移动对象时，需要持续选取相机，以检测移动对象，是否真正位于相机视锥体内，并在必要时调整其位置。针对这一问题，Unity应可提供稳定的视锥体Gizmo查看机制，即使当前相机未被选中。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"> </span><br><span class="line">[<span class="meta">ExecuteInEditMode</span>]ExecuteInEditMode.note</span><br><span class="line">[<span class="meta">RequireComponent(typeof(Camera))</span>]</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">DrawFrustumRefined</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> Camera Cam = <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">bool</span> ShowCamGizmo = <span class="literal">true</span>;</span><br><span class="line">   </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Awake</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Cam = GetComponent&lt;Camera&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">OnDrawGizmos</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">//Should we show qizmo?</span></span><br><span class="line">        <span class="keyword">if</span> (!ShowCamGizmo) <span class="keyword">return</span>;</span><br><span class="line"> </span><br><span class="line">        <span class="comment">//Get size (dimensions) of Game Tab</span></span><br><span class="line">        Vector2 v = DrawFrustumRefined.GetGameViewSize();</span><br><span class="line"> </span><br><span class="line">        <span class="keyword">float</span> GameAspect = v.x / v.y; <span class="comment">//Calculate tab aspect ratio</span></span><br><span class="line">        <span class="keyword">float</span> FinalAspect = GameAspect / Cam.aspect;</span><br><span class="line"> </span><br><span class="line">        Matrix4x4 LocalToWorld = transform.localToWorldMatrix;</span><br><span class="line">        Matrix4x4 ScaleMatrix = Matrix4x4.Scale(<span class="keyword">new</span></span><br><span class="line">        Vector3(Cam.aspect * (Cam.rect.width / Cam.rect.height)， FinalAspect， <span class="number">1</span>));</span><br><span class="line"> </span><br><span class="line">        Gizmos.matrix = LocalToWorld * ScaleMatrix;</span><br><span class="line">        Gizmos.DrawFrustum(transform.position， Cam.fieldOfView，</span><br><span class="line">        Cam.nearClipPlane， Cam.farClipPlane， FinalAspect);</span><br><span class="line">        Gizmos.matrix = Matrix4x4.identity; <span class="comment">//Reset gizmo matrix</span></span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">//Function to get dimensions of game tab</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Vector2 <span class="title">GetGameViewSize</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        System.Type T = System.Type.GetType(<span class="string">"UnityEditor.GameView， UnityEditor"</span>);</span><br><span class="line">        System.Reflection.MethodInfo GetSizeOfMainGameView =</span><br><span class="line">        T.GetMethod(<span class="string">"GetSizeOfMainGameView"</span>， System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);</span><br><span class="line">        <span class="keyword">return</span> (Vector2)GetSizeOfMainGameView.Invoke(<span class="literal">null</span>， <span class="literal">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <ul>
