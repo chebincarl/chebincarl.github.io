@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="本章涵盖：  比较旧GUI系统（Unity4.6之前）和新GUI系统 创建用于界面的画布 通过锚点定位UI元素 为UI添加交互（按钮、滑动条等） 从UI广播和侦听事件">
+<meta name="keywords" content="Unity">
+<meta property="og:type" content="article">
+<meta property="og:title" content="在3D游戏中放置2D图形用户界面">
+<meta property="og:url" content="http://yoursite.com/2019/03/20/在3D游戏中放置2D图形用户界面/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="本章涵盖：  比较旧GUI系统（Unity4.6之前）和新GUI系统 创建用于界面的画布 通过锚点定位UI元素 为UI添加交互（按钮、滑动条等） 从UI广播和侦听事件">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/2019/03/20/在3D游戏中放置2D图形用户界面/1.png">
+<meta property="og:image" content="http://yoursite.com/2019/03/20/在3D游戏中放置2D图形用户界面/2.png">
+<meta property="og:image" content="http://yoursite.com/2019/03/20/在3D游戏中放置2D图形用户界面/3.png">
+<meta property="og:image" content="http://yoursite.com/2019/03/20/在3D游戏中放置2D图形用户界面/4.png">
+<meta property="og:image" content="http://yoursite.com/2019/03/20/在3D游戏中放置2D图形用户界面/5.png">
+<meta property="og:image" content="http://yoursite.com/2019/03/20/在3D游戏中放置2D图形用户界面/6.png">
+<meta property="og:image" content="http://yoursite.com/2019/03/20/在3D游戏中放置2D图形用户界面/7.png">
+<meta property="og:image" content="http://yoursite.com/2019/03/20/在3D游戏中放置2D图形用户界面/8.png">
+<meta property="og:image" content="http://yoursite.com/2019/03/20/在3D游戏中放置2D图形用户界面/9.png">
+<meta property="og:image" content="http://yoursite.com/2019/03/20/在3D游戏中放置2D图形用户界面/10.png">
+<meta property="og:image" content="http://yoursite.com/2019/03/20/在3D游戏中放置2D图形用户界面/11.png">
+<meta property="og:image" content="http://yoursite.com/2019/03/20/在3D游戏中放置2D图形用户界面/12.png">
+<meta property="og:image" content="http://yoursite.com/2019/03/20/在3D游戏中放置2D图形用户界面/13.png">
+<meta property="og:updated_time" content="2019-03-20T15:36:50.681Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="在3D游戏中放置2D图形用户界面">
+<meta name="twitter:description" content="本章涵盖：  比较旧GUI系统（Unity4.6之前）和新GUI系统 创建用于界面的画布 通过锚点定位UI元素 为UI添加交互（按钮、滑动条等） 从UI广播和侦听事件">
+<meta name="twitter:image" content="http://yoursite.com/2019/03/20/在3D游戏中放置2D图形用户界面/1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/03/20/在3D游戏中放置2D图形用户界面/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>在3D游戏中放置2D图形用户界面 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/20/在3D游戏中放置2D图形用户界面/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Che Bin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">在3D游戏中放置2D图形用户界面
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-03-20 20:48:27 / 修改时间：23:36:50" itemprop="dateCreated datePublished" datetime="2019-03-20T20:48:27+08:00">2019-03-20</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本章涵盖：</p>
+<ul>
+<li>比较旧GUI系统（Unity4.6之前）和新GUI系统</li>
+<li>创建用于界面的画布</li>
+<li>通过锚点定位UI元素</li>
+<li>为UI添加交互（按钮、滑动条等）</li>
+<li>从UI广播和侦听事件</li>
+</ul>
+<a id="more"></a>
+<p>本章中将构建一个在第一人称demo游戏虚拟场景上显示的2D界面。每个游戏除了进行游戏玩法的虚拟场景外，还需要一些抽象交互和一些信息显示。对于所有游戏这都是真实的情况，不管是2D游戏还是3D游戏，第一人称射击游戏还是益智游戏。</p>
+<p>这些抽象的交互显示被称为UI，更具体而言就是GUI。GUI指的是界面的可视化部分，例如文本和按钮（如下图所示）。</p>
+<img src="/2019/03/20/在3D游戏中放置2D图形用户界面/1.png">
+<p>在游戏中，文本和按钮通常覆盖在游戏视图上，这是一种称为HUD的显示。</p>
+<p>平视显示（HUD，heads-up display）使得图形叠加在世界视图上。这个概念源于军用飞机，目的是为了让飞行员不低头就能看到重要信息。类似的，GUI像HUD一样叠加在游戏视图上。</p>
+<p>步骤：<br>(1)规划界面<br>(2)放置显示的UI元素<br>(3)对UI元素编写交互<br>(4)让GUI响应场景中的事件<br>(5)让场景响应GUI上的动作</p>
+<h1 id="前期准备"><a href="#前期准备" class="headerlink" title="前期准备"></a>前期准备</h1><h2 id="直接模式GUI还是高级2D界面"><a href="#直接模式GUI还是高级2D界面" class="headerlink" title="直接模式GUI还是高级2D界面"></a>直接模式GUI还是高级2D界面</h2><p>Unity的第一个GUI系统是直接模式（immediate mode）GUI系统，该系统可以使在屏幕上放置按钮很简单。代码清单1展示了使用直接模式GUI系统的代码，它可以简单地将这个脚本附加到场景中的任何对象上。这个GUI系统完全基于代码，不能在Unity的编辑器上工作。</p>
+<p>直接模式在每帧显式发出绘制命令，而对于另一种系统，只需要一次定义所有的视觉效果，之后系统就知道每帧需要绘制什么，而不必再重新声明。后一种方法称为保留模式（retained mode）。</p>
+<p>代码清单1 使用直接模式GUI创建按钮的示例<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">BasicUI</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;	</span><br><span class="line">	<span class="comment">// 函数在每帧渲染其他所有对象之后调用</span></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">OnGUI</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>	&#123;</span><br><span class="line">		<span class="keyword">if</span> (GUI.Button(<span class="keyword">new</span> Rect(<span class="number">10</span>, <span class="number">10</span>, <span class="number">40</span>, <span class="number">20</span>), <span class="string">"Test"</span>)) <span class="comment">// 参数：位置X，Y，宽度，高度和文本标签</span></span><br><span class="line">		&#123;</span><br><span class="line">			Debug.Log(<span class="string">"Test button"</span>); </span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面代码清单中的核心代码是OnGUI()方法。非常类似于Start()和Update()，每个MonoBehaviour自动响应OnGUI()方法。这个方法会在每帧渲染完3D场景后执行，它提供了一个放置GUI绘制命令的入口。这段代码绘制了一个按钮；注意，用于绘制按钮的命令会在每帧执行（这就是直接模式）。按钮命令以条件判断的方式使用，这使得按钮被按下时可以进行响应。</p>
+<p>新的UI系统基于保留模式工作，因此图形只需要布局一次就能在每帧被绘制而不需要重新定义。在这个系统中，用于UI的图形放置在编辑器中。相比于直接模式UI，这提供了两个优势：<br>1)可以在放置UI元素时看到当前UI的外观。<br>2)这个系统可以让使用图像来定制UI变得更直接。</p>
+<p>为了使用这个系统，需要导入图像并将对象拖动到场景中。接下来规划UI的外观。</p>
+<h2 id="规划布局"><a href="#规划布局" class="headerlink" title="规划布局"></a>规划布局</h2><p>大多数游戏的HUD只是不停重复一些不同的UI控件。这意味着这个项目不需要你学习构建非常复杂的UI。接下来将在主游戏视图之上的屏幕角落中放置显示分数和设置按钮的UI（如下图所示）。设置按钮将打开一个弹出窗口，该窗口中包含一个文本域和一个滑动条。</p>
+<img src="/2019/03/20/在3D游戏中放置2D图形用户界面/2.png">
+<p>本例中，那些输入控件将用于设置玩家的姓名和移动速度，但基本上这些UI元素就可以控制游戏中的任何设置。</p>
+<p>很好，规划确实比较简单！接下来将需要的图像导入到项目中。</p>
+<h2 id="导入UI图像"><a href="#导入UI图像" class="headerlink" title="导入UI图像"></a>导入UI图像</h2><p>UI需要一些用于显示类似按钮之类的图像。下面使用2D图像构建UI，因此需要遵循以下两个步骤：</p>
+<p>(1)导入图像（如果有必要，设置它们为Sprite）<br>(2)将精灵拖动到场景中</p>
+<p>首先将图像拖动到Project视图中，导入它们，接着在Inspector中将它们的Texture Type设置改为Sprite(2D And UI)。</p>
+<img src="/2019/03/20/在3D游戏中放置2D图形用户界面/3.png">
+<p>Texture Type设置在3D项目中默认为Texture，而在2D项目中默认为Sprite。如果要在3D项目中使用精灵，需要手动调整这个设置。</p>
+<p>将图像导入到项目中。确保所有导入的资源都被设置为Sprite，你可能需要在导入之后调整设置中的Texture Type。</p>
+<img src="/2019/03/20/在3D游戏中放置2D图形用户界面/4.png">
+<p>这些精灵构成了接下来将创建的按钮、分数显示和弹出窗口。现在图像已导入，下面将这些图形放置到屏幕上。</p>
+<h1 id="设置GUI显示"><a href="#设置GUI显示" class="headerlink" title="设置GUI显示"></a>设置GUI显示</h1><p>美术资源和2D精灵是同一种资源，但这些资源在场景中以稍微不同的方式使用。Unity提供了一些特殊的工具，使图像成为HUD并显示在3D场景上，而不是显示作为场景一部分的图像。UI元素的定位通常由一些特殊技巧，因为显示可能需要根据不同的屏幕上进行变化。</p>
+<h2 id="为界面创建画布"><a href="#为界面创建画布" class="headerlink" title="为界面创建画布"></a>为界面创建画布</h2><p>UI系统工作原理中最基础且最特殊的一面是所有图像必须附加到画布对象上。</p>
+<p>画布（Canvas）是Unity用于为游戏渲染UI的一类特殊对象。</p>
+<p>Hierarchy视图右键“UI-&gt;Canvas”创建Canvas。在场景中将会出现一个Canvas对象（将该对象命名为HUD Canvas可能会更清晰）。该对象代表整个屏幕的范围，而且它的大小相对于3D场景，因为它将屏幕上的一个像素缩放为场景中的一个单位。</p>
+<p>当创建Canvas对象时，也会自动创建EventSystem对象。对于UI交互，该对象是必需的，但你可以忽略它。</p>
+<p>切换为2D视图模式（见下图）并双击Hierarchy中的画布，缩放视图使得完全可以看到它。2D视图模式在2D项目中会自动启用，但在3D项目中，需要手动单击才能在UI和主场景之间切换。为了切换回3D场景，关闭2D视图模式并双击建筑，使视野缩放到该对象。<br><img src="/2019/03/20/在3D游戏中放置2D图形用户界面/5.png"></p>
+<p>Scene视图面板顶部的按钮控制所显示的内容，因此查找Effects按钮，关闭天空盒。</p>
+<p>画布中有一些可以调整的设置。首先是Render Mode选项，让它保持默认设置，但你应该知道如下三种设置的含义：</p>
+<ul>
+<li><p>Screen Space-Overlay：将UI渲染为摄像机视图顶部的2D图形（这是默认设置）。</p>
+</li>
+<li><p>Screen Space-Camera：也将UI渲染在摄像机视图顶部，但UI元素可以进行透视效果的旋转。</p>
+</li>
+<li><p>World Space：将画布对象放置在场景中，就好像UI是3D场景的一部分。</p>
+</li>
+</ul>
+<p>初始默认设置之外的另外两种模式有时对于实现特殊效果很有用，但也会稍微复杂一些。另外一个重要的设置是Pixel Perfet。这个设置导致渲染轻微调整图像的位置，以使图像完全清晰和锐利（相反，在像素之间定位时会模糊它们）。继续并选中复选框。现在HUD画布已经设置完毕，但它依然是空白的，此时需要一些精灵。</p>
+<img src="/2019/03/20/在3D游戏中放置2D图形用户界面/6.png">
+<h2 id="按钮、图像和文本标签"><a href="#按钮、图像和文本标签" class="headerlink" title="按钮、图像和文本标签"></a>按钮、图像和文本标签</h2><p>画布对象定义了一个用于显示UI的区域，但它依然需要精灵来显示。如果参见下图中的UI版面，就会有个方块/敌人的图像在左上角，后面跟着显示分数的文本，右上角还有一个齿轮形状的按钮。因此，在GameObject菜单的UI部分只要为每个元素创建图像、文本或按钮即可。</p>
+<p>为了正确显示UI元素，UI元素需要成为画布对象的子节点。Unity自动处理了这个操作，但记住，通常可以在Hierarchy视图（如下图所示）中拖动对象来创建父子关系。<br><img src="/2019/03/20/在3D游戏中放置2D图形用户界面/7.png"></p>
+<p>画布中的对象可以因为定位的原因成为其他对象的父节点，就像场景中的任何对象一样。例如，你可能想把文本对象拖放到图像对象上，使文本随着图像的移动而移动。类似的，默认按钮对象有文本对象作为其子节点，这个按钮不需要文本标签，因此可以删除文本对象。</p>
+<p>将UI元素粗略定位到角落。现在拖动对象，直到将它们放在比较协调的位置。单击并将图像对象拖放到画布的左上角，将按钮移到右上角。</p>
+<p>在2D模式下使用Rect工具。把它描述为一个合并了三种变换（Move、Rotate和Scale）的工具。这些操作在3D模式中拆分为单独的工具，但在2D模式中需要合并起来，这是因为在2D模式中有一个维度不需要关心。在2D模式中，这个工具被自动选中，或者可以单击Unity左上角的按钮来选中它。</p>
+<p>此时，图像是空白的。如果选择一个UI对象并观察它的Inspector，将会发现图像组件的顶部附近有一个Source Image槽。如下图所示，从Project视图中拖动精灵（记住不是贴图！），将其赋给对象的图像。将敌人精灵赋给图像对象，并且将齿轮精灵赋给按钮对象（在将精灵赋到对象后单击Set Native Size来修正图像对象的大小）。</p>
+<img src="/2019/03/20/在3D游戏中放置2D图形用户界面/8.png">
+<p>首先关注敌人图像和齿轮按钮的外观。对于文本对象，在Inspector中有一些设置。首先，在大的Text框中输入一个数字；这个文本以后将被覆盖，但现在还是有用的，因为它看起来像是在编辑器中显示分数。由于该文本太小，因此增加Font Size为24并设置样式为Bold，你可能还想设置这个标签为水平左对齐（如下图所示）和垂直居中对齐。现在剩余的设置保留它们的默认值即可。</p>
+<img src="/2019/03/20/在3D游戏中放置2D图形用户界面/9.png">
+<p>除了Text盒和对齐，最常见的调整的属性就是字体。可以将TrueType字体导入到Unity中，然后将该字体放置到Inspector中。</p>
+<p>现在精灵已经被赋到UI图像，分数文本也已设置好，可以单击Play看看3D游戏顶部的HUD，如下图所示，显示在Unity的编辑器中的画布显示了屏幕的边界，可以在屏幕的这些位置上绘制UI元素。<br><img src="/2019/03/20/在3D游戏中放置2D图形用户界面/10.png"></p>
+<p>很好，已经在3D游戏中使用2D图像显示了HUD！还有一个更复杂的可视化设置需要完成：相对于画布来定位UI元素。</p>
+<h2 id="控制UI元素的位置"><a href="#控制UI元素的位置" class="headerlink" title="控制UI元素的位置"></a>控制UI元素的位置</h2><p>所有UI对象都有锚点（anchor），在编辑器中显示为target X（如下图所示），锚点是一种在UI中灵活定位对象的方式。<br><img src="/2019/03/20/在3D游戏中放置2D图形用户界面/11.png"></p>
+<p>对象的锚点是对象附加到画布或屏幕的点，它决定了计算对象的位置所依赖的点。</p>
+<p>位置是类似“X轴偏移50像素”这样的值。但存在一个问题：这50像素是相对什么而言？这正是锚点存在的原因。锚点的作用是当对象相对于锚点放置时，锚点相对画布移动。锚点定义为类似“屏幕中心”，那么当屏幕改变大小时锚点依然会在中心。类似的，设置锚点为屏幕的右边会让对象不管屏幕是否改变大小都保留在右边（例如，假设游戏在不同显示器上运行时）。</p>
+<p>理解所说的内容最简单的方式就是实践。选择图像对象并观察Inspector。锚点设置（如下图所示）将会出现在transform组件下的右侧。默认情况下，UI元素让它们的锚点设置为Center，但是可以将这个图像的锚点设置为Top Left；下图演示了如何使用Anchor Presets对锚点进行调整。</p>
+<img src="/2019/03/20/在3D游戏中放置2D图形用户界面/12.png">
+<p>同样，下面修改齿轮按钮，设置这个对象的锚点为Top Right；单击右上角的Anchor Preset。现在尝试缩放窗口的左右：单击并拖动Scene视图的边。由于存在锚点，UI对象会在画布改变大小时一直保留在角落。如下图所示，这些UI元素会在屏幕移动时固定在位置上。</p>
+<p>锚点能同时调整缩放和位置。图像上的每个角落都可以定位到屏幕的不同位置。下图中图像没有改变大小，但可以调整锚点使得当屏幕改变大小时图像进行缩放。</p>
+<img src="/2019/03/20/在3D游戏中放置2D图形用户界面/13.png">
+<p>所有的可视化设置已经完成，现在是时候编写程序进行交互了。</p>
+<h1 id="编写UI中的交互"><a href="#编写UI中的交互" class="headerlink" title="编写UI中的交互"></a>编写UI中的交互</h1><p>在与UI交互之前，需要有鼠标光标。如果回想一下，就会记起该游戏是在RayShooter代码的Start()方法中调整Cursor设置。这些设置锁定并隐藏了鼠标光标，这种行为在FPS游戏的控件中可以正常工作，但是影响了UI的使用。从RayShooter.cs中移除这些设置光标的代码，这样就可以单击HUD。</p>
+<p>只要打开了RayShooter.cs，就可以确保当与GUI交互时不能射击。代码清单2可以实现这一点。<br>代码清单6.2 在RayShooter.cs中添加GUI检查的代码</p>
+<pre><code class="cs"><span class="keyword">using</span> UnityEngine.EventSystems; <span class="comment">// 包含UI系统代码框架</span>
+...
+<span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>) </span>
+<span class="function"></span>{
+    <span class="keyword">if</span>(Input.GetMouseButtonDown(<span class="number">0</span>) &amp;&amp; !EventSystem.current.IsPointerOverGameObject() )
+    { <span class="comment">// 检查GUI未被使用</span>
+        Vector3 point = <span class="keyword">new</span> Vector3(camera.pixelwidth/<span class="number">2</span>, camera.pixelHeight/<span class="number">2</span>, <span class="number">0</span>);  
+...
+</code></pre>
+<p>现在可以运行游戏并单击按钮，尽管该游戏还没有任何功能。可以看到，当鼠标移到按钮并单击时，它的颜色发生了变化。这个鼠标悬停和单击时表现为默认的染色，对于每个按钮都可以修改这个染色，但现在默认颜色看起来还可以。你可以加速默认的淡入淡出行为，Fade Duration是按钮组件中的设置，可以尝试将其减少为0.01并观察按钮如何变化。</p>
+<p>有时，UI默认的交互控件会影响游戏。记住EventSystem对象会随着画布被自动创建。EventSystem对象控制UI交互控件，默认情况下，它使用方向按键来与GUI进行交互。你可能需要关闭EventSystem中的方向按键：在EventSystem设置中，不要选中Send Navigation Event复选框。</p>
+<p>但当单击按钮时什么事情也没有发生,因为现在还没有关联按钮到任何代码。下面将编写代码。</p>
+<h2 id="编写不可见的UIController"><a href="#编写不可见的UIController" class="headerlink" title="编写不可见的UIController"></a>编写不可见的UIController</h2><p>通常,所有UI元素的UI交互都一样,都以一系列标准步骤进行编写:(1)在场景中创建U1对象(前面部分创建的按钮)(2)编写当操作U1时调用的代码<br>(3)将脚本附加到场景的对象上<br>(4)通过脚本将UI元素(如按钮)关联到对象上为了按照这些步骤进行操作,首先需要创建控制器对象来关联按钮。创建UIController脚本(如代码清单6.3所示),并将该脚本拖动到场景中的控制器对象上。<br>代码清单6.3 对按钮编程的UIController脚本using UnityEngine;<br>using UnityEngine.UI;<br>using System. Collectie  ns:<br>导入U代码框架<br>public class UIController : MonoBehaviour {[SerializeField] private Text scoreLabel;<br>4<br>在场景中引用文本对象,设置文本属性<br>void Update () t<br>scoreLabel.text = Time.realtimesincestartup.ToString ();<br>public void OnOpenSettings() {Debuq. Log (“open settings”);<br>由设置按钮调用的方法</p>
+<p>你可能想知道为什么我们需要为SceneController和UIController分离对象,实际上,这个场景很简单,你可以用一个控制器来处理3D场景和UI.然而随着游戏变得更复杂,将3D场景和UI分为不同的模块将会更有用,它们之间间接通信。通常这个概念能很好地延伸到游戏。软件工程师称这个原理为关注分离(separation of concerns).</p>
+<p>现在将对象拖动到组件槽,连接它们。将分数标签(我们之前创建的文本对象)拖动到UIController的文本槽。UIController中的代码设置了显示在该标签上的文本。当前代码显示了一个定时器,以测试文本显示;这将会在后面修改为分数。<br>    接下来,将一个OnClick条目添加到按钮上并将控制器对象拖动到它上面。选中按钮观察它在Inspector中的设置。移动到底部,你将看到OnClick面板,初始时该面板为空,</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Unity/" rel="tag"># Unity</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/19/Unity灯光与渲染/" rel="next" title="Unity灯光与渲染">
+                <i class="fa fa-chevron-left"></i> Unity灯光与渲染
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Che Bin</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">65</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">4</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前期准备"><span class="nav-number">1.</span> <span class="nav-text">前期准备</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#直接模式GUI还是高级2D界面"><span class="nav-number">1.1.</span> <span class="nav-text">直接模式GUI还是高级2D界面</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#规划布局"><span class="nav-number">1.2.</span> <span class="nav-text">规划布局</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#导入UI图像"><span class="nav-number">1.3.</span> <span class="nav-text">导入UI图像</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#设置GUI显示"><span class="nav-number">2.</span> <span class="nav-text">设置GUI显示</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#为界面创建画布"><span class="nav-number">2.1.</span> <span class="nav-text">为界面创建画布</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#按钮、图像和文本标签"><span class="nav-number">2.2.</span> <span class="nav-text">按钮、图像和文本标签</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#控制UI元素的位置"><span class="nav-number">2.3.</span> <span class="nav-text">控制UI元素的位置</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#编写UI中的交互"><span class="nav-number">3.</span> <span class="nav-text">编写UI中的交互</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#编写不可见的UIController"><span class="nav-number">3.1.</span> <span class="nav-text">编写不可见的UIController</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Che Bin</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v6.5.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
