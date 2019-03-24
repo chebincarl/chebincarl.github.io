@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="一般来说，3D游戏以透视摄像机作为观察者，以3D模型作为被观察物；2D游戏以正交摄像机作为观察者，以面片模型作为被观察物，而这种2D游戏专用的面片模型是精灵。">
+<meta name="keywords" content="Unity">
+<meta property="og:type" content="article">
+<meta property="og:title" content="2D游戏基础">
+<meta property="og:url" content="http://yoursite.com/2019/03/24/2D游戏基础/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="一般来说，3D游戏以透视摄像机作为观察者，以3D模型作为被观察物；2D游戏以正交摄像机作为观察者，以面片模型作为被观察物，而这种2D游戏专用的面片模型是精灵。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-03-24T15:50:23.194Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="2D游戏基础">
+<meta name="twitter:description" content="一般来说，3D游戏以透视摄像机作为观察者，以3D模型作为被观察物；2D游戏以正交摄像机作为观察者，以面片模型作为被观察物，而这种2D游戏专用的面片模型是精灵。">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/03/24/2D游戏基础/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>2D游戏基础 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/24/2D游戏基础/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Che Bin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">2D游戏基础
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-03-24 23:50:06 / 修改时间：23:50:23" itemprop="dateCreated datePublished" datetime="2019-03-24T23:50:06+08:00">2019-03-24</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>一般来说，3D游戏以透视摄像机作为观察者，以3D模型作为被观察物；2D游戏以正交摄像机作为观察者，以面片模型作为被观察物，而这种2D游戏专用的面片模型是精灵。</p>
+<a id="more"></a>
+<h1 id="正交摄像机"><a href="#正交摄像机" class="headerlink" title="正交摄像机"></a>正交摄像机</h1><p>新建工程后，设置默认摄像机Projection参数为Orthographic，如下图所示，摄像机所能看到的是一个立方体。立方体的大小由图1中的Size大小决定。</p>
+<h1 id="精灵"><a href="#精灵" class="headerlink" title="精灵"></a>精灵</h1><p>在2D游戏中，被观察物是精灵。屏幕上显示的2D图片都叫作精灵，例如游戏里的角色（如主角和敌人）、场景装饰（如花草）等散布在场景中的道具都是精灵。</p>
+<h2 id="精灵实现"><a href="#精灵实现" class="headerlink" title="精灵实现"></a>精灵实现</h2><p>精灵实现分为3步：编辑器设置、图片导入和精灵显示。</p>
+<ul>
+<li><p>编辑器设置。首先在编辑器设置中将开发模式设置为2D，点击导航菜单栏-&gt;Edit-&gt;Projet Settings-&gt;Editor，打开Editor编辑器设置。如下图所示，将Default Behavior Mode下的Mode参数设置为2D，设置后向Unity工程导入图片资源，将默认为Sprite类型。</p>
+</li>
+<li><p>图片导入。任意拖入一张图片到Project窗口中完成导入。选中导入的图片查看Inspector视图下的设置信息。Texture Type（贴图类型）已经是Sprite（2D and UI）。</p>
+</li>
+<li><p>精灵显示。将图片拖入Hicrarchy视图内，即完成了精灵的显示，可以看到生动的精灵已经在我们的Scene窗体内了。</p>
+</li>
+</ul>
+<h2 id="调整精灵尺寸"><a href="#调整精灵尺寸" class="headerlink" title="调整精灵尺寸"></a>调整精灵尺寸</h2><p>点击Scene窗内顶部菜单栏2D按钮，可以看到Scene场景的视角已经锁定为正交模式（如下图所示）。</p>
+<p>在下图中，有4个圆点围绕在精灵的4个顶角上。拖动任意一个圆点，精灵都会随着鼠标的移动变大或缩小。同时观察Inspector窗口中Transform组件的Position和Scale，它们也跟随着变化，可以很方便地调节精灵的大小。当点击键盘的Shift键拖动时，精灵呈现长宽比规则缩放，再点击Alt键，就会中心等比例缩放。当鼠标靠近圆点鼠标时，会出现旋转提示，这时就可以旋转精灵了。使用Shift键旋转会出现固定的角度旋转。</p>
+<p>在实现了精灵的显示后，下面来详细说明精灵实现过程中的各个功能参数。</p>
+<h2 id="精灵渲染器"><a href="#精灵渲染器" class="headerlink" title="精灵渲染器"></a>精灵渲染器</h2><p>精灵渲染器（Sprite Renderer）是添加在游戏对象上用以渲染精灵的组件，将图片渲染在场景世界里。当我们将图片拖入到Hierarchy视图，其实就是Unity为我们创建了一个游戏对象，并添加了Sprite Renderer组件，指定Sprite参数为拖曳的图片。</p>
+<p>如果游戏中需要显示隐藏精灵，可以设置Sprite Renderer的enable参数为true或者false，下表是Sprite Renderer的参数说明。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">参数</th>
+<th style="text-align:left">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Sprite</td>
+<td style="text-align:left">选择其他的精灵</td>
+</tr>
+<tr>
+<td style="text-align:left">Color</td>
+<td style="text-align:left">设置精灵颜色</td>
+</tr>
+<tr>
+<td style="text-align:left">Material</td>
+<td style="text-align:left">精灵的默认材质</td>
+</tr>
+<tr>
+<td style="text-align:left">Sorting Layer</td>
+<td style="text-align:left">所属层</td>
+</tr>
+<tr>
+<td style="text-align:left">Order in Layer</td>
+<td style="text-align:left">渲染顺序</td>
+</tr>
+</tbody>
+</table>
+<p>在Scene视图中，点击左上角的Shaded按钮，选择Wireframe线框模式。观察图19-5中的精灵可以看到精灵实际上就是一个面片，如图19-6所示。</p>
+<h2 id="图片导入设置"><a href="#图片导入设置" class="headerlink" title="图片导入设置"></a>图片导入设置</h2><p>下面就来看看图片导入时的各个参数，在Project视图中选中之前的图片，Inspector现图中的导入设置如图19-7所示。</p>
+<ul>
+<li><p>Sprite Mode：有两种模式：Single和Multiple，分别用来处理一张图承载单个美术元素和多个美术元素的资源。</p>
+</li>
+<li><p>Packing Tag：标示Sprite Packer的标示字符。</p>
+</li>
+<li><p>Pixels Per Unit：指多少像素对应一个Unity单位。2D游戏所使用的图片以像素为单位，Unity的单位是Unit，这个参数就是设定图片像素和Unity单位的对应关系。例如在美术设计时，规定人物的高度是32像素，其他图片资源按照这个比例设计。资源导入Unity后设置Pixels Per Unit为32（默认是100），那么这个人物的高度等于一个Unity单位。创建一个立方体，它的长宽高默认为1，将其与人物对比，高度一致，如图19-8所示。像素比例大小以及摄像机的Size设置是2D游戏开发初期非常重要的规划。</p>
+</li>
+<li><p>Sprite Editor：精灵编辑器按钮</p>
+</li>
+<li><p>Generate Mip Maps：是根据图片远离透视摄像机的程序呈现不同的渲染效果，勾选后图片会创建多个层次大小的图片，如图19-9所示。2D游戏开发不会出现这种远近差别。如果不是特殊情况，建议不要勾选。读者可以通过开关此参数在下方的预览图中对比图片。另外，需要注意的是，图片需要POT（Power Of Two）2的幂次方大小，才能支持这个技术。</p>
+</li>
+<li><p>Filter Mode：过滤模式和Texture2D一样，点模糊、线性模糊和三线性模糊。</p>
+</li>
+</ul>
+<h2 id="精灵编辑"><a href="#精灵编辑" class="headerlink" title="精灵编辑"></a>精灵编辑</h2><p>在图片导入的过程中，有时候还需要对图片承载的精灵进行处理，例如一张图片中包含多个精灵，或者将多个道具放在一张图片里，或者主角挥刀的动作，按照动作的时间点被拆解成多张图片。这种播放动画的方式叫帧动画，每个时间点为一帧，通常一组帧动画会全部放入一张图片中，如19-10所示。这时我们就需要在精灵编辑器中设置，并将图片切割成一个个精灵。</p>
+<p>选中导入图片，在Inspector视图中点击Sprite Editor按钮，打开精灵编辑界面。点击左上方的Slice按钮，弹出裁剪方式面板，如图19-11所示。</p>
+<p>设置Type参数为Grid，Pixel Size参数X和Y均为32，Pivot（锚点）参数为Center，点击Slice按钮进行切割，点击右上角Apply按钮生成精灵组。图片下切割好的精灵在Project视图中，如图所示。</p>
+<p>任意选择其中一个拖入Hierarchy面板中，就可以创建精灵对象了。选中所有精灵，拖入Hierarchy窗体中生成精灵动画。选中生成动画文件，点击菜单栏-&gt;Window-&gt;Animation，打开动画编辑工具，如图19.13所示。</p>
+<p>点击播放按钮（黑色三角形）就可以播放精灵动画了。</p>
+<h2 id="精灵图集"><a href="#精灵图集" class="headerlink" title="精灵图集"></a>精灵图集</h2><p>我们也可以将多个精灵打入一张图集里，这样做可以提高渲染效率。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Unity/" rel="tag"># Unity</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/24/UnityUI/" rel="next" title="UnityUI">
+                <i class="fa fa-chevron-left"></i> UnityUI
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/24/Unity2D游戏开发/" rel="prev" title="Unity2D游戏开发">
+                Unity2D游戏开发 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Che Bin</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">75</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">4</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#正交摄像机"><span class="nav-number">1.</span> <span class="nav-text">正交摄像机</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#精灵"><span class="nav-number">2.</span> <span class="nav-text">精灵</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#精灵实现"><span class="nav-number">2.1.</span> <span class="nav-text">精灵实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#调整精灵尺寸"><span class="nav-number">2.2.</span> <span class="nav-text">调整精灵尺寸</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#精灵渲染器"><span class="nav-number">2.3.</span> <span class="nav-text">精灵渲染器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#图片导入设置"><span class="nav-number">2.4.</span> <span class="nav-text">图片导入设置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#精灵编辑"><span class="nav-number">2.5.</span> <span class="nav-text">精灵编辑</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#精灵图集"><span class="nav-number">2.6.</span> <span class="nav-text">精灵图集</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Che Bin</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v6.5.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

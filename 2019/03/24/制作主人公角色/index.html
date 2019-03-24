@@ -1,0 +1,937 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.5.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=6.5.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.5.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.5.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '6.5.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="将用于游戏的3D模型放置于场景视图有两种方法：一是直接使用相应的3D模型；二是先建立空游戏对象，然后将3D模型拖曳至新建的空游戏对象下，使之成为其子对象。">
+<meta name="keywords" content="Unity">
+<meta property="og:type" content="article">
+<meta property="og:title" content="制作主人公角色">
+<meta property="og:url" content="http://yoursite.com/2019/03/24/制作主人公角色/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="将用于游戏的3D模型放置于场景视图有两种方法：一是直接使用相应的3D模型；二是先建立空游戏对象，然后将3D模型拖曳至新建的空游戏对象下，使之成为其子对象。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-03-24T15:56:26.208Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="制作主人公角色">
+<meta name="twitter:description" content="将用于游戏的3D模型放置于场景视图有两种方法：一是直接使用相应的3D模型；二是先建立空游戏对象，然后将3D模型拖曳至新建的空游戏对象下，使之成为其子对象。">
+
+
+
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/03/24/制作主人公角色/">
+
+
+
+<script type="text/javascript" id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>制作主人公角色 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style type="text/css">
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion {
+      .logo-line-before i { left: initial; }
+      .logo-line-after i { right: initial; }
+    }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/24/制作主人公角色/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Che Bin">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">制作主人公角色
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-03-24 23:55:01 / 修改时间：23:56:26" itemprop="dateCreated datePublished" datetime="2019-03-24T23:55:01+08:00">2019-03-24</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>将用于游戏的3D模型放置于场景视图有两种方法：一是直接使用相应的3D模型；二是先建立空游戏对象，然后将3D模型拖曳至新建的空游戏对象下，使之成为其子对象。</p>
+<a id="more"></a>
+<p>如果是用于舞台设计的静态模型，一般会使用第一种方法。而如果是用于主人公角色或者敌对角色（NPC）等需要实现各种逻辑的模型。则一般会使用第二种方法。</p>
+<p>新建空游戏对象并重命名为Player。对于新建的GameObject，除非特殊情况，否则必须先将Transform的Position属性设置为(0, 0, 0)再操作。</p>
+<p>层次（Hierarchy）视图列出的都是游戏对象，平行光、主摄像机都只是在空游戏对象中添加了光源组件和摄像机组件而已。</p>
+<p>将用于主人公的Player3D模型拖曳到前面新建的Player游戏对象下并重命名为PlayerModel，主人公的Player模型就会变为其子模型。Unity中子3D对象在父3D对象中称编组（Grouping），父模型移动时，子模型会同时移动。</p>
+<p>将重命名后的PlayerModel的Transform中的Position属性设置为（0, 0, 0），因为在层次视图中Player和PlayerModel是父子关系，需要确保其在场景视图中显示的坐标位置一致。另外，如果需将模型移动到舞台特定位置，则不要在场景视图中直接用鼠标点击操作，而要先选择层次视图中的父Player，再通过点击坐标轴进行移动。</p>
+<p>一定要将放置在场景视图中的模型或者游戏对象的Tansform Position属性设置为(0, 0, 0)后再开始工作。另外，空游戏对象下端的子游戏对象或者子3D模型Transform Position属性也要设置为原点(0, 0, 0)。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">函数名</th>
+<th style="text-align:left">函数属性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Awake</td>
+<td style="text-align:left">执行脚本时只调用一次，主要用于初始化游戏的状态值或初始化变量，调用Start函数前首先调用，禁用脚本时也可以执行，不可用于例程</td>
+</tr>
+<tr>
+<td style="text-align:left">Start</td>
+<td style="text-align:left">调用Update函数前仅调用一次，激活脚本后才能执行，其他脚本的所有Awake函数均执行后才能执行</td>
+</tr>
+<tr>
+<td style="text-align:left">Update</td>
+<td style="text-align:left">每个游戏帧都要调用，是制作游戏的核心逻辑，激活脚本后才能执行</td>
+</tr>
+<tr>
+<td style="text-align:left">LateUpdate</td>
+<td style="text-align:left">所有Update函数均调用后调用一次，用于按顺序执行的逻辑，主要用于摄像机移动逻辑，激活脚本后才能执行</td>
+</tr>
+<tr>
+<td style="text-align:left">FixedUpdate</td>
+<td style="text-align:left">主要用于使用物理引擎时，每间隔一定时间即被调用，每次调用的间隔时间一致</td>
+</tr>
+<tr>
+<td style="text-align:left">OnEnable</td>
+<td style="text-align:left">激活游戏对象或脚本时调用，事件发生时使用，不可用于例程</td>
+</tr>
+<tr>
+<td style="text-align:left">OnDisable</td>
+<td style="text-align:left">禁用游戏对象或脚本时调用，事件结束时使用，不可用于例程</td>
+</tr>
+<tr>
+<td style="text-align:left">OnGUI</td>
+<td style="text-align:left">处理GUI事件时调用</td>
+</tr>
+</tbody>
+</table>
+<p>下载键盘输入值</p>
+<p>外部输入的资源有键盘、鼠标、移动设备的触摸、游戏杆等很多种类，Input类管理这些来自外部的输入值。下面利用Input类接收键盘输入值。<br>Unity定义了游戏中常用的组合键，这些组合键可以在输入管理器中进行管理。选择菜单Editor-&gt;Project Settings-&gt;Input打开输入管理器，如下图所示。组合键常以Vertical、Horizontal、Fire1、Jump、Mouse X等命名，可以修改其明细或添加新的组合键。<br>脚本中，可以通过Input.GetAxis(“组合键名”)函数获取事先设置的组合键的值。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">PlayerCtrl</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">float</span> h = <span class="number">0.0f</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">float</span> v = <span class="number">0.0f</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        h = Input.GetAxis(<span class="string">"Horizontal"</span>);</span><br><span class="line">        v = Input.GetAxis(<span class="string">"Vertical"</span>);</span><br><span class="line">        Debug.Log(<span class="string">"H="</span> + h.ToString());</span><br><span class="line">        Debug.Log(<span class="string">"V="</span> + v.ToString()),</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Input.GetAxis(“Horizontal”)函数是InputManager的Horizontal项事先设置的值，玩家按键盘的A、D键或光标键Left、Right时，该函数返回-1 ~ 1的值。</p>
+<p>同时，Input.GetAxis(“Vertical”)函数也可以在玩家按健盘W、S、UP、Down键时返回-1 ~ 1的值</p>
+<p>Debug.Log()函数的参数是字符串类型，所以要利用ToString()方法将浮点类型变量h和v转换为字符串类型。</p>
+<p>Input.GetAxis(“Horizontal”)返回-1.0f ~ 1.0f的值，通常在游戏对象做出平滑动作时使用。如果对键盘控制的即时性要求较高，请使用Input.GetAxisRaw(“Horizontal”)函数，该函数仅返回-1、0、1这3个枚举值。</p>
+<h2 id="角色移动"><a href="#角色移动" class="headerlink" title="角色移动"></a>角色移动</h2><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">PlayerCtrl</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">float</span> h = <span class="number">0.0f</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">float</span> v = <span class="number">0.0f</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 必须先分配变量，之后才能使用需要访问的组件。</span></span><br><span class="line">    <span class="keyword">private</span> Transform tr;</span><br><span class="line">    <span class="comment">// 移动速度变量</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> moveSpeed = <span class="number">10.0f</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 向脚本初始部分分配Transform组件。</span></span><br><span class="line">        tr = GetComponent&lt;Transform&gt;();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        h = Input.GetAxis(<span class="string">"Horizontal"</span>);</span><br><span class="line">        v = Input.GetAxis(<span class="string">"Vertical"</span>);</span><br><span class="line"></span><br><span class="line">        Debug.Log(<span class="string">"H = "</span> + h.ToString());</span><br><span class="line">        Debug.Log(<span class="string">"V = "</span> + v.ToString());</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// Translate(移动方向 * 速度 * 位移值 * Time.deltaTime, 基础坐标)</span></span><br><span class="line">        tr.TransLate(Vector3.forward * moveSpeed * v * Time.deltaTime, Space.Self);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果变量被public修饰，则其在Inspector视图中设置的值要比脚本中指定的值优先级更高。</p>
+<p>Inspector视图默认不显示访问权限修饰词为private的变量。实际开发中，有时会需要查看private变量的值，此时可以通过鼠标右击Inspector视图选项卡，在上下文菜单中选择Debug以显示声明为private的变量。</p>
+<h2 id="处理组件缓存"><a href="#处理组件缓存" class="headerlink" title="处理组件缓存"></a>处理组件缓存</h2><p>每帧都会调用一次Update函数，因此，需要时刻注意该函数的优化。比如，,运行游戏的设备为30帧（FPS，frame per seconds）时，Update函数每秒将会被调用30次。需要注意，不要使用Update函数编写占用资源过高的代码，更不要有错误的逻辑。特别在游戏对象移动时，其Transform组件的Position属性是一直在变的，所以Unity不提倡每帧都访问Transform组件。</p>
+<p>建议各位可以先在Awake函数或Start函数创建要在Update函数中使用的组件，然后再用于Update函数。<br>GetComponent函数获取Transform组件并赋值于tr变量，其依赖于各类游戏对象拥有的特定组件。 GetComponent函数的使用方法如下，可以用多种语法表示。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">tr = GetComponent&lt;Transform&gt;();</span><br><span class="line">tr = gameObject.GetComponent&lt;Transform&gt;();</span><br><span class="line">tr = (Transform)GetComponent(<span class="string">"Transform"</span>);</span><br><span class="line">tr = (Transform)GetComponent(<span class="keyword">typeof</span>(Transform));</span><br></pre></td></tr></table></figure>
+<p>以上使用方法的效果相同，第一种方法用于通用类型的Transform组件，无需额外的类型转换。使用这种通用类型的Transform组件可以有效简化代码，所以会一直使用该类型。</p>
+<p>Start函数中，为tr变量赋值的语法可概述为：tr = this.gameObject.GetComponent<transform>();<br>从该脚本包含的游戏对象拥有的各组件中抽取Transform组件，并保存至tr变量。</transform></p>
+<p>this关键字代表当前脚本，此处为PlayCtrl脚本。this.gameObject表示该脚本中添加的游戏对象，此处this.gameObject可以省略不写。</p>
+<p>Unity 5删除的获取组件方法的缩略写法（getter）<br>Unity 4.x及更早版本提供了常用的获取组件方法的缩写形式，但从Unity 5开始只保留获取transform组件的缩写形式，其余的都删除了。因此，下表中的任一缩写形式都不能再使用了。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Unity 4.x</th>
+<th style="text-align:left">Unity 5.x</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">rigidbody</td>
+<td style="text-align:left">GetComponent<rigidbody></rigidbody></td>
+</tr>
+<tr>
+<td style="text-align:left">audio</td>
+<td style="text-align:left">GetComgonent<audiosource></audiosource></td>
+</tr>
+<tr>
+<td style="text-align:left">collider</td>
+<td style="text-align:left">GetComponent<collider>()</collider></td>
+</tr>
+<tr>
+<td style="text-align:left">renderer</td>
+<td style="text-align:left">GetComponent<renderer>()</renderer></td>
+</tr>
+</tbody>
+</table>
+<h2 id="游戏对象的移动"><a href="#游戏对象的移动" class="headerlink" title="游戏对象的移动"></a>游戏对象的移动</h2><p>Unity中移动某种游戏对象有以下两种方式：</p>
+<ul>
+<li>更改Transform组件的Position属性；</li>
+<li>利用物理引擎（PhysX，Box2D）移动游戏对象。</li>
+</ul>
+<p>首先学习如何通过调整Transform组件的position属性实现游戏对象的移动。下列示例在每帧中将Z轴的值增加1，使游戏对象前进。Unity使用了左手坐标系，所以+Z轴方向是前进，-Z轴方向就是后退。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    transform.position += <span class="keyword">new</span> Vector3(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>);    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>但是，如果所有游戏对象的移动逻辑都像上面那样编码，则会很繁项，而且容易降低代码可读性。幸好Unity中提供了更加简便的方法。</p>
+<p>Vector3数据类型<br>Vector3(x, y, z)是Unity提供的用于保存三维坐标值和向量数据的结构体。</p>
+<h2 id="Translate函数"><a href="#Translate函数" class="headerlink" title="Translate函数"></a>Translate函数</h2><p>Translate函数用于处理游戏对象移动，函数原型如下。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Translate</span>(<span class="params">Vector3 direction, [Space relativeTo]</span>)</span>;</span><br></pre></td></tr></table></figure>
+<p>用Translate方法重写上文中每帧加Z值的脚本，可以编写如下简洁并具有相当可读性的代码。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    tr.Translate(Vector3.forward);    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>Vector3.forward是预定义的单位向量缩写形式，与Vector3(0, 0, 1)含义一样。在代码中利用此单位向量乘以速度（moveSpeed ），游戏对象就会按照moveSpeed变量指定的速度移动。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tr.Translate(Vector3.forward * moveSpeed * v * Time.deltaTime, Space.Self);</span><br></pre></td></tr></table></figure></p>
+<p>该函数原型如下。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tr.Translate(将移动的方向 * 速度 * 前进/后退方向 * Time.deltaTime, 基准坐标系);</span><br></pre></td></tr></table></figure></p>
+<p>Time.deltaTime表示前一帧到当前帧花费的时间，需要注意的是，Update函数内，使用Transform组件使游戏对象移动的逻辑必须乘以deltaTime，使游戏对象的移动速度不受帧率（FrameRate）影响，而根据某个固定的速度移动。也就是说，上述脚本中如果没有乘以Time.deltaTime，游戏对象将每帧以10单位速度前进；如果乘以Time.deltaTime，游戏对象将每秒以10单位速度前进。因此，在帧率不同的机器上也可以相同速度移动。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 每帧移动10单位</span></span><br><span class="line">transform.Translate(Vector3.forward * <span class="number">10</span>);</span><br><span class="line"><span class="comment">// 每秒移动10单位</span></span><br><span class="line">transform.Translate(Vector3.forward * Time.deltaTime * <span class="number">10</span>);</span><br></pre></td></tr></table></figure></p>
+<p>Translate函数的第二个参数决定游戏对象以全局坐标（Space.World）还是局部坐标（Space.Self）为基准移动。如果省略基准坐标参数，游戏对象将默认以局部坐标为基准移动。<br>提示<br>坐标系：局部坐标系和全局坐标系</p>
+<p>Unity的场景视图是无限的三维空间，此三维空间中一直不变的基准坐标是全局坐标；反之，局部坐标指各游戏对象自己的坐标。</p>
+<p>因此，如果Translate函数的基准坐标指定为Space.Self，那么游戏对象将以局部坐标为基准进行移动；若指定为Space.World，则将以全局坐标为基准进行移动。（类比一下地球和个人。地球的上北下南左西右东是不变的，但是个人往前走，肯定是根据自己的前往前走，不是地球的前往前走。）</p>
+<h2 id="单位向量"><a href="#单位向量" class="headerlink" title="单位向量"></a>单位向量</h2><p>向量是具有大小和方向的数据类型，Unity中，每个方向轴上大小为1的向量称为单位向量（正规化向量，Normalized Vector）此处可以将之理解为只表示方向的向量。Vector3结构体是Unity提供的在开发过程中用以表示三维空间坐标和方向的数据类型。Unity提供了如表1所示的各种单位向量的简写形式，可以轻松调用。<br>表1-单位向量的简写形式</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">简写形式</th>
+<th style="text-align:left">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Vector3.forward</td>
+<td style="text-align:left">Vector3(0, 0, 1)</td>
+</tr>
+<tr>
+<td style="text-align:left">Vector3.back</td>
+<td style="text-align:left">Vector3(0, 0, -1)</td>
+</tr>
+<tr>
+<td style="text-align:left">Vector3.left</td>
+<td style="text-align:left">Vector3(-1, 0, 0)</td>
+</tr>
+<tr>
+<td style="text-align:left">Vector3.right</td>
+<td style="text-align:left">Vector3(1, 0, 0)</td>
+</tr>
+<tr>
+<td style="text-align:left">Vector3.up</td>
+<td style="text-align:left">Vector3(0, 1, 0)</td>
+</tr>
+<tr>
+<td style="text-align:left">Vector3.down</td>
+<td style="text-align:left">Vector3(0, -1, 0)</td>
+</tr>
+<tr>
+<td style="text-align:left">Vector3.one</td>
+<td style="text-align:left">Vector3(1, 1, 1)</td>
+</tr>
+<tr>
+<td style="text-align:left">Vector3.zero</td>
+<td style="text-align:left">Vector3(0, 0, 0)</td>
+</tr>
+</tbody>
+</table>
+<p>Unity使用左手坐标系，左手拇指表示X轴、食指表示Y轴、中指表示Z轴，Z轴代表了游戏对象前进的方向，Vector3.forward与Vector3(0, 0, 1)一样，Vetor3.forward乘以速度就是具有Z轴方向的向量。</p>
+<p>与大部分3D工具一样，X、Y、Z轴对应的颜色分别为红（R）、绿（G）、蓝（B）。 看到Transform轴的颜色就应该知道是哪个轴。</p>
+<p>现在运行之前编写的游戏脚本，通过键盘上下方向键查看游戏主人公能否前进或后退。如果游戏模型的动作正确，那么可以继续向Player添加左右移动的动作，PlayerCrl脚本修改如下所示。</p>
+<p>PlayerCtri脚本：前后左右移动逻辑</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">PlayerCtrl</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">float</span> h = <span class="number">0.0f</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">float</span> v = <span class="number">0.0f</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 必须先分配变量，之后才能使用需要访问的组件。</span></span><br><span class="line">    <span class="keyword">private</span> Transform tr;</span><br><span class="line">    <span class="comment">// 移动速度变量（声明为public并显示到检视视图。）</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> moveSpeed = <span class="number">10.0f</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 向脚本初始部分分配Transform组件。</span></span><br><span class="line">        tr = GetComponent&lt;Transform&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        h = Input.GetAxis(<span class="string">"Horizontal"</span>);</span><br><span class="line">        v = Input.GetAxis(<span class="string">"Vertical"</span>);  </span><br><span class="line"></span><br><span class="line">        Debug.Log(<span class="string">"H = "</span> + h.ToString());</span><br><span class="line">        Debug.Log(<span class="string">"V = "</span> + v.ToString());</span><br><span class="line">    </span><br><span class="line">        <span class="comment">// 计算前后左右移动方向向量。</span></span><br><span class="line">        Vector3 moveDir = (Vector3.forward * v) + (Vector3.right * h);</span><br><span class="line">        <span class="comment">// Translate（移动方向.Tune.deltaTime.位移值·速度,基础坐标）</span></span><br><span class="line">        tr.Translate(moveDir * Time.deltaTime * moveSpeed, Space.Self);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>将前进/后退向量和左右向量按照如下公式计算，利用加法运算得到一个方向向量，用其乘以速度即可使游戏对象前后左右移动。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 计算前后左右移动方向向量。</span></span><br><span class="line">Vector3 moveDir = (Vector3.forward * v) + (Vector3.right * h);</span><br><span class="line"><span class="comment">// Translate(移动方向 * Time.deltaTime * 位移值 * 速度, 基础坐标)</span></span><br><span class="line">tr.Translate(moveDir * Time.deltaTime * moveSpeed, Space.Self);</span><br></pre></td></tr></table></figure></p>
+<p>运行后，使用前后左右方向箭头或W、A、S、D键可以移动Player游戏模型。</p>
+<p>moveDir变量属于Vector3类型，通过键盘输入值进行向量运算。对前进方向和左右方向的向量做加法运算，就会得到对角线方向的向量，如下图所示。根据“勾股定理”可以算出向量长度约为1.414，这个值为小数，所以需要将其转换为长度为1的单位向量。而且只能使用这个向量的方向，忽略其数值部分。</p>
+<p>为了只获取向量的方向，需将其转换为单位向量。此处可以利用Vector3.normalized属性获取单位向量值，请如下修改PlayCtrl脚本。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Vector3 moveDir = (Vector3.forvard * v) + (Vector3.right * b);</span><br><span class="line">tr.Translate(moveDir.normalized * Time.deltaTime * moveSpeed, Space.Self);</span><br></pre></td></tr></table></figure></p>
+<p>向量的大小和正规化<br>可以通过Vector3.Magnitude函数获取向量大小（Magnitude）。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">float</span> vec1 = <span class="function">Vector3 <span class="title">Magnitude</span>(<span class="params">Vector3.forward</span>)</span>;</span><br><span class="line">    <span class="keyword">float</span> vec2 = Vector3.Magnitude(Vector3.forward + Vector3.right);</span><br><span class="line">    <span class="keyword">float</span> vec3 = Vector3.Magnitude(Vector3.forward + Vector3.right).normalized;</span><br><span class="line"></span><br><span class="line">    Debua.Log(vec1);</span><br><span class="line">    Debug.Log(vec2);</span><br><span class="line">    Debug.Log(vec3);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上述代码运行结果如下图所示。</p>
+<h2 id="角色旋转：Rotate"><a href="#角色旋转：Rotate" class="headerlink" title="角色旋转：Rotate"></a>角色旋转：Rotate</h2><p>要想旋转游戏对象，可以使用Rotate函数及如下各种参数</p>
+<ul>
+<li>void Rotate(Vector3 eulerAngles, [Space relativeTo]);</li>
+<li>void Rotate(float xAngle, float yAngle, float zAngle, [Space relativeTo]);</li>
+<li>void Rotate(Vector3 axis, float angle, [Space relativeTo]);</li>
+</ul>
+<p>以下示例中，Rotate函数使用的参数各有不同，但结果一样，都使游戏对象以Y轴为基准进行旋转。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">transform.Rotate(Vector3.up * Time.deltaTime);</span><br><span class="line">transform.Rotate(<span class="number">0</span>, Time.deltaTime, <span class="number">0</span>);</span><br><span class="line">transform.Rotate(Vector3.up, Time.deltaTime);</span><br></pre></td></tr></table></figure></p>
+<p>要添加到PlayerCtrl的旋转逻辑如下所示。Rotate函数与Time.deltaTime相乘后，即可不受帧率影响进行旋转。<br>Rotate(旋转基准坐标轴 <em> Time.deltaTime </em> 旋转速度 * 输入的位移值)</p>
+<p>之前的前进和后退是通过键盘输入值实现的，下面用鼠标的左右移动操控游戏对象旋转。在InputManager中使用定义为Mouse X的Axis，用于在脚本中获取旋转的位移值。另外，可以在此修改鼠标灵敏度（即旋转角色的灵敏度），通过调整Mouse X中的Sensitivity值（或在脚本中调整速度）实现。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">PlayerCtrl</span>: <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">float</span> h = <span class="number">0.0f</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">float</span> v = <span class="number">0.0f</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 必须先分配变量，之后才能使用常用组件。</span></span><br><span class="line">    <span class="keyword">private</span> Transform tr;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 移动速度变量（声明为public，并显示到检视视图。）</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> moveSpeed = <span class="number">10.0f</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 旋转速度变量</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> rotSpeed = <span class="number">100.0f</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 向脚本初始部分分配Transform组件。</span></span><br><span class="line">        tr = GetComponent&lt;Transform&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        h = Input.GetAxis(<span class="string">"Horizontal"</span>);</span><br><span class="line">        v = Input.GetAxis(<span class="string">"Vertical"</span>);</span><br><span class="line"></span><br><span class="line">        Debug.Log(<span class="string">"H = "</span>, h.ToString());</span><br><span class="line">        Debug.Log(<span class="string">"V = "</span>, v.ToString());</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 计算前后左右移动方向向量</span></span><br><span class="line">        Vector3 moveDir = (Vector3.forward * v) + (Vector3.right * h);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Translate（移动方向 * Time.deltaTime * 位移值 * 速度,基础坐标）</span></span><br><span class="line">        tr.Translate(moveDir.normalized * Time.deltaTime * moveSpeed, Space.Self)</span><br><span class="line">        <span class="comment">// 以Vector3.up轴为基准，以rotSpeed速度施转。</span></span><br><span class="line">        tr.Rotate(Vector3.up * Time.deltaTime * rotSpeed * Input.GetAxis(<span class="string">"Mouse X"</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行脚本后，左右移动鼠标即可看到游戏角色旅转。</p>
+<h2 id="摄像机追踪：Follow-Cam"><a href="#摄像机追踪：Follow-Cam" class="headerlink" title="摄像机追踪：Follow Cam"></a>摄像机追踪：Follow Cam</h2><p>Unity中，要想使摄像机始终跟随主人公角色移动，最简单的方法就是直接将主摄像机拖曳到Player游戏对象下。但如果想要在实际游戏中实现平滑移动和震动效果，则需要添加追踪主人公角色模型的脚本。</p>
+<p>新建脚本，重命名为FollowCam，代码如下。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">FollowCam</span> : <span class="title">MonoBehaviour</span> </span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> Transform targetTr; <span class="comment">// 要追踪的游戏对象的Transform变量</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> dist = <span class="number">10.0f</span>; <span class="comment">// 与摄像机之间的距离</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> height = <span class="number">3.0f</span>; <span class="comment">// 设置摄像机高度</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> dampTrace = <span class="number">20.0f</span>; <span class="comment">// 实现平滑追踪的变量</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 摄像机本身的Transform变量</span></span><br><span class="line">    <span class="keyword">private</span> Transform tr;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 将摄像机本身的Transform组件分配至tr</span></span><br><span class="line">        tr = GetComponent&lt;Transform&gt;();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 使用LateUpdate函数，调用所有Update函数后才会调用该函数。</span></span><br><span class="line">    <span class="comment">// 要追踪的目标游戏对象停止移动后，调用LateUpdate函数。</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">LateUpdate</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 将摄像机放置在被追踪目标后方的dist距离的位置。</span></span><br><span class="line">        <span class="comment">// 将摄像机向上抬高height。</span></span><br><span class="line">        tr.position = Vector3.Lerp(tr.position, targetTr.position - (targetTr.forward * dist) + (Vector3.up * height), Time.deltaTime * dampTrace);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 使摄像机朝向游戏对象。</span></span><br><span class="line">        tr.LookAt(targetTr.position);   </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>以上追踪脚本首先将摄像机从要追踪目标的位置向后移动距离dist，然后再将其抬高height，并使摄像机与被追踪目标旋转角度相同。为了达到平滑柔和的追踪效果，此处使用了Vector3.Lerp函数。该函数将2个向量进行线性内插（Linear Interpolation），实时计算摄像机当前应该处于的位置。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Vector3.Lerp(Vector3起始位置, Vector3结束位置, 浮点格式时间);</span><br></pre></td></tr></table></figure></p>
+<p>时间变量为起始值0.0f时，返回摄像机起始位置值；取值为1.0f时，返回终止位置值。因此，调整dampTrace变量即可调整追踪动画的视觉效果。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Vector3.Lerp(tr.position, targetTr.position - (targetTr.forward * dist) + (Vector3.up * height), Time.deltaTime * dampTrace);</span><br></pre></td></tr></table></figure></p>
+<p>如果在Update函数中实现计算摄像机位置的逻辑，即在Player移动完成之前就移动摄像机，则可能出现画面抖动现象。因此，必须在Player的移动及旋转都结束后再计算摄像机位置，所以这一步需要在LateUpdate函数中执行。</p>
+<p>场景中所有脚本的Update函数完成后才会调用LateUpdate函数。</p>
+<p>将FollowCam脚本添加到主摄像机下，将摄像机要追踪的目标–Player游戏对象拖曳到FollowCam组件的targetTr变量。</p>
+<p>实际运行游戏时，用鼠标移动或旋转主人公角色后，会看到摄像机平滑柔和地跟随主人公移动或旋转。也可以适当修改摄像机的Dist和Height等属性值，获得想要的摄像机角度。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+       
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Unity/" rel="tag"># Unity</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/24/Skybox/" rel="next" title="Skybox">
+                <i class="fa fa-chevron-left"></i> Skybox
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/24/Character-Controller/" rel="prev" title="Character Controller">
+                Character Controller <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">Che Bin</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">75</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">4</span>
+                    <span class="site-state-item-name">标签</span>
+                  
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#角色移动"><span class="nav-number">1.</span> <span class="nav-text">角色移动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#处理组件缓存"><span class="nav-number">2.</span> <span class="nav-text">处理组件缓存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#游戏对象的移动"><span class="nav-number">3.</span> <span class="nav-text">游戏对象的移动</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Translate函数"><span class="nav-number">4.</span> <span class="nav-text">Translate函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#单位向量"><span class="nav-number">5.</span> <span class="nav-text">单位向量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#角色旋转：Rotate"><span class="nav-number">6.</span> <span class="nav-text">角色旋转：Rotate</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#摄像机追踪：Follow-Cam"><span class="nav-number">7.</span> <span class="nav-text">摄像机追踪：Follow Cam</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Che Bin</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a> v6.5.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+	
+    
+
+    
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=6.5.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=6.5.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=6.5.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=6.5.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=6.5.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
