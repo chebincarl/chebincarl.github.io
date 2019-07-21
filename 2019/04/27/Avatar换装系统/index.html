@@ -1,0 +1,1464 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="换装系统又称纸娃娃系统，是运用在游戏开发上的关键技术。市面上关于换装的游戏非常多，3D MMORPG游戏中也使用了角色换装技术，所以掌握换装技术是非常重要的。换装系统原理也同样适用于换武器、换表情等。本章先讲换装实现原理，再讲换装的编程实现，最后提醒读者在运用该技术解决问题时应注意的事项。">
+<meta name="keywords" content="Unity 3D实战核心技术详解">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Avatar换装系统">
+<meta property="og:url" content="http://chebincarl.github.io/2019/04/27/Avatar换装系统/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="换装系统又称纸娃娃系统，是运用在游戏开发上的关键技术。市面上关于换装的游戏非常多，3D MMORPG游戏中也使用了角色换装技术，所以掌握换装技术是非常重要的。换装系统原理也同样适用于换武器、换表情等。本章先讲换装实现原理，再讲换装的编程实现，最后提醒读者在运用该技术解决问题时应注意的事项。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://chebincarl.github.io/2019/04/27/Avatar换装系统/1.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/04/27/Avatar换装系统/2.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/04/27/Avatar换装系统/3.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/04/27/Avatar换装系统/4.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/04/27/Avatar换装系统/5.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/04/27/Avatar换装系统/6.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/04/27/Avatar换装系统/7.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/04/27/Avatar换装系统/8.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/04/27/Avatar换装系统/9.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/04/27/Avatar换装系统/12.png">
+<meta property="og:updated_time" content="2019-07-17T14:44:47.972Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Avatar换装系统">
+<meta name="twitter:description" content="换装系统又称纸娃娃系统，是运用在游戏开发上的关键技术。市面上关于换装的游戏非常多，3D MMORPG游戏中也使用了角色换装技术，所以掌握换装技术是非常重要的。换装系统原理也同样适用于换武器、换表情等。本章先讲换装实现原理，再讲换装的编程实现，最后提醒读者在运用该技术解决问题时应注意的事项。">
+<meta name="twitter:image" content="http://chebincarl.github.io/2019/04/27/Avatar换装系统/1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/04/27/Avatar换装系统/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Avatar换装系统 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">文章看10遍，动手做10遍，自然就会了</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/04/27/Avatar换装系统/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Avatar换装系统
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-04-27 16:12:07" itemprop="dateCreated datePublished" datetime="2019-04-27T16:12:07+08:00">2019-04-27</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-07-17 22:44:47" itemprop="dateModified" datetime="2019-07-17T22:44:47+08:00">2019-07-17</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Unity/" itemprop="url" rel="index"><span itemprop="name">Unity</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">14k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">12 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>换装系统又称纸娃娃系统，是运用在游戏开发上的关键技术。市面上关于换装的游戏非常多，3D MMORPG游戏中也使用了角色换装技术，所以掌握换装技术是非常重要的。换装系统原理也同样适用于换武器、换表情等。本章先讲换装实现原理，再讲换装的编程实现，最后提醒读者在运用该技术解决问题时应注意的事项。</p>
+<a id="more"></a>
+
+<h1 id="换装原理"><a href="#换装原理" class="headerlink" title="换装原理"></a>换装原理</h1><p>游戏内的角色，能够像纸娃娃换装那样让玩家为自己的角色改变外观，一直深受广大玩家欢迎。一般而言，建好的3D模型，如果要将其中一个部位换成另外一个形状，最直接的做法是将该物件的模型Mesh替换掉，那么外观就改变了，但这种方法如果运用在需要做动作的模型上，被置换的部位可能就不会正常做动作了，更糟的状况是可能连模型显示的位置及方向都是错误的，所以，直接更换Mesh的方法只适用于静态模型物件。为此，必须找出更深入的方法来实现换装的功能。</p>
+<p>首先看看模型的结构。在Hierarchy视窗中将物件展开，我们会发现几个名称相同并使用数字区别的物件，它们分別代表人物各部位的模型。由此可知，整个人物包含多个相同部位的模型，其在Unity中的表现如下图所示。对象FemaleAvatar的子节点Famale_Bip01是整个人物的骨架结构，人物的动作组件则设置在顶层对象（FemaleAvatar）的Animation组件中，这个模型是资源模型，而不是实际上要放在场景中的目标物件。模型的制作是需要美术将其呈现出来的，最后交付给程序使用。在这里给读者介绍模型资源结构的主要目的是希望读者了解模型制作要求。</p>
+<img src="/2019/04/27/Avatar换装系统/1.png">
+
+<p>上图的FemaleAvatar对象中每个部位都有多个模型部件，这些部件就是用来换装的，其在Unity场景中的效果表现如下图所示。</p>
+<img src="/2019/04/27/Avatar换装系统/2.png">
+
+<p>身体的每个部位是由两部分组成的，这也是换装模型的源文件，将模型作为来源模型资源，再依照需求将资源模型各部位重新组合成一个新的目标模型。接下来开始制作源模型Source和目标模型Target。现将人物模型FemaleAvatar放到场景中，同时再复制一个作为目标模型使用，把它们分别命名为Source和Target，在Unity编辑器的操作如下图所示。</p>
+<img src="/2019/04/27/Avatar换装系统/3.png">
+
+<p>其中targetmodel模型是将源FemaleAvatar对象中除了Female_Bip01外其他部分都删除掉，将父节点名字改成targetmodel，这样就完成了targetmodel对象的制作，是不是很简单？然后将它们拖入Resources文件夹中作为实例化模型。接下来需要为其设置一个动作，可以循环播放的动作，设置组件参数如下图所示。</p>
+<img src="/2019/04/27/Avatar换装系统/4.png">
+
+<p>Source物件是作为来源资源使用的，实际在场景中不需要显示。Source中的各部位名称必须要有编号，例如，face-001。为了便于区分换装的各个Mesh部分，如果没有编号，请开发者自行加上编号，这些工作需要程序员和美工事先定义好，完成以上的准备工作，就要开始写程序了。</p>
+<p>程序员的主要工作是先将Source中每个物件的SkinnedMeshRenderer取出并储存在data表中，data的内容则是根据部位分类索引。接下来在Target中加入SkinnedMeshRenderer，然后在每个部位取出一个指定的Mesh，利用CombineInstance类及Mesh.CombineMeshes()将各部位模型合并，同时也要重新排列材质，依照取出的SkinnedMeshRenderer的bone的名称，找到与Target的Female_Bip01子物件内名称相对应的物件重建骨架列表。最后将这些重新组合建立的资源赋给Target的各个SkinnedMeshRenderer，如此就可完成换装的工作了。原理搞清楚了，下面开始实现具体代码。</p>
+<h1 id="换装代码实现"><a href="#换装代码实现" class="headerlink" title="换装代码实现"></a>换装代码实现</h1><p>以下是完整的换装源代码。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">AvatarSys</span> : <span class="title">MonoBehaviour</span> </span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 来源模型资源的物件</span></span><br><span class="line">    <span class="keyword">private</span> Transform source;</span><br><span class="line">    <span class="comment">// 目标物件</span></span><br><span class="line">    <span class="keyword">private</span> Transform target;</span><br><span class="line">    <span class="comment">// 实例化的源文件和目标文件</span></span><br><span class="line">    <span class="keyword">private</span> GameObject sourceobj;</span><br><span class="line">    <span class="keyword">private</span> GameObject targetobj;</span><br><span class="line">    <span class="comment">// 模型资源</span></span><br><span class="line">    <span class="keyword">private</span> Dictionary&lt;<span class="keyword">string</span>, Dictionary&lt;<span class="keyword">string</span>, Transform&gt;&gt; data = <span class="keyword">new</span> Dictionary&lt;<span class="keyword">string</span>, Dictionary&lt;<span class="keyword">string</span>, Transform&gt;&gt;();</span><br><span class="line">    <span class="comment">// 播放的动作</span></span><br><span class="line">    <span class="keyword">private</span> Animation mAnim;</span><br><span class="line">    <span class="comment">// 目标物件的骨架</span></span><br><span class="line">    <span class="keyword">private</span> Transform[] hips;</span><br><span class="line">    <span class="comment">// 目标物件各部位的 SkinnedMeshRenderer（参照）</span></span><br><span class="line">    <span class="keyword">private</span> Dictionary&lt;<span class="keyword">string</span>, SkinnedMeshRenderer&gt; targetSmr = <span class="keyword">new</span> Dictionary&lt;<span class="keyword">string</span>, SkinnedMeshRenderer&gt;();</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> AvatarSys instance;</span><br><span class="line">    <span class="comment">// 各部分换装的名字</span></span><br><span class="line">    <span class="keyword">string</span>[,] avatarstr = <span class="keyword">new</span> <span class="keyword">string</span>[,] &#123; &#123; <span class="string">"coat"</span>, <span class="string">"003"</span> &#125;, &#123; <span class="string">"hair"</span>, <span class="string">"003"</span> &#125;, &#123; <span class="string">"pant"</span>, <span class="string">"003"</span> &#125;, &#123; <span class="string">"hand"</span>, <span class="string">"003"</span> &#125;, &#123; <span class="string">"foot"</span>, <span class="string">"003"</span> &#125;, &#123; <span class="string">"head"</span>, <span class="string">"003"</span> &#125; &#125;;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">string</span>[,] avatarstr0 = <span class="keyword">new</span> <span class="keyword">string</span>[,] &#123; &#123; <span class="string">"coat"</span>, <span class="string">"001"</span> &#125;, &#123; <span class="string">"hair"</span>, <span class="string">"001"</span> &#125;, &#123; <span class="string">"pant"</span>, <span class="string">"001"</span> &#125;, &#123; <span class="string">"hand"</span>, <span class="string">"003"</span> &#125;, &#123; <span class="string">"foot"</span>, <span class="string">"003"</span> &#125;, &#123; <span class="string">"head"</span>, <span class="string">"003"</span> &#125; &#125;;</span><br><span class="line">    <span class="keyword">string</span>[,] avatarstr1 = <span class="keyword">new</span> <span class="keyword">string</span>[,] &#123; &#123; <span class="string">"coat"</span>, <span class="string">"003"</span> &#125;, &#123; <span class="string">"hair"</span>, <span class="string">"001"</span> &#125;, &#123; <span class="string">"pant"</span>, <span class="string">"001"</span> &#125;, &#123; <span class="string">"hand"</span>, <span class="string">"003"</span> &#125;, &#123; <span class="string">"foot"</span>, <span class="string">"001"</span> &#125;, &#123; <span class="string">"head"</span>, <span class="string">"001"</span> &#125; &#125;;</span><br><span class="line"> </span><br><span class="line"> </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">float</span> pos;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 用于初始化</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span> (<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        instance = <span class="keyword">this</span>;</span><br><span class="line">        AvatarManager(<span class="number">0.0f</span>);</span><br><span class="line">        AvatarManager0(<span class="number">1.0f</span>);</span><br><span class="line">       <span class="comment">//AvatarManager1(2.0f);</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建多个换装模型</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">AvatarManager</span>(<span class="params"><span class="keyword">float</span> pos</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        InstantiateAvatar();</span><br><span class="line">        InstantiateSkeleton(pos);</span><br><span class="line"> </span><br><span class="line">        LoadAvatarData(source);</span><br><span class="line">        hips = target.GetComponentsInChildren&lt;Transform&gt;();</span><br><span class="line">        Inivatar();</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">AvatarManager0</span>(<span class="params"><span class="keyword">float</span> pos</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        InstantiateAvatar();</span><br><span class="line">        InstantiateSkeleton(pos);</span><br><span class="line"> </span><br><span class="line">        LoadAvatarData(source);</span><br><span class="line">        hips = target.GetComponentsInChildren&lt;Transform&gt;();</span><br><span class="line">        Inivatar0();</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">AvatarManager1</span>(<span class="params"><span class="keyword">float</span> pos</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        InstantiateAvatar();</span><br><span class="line">        InstantiateSkeleton(pos);</span><br><span class="line"> </span><br><span class="line">        LoadAvatarData(source);</span><br><span class="line">        hips = target.GetComponentsInChildren&lt;Transform&gt;();</span><br><span class="line">        Inivatar1();</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// 实例化Avatar模型</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">InstantiateAvatar</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        sourceobj = Instantiate(Resources.Load(<span class="string">"FemaleAvatar"</span>)) <span class="keyword">as</span> GameObject;</span><br><span class="line">        source = sourceobj.transform;</span><br><span class="line">        sourceobj.SetActive(<span class="literal">false</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 实例化骨骼动画</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">InstantiateSkeleton</span>(<span class="params"><span class="keyword">float</span> pos</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        targetobj = Instantiate(Resources.Load(<span class="string">"targetmodel"</span>)) <span class="keyword">as</span> GameObject;</span><br><span class="line">        target = targetobj.transform;</span><br><span class="line">        target.transform.position = <span class="keyword">new</span> Vector3(pos, <span class="number">0.0f</span>, <span class="number">0.0f</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 加载Avatar数据</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">LoadAvatarData</span>(<span class="params">Transform source</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        data.Clear();</span><br><span class="line">        targetSmr.Clear();</span><br><span class="line"> </span><br><span class="line">        <span class="keyword">if</span> (source == <span class="literal">null</span>)</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        SkinnedMeshRenderer[] parts = source.GetComponentsInChildren&lt;SkinnedMeshRenderer&gt;(<span class="literal">true</span>);</span><br><span class="line">        <span class="keyword">foreach</span> (SkinnedMeshRenderer part <span class="keyword">in</span> parts)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">string</span>[] partName = part.name.Split(<span class="string">'-'</span>);</span><br><span class="line">            <span class="keyword">if</span>(!data.ContainsKey(partName[<span class="number">0</span>]))</span><br><span class="line">            &#123;</span><br><span class="line">                data.Add(partName[<span class="number">0</span>], <span class="keyword">new</span> Dictionary&lt;<span class="keyword">string</span>, Transform&gt;());</span><br><span class="line">                GameObject partobj = <span class="keyword">new</span> GameObject();</span><br><span class="line">                partobj.name = partName[<span class="number">0</span>];</span><br><span class="line">                partobj.transform.parent = target;</span><br><span class="line"> </span><br><span class="line">                targetSmr.Add(partName[<span class="number">0</span>], partobj.AddComponent&lt;SkinnedMeshRenderer&gt;());</span><br><span class="line">            &#125;</span><br><span class="line">            data[partName[<span class="number">0</span>]].Add(partName[<span class="number">1</span>], part.transform);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 改变Avatar模型</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ChangeMesh</span>(<span class="params"><span class="keyword">string</span> part, <span class="keyword">string</span> item</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        SkinnedMeshRenderer smr = data[part][item].GetComponent&lt;SkinnedMeshRenderer&gt;();</span><br><span class="line"> </span><br><span class="line">        List&lt;Transform&gt; bones = <span class="keyword">new</span> List&lt;Transform&gt;();</span><br><span class="line">        <span class="keyword">foreach</span> (Transform bone <span class="keyword">in</span> smr.bones)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">foreach</span> (Transform hip <span class="keyword">in</span> hips)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span> (hip.name != bone.name)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                bones.Add(hip);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line"> </span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        targetSmr[part].sharedMesh = smr.sharedMesh;</span><br><span class="line">        targetSmr[part].bones = bones.ToArray();</span><br><span class="line">        targetSmr[part].materials = smr.materials;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Inivatar</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">int</span> nLength = avatarstr.GetLength(<span class="number">0</span>);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; nLength; i++ )</span><br><span class="line">        &#123;</span><br><span class="line">            ChangeMesh(avatarstr[i, <span class="number">0</span>], avatarstr[i, <span class="number">1</span>]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Inivatar0</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">int</span> nLength = avatarstr0.GetLength(<span class="number">0</span>);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; nLength; i++)</span><br><span class="line">        &#123;</span><br><span class="line">            ChangeMesh(avatarstr0[i, <span class="number">0</span>], avatarstr0[i, <span class="number">1</span>]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Inivatar1</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">int</span> nLength = avatarstr1.GetLength(<span class="number">0</span>);</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; nLength; i++)</span><br><span class="line">        &#123;</span><br><span class="line">            ChangeMesh(avatarstr1[i, <span class="number">0</span>], avatarstr1[i, <span class="number">1</span>]);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>程序将模型资源的存储放到了一个Dictionary字典列表里面，代码如下所示。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 模型资源</span></span><br><span class="line"><span class="keyword">private</span> Dictionary&lt;<span class="keyword">string</span>, Dictionary&lt;<span class="keyword">string</span>, Transform&gt;&gt; data = <span class="keyword">new</span> Dictionary&lt;<span class="keyword">string</span>, Dictionary&lt;<span class="keyword">string</span>, Transform&gt;&gt;();</span><br></pre></td></tr></table></figure>
+
+<p>模型Mesh的挂接部位SkinnedMeshRenderer放在如下的列表里面，代码如下所示。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 目标物件各部位的 SkinnedMeshRenderer （参照）</span></span><br><span class="line"><span class="keyword">private</span> Dictionary&lt;<span class="keyword">string</span>, SkinnedMeshRenderer&gt; targetSmr = <span class="keyword">new</span> Dictionary&lt;<span class="keyword">string</span>, SkinnedMeshRenderer&gt;();</span><br></pre></td></tr></table></figure>
+
+<p>下面开始介绍代码的编写思路。我们可以创建多个Avatar模型，创建Avatar模型的函数如下所示。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建多个换装模型</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">AvatarManager</span>(<span class="params"><span class="keyword">float</span> pos</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    InstantiateAvatar();</span><br><span class="line">    InstantiateSkeleton(pos);</span><br><span class="line"></span><br><span class="line">    LoadAvatarData(source);</span><br><span class="line">    hips = target.GetComponentsInChildren&lt;Transform&gt;();</span><br><span class="line">    Inivatar();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>该函数调用了多个接口函数，第一个函数InstantiateAvatar()用于创建资源实例，其实就是加载要更换的模型资源，加载完成后将其设置成不可见，代码如下所示。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 实例化Avatar模型</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">InstantiateAvatar</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    sourceobj = Instantiate(Resources.Load(<span class="string">"FemaleAvatar"</span>)) <span class="keyword">as</span> GameObject;</span><br><span class="line">    source = sourceobj.transform;</span><br><span class="line">    sourceobj.SetActive(<span class="literal">false</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>更换的资源实例化后，需要将它们挂接到骨骼动画上，所以接下来需要实例化出Target目标模型——骨骼动画，也就是函数InstantiateSkeleton(float pos)要做的事情，代码如下所示。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 实例化骨骼动画</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">InstantiateSkeleton</span>(<span class="params"><span class="keyword">float</span> pos</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    targetobj = Instantiate(Resources.Load(<span class="string">"targetmodel"</span>)) <span class="keyword">as</span> GameObject;</span><br><span class="line">    target = targetobj.transform;</span><br><span class="line">    target.transform.position = <span class="keyword">new</span> Vector3(pos, <span class="number">0.0f</span>, <span class="number">0.0f</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>资源和骨骼动画实例化后就要考虑更换Mesh，也就是换装的操作。函数InstantiateAvatar()只是把资源实例化出来，还没有把各个Mesh取到，这样还不能进行换装，在换装之前还要做的一项工作就是拿到各个部分的Mesh。函数LoadAvatarData(Transform source)就是做这个工作的，代码如下所示。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 加载Avatar数据</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">LoadAvatarData</span>(<span class="params">Transform source</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    data.Clear();</span><br><span class="line">    targetSmr.Clear();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (source == <span class="literal">null</span>)</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    SkinnedMeshRenderer[] parts = source.GetComponentsInChildren&lt;SkinnedMeshRenderer&gt;(<span class="literal">true</span>);</span><br><span class="line">    <span class="keyword">foreach</span> (SkinnedMeshRenderer part <span class="keyword">in</span> parts)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">string</span>[] partName = part.name.Split(<span class="string">'-'</span>);</span><br><span class="line">        <span class="keyword">if</span>(!data.ContainsKey(partName[<span class="number">0</span>]))</span><br><span class="line">        &#123;</span><br><span class="line">            data.Add(partName[<span class="number">0</span>], <span class="keyword">new</span> Dictionary&lt;<span class="keyword">string</span>, Transform&gt;());</span><br><span class="line">            GameObject partobj = <span class="keyword">new</span> GameObject();</span><br><span class="line">            partobj.name = partName[<span class="number">0</span>];</span><br><span class="line">            partobj.transform.parent = target;</span><br><span class="line"></span><br><span class="line">            targetSmr.Add(partName[<span class="number">0</span>], partobj.AddComponent&lt;SkinnedMeshRenderer&gt;());</span><br><span class="line">        &#125;</span><br><span class="line">        data[partName[<span class="number">0</span>]].Add(partName[<span class="number">1</span>], part.transform);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>执行该函数后，就拿到了运用于换装的各个Mesh，下面开始换装了，换装的函数是public void ChangeMesh(string part，string item)，其参数分别表示换装的名字和换装项的名字，类似这个“coat”“03”，函数代码如下所示。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 改变Avatar模型</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ChangeMesh</span>(<span class="params"><span class="keyword">string</span> part, <span class="keyword">string</span> item</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    SkinnedMeshRenderer smr = data[part][item].GetComponent&lt;SkinnedMeshRenderer&gt;();</span><br><span class="line"></span><br><span class="line">    List&lt;Transform&gt; bones = <span class="keyword">new</span> List&lt;Transform&gt;();</span><br><span class="line">    <span class="keyword">foreach</span> (Transform bone <span class="keyword">in</span> smr.bones)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">foreach</span> (Transform hip <span class="keyword">in</span> hips)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (hip.name != bone.name)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            bones.Add(hip);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    targetSmr[part].sharedMesh = smr.sharedMesh;</span><br><span class="line">    targetSmr[part].bones = bones.ToArray();</span><br><span class="line">    targetSmr[part].materials = smr.materials;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样整个换装代码的流程就写完了，该脚本可以直接挂接到场景中的某个对象上，该程序是挂接到Camera上面的，如下图所示。</p>
+<img src="/2019/04/27/Avatar换装系统/5.png">
+
+<p>挂接好脚本后，需要把要实例化的资源模型FemaleAvatar和targetmodel放到Resources资源文件夹下面，主要是便于实例化加载，如下图所示。</p>
+<img src="/2019/04/27/Avatar换装系统/6.png">
+
+<p>接下来为了便于换装操作，需要做几个UI按钮，搭建一个舞台场景，如下图所示。</p>
+<img src="/2019/04/27/Avatar换装系统/7.png">
+
+<p>最后需要编写一个脚本用于UI的操作，完整的代码如下所示。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Avatar_Btn</span> : <span class="title">MonoBehaviour</span> &#123;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">int</span> count = <span class="number">0</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">OnClick</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">string</span> name = <span class="keyword">this</span>.gameObject.name;</span><br><span class="line">        <span class="keyword">switch</span> (name)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">"coat"</span>:</span><br><span class="line">                <span class="keyword">if</span> (count == <span class="number">0</span>)</span><br><span class="line">                &#123;</span><br><span class="line">                    AvatarSys.instance.ChangeMesh(<span class="string">"coat"</span>, <span class="string">"001"</span>);</span><br><span class="line">                    count = <span class="number">1</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                &#123;</span><br><span class="line">                    AvatarSys.instance.ChangeMesh(<span class="string">"coat"</span>, <span class="string">"003"</span>);</span><br><span class="line">                    count = <span class="number">0</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">"hair"</span>:</span><br><span class="line">                <span class="keyword">if</span> (count == <span class="number">0</span>)</span><br><span class="line">                &#123;</span><br><span class="line">                    AvatarSys.instance.ChangeMesh(<span class="string">"hair"</span>, <span class="string">"001"</span>);</span><br><span class="line">                    count = <span class="number">1</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                &#123;</span><br><span class="line">                    AvatarSys.instance.ChangeMesh(<span class="string">"hair"</span>, <span class="string">"003"</span>);</span><br><span class="line">                    count = <span class="number">0</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">"hand"</span>:</span><br><span class="line">                <span class="keyword">if</span> (count == <span class="number">0</span>)</span><br><span class="line">                &#123;</span><br><span class="line">                    AvatarSys.instance.ChangeMesh(<span class="string">"hand"</span>, <span class="string">"001"</span>);</span><br><span class="line">                    count = <span class="number">1</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                &#123;</span><br><span class="line">                    AvatarSys.instance.ChangeMesh(<span class="string">"hand"</span>, <span class="string">"003"</span>);</span><br><span class="line">                    count = <span class="number">0</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">"head"</span>:</span><br><span class="line">                <span class="keyword">if</span> (count == <span class="number">0</span>)</span><br><span class="line">                &#123;</span><br><span class="line">                    AvatarSys.instance.ChangeMesh(<span class="string">"head"</span>, <span class="string">"001"</span>);</span><br><span class="line">                    count = <span class="number">1</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                &#123;</span><br><span class="line">                    AvatarSys.instance.ChangeMesh(<span class="string">"head"</span>, <span class="string">"003"</span>);</span><br><span class="line">                    count = <span class="number">1</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">"pant"</span>:</span><br><span class="line">                <span class="keyword">if</span> (count == <span class="number">0</span>)</span><br><span class="line">                &#123;</span><br><span class="line">                    AvatarSys.instance.ChangeMesh(<span class="string">"pant"</span>, <span class="string">"001"</span>);</span><br><span class="line">                    count = <span class="number">1</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                &#123;</span><br><span class="line">                    AvatarSys.instance.ChangeMesh(<span class="string">"pant"</span>, <span class="string">"003"</span>);</span><br><span class="line">                    count = <span class="number">0</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">"foot"</span>:</span><br><span class="line">                <span class="keyword">if</span> (count == <span class="number">0</span>)</span><br><span class="line">                &#123;</span><br><span class="line">                    AvatarSys.instance.ChangeMesh(<span class="string">"foot"</span>, <span class="string">"001"</span>);</span><br><span class="line">                    count = <span class="number">1</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">else</span></span><br><span class="line">                &#123;</span><br><span class="line">                    AvatarSys.instance.ChangeMesh(<span class="string">"foot"</span>, <span class="string">"003"</span>);</span><br><span class="line">                    count = <span class="number">0</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>该类实现了接口publicvoid OnClick()。调用AvatarSys脚本中的ChangeMesh完成换装，将该脚本挂接到UI的每个Button上面，如下图所示。</p>
+<img src="/2019/04/27/Avatar换装系统/8.png">
+
+<p>完成以上操作后就可以运行游戏了，效果如下图所示。</p>
+<img src="/2019/04/27/Avatar换装系统/9.png">
+
+<p>角色在运动，单击头发按钮，角色的头发已经被更换过了。<br>再单击裤子，裤子已经被更换过了。<br>再看看换装后运行的资源效果，如下图所示。</p>
+<img src="/2019/04/27/Avatar换装系统/12.png">
+
+<p>换装后的材质发生了改变，通过上图可以看出，有不同部位的裤子材质。</p>
+<p>以上介绍主要是为了帮助读者了解换装所需要做的工作，实际项目开发时，不太可能把游戏中的角色全身各部位的模型资料全部都载入作为来源资料。例如游戏中的武器有100种，角色背包中有3种武器，但为了换装却把100种武器都载入到游戏中，而实际上此角色最多也只能变换背包中的3种武器而已，这样无疑是浪费了97种武器所占用的资源。所以在了解如何换装后，实际操作时应该尽量把来源资源包装起来，只取出需要的资源来进行换装。</p>
+<p>#　小结<br>本章的Avatar换装技术，是针对3D游戏设计的，2D游戏只需要换材质就可以了，比较简单，这里就不介绍了。3D的Avatar换装技术是作为游戏开发者和VR/AR开发者必须要掌握的技能之一。要想掌握Avatar技术主要从两方面入手：一是技术实现，Mesh是绑定到骨骼上的；二是3D MAX建模的要求，或者说是规范，要告诉美工如何建模。希望通过本章的学习，读者可以举一反三做一套更换面部表情的换装系统。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Unity-3D实战核心技术详解/" rel="tag"># Unity 3D实战核心技术详解</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/26/让角色活灵活现：Unity中的动画系统/" rel="next" title="让角色活灵活现：Unity中的动画系统">
+                <i class="fa fa-chevron-left"></i> 让角色活灵活现：Unity中的动画系统
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/27/消息事件封装/" rel="prev" title="消息事件封装">
+                消息事件封装 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">269</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">29</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2019/07/21/存储器和指针：指向何方？/" title="存储器和指针：指向何方？" target="_blank">存储器和指针：指向何方？</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/07/20/结构、联合与位字段：创建自己的字段/" title="结构、联合与位字段：创建自己的字段" target="_blank">结构、联合与位字段：创建自己的字段</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/07/20/第2章-算法/" title="第2章 算法" target="_blank">第2章 算法</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/07/20/C语言入门：进入C语言的世界/" title="C语言入门：进入C语言的世界" target="_blank">C语言入门：进入C语言的世界</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/07/19/多路查找树（B树）/" title="多路查找树（B树）" target="_blank">多路查找树（B树）</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#换装原理"><span class="nav-number">1.</span> <span class="nav-text">换装原理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#换装代码实现"><span class="nav-number">2.</span> <span class="nav-text">换装代码实现</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">1.3m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">20:03</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

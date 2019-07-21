@@ -1,0 +1,1666 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="粒子系统（Particle System）在各个游戏引擎中都是非常重要的功能，而且具有相同的原理和相似的用法，下面就先讲述粒子系统的原理。">
+<meta name="keywords" content="Unity5.X游戏开发指南">
+<meta property="og:type" content="article">
+<meta property="og:title" content="粒子系统">
+<meta property="og:url" content="http://chebincarl.github.io/2019/02/27/粒子系统/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="粒子系统（Particle System）在各个游戏引擎中都是非常重要的功能，而且具有相同的原理和相似的用法，下面就先讲述粒子系统的原理。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-07-17T14:44:49.354Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="粒子系统">
+<meta name="twitter:description" content="粒子系统（Particle System）在各个游戏引擎中都是非常重要的功能，而且具有相同的原理和相似的用法，下面就先讲述粒子系统的原理。">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/02/27/粒子系统/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>粒子系统 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">文章看10遍，动手做10遍，自然就会了</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/02/27/粒子系统/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">粒子系统
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-02-27 20:40:25" itemprop="dateCreated datePublished" datetime="2019-02-27T20:40:25+08:00">2019-02-27</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-07-17 22:44:49" itemprop="dateModified" datetime="2019-07-17T22:44:49+08:00">2019-07-17</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Unity/" itemprop="url" rel="index"><span itemprop="name">Unity</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">5.3k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">5 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>粒子系统（Particle System）在各个游戏引擎中都是非常重要的功能，而且具有相同的原理和相似的用法，下面就先讲述粒子系统的原理。</p>
+<a id="more"></a>
+
+<h1 id="粒子系统介绍"><a href="#粒子系统介绍" class="headerlink" title="粒子系统介绍"></a>粒子系统介绍</h1><p>在3D游戏里，角色及场景元素通常都是网格模型。但要在场景中模拟火焰、烟雾和云彩等难以用网格模型来表现的效果时，则需要用到粒子系统。粒子系统还有一个别名：Shuriken，即手里剑。</p>
+<p>粒子系统发射大量的简单粒子单元，它们以特定的规律运动。这些粒子共同模拟复杂的自然现象或效果，粒子本质是简单微小的图片或者网格。</p>
+<p>以云雾为例，每个粒子都是细小的一小片云贴图，大量粒子组成了流动的体积云，可以说粒子系统的核心是一组粒子以一定的规律运动。</p>
+<h1 id="粒子系统各个模块"><a href="#粒子系统各个模块" class="headerlink" title="粒子系统各个模块"></a>粒子系统各个模块</h1><p>新建场景并命名为ParticleDemo。点击菜单栏-&gt;GameObject-&gt;Effects-&gt;Particle System，创建粒子系统，默认的粒子系统效果是一些从中心点向上飘飞的“雪花”。</p>
+<h2 id="Particle-System模块"><a href="#Particle-System模块" class="headerlink" title="Particle System模块"></a>Particle System模块</h2><p>选择粒子系统游戏对象，在Inspector窗口中可以看到粒子系统有众多模块。第一个模块–Particle System基本模块，该模块不能删除或禁用，参数说明如下表所示。</p>
+<table>
+<thead>
+<tr>
+<th align="left"><center>参数</center></th>
+<th align="left"><center>说明</center></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Duration</td>
+<td align="left">持续时间，粒子系统发射粒子持续的时间</td>
+</tr>
+<tr>
+<td align="left">Looping</td>
+<td align="left">是否循环</td>
+</tr>
+<tr>
+<td align="left">Prewarm</td>
+<td align="left">预热，只有循环的粒子系统可以设置预热，即在发射粒子时就已经发射了一个周期</td>
+</tr>
+<tr>
+<td align="left">Start Delay</td>
+<td align="left">启动延迟，如果启动了预热将不能使用延迟选项，延迟发射粒子</td>
+</tr>
+<tr>
+<td align="left">Start Lifetime</td>
+<td align="left">初始生命周期，以秒为单位</td>
+</tr>
+<tr>
+<td align="left">Start Speed</td>
+<td align="left">初始速度</td>
+</tr>
+<tr>
+<td align="left">Start Size</td>
+<td align="left">初始尺寸</td>
+</tr>
+<tr>
+<td align="left">Start Rotation</td>
+<td align="left">初始旋转角度</td>
+</tr>
+<tr>
+<td align="left">Start Color</td>
+<td align="left">初始颜色</td>
+</tr>
+<tr>
+<td align="left">Gravity Modifier</td>
+<td align="left">重力系数，对于在Physics Manager里设置的重力进行百分比缩放</td>
+</tr>
+<tr>
+<td align="left">Inherit Velocity</td>
+<td align="left">继承速度，初始速度</td>
+</tr>
+<tr>
+<td align="left">Simulation Space</td>
+<td align="left">模拟空间，选择在世界空间还是物体空间</td>
+</tr>
+<tr>
+<td align="left">Play On Awake</td>
+<td align="left">唤醒时播放，是否自动播放</td>
+</tr>
+<tr>
+<td align="left">Max Particles</td>
+<td align="left">最大粒子数量</td>
+</tr>
+</tbody></table>
+<h2 id="Emission模块"><a href="#Emission模块" class="headerlink" title="Emission模块"></a>Emission模块</h2><p>Emission模块控制粒子的发射量，可以在某刻大量发射粒子，对于爆炸这种需要一瞬间发射大量粒子的效果尤其实用。Emission模块的参数说明如下表所示。</p>
+<table>
+<thead>
+<tr>
+<th align="left"><center>参数</center></th>
+<th align="left"><center>说明</center></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Rate</td>
+<td align="left">每秒或者每移动一个单位距离所产生的粒子</td>
+</tr>
+<tr>
+<td align="left">Bursts</td>
+<td align="left">当勾选时间选项时开启Bursts选项</td>
+</tr>
+<tr>
+<td align="left">Time and Number of Particles</td>
+<td align="left">在周期内到达某个时间点的时候发射指定数量的粒子，最多可以添加4组</td>
+</tr>
+</tbody></table>
+<h2 id="Shape-Module模块"><a href="#Shape-Module模块" class="headerlink" title="Shape Module模块"></a>Shape Module模块</h2><p>Shape Module模块用来选择发射体的形状以及在体内的哪里被发射，参数说明如下表所示。</p>
+<table>
+<thead>
+<tr>
+<th align="left"><center>参数</center></th>
+<th align="left"><center>说明</center></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Shape</td>
+<td align="left">发射体的形状。有球体、半球体、圆锥体、盒子、网格、圆圈、边缘。如果是网格，需要指定是从顶点、基本三角形发射，还是从边缘发射</td>
+</tr>
+<tr>
+<td align="left">Random Direction</td>
+<td align="left">当激活时，所有粒子将被赋予随机的初始方向。不激活时，球体从内向外随机发射；半球体从内向外随机发射但不包括底部；圆锥体/盒子从底部向顶部发射；网格/圆圈在截平面内从圈内向圈外发射；边缘，其实是一条线，线向一个固定方向发射</td>
+</tr>
+<tr>
+<td align="left">Radius</td>
+<td align="left">网弧的度数（球体、半球体、圆锥体、圆圈、边缘）</td>
+</tr>
+<tr>
+<td align="left">Angle</td>
+<td align="left">网锥体的角度，0是圆柱体，90是平面</td>
+</tr>
+<tr>
+<td align="left">Box X,Y,Z</td>
+<td align="left">为Box指定长宽高</td>
+</tr>
+<tr>
+<td align="left">Mesh</td>
+<td align="left">为Mesh指定网格</td>
+</tr>
+<tr>
+<td align="left">Emit from Shell</td>
+<td align="left">从体内还是体外发射粒子（球体、半球体），勾选时粒子在球面发射，不勾选时从球内发射</td>
+</tr>
+<tr>
+<td align="left">Emit from</td>
+<td align="left">从圆锥体的什么部位发射：Base从底部向顶部发射，Base Shell从底部的表面向顶部发射，Volume从阅锥体内向外发射，Volume Shell从圆锥体的表面向外发射</td>
+</tr>
+<tr>
+<td align="left">Arc</td>
+<td align="left">圆圈专有属性：360为圆圈，小于360为扇形</td>
+</tr>
+<tr>
+<td align="left">Emit From Edge</td>
+<td align="left">圆圈专有属性：勾选时从圆圈的边缘发射，不勾选时从圆圈的中心发射</td>
+</tr>
+</tbody></table>
+<h2 id="Velocity-over-Lifetime模块"><a href="#Velocity-over-Lifetime模块" class="headerlink" title="Velocity over Lifetime模块"></a>Velocity over Lifetime模块</h2><p>Velocity over Lifetime模块设置整个生命周期的速度，参数说明如下所示。</p>
+<ul>
+<li>X,Y,Z：粒子在各个轴向的速度。</li>
+<li>Space：选择相对本地坐标系还是世界坐标系。<br>Start Speed和Velocity的区别如下。</li>
+<li>float startSpeed：基础速度标量，主要表示速度的大小。</li>
+<li>Vector3 Velocity：速度向量，主要表示速度的方向。在某一个时间点的速度为startSpeed * Velocity。</li>
+</ul>
+<h2 id="Limit-Velocity-over-Lifetime模块"><a href="#Limit-Velocity-over-Lifetime模块" class="headerlink" title="Limit Velocity over Lifetime模块"></a>Limit Velocity over Lifetime模块</h2><p>Limit Velocity over Lifetime模块主要用来限制粒子的速度，参数说明如下所示。</p>
+<ul>
+<li>Separate Axis：是否分X、Y、Z轴单独设置各个轴向的限定速度。</li>
+<li>Speed：设置限定速度。</li>
+<li>Space：选择相对本地坐标系还是世界坐标系。</li>
+<li>Dampen：当粒子速度的速度超过后限定速度后的衰减系数，范围是[0,1]。</li>
+</ul>
+<h2 id="Force-over-Lifetime模块"><a href="#Force-over-Lifetime模块" class="headerlink" title="Force over Lifetime模块"></a>Force over Lifetime模块</h2><p>Force over Lifetime模块对所有粒子施加力，使之具有加速度，参数说明如下所示。</p>
+<ul>
+<li>X,Y,Z：力在3个轴向的值。</li>
+<li>Space：选择相对本地坐标系还是世界坐标系。<br>  流体经常在流动中受到力的影响，例如从火中冒起的烟受热气的轻微的力作用，可以通过设置速度在生命周期中的曲线来达到。一开始烟受热气上升，但是热气遇到冷空气后不再对烟施力，烟升腾到顶部会回落。</li>
+</ul>
+<h2 id="Color-over-Lifetime模块"><a href="#Color-over-Lifetime模块" class="headerlink" title="Color over Lifetime模块"></a>Color over Lifetime模块</h2><p>Color over Lifetime模块用来处理粒子颜色在生命周期内的变化，参数Color用来处理粒子的颜色。</p>
+<p>很多自然的效果粒子的顏色是随时间变化的，例如火花飞溅的火星会在空气中冷却变暗乃至消失，那么最后以透明白色结束是最适合的。</p>
+<h2 id="Color-by-Speed模块"><a href="#Color-by-Speed模块" class="headerlink" title="Color by Speed模块"></a>Color by Speed模块</h2><p>粒子颜色也可以随速度变化，这就需要用到Color by Speed模块，该模块的参数如下所示。</p>
+<ul>
+<li>Color：粒子的颜色</li>
+<li>Speed Range：颜色对应的速度范围。</li>
+</ul>
+<p>在火星四溅的效果中，快速的粒子会更亮（因为接触到更多的氧气，燃烧更剧烈），可以在Color的左端设置红色代表低速颜色,右段白色代表高速颜色。</p>
+<h2 id="Size-over-Lifetime模块"><a href="#Size-over-Lifetime模块" class="headerlink" title="Size over Lifetime模块"></a>Size over Lifetime模块</h2><p>Size over Lifetime模块根据生命周期设置粒子的大小，参数Size可以设置粒子在生命周期内的大小变化。</p>
+<p>烟雾等特效通常会在远离中心点的同时改变。例如，烟雾趋向于散开。这时曲线可以设置为上升的斜坡，可以和Color Over Lifetime一同使用，而燃料引起的火焰则是先上升再下降的曲线。</p>
+<h2 id="Size-by-Speed模块"><a href="#Size-by-Speed模块" class="headerlink" title="Size by Speed模块"></a>Size by Speed模块</h2><p>Size by Speed模块根据速度设置粒子的大小，参数如下所示。</p>
+<ul>
+<li>Size：曲线、定义粒子在速度范围内如何变化。</li>
+<li>Speed Range：速度最小值和速度最大值，对应Size曲线的两端。</li>
+</ul>
+<p>不光可以通过生命周期改变粒子大小，还可以通过速度。例如，爆炸效果中碎片向外飞溅。其中小碎片会飞得快些，而大碎片会飞得慢些。最好不要使用Limit Velocity Over Lifetime，除非想让粒子迅速缩小。</p>
+<h2 id="Rotation-over-Lifetime模块"><a href="#Rotation-over-Lifetime模块" class="headerlink" title="Rotation over Lifetime模块"></a>Rotation over Lifetime模块</h2><p>Rotation over Lifetime模块用来让粒子在生命周期内旋转，参数Angular Velocity用来设置旋转的角速度（度/秒）。</p>
+<p>这个属性适合小型固体，如爆炸中的碎片。设置一个范围内的随意角速度会让效果看起来更真实，更自然，因为没有过多相似的粒子。</p>
+<h2 id="Rotation-by-Speed模块"><a href="#Rotation-by-Speed模块" class="headerlink" title="Rotation by Speed模块"></a>Rotation by Speed模块</h2><p>使用Rotation by Speed模块，可以通过速度来设置旋转，参数如下所示。</p>
+<ul>
+<li>Angular Velocity：旋转的角速度（度/秒）</li>
+<li>Speed Range：当Angular Velocity为曲线时，该值对应速度最小值和速度最大值。该模块可以用来表现石头群从坡上滚落的效果。</li>
+</ul>
+<h2 id="External-Forces模块"><a href="#External-Forces模块" class="headerlink" title="External Forces模块"></a>External Forces模块</h2><p>外部力量模块。当勾选时，Wind Zone风域不仅可以作用于树术，还可以作用于粒子，参数如下所示。</p>
+<ul>
+<li>External Forces：是否激活外部力量。</li>
+<li>Multiplier：风域系数。</li>
+</ul>
+<p>地形系统可以通过Wind Zone对树木施加力产生风吹的效果，激活外部力量使得风域同样可以作用于粒子系统，Multiplier可以设置得大一些，因为起风时粒子通常会比树枝被吹得猛烈得多。</p>
+<h2 id="Collision模块"><a href="#Collision模块" class="headerlink" title="Collision模块"></a>Collision模块</h2><p>Collision模块控制粒子如何与场景中的碰撞体碰撞，主要分为World和Planes两种。World参数如下表所示。</p>
+<table>
+<thead>
+<tr>
+<th align="left"><center>参数</center></th>
+<th align="left"><center>说明</center></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Dampen</td>
+<td align="left">在碰撞后由于摩擦而损失速度的百分比。0代表在碰撞后不损失速度，1代表碰撞后速度为0</td>
+</tr>
+<tr>
+<td align="left">Bounce</td>
+<td align="left">弹性。0表示碰撞后不会弹起，1表示会最大弹起</td>
+</tr>
+<tr>
+<td align="left">Lifetime loss</td>
+<td align="left">碰撞所消耗的生命周期，0代表不会消耗，1代表完全消耗，也就是碰撞后粒子立刻消失</td>
+</tr>
+<tr>
+<td align="left">Min Kill Speed</td>
+<td align="left">当碰撞后小于此速度值的粒子将会消失</td>
+</tr>
+<tr>
+<td align="left">Collides With</td>
+<td align="left">粒子所能碰撞的layer层</td>
+</tr>
+<tr>
+<td align="left">Collision Quality</td>
+<td align="left">碰撞的精确度，如果选择low的话，有时粒子会穿过碰撞体</td>
+</tr>
+<tr>
+<td align="left">Send Collision Messages</td>
+<td align="left">如果激活，当有碰撞体受到粒子撞击时，会发送消息调用脚本中的OnParticleCollision()函数</td>
+</tr>
+</tbody></table>
+<p>Plane参数如下表所示。</p>
+<table>
+<thead>
+<tr>
+<th align="left"><center>参数</center></th>
+<th align="left"><center>说明</center></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Visualization</td>
+<td align="left">平面的显示方式。Grid：只在Scene视图下以线征的形式呈现。Solid：在Scene和Game视图下都会直接显示一个平面</td>
+</tr>
+<tr>
+<td align="left">Scale Plane</td>
+<td align="left">缩放可提化的平面（只与显示有关）</td>
+</tr>
+<tr>
+<td align="left">Dampen</td>
+<td align="left">在碰撞后由于摩擦而损失速度的百分比。0代表在碰撞后不损失速度，1代表碰撞后的速度为0</td>
+</tr>
+<tr>
+<td align="left">Bounce</td>
+<td align="left">弹性。0表示碰撞后不会弹起，1表示会最大弹起</td>
+</tr>
+<tr>
+<td align="left">Lifetimse loss</td>
+<td align="left">碰撞所消耗的生命周期，0代表不会消耗，1代表完全消耗，也就是碰撞后粒子立刻消失</td>
+</tr>
+<tr>
+<td align="left">Min Kill Speed</td>
+<td align="left">当碰撞后小于此速度值的粒子将会消失</td>
+</tr>
+<tr>
+<td align="left">Particle Radius</td>
+<td align="left">粒子的大致尺寸，避免粒子与平面出现部分重叠</td>
+</tr>
+<tr>
+<td align="left">Send Collision Messages</td>
+<td align="left">如果激活，当有碰撞体受到粒子撞击时，会发送消息调用脚本中的onParticleCollision()函数</td>
+</tr>
+</tbody></table>
+<p>当其他物体包围粒子系统时，粒子系统与它们有良好的交互看起来会更真实。例如水或者碎片遇到一面墙的时候，应该被阻挡而不是直接穿过去。激活Collision就可以实现此效果。当选择World模式时，会默认能与所有物体碰撞，也可以在Collide With里设置哪些层可与粒子碰撞，哪些不可以。Plane模式可以添加一组游戏对象，表示平面与粒子系统碰撞。当实现粒子与楼梯、墙壁等碰撞时，Plane模式的CPU效率更高。当使用Plane模式时，可以添加一个或一组游戏对象至Planes属性上。</p>
+<p>这些游戏对象会在本地的X、Z轴向展开无尽的平面，而Y的正向代表平面的法线方向，可以在Visualization里显示这些看不见的平面，以帮助我们设置。</p>
+<p>当碰撞激活时会有一个问题：当粒子与物体碰撞时，有可能出现边缘重叠或者交错的情况，因为粒子的大小有可能在碰撞后的反弹前变化，Particle Radius这个属性可以很好地解决这个问题，例如设置得比原尺寸稍微大一点。</p>
+<p>当用粒子表示固体(例如石头)从坡上滚下时，Dampen和Bounce两个属性非常有用。石头在落地时会弹起，而雪球在落地后会趋向于停下来，Lifetime Loss和Min Kill Speed可以设置在一个粒子碰撞后剩下的粒子跟随的情况，例如一个火球发生碰撞后，迸发出的火星粒子应该分开消散。</p>
+<h2 id="Sub-Emitters模块"><a href="#Sub-Emitters模块" class="headerlink" title="Sub Emitters模块"></a>Sub Emitters模块</h2><p>Sub Emitters模块是子发射器，参数如下所示。</p>
+<ul>
+<li>Birth：在粒子系统的起始阶段最多创建2个子粒子系统。</li>
+<li>Collision：在粒子发生碰撞的时候最多创建2个子粒子系统。</li>
+<li>Death：在粒子系统生命周期结束的时候最多创建2个子粒子系统。</li>
+</ul>
+<p>例如，子弹离开舱膛时会有硝烟，而火球撞到目标时会发生爆炸。子发射器发射的粒子系统也是普通的粒子系统，只是发射粒子或激活粒子系统的时机由父粒子系统决定而已。子粒子系统依然可以有子粒子系统，但是用子发射器很容易产生大量的粒子，使用时一定要注意。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Unity5-X游戏开发指南/" rel="tag"># Unity5.X游戏开发指南</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/02/26/导航系统/" rel="next" title="导航系统">
+                <i class="fa fa-chevron-left"></i> 导航系统
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/02/27/数据存储与读取/" rel="prev" title="数据存储与读取">
+                数据存储与读取 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">269</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">29</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2019/07/21/存储器和指针：指向何方？/" title="存储器和指针：指向何方？" target="_blank">存储器和指针：指向何方？</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/07/20/结构、联合与位字段：创建自己的字段/" title="结构、联合与位字段：创建自己的字段" target="_blank">结构、联合与位字段：创建自己的字段</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/07/20/第2章-算法/" title="第2章 算法" target="_blank">第2章 算法</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/07/20/C语言入门：进入C语言的世界/" title="C语言入门：进入C语言的世界" target="_blank">C语言入门：进入C语言的世界</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/07/19/多路查找树（B树）/" title="多路查找树（B树）" target="_blank">多路查找树（B树）</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#粒子系统介绍"><span class="nav-number">1.</span> <span class="nav-text">粒子系统介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#粒子系统各个模块"><span class="nav-number">2.</span> <span class="nav-text">粒子系统各个模块</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Particle-System模块"><span class="nav-number">2.1.</span> <span class="nav-text">Particle System模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Emission模块"><span class="nav-number">2.2.</span> <span class="nav-text">Emission模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Shape-Module模块"><span class="nav-number">2.3.</span> <span class="nav-text">Shape Module模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Velocity-over-Lifetime模块"><span class="nav-number">2.4.</span> <span class="nav-text">Velocity over Lifetime模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Limit-Velocity-over-Lifetime模块"><span class="nav-number">2.5.</span> <span class="nav-text">Limit Velocity over Lifetime模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Force-over-Lifetime模块"><span class="nav-number">2.6.</span> <span class="nav-text">Force over Lifetime模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Color-over-Lifetime模块"><span class="nav-number">2.7.</span> <span class="nav-text">Color over Lifetime模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Color-by-Speed模块"><span class="nav-number">2.8.</span> <span class="nav-text">Color by Speed模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Size-over-Lifetime模块"><span class="nav-number">2.9.</span> <span class="nav-text">Size over Lifetime模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Size-by-Speed模块"><span class="nav-number">2.10.</span> <span class="nav-text">Size by Speed模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Rotation-over-Lifetime模块"><span class="nav-number">2.11.</span> <span class="nav-text">Rotation over Lifetime模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Rotation-by-Speed模块"><span class="nav-number">2.12.</span> <span class="nav-text">Rotation by Speed模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#External-Forces模块"><span class="nav-number">2.13.</span> <span class="nav-text">External Forces模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Collision模块"><span class="nav-number">2.14.</span> <span class="nav-text">Collision模块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Sub-Emitters模块"><span class="nav-number">2.15.</span> <span class="nav-text">Sub Emitters模块</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">1.3m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">20:03</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

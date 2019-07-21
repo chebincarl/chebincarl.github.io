@@ -1,0 +1,1587 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="1.光照来源有几种？分别是什么意思？2.预计算阶段是什么意思？3.GI是什么意思？选择Bake后有几种模式？4.Reflection Probe是什么？使用步骤是什么？5.烘焙模式下移动物体没有直射光和间接光，如何处理？">
+<meta name="keywords" content="Unity5.X游戏开发指南">
+<meta property="og:type" content="article">
+<meta property="og:title" content="光照-2">
+<meta property="og:url" content="http://chebincarl.github.io/2019/04/11/光照-2/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="1.光照来源有几种？分别是什么意思？2.预计算阶段是什么意思？3.GI是什么意思？选择Bake后有几种模式？4.Reflection Probe是什么？使用步骤是什么？5.烘焙模式下移动物体没有直射光和间接光，如何处理？">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://chebincarl.github.io/2019/04/11/光照-2/3.jpg">
+<meta property="og:updated_time" content="2019-07-17T14:44:48.632Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="光照-2">
+<meta name="twitter:description" content="1.光照来源有几种？分别是什么意思？2.预计算阶段是什么意思？3.GI是什么意思？选择Bake后有几种模式？4.Reflection Probe是什么？使用步骤是什么？5.烘焙模式下移动物体没有直射光和间接光，如何处理？">
+<meta name="twitter:image" content="http://chebincarl.github.io/2019/04/11/光照-2/3.jpg">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/04/11/光照-2/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>光照-2 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">文章看10遍，动手做10遍，自然就会了</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/04/11/光照-2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">光照-2
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-04-11 06:35:07" itemprop="dateCreated datePublished" datetime="2019-04-11T06:35:07+08:00">2019-04-11</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-07-17 22:44:48" itemprop="dateModified" datetime="2019-07-17T22:44:48+08:00">2019-07-17</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Unity/" itemprop="url" rel="index"><span itemprop="name">Unity</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">4.2k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">4 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>1.光照来源有几种？分别是什么意思？<br>2.预计算阶段是什么意思？<br>3.GI是什么意思？选择Bake后有几种模式？<br>4.Reflection Probe是什么？使用步骤是什么？<br>5.烘焙模式下移动物体没有直射光和间接光，如何处理？</p>
+<a id="more"></a>
+
+<p>本章涵盖：</p>
+<ul>
+<li>GI</li>
+<li>反射环境</li>
+<li>光照探针</li>
+</ul>
+<h1 id="GI-Global-Illumination"><a href="#GI-Global-Illumination" class="headerlink" title="GI(Global Illumination)"></a>GI(Global Illumination)</h1><p>光照按光的来源可分为两种：直接光照（Direct Lighting）和间接光照（Indirect Lighting）。从光源直接发出的光称为直接光照，物体表面在接受光照后反射出的光称为间接光照。</p>
+<h2 id="GI介绍"><a href="#GI介绍" class="headerlink" title="GI介绍"></a>GI介绍</h2><p>在Unity 5.0以前，Unity的光照系统只能将光照信息（包括间接光照）通过烘焙的方式储存在Lightmap即光照贴图中，而无法实时处理间接光照。而Unity 5.0之后的版本使用了Enlighten光照系统。该系统提供了最先进的动态光照解决方案，能实时计算间接光照。<span style="color:red;">这种能计算间接光照的光照系统，就是GI系统，即全局光照系统。</span></p>
+<p>Unity所使用的Enlighten光照系统是唯一被证明能提供实时GI的光照系统，并且支持移动平台。GI有实时、烘焙以及混合这几种模式，切换也非常简单，直接设置光的Mode属性，在Realtime（实时），Baked（烘焙）和Mixed（混合）3种模式之间切换即可。</p>
+<ul>
+<li><p>Realtime：实时模式。<span style="color:red;">在编译前有一个预计算阶段，主要收集场景几何信息等信息。在实时渲染阶段，会根据预计算阶段收集的信息进行直接光照和间接光照的计算。</span></p>
+</li>
+<li><p>Baked：烘焙模式。将静态光照和动态光照等信息烘焙至Lightmap光照贴图中。</p>
+</li>
+<li><p>Mixed：实时模式与烘焙模式的混合。</p>
+</li>
+</ul>
+<h2 id="GI使用"><a href="#GI使用" class="headerlink" title="GI使用"></a>GI使用</h2><p>点击导航菜单-&gt;Window-&gt;Lighting，进入光照界面，如图1所示。Environment Light栏是环境光和天空盒的设置。</p>
+
+
+<center>图1：Lighting设置</center>
+
+<p><span style="color:red;">Precomputed是预计算阶段的GI设置。</span>一般来说，Realtime Resolution分辨率设置低的值以便快速更新，填1也就是一米一像素够了。</p>
+<p>Baked GI是烘焙阶段的GI设置。</p>
+<p>GI分为两种模式：迭代式和快照式。</p>
+<ul>
+<li>迭代式（Iterative）：当勾选图1中右下角的Continuous Baking时为迭代式， Editor监测任何场景改变并立刻开始更新对应烘焙信息或者动态光照的预计算信息并自动烘焙数据。</li>
+<li>快照式（Snapshot）：当不勾选图1中右下角的Continuous Baking时为快照式，当点击Build按钮后进行GI计算，其他时候不进行任何GI计算。每一次点击Build后的光照信息都会作为快照被储存起来。</li>
+</ul>
+<p>在Scene窗口的Shaded页签下有多种观察模式，如图2所示，我们可以选择Global Illumination下的各个模式，以可视化的形式观察场景GI的状态。</p>
+
+<center>图2：Shaded模式</center> 
+
+<h1 id="反射环境"><a href="#反射环境" class="headerlink" title="反射环境"></a>反射环境</h1><p>在3D开发中，需要模拟很多现实中的效果。例如一颗钢珠会将四周的画面反射，如图3所示。在Unity中，可以通过设置材质的属性来实现。</p>
+<img src="/2019/04/11/光照-2/3.jpg">
+<center>图3：反射环境</center>
+
+<h2 id="反射天空盒"><a href="#反射天空盒" class="headerlink" title="反射天空盒"></a>反射天空盒</h2><p>实现起来非常简单。新建一个场景，然后创建一个Sphere球体，新建材质并赋予球体，画面如图4所示。</p>
+<p>接下来只需要设置材质的两个参数即可反射天空盒，将材质的Metallic设置为1，也就是金属属性为最大，将Smoothness设置为1，最平滑，画面如图5所示。</p>
+
+<center>图4：Metallic为0</center>
+
+
+<center>图5：Metallic为1</center>
+
+<h2 id="反射天空盒及场景"><a href="#反射天空盒及场景" class="headerlink" title="反射天空盒及场景"></a>反射天空盒及场景</h2><p>但是仅仅反射天空盒是不够的，像赛车游戏中赛车的玻璃和车身，如果能反映周围的环境，就会大大提高游戏的画面表现力。这一切都可以借助Reflection Probe反射探针来实现。</p>
+<p>创建一个新场景，加入地形和树木。点击导航菜单栏-&gt;GamgObject-&gt;Light-&gt;Reflection Probe，创建反射探针，如图6所示。</p>
+
+<center>图6：反射探针</center>
+
+<p><span style="color:red;">探针像摄像机一样拍摄周围的画面，不同的是，探针拍摄的是四周所有角度的画面，然后将画面存在一张Cube Map中</span>，如图7所示。我们可以在场景里创建多个这样的反射探针，当物体需要反映场景时，取最近的数个反射探针，并将它们的Cube Map混合显示。图6所示的立方体线框所示区域，为反射探针的作用区域，超过此区域的物体不能获取此探针。</p>
+
+<center>图7：Cube Map</center>
+
+<blockquote>
+<p>Cube Map</p>
+</blockquote>
+<p>这里我们创建一个胶囊体，新建一个材质并赋予胶囊体，将材质的Metallic设置为1，将Smoothness设置为1，再将胶囊体Mesh Renderer组件的Reflection Probes属性设置为Blend Probes And SkyBox，画面如图8所示。</p>
+
+<center>胶囊体反射天空盒及场景的画面</center>
+
+<p>下面我们再来详细看看Reflection Probe的属性。首先是类型，如表1所示。</p>
+<center>表1：Reflection Probe的类型</center>
+
+<table>
+<thead>
+<tr>
+<th align="left"><center>类型</center></th>
+<th align="left"><center>说明</center></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Baked</td>
+<td align="left">根据标记为ReflectionProbeStatic的对象生成静态的CubeMap。烘焙只在Editor中进行，也就是动态物体不会被反射探针探测到</td>
+</tr>
+<tr>
+<td align="left">Custom</td>
+<td align="left">为各个反射探针手动生成Cube Map。在手动点击Inspector界面下ReflectionProbe的Bake按钮时，指定Cube Map的保存路径并保存，也可以在Cubemap栏指定其他Cubemap</td>
+</tr>
+<tr>
+<td align="left">Realtime</td>
+<td align="left">根据所有区域内静态及动态物体实时生成Cube Map，非常消耗效率</td>
+</tr>
+</tbody></table>
+<p>还有一些非常重要的参数，如表2所示。</p>
+<center>表2：Reflection Probe的参数</center>
+
+<table>
+<thead>
+<tr>
+<th align="left"><center>属性</center></th>
+<th align="left"><center>说明</center></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Size</td>
+<td align="left">区域内的物体能够接收探针的Cube Map，在Scene窗口中以黄色线框显示</td>
+</tr>
+<tr>
+<td align="left">Intensity</td>
+<td align="left">Cube Map应用于贴图的强度，默认值为1</td>
+</tr>
+<tr>
+<td align="left">Resolution</td>
+<td align="left">分辨率</td>
+</tr>
+<tr>
+<td align="left">HDR</td>
+<td align="left">是否开启HDR高动态范围模式</td>
+</tr>
+<tr>
+<td align="left">Box Projection</td>
+<td align="left">盒子投影，当反映的是近似立方体的环境（例如一个房间）时，开启盒子投影能得到正确的结果，效果如图9及图10所示（Shader model 3.0以上才支持）</td>
+</tr>
+</tbody></table>
+
+<center>图9：未开启Box Projection</center>
+
+
+<center>图10：开启Box Projection</center>
+
+<p>选中胶囊体，在Inspector界面中的Mesh Renderer栏下的Reflection Probes设置反射探针的混合类型，如表3所示。</p>
+<center>表3：Reflection Probes的类型</center>
+
+<table>
+<thead>
+<tr>
+<th align="left"><center>类型</center></th>
+<th align="left"><center>说明</center></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">off</td>
+<td align="left">不混合、仅仅反射天空盒</td>
+</tr>
+<tr>
+<td align="left">Simple</td>
+<td align="left">简单混合天空盒和最近的反射探针</td>
+</tr>
+<tr>
+<td align="left">Blend Probes</td>
+<td align="left">在附近的反射探针之间取插值。不包括天空盒，适用于室内物体</td>
+</tr>
+<tr>
+<td align="left">Blend Probes And Skybox</td>
+<td align="left">在附近的反射探针之间取插值并与天空盒混合。适用于室外对象，当位于探针区域内时取探针Cube Map，离开区域后切换到天空盒</td>
+</tr>
+</tbody></table>
+<h1 id="光照探针"><a href="#光照探针" class="headerlink" title="光照探针"></a>光照探针</h1><p>首先介绍一组名词：在Inspector视图的右上角的Static下拉菜单中勾选Lightmap Static的物体，在光照方面我们称之为<strong>静态物体</strong>，不勾选的我们称之为<strong>动态物体</strong>。一般来说，对于静止不动的物体（如建筑物等），我们会勾选Lightmap Static，即设置其为静态物体，而将人物等移动的物体设置为动态物体。<span style="color:red;">对于设置为实时的光源，静态物体的直接光照和间接光照以及动态物体的直接光照，光照系统都会处理，而动态物体的间接光照则需要光照探针（ Light Probe ）来辅助计算。对于设置为烘焙的光源，静态物体的直接光照和间接光照光照系统都会处理，而动态物体的直接光照以及间接光照都需要光照探针来辅助计算。</span></p>
+<p>例如在场景1中，有一个聚光灯光源，为烘焙类型。地面为静态物体，中央摆放的立方体为动态物体。在烘焙后，地面作为静态物体参与直接光照和间接光照的计算，因此有光照效果；而立方体作为动态物体，它的直接光照以及间接光照都需要光照探针来辅助计算，而我们还没有设置光照探针，所以没有光照效果，如图11所示。</p>
+
+<center>图11：场景1在烘焙后的效果</center>
+
+<p>而光照探针组（Light Probe Group）可以帮助动态物体计算光照。大致原理是每个探针根据所处位置及周围环境计算该点的直接光照和间接光照并将信息储存起来。位于探针区域内的动态物体根据周围探针的光照信息综合计算得出光照信息并显示。</p>
+<p>新建一个场景并命名为2，进行相似的场景布置。然后点击导航菜单栏-&gt;GameObject-&gt;Light-&gt;Light Probe Group，创建一个光照探针组。如图12所示，选中Light Probe Group对象，在Scene界面中显示的黄色圆球为一个个光照探针，可以对其进行拖曳等操作</p>
+
+<center>图12：Scene界面中的光照探针组</center>
+
+<p>在Inspector视图中，光照探针组界面有4个按钮辅助操作，如图13所示，按钮说明如表4<br>所示。</p>
+
+<center>图13：Inspector界面中的光照探针组</center>
+
+<center>表4：光照探针组的按钮</center>
+
+<table>
+<thead>
+<tr>
+<th align="left"><center>按钮</center></th>
+<th align="left"><center>说明</center></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Add Probe</td>
+<td align="left">添加一个探针</td>
+</tr>
+<tr>
+<td align="left">Select All</td>
+<td align="left">选择所有探针</td>
+</tr>
+<tr>
+<td align="left">Delete Selected</td>
+<td align="left">删除已选探针</td>
+</tr>
+<tr>
+<td align="left">Duplicate Selected</td>
+<td align="left">复制已选探针</td>
+</tr>
+</tbody></table>
+<p>选取探针也非常简单，在Scene界面中点击黄色球体即可，按住Ctrl或者Shift键点击则是多选。新创建的探针组有默认的8个探针组成一个封闭的空间。通常我们创建均匀分布的探针，使探针组成为一个阵列。</p>
+<p>设置好探针组，等烘焙完，中央的立方体就受到光照的影响而改变亮度了，如图14所示。</p>
+
+<center>图14：设置探针组后的效果</center>
+
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>本章首先介绍了光照的基本类型以及使用方法，接着介绍了阴影和渲染模式，然后介绍了5.0中最新的全域光照GI系统，最后讲解了如何使用反射探针反射环境和使用光照探针计算光照。</p>
+<h1 id="习题"><a href="#习题" class="headerlink" title="习题"></a>习题</h1><p>1.光源有哪几种类型？<br>2.简述反射探针和光照探针各自的作用。<br>3.创建并布置一个场景，加入光源并进行烘焙。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Unity5-X游戏开发指南/" rel="tag"># Unity5.X游戏开发指南</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/11/光照-1/" rel="next" title="光照-1">
+                <i class="fa fa-chevron-left"></i> 光照-1
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/12/物理引擎（1）/" rel="prev" title="物理引擎（1）">
+                物理引擎（1） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">269</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">29</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2019/07/21/存储器和指针：指向何方？/" title="存储器和指针：指向何方？" target="_blank">存储器和指针：指向何方？</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/07/20/结构、联合与位字段：创建自己的字段/" title="结构、联合与位字段：创建自己的字段" target="_blank">结构、联合与位字段：创建自己的字段</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/07/20/第2章-算法/" title="第2章 算法" target="_blank">第2章 算法</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/07/20/C语言入门：进入C语言的世界/" title="C语言入门：进入C语言的世界" target="_blank">C语言入门：进入C语言的世界</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/07/19/多路查找树（B树）/" title="多路查找树（B树）" target="_blank">多路查找树（B树）</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#GI-Global-Illumination"><span class="nav-number">1.</span> <span class="nav-text">GI(Global Illumination)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#GI介绍"><span class="nav-number">1.1.</span> <span class="nav-text">GI介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GI使用"><span class="nav-number">1.2.</span> <span class="nav-text">GI使用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#反射环境"><span class="nav-number">2.</span> <span class="nav-text">反射环境</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#反射天空盒"><span class="nav-number">2.1.</span> <span class="nav-text">反射天空盒</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#反射天空盒及场景"><span class="nav-number">2.2.</span> <span class="nav-text">反射天空盒及场景</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#光照探针"><span class="nav-number">3.</span> <span class="nav-text">光照探针</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#小结"><span class="nav-number">4.</span> <span class="nav-text">小结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#习题"><span class="nav-number">5.</span> <span class="nav-text">习题</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">1.3m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">20:03</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

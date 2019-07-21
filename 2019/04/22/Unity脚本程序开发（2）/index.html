@@ -1,0 +1,1649 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="本章涵盖：  预制体（prefab）资源的应用 常用输入对象 与销毁相关的方法">
+<meta name="keywords" content="Unity游戏开发技术详解与典型案例">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Unity脚本程序开发（2）">
+<meta property="og:url" content="http://chebincarl.github.io/2019/04/22/Unity脚本程序开发（2）/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="本章涵盖：  预制体（prefab）资源的应用 常用输入对象 与销毁相关的方法">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-07-17T14:44:48.605Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Unity脚本程序开发（2）">
+<meta name="twitter:description" content="本章涵盖：  预制体（prefab）资源的应用 常用输入对象 与销毁相关的方法">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/04/22/Unity脚本程序开发（2）/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Unity脚本程序开发（2） | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">文章看10遍，动手做10遍，自然就会了</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/04/22/Unity脚本程序开发（2）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Unity脚本程序开发（2）
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-04-22 13:50:10" itemprop="dateCreated datePublished" datetime="2019-04-22T13:50:10+08:00">2019-04-22</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-07-17 22:44:48" itemprop="dateModified" datetime="2019-07-17T22:44:48+08:00">2019-07-17</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Unity/" itemprop="url" rel="index"><span itemprop="name">Unity</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">15k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">14 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>本章涵盖：</p>
+<ul>
+<li>预制体（prefab）资源的应用</li>
+<li>常用输入对象</li>
+<li>与销毁相关的方法</li>
+</ul>
+<a id="more"></a>
+
+<p>思考并回答以下问题：<br>1.鼠标有几个输入来源？如何得到？<br>2.键盘这么多的按键怎么得到？<br>3.如何得到不同的操作状态，比如按下，按住，抬起？</p>
+<h1 id="预制体（prefab）资源的应用"><a href="#预制体（prefab）资源的应用" class="headerlink" title="预制体（prefab）资源的应用"></a>预制体（prefab）资源的应用</h1><p>在一个项目的开发过程中经常会应用到预制件（prefab）资源。在场景的开发中会同时创建多个完全相同的游戏对象，如果一一创建会耗费大量的时间，并且也会耗费游戏资源，在管理上也会有一定的难度。这时就需要实例化预制件（prefab）来实现。</p>
+<h2 id="预制件（prefab）资源的创建"><a href="#预制件（prefab）资源的创建" class="headerlink" title="预制件（prefab）资源的创建"></a>预制件（prefab）资源的创建</h2><p>在Assets菜单Create命令的选项中选择创建perfab，就会在资源项目列表中创建一个预制件（perfab）资源。此时的预制件（perfab）只是一个空壳，还需添加一些具体的游戏对象，具体操作步骤如下。</p>
+<p>(1)通过菜单创建一个prefab。执行“Assets-&gt;Create-&gt;Prefab”命令，即可在项目资源列表中创建一个prefab，然后将其名字改为“BallPrefab”。</p>
+<p>(2)在场景中创建一个球体并改名为“Ball”。</p>
+<p>(3)向项目中导入一个球面纹理图片资源。执行“Assets-&gt;Import New Asset…”命令，会立刻弹出一个Import New Assets对话框，在对话框中选中需要的球面纹理图片，单击“Import”按钮完成导入。</p>
+<p>(4)为创建的Ball添加刚体属性和球体碰撞者属性，即先选中Ball，再执行“Component-&gt;Physics-&gt;Rigidbody”命令，即可为Ball添加刚体属性，再执行“Component-&gt;Physics-&gt;Sphere Collider”命令，即可为Ball添加球体碰撞属性。</p>
+<p>(5)将导入的球面纹理图片资源添加到创建的Ball上面。选中纹理图片然后将其拖动到创建的Ball上面即可，添加的各个属性都将在属性查看器中显示出来。</p>
+<p>(6)为刚创建的BallPrefab添加真实的游戏对象。这个操作跟5中一样，只要选中刚刚创建的Ball对象，然后将其拖到Assets面板中已经创建好的BallPrefab上即可，此时这个空的BallPrefab就具有了与Ball对象完全相同的属性。</p>
+<h3 id="通过prefab资源进而实例化对象"><a href="#通过prefab资源进而实例化对象" class="headerlink" title="通过prefab资源进而实例化对象"></a>通过prefab资源进而实例化对象</h3><p>在实际的开发过程中，若要创建大量的重复化的资源，就需要使用到prefab资源。通过脚本编写程序实例化这些游戏对象，这样可以省去创建过程的时间，以及为各个游戏对象添加相同属性的烦琐操作，并且还会节省大量的游戏资源，提高项目的运行效率。</p>
+<p>下面将通过一个实例化篮球的小案例来讲解prefab实例化的具体操作过程。</p>
+<p>1.以上面的BallPrefab为例，在此有关prefab的具体创建过程就不再进行讲解。</p>
+<p>2.编写脚本，实例化篮球。在项目中创建一个“BallPrefabScript”脚本。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">BallPrefabScript</span> : <span class="title">MonoBehaviour</span> </span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">int</span> i = <span class="number">5</span>; <span class="comment">// 声明整型变量i</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">int</span> j = <span class="number">0</span>; <span class="comment">// 声明整型变量j</span></span><br><span class="line">	<span class="keyword">public</span> Rigidbody BallPrefab; <span class="comment">// 声明刚体BallPrefab</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">float</span> x = <span class="number">0.0f</span>; <span class="comment">// 初始化x,y,z的坐标</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">float</span> y = <span class="number">4.0f</span>;</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">float</span> z = <span class="number">0.0f</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">float</span> k = <span class="number">2.0f</span>;</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">int</span> n = <span class="number">4</span>;  <span class="comment">// 声明实例化球的行数</span></span><br><span class="line">	<span class="keyword">int</span> count = <span class="number">0</span>;  <span class="comment">// 声明一个计数器</span></span><br><span class="line">	<span class="keyword">public</span> Rigidbody[] BP; <span class="comment">// 声明刚体数组</span></span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>	&#123;</span><br><span class="line">		Bp = <span class="keyword">new</span> Rigidbody[<span class="number">10</span>];  <span class="comment">// 初始化刚体数组</span></span><br><span class="line">		count = <span class="number">0</span>; <span class="comment">// 计数器置0</span></span><br><span class="line">		<span class="keyword">for</span> (i = <span class="number">0</span>; i &lt;= n; i++) <span class="comment">// 对变量i进行循环</span></span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; i; j++) <span class="comment">// 对变量j进行循环</span></span><br><span class="line">			&#123;</span><br><span class="line">				<span class="comment">// 在自定义坐标位置实例化10球</span></span><br><span class="line">				BP[count++] = (Rigidbody)Instantiate(BallPrefab, <span class="keyword">new</span> Vector3 (x<span class="number">-2.0f</span>*k*i + <span class="number">4.0f</span>*j*k,  <span class="number">2.0f</span>, z<span class="number">-2.0f</span>*<span class="number">1.75f</span>*k*i), BallPrefab.rotation);</span><br><span class="line">			&#125;</span><br><span class="line">		&#125; 	</span><br><span class="line">	&#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>首先声明变量，主要声明了整型变量i、j，刚体BallPrefab, x、y、z的坐标，刚体的行数及计数器，并且对相关的参数进行了赋值。在开发环境下的属性查看器中可以为各个参数指定资源或者取值。</p>
+<p>对Start方法进行了重写，初始化了刚体数组，然后先对i进行循环，再在i的循环中将j进行循环，最后在自定义坐标位置通过实例化刚体数组创建了10个球体，并且对10个球的位置按照一定的规律进行了排列。</p>
+<p>3.将编写完的脚本挂载到摄像机上，然后对摄像机脚本属性中的各个变量参数进行设置。设置完毕后运行，在游戏场景中会显示出实例化的效果。本案例中创建了10个BallPefab。</p>
+<h1 id="常用的输入对象"><a href="#常用的输入对象" class="headerlink" title="常用的输入对象"></a>常用的输入对象</h1><p>在游戏的开发过程中，时常需要获取用户的输入情况，类似于手机或平板中的触控行为，计算机端的键盘鼠标操作行为等，在其他的开发平台中，要获取这些操控参数往往需要通过开发人员编写不少代码来实现，而Unity 3D引擎在设计时就封装好了这些常用的方法与参数。</p>
+<p>针对用户的输入，引擎专门为开发人员提供了两个输入对象--Touch与Input。开发人员通过Touch与Input输入对象中的方法以及参数可以非常方便地获取用户输入的各种参数，包括触控的位置、相位、手指按下位移，以及用户鼠标键盘的输入等。</p>
+<h2 id="Touch输入对象"><a href="#Touch输入对象" class="headerlink" title="Touch输入对象"></a>Touch输入对象</h2><p>Touch输入对象中提供了非常详细的参数以及方法，通过使用该对象可以获取如Android、IOS等移动平台中的详细的触摸操控信息，读者可以将分析Touch的代码写在对应的脚本中，然后挂载到对应的游戏对象上，就可以轻松地获取到Touch的信息了。Touch事件变量如下表所示。</p>
+<table>
+<thead>
+<tr>
+<th align="left">变量名</th>
+<th align="left">含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">fingerID</td>
+<td align="left">手指的索引</td>
+</tr>
+<tr>
+<td align="left">position</td>
+<td align="left">手指的位置</td>
+</tr>
+<tr>
+<td align="left">deltaPosition</td>
+<td align="left">距离上次改变的距离增量</td>
+</tr>
+<tr>
+<td align="left">deltaTime</td>
+<td align="left">自上次改变的时间增量</td>
+</tr>
+<tr>
+<td align="left">tapCount</td>
+<td align="left">点击次数</td>
+</tr>
+<tr>
+<td align="left">phase</td>
+<td align="left">触摸相位</td>
+</tr>
+</tbody></table>
+<p>Touch触摸输入对象的各个参数在开发的过程中一般都是相互配合使用的，只有这样才能符合开发的需要。</p>
+<p>1.首先新建一个场景并将其命名为“TouchTest”，创建一个小球并赋予其纹理图。调整小球的大小与位置以及摄像机的位置，如下图所示。</p>
+<p>2.新建一个名为“TouchTest.cs”的C#脚本，将其挂载到主摄像机MainCamera上。脚本代码如下：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">TouchTest</span> : <span class="title">MonoBehaviour</span> </span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">public</span> GameObject ball;  <span class="comment">// Sphere游戏对象的引用</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">float</span> lastDis = <span class="number">0</span>;  <span class="comment">// 上一次两个手指的距离</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">float</span> cameraDis = <span class="number">-20</span>;  <span class="comment">// 摄像机距离球的距离</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">float</span> ScaleDump = <span class="number">0.1f</span>;  <span class="comment">// 缩放阻尼</span></span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">		<span class="keyword">if</span> (Input.touchCount == <span class="number">1</span>)  <span class="comment">// 触控</span></span><br><span class="line">		&#123; </span><br><span class="line">			Touch t = Input.GetTouch(<span class="number">0</span>);  <span class="comment">// 获取触控</span></span><br><span class="line">			<span class="keyword">if</span> (t.phase == TouchPhase.Moved) <span class="comment">// 手指移动中</span></span><br><span class="line">			&#123;  </span><br><span class="line">				ball.transform.Rotate(Vector3.right, Input.GetAxis(<span class="string">"Mouse Y"</span>), Space.World); <span class="comment">// 竖直旋转</span></span><br><span class="line">				ball.transform.Rotate(Vector3.up, <span class="number">-1</span> * Input.GetAxis(<span class="string">"Mouse X"</span>), Space.World);<span class="comment">// 水平旋转</span></span><br><span class="line">			&#125;</span><br><span class="line">		&#125; <span class="keyword">else</span> <span class="keyword">if</span> (Input.touchCount &gt; <span class="number">1</span>)</span><br><span class="line">		&#123;</span><br><span class="line">			Touch t1 = Input.GetTouch(<span class="number">0</span>);  <span class="comment">// 获取触控</span></span><br><span class="line">			Touch t2 = Input.GetTouch(<span class="number">1</span>);  <span class="comment">// 获取触控</span></span><br><span class="line">			<span class="keyword">if</span> (t2.phase == TouchPhase.Began) <span class="comment">// 开始触摸</span></span><br><span class="line">			&#123; </span><br><span class="line">				lastDis = Vector2.Distance(t1.position, t2.position); <span class="comment">// 初始化lastDis</span></span><br><span class="line">			&#125; elseif (t1.phase == TouchPhase.Moved &amp;&amp; t2.phase == TouchPhase.Moved) <span class="comment">// 两个手指都在移动</span></span><br><span class="line">			&#123; </span><br><span class="line">				<span class="keyword">float</span> dis = Vector2.Distance(t1.position, t2.position); <span class="comment">// 计算手指位置</span></span><br><span class="line">				<span class="keyword">if</span> (Mathf.Abs(dis -lastDis) &gt; <span class="number">1</span>)</span><br><span class="line">				&#123;  </span><br><span class="line">					<span class="comment">// 若是手指距离&gt;1</span></span><br><span class="line">					cameraDis += (dis - lastDis) * ScaleDump;  <span class="comment">// 设置摄像机到物体的距离</span></span><br><span class="line">					cameraDis = Mathf.Clamp(cameraDis, <span class="number">-40</span>, <span class="number">-5</span>); <span class="comment">// 限制摄像机到物体的距离</span></span><br><span class="line">					lastDis = dis;  <span class="comment">// 备份本次触摸结果</span></span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">LateUpdate</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>	&#123;</span><br><span class="line">		<span class="keyword">this</span>.transform.position = <span class="keyword">new</span> Vector3(<span class="number">0</span>, <span class="number">0</span>, cameraDis); <span class="comment">// 调整摄像机的位置</span></span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">OnGUI</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>	&#123;</span><br><span class="line">		<span class="comment">// 打印信息与退出按钮</span></span><br><span class="line">		<span class="keyword">string</span> s = <span class="keyword">string</span>.Format(<span class="string">"Input.touchCount=&#123;0&#125;\ncameraDIS=\n&#123;1&#125;"</span>,Input.touchCount, cameraDis);  <span class="comment">// 打印字符</span></span><br><span class="line">		GUI.TextArea(<span class="keyword">new</span> Rect (<span class="number">0</span>, <span class="number">0</span>, Screen.width / <span class="number">10</span>, Screen.height), s); <span class="comment">// 用Text控件显示字符串</span></span><br><span class="line">		<span class="keyword">if</span> (GUI.Button(<span class="keyword">new</span> Rect (Screen.width *<span class="number">9</span>/<span class="number">10</span>, <span class="number">0</span>, Screen.width / <span class="number">10</span>, Screen.height / <span class="number">10</span>), <span class="string">"quit"</span>)) <span class="comment">// 退出按钮</span></span><br><span class="line">		&#123;</span><br><span class="line">			Debug.Log(<span class="string">"quit"</span>);  <span class="comment">// 打印点击信息</span></span><br><span class="line">			Application.Quit();  <span class="comment">// 退出程序</span></span><br><span class="line">		&#125; </span><br><span class="line">	&#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>首先引用命名空间以及声明变量。在声明变量的部分中声明了场景中的Sphere游戏对象的引用Ball，方便下面对其进行旋转等变换；同时还声明了一些数据全局变量。</p>
+<p>在Update方法中对单指操控行为进行解析。当发生触控并且用户的手指在移动状态，就可以通过Input.GetAxis(“Mouse X/Y”)获取用户的手指位移，然后将其转换为旋转角对ball进行旋转。运行时就可以看到，当用户滑动手指时，场景中的小球根据滑动方向进行旋转。</p>
+<p>接着解析用户多点操控的行为，当手指数目大于1时，计算两个手指间的距离，并与上一次计算出的距离进行比较，若是距离变大就将摄像机向近推产生放大的效果，反之摄像机向后推就可以得到缩小的效果。这里还对摄像机的位置进行了限制，使其不能无限放大或者缩小。最后备份下这一帧中手指间的距离用于下一帧中和新的距离进行比较。</p>
+<p>对LateUpdate方法进行重写，这个方法在Update方法回调完后进行回调。在这部分中根据上一步算出来的cameraDis对摄像机进行前推或者后拉，产生放大或者缩小的效果。</p>
+<p>OnGUI函数与触控的检测没有什么关系，主要是使用Text控件对触控的信息进行打印，使其在真机上也可以看到，方便学习与调试，最后还设置了一个退出按钮，单击该按钮后程序结束运行。</p>
+<p>使用了Input.GetAxis(“Mouse X/Y”)来获取用户手指的位移而没有使用Touch.deltaPosition，这是因为手机屏幕的不同Touch.deltaPosition的返回值是不同的，所以使用起来比较不方便；而Input.GetAxis(“Mouse X/Y”)也可以实现相应的效果，并且在iOS平台中也可以使用该方法。具体使用哪个，读者可以根据开发需要自行选择。</p>
+<p>(3)将案例导入手机中运行，就可以看到小球根据玩家的手指滑动或两指放大收缩而发生旋转或缩放了。需要注意的是，与Touch有关的项目都需要在真机上进行测试。</p>
+<h2 id="Input输入对象"><a href="#Input输入对象" class="headerlink" title="Input输入对象"></a>Input输入对象</h2><p>如果说Touch输入对象可以用于获取用户的触摸操作信息，那么Input对象就可以获取用户其他所有行为的输入，如鼠标、键盘、加速度、陀螺仪、按钮等，所以掌握Input输入对象就可以在外部输入信息和系统之间架立一座桥梁，因此显得其尤为重要。Input对象的主要变量如下表所示。</p>
+<blockquote>
+<p>Input对象的主要变量</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th align="left">变量名</th>
+<th align="left">含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">mousePosition</td>
+<td align="left">当前鼠标的像素坐标</td>
+</tr>
+<tr>
+<td align="left">anyKeyDown</td>
+<td align="left">用户点击任何键或鼠标按钮，第一帧返回true</td>
+</tr>
+<tr>
+<td align="left">acceleration</td>
+<td align="left">加速度传感器的值</td>
+</tr>
+<tr>
+<td align="left">anyKey</td>
+<td align="left">当前是否有按键按住，若有返回true</td>
+</tr>
+<tr>
+<td align="left">inputString</td>
+<td align="left">返回键盘输入的字符串</td>
+</tr>
+<tr>
+<td align="left">touches</td>
+<td align="left">返回当前所有触摸（Touch）列表</td>
+</tr>
+</tbody></table>
+<p>1.mousePosition变量</p>
+<p>变量mousePosition是一个三维的坐标，用于获取当前鼠标的像素坐标。像素坐标是以屏幕左下角为（0,0），屏幕右上角坐标为（Screen.width, Screen.height）计算的。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(Input.GetButtonDown(<span class="string">"Fire1"</span>)) <span class="comment">// 鼠标左键点下  </span></span><br><span class="line">    &#123;</span><br><span class="line">        Debug.Log(Input.mousePosition);  <span class="comment">// 打印鼠标位置</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>2.anyKey变量与anyKeyDown变量</p>
+<p>变量anyKey用于显示当前是否有任何按键按下，若是有，就始终返回True。将下面的代码添加到脚本中，将脚本挂载到摄像机上，当按下任何按键时就会不停地显示打印信息。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>(Input.anyKey) <span class="comment">// 有按钮按下</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 打印信息</span></span><br><span class="line">        Debug.Log(<span class="string">"A key or mouse click has been detected"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>变量anyKeyDown和变量anyKey有些许差别，前者只有按下按钮后的第一帧返回True。将上面的代码片段稍做修改后运行场景即可发现，只要有按钮按下，就会打印一次信息；若是按钮持续处于按下状态，也仅仅打印第一次。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (Input.anyKeyDown) <span class="comment">// 按钮按下</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 打印信息</span></span><br><span class="line">        Debug.Log(<span class="string">"A key or mouse click has been detected"</span>);</span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>3.inputString变量</p>
+<p>变量inputString返回键盘在这一帧中输入的字符串。注意，在返回的字符串中只包含ASCII码中的字符，若是本次没有输入字符串就会返回一个空串，如下面的代码片段所示。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (Input.inputString != <span class="string">""</span>) <span class="comment">// 若当前输入字符串不为空</span></span><br><span class="line">    &#123;</span><br><span class="line">        Debug.Log(Input.inputString); <span class="comment">// 打印输入字符串</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>4.acceleration变量</p>
+<p>变量acceleration可以获取设备在当前三维空间中的线性加速度，常见于3D游戏中的重力感应操控模式。当用户倾斜设备时，若设备上有加速度传感器，就会回传一个代表设备倾斜加速度的三维向量，使用Input.acceleration变量就可以获取该参数。具体实现代码如下。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">example</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> speed = <span class="number">10.0f</span>; <span class="comment">// 移动速度</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Vector3 dir = Vector3.zero; <span class="comment">// 新建一个三维向量</span></span><br><span class="line">        dir.x = -Input.acceleration.y; <span class="comment">// 获取重力感应y轴参数</span></span><br><span class="line">        dir.z = Input.acceleration.x; <span class="comment">// 获取重力感应x轴参数</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (dir.sgrMagnitude &gt;<span class="number">1</span>) <span class="comment">// 若是获取的三维向量不是标准向量</span></span><br><span class="line">            dir.Normalize(); <span class="comment">// 规格化向量</span></span><br><span class="line">        </span><br><span class="line">        dir *= Time.deltaTime; <span class="comment">// 将方向向量转换为速度</span></span><br><span class="line">        transform.Translate(dir * speed); <span class="comment">// 平移物体</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>将该脚本挂载在一个游戏对象上，导入支持重力传感器的设备中运行后就可以看到，游戏对象会根据用户倾斜手机的方向进行相应方向的移动。当然，这段代码需要设备支持重力感应，否则就会一直返回Vector3.Zero。</p>
+<p>5.touches变量</p>
+<p>上一节中介绍过Touch输入对象，与之相对应地，通过Input.touches变量可以获取到当前在屏幕上的所有触控的引用（Touch[]类型），开发人员就可以根据索引轻易地获取各个触控点的信息，所以该变量也会经常被使用到。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> fingerCount = <span class="number">0</span>; <span class="comment">// 手指数目计数器</span></span><br><span class="line">    <span class="keyword">foreach</span> (Touch touch <span class="keyword">in</span> Input.touches) <span class="comment">// 遍历每个触控点</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (touch.phase != TouchPhase. Ended &amp;&amp; touch.phase != TouchPhase.Canceled) <span class="comment">// 当前触控点不是结束状态且当前触控不是取消状态</span></span><br><span class="line">        &#123;</span><br><span class="line">            fingerCount++; <span class="comment">// 触摸计数器自加</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (fingerCount &gt; <span class="number">0</span>) <span class="comment">// 有触摸</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// 打印信息</span></span><br><span class="line">            print(<span class="string">"User has "</span> + fingerCount + <span class="string">"finger(s) touching the screen"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>该代码片段的作用为，每当触控发生时就通过Input.touches获取到每个触控的引用，然后遍历触控列表。若触控的相位不是结束状态或取消状态，就将手指数目计数器fingerCount加1，最后打印出当前在屏幕上的有效触控手指的数目。</p>
+<p>Input输入对象中不仅包括了丰富的变量，而且还提供了大量的实用方法。下面将对Input输入对象中封装好的常用方法进行进行详细的介绍。</p>
+<blockquote>
+<p>Input输入对象中的主要方法</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th align="left">方法名</th>
+<th align="left">含义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">GetAxis</td>
+<td align="left">返回被表示的虚拟轴的值</td>
+</tr>
+<tr>
+<td align="left">GetButton</td>
+<td align="left">若虚拟按钮被按下返同true</td>
+</tr>
+<tr>
+<td align="left">GetButtonUp</td>
+<td align="left">虚拟按钮抬起的一帧返回true</td>
+</tr>
+<tr>
+<td align="left">GetKeyDown</td>
+<td align="left">按下指定按钮的一帧返回true</td>
+</tr>
+<tr>
+<td align="left">GetMouseButton</td>
+<td align="left">指定的鼠标按键按下时返回true</td>
+</tr>
+<tr>
+<td align="left">GetMouseButtontUp</td>
+<td align="left">指定鼠标按键抬起的一帧返回true</td>
+</tr>
+<tr>
+<td align="left">GetAxisRaw</td>
+<td align="left">返回没有经过平滑处理的虚拟轴的值</td>
+</tr>
+<tr>
+<td align="left">GetButtonDown</td>
+<td align="left">虚拟按钮被按下的一帧返回true</td>
+</tr>
+<tr>
+<td align="left">GetKey</td>
+<td align="left">按下指定按钮时返回true</td>
+</tr>
+<tr>
+<td align="left">GetKeyUp</td>
+<td align="left">抬起指定按钮的一帧返回true</td>
+</tr>
+<tr>
+<td align="left">GetMouseButtonDown</td>
+<td align="left">指定的鼠标按键按下的一帧返回true</td>
+</tr>
+<tr>
+<td align="left">GetTouch</td>
+<td align="left">根据索引返回当前触控（Touch类型）</td>
+</tr>
+</tbody></table>
+<p>6.GetAxis方法和GetAxisRaw方法</p>
+<p>GetAxis方法和GetAxisRaw方法都是获取虚拟轴的值的方法。在游戏的开发过程中，经常会在屏幕中添加一些2D的虚拟轴，可以通过触控或者鼠标事件改变虚拟轴的值来控制场景中的游戏对象。具体使用方法如下面的代码片段所示。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">InputTest</span> : <span class="title">MonoBehaviour</span> </span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">float</span> speed = <span class="number">0.1f</span>; <span class="comment">// 移动速度 </span></span><br><span class="line">     </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">float</span> moveX = Input.GetAxis(<span class="string">"Horizontal"</span>);  <span class="comment">// 获取水平轴的值</span></span><br><span class="line">        <span class="keyword">float</span> moveY = Input.GetAxis(<span class="string">"Vertical"</span>);  <span class="comment">// 获取垂直轴的值</span></span><br><span class="line">        <span class="keyword">this</span>.transform.Translate(<span class="keyword">new</span> Vector3(moveX, moveY, <span class="number">0</span>) *speed); <span class="comment">//移动物体</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>将上面的脚本挂载到场景中的游戏对象上，使用键盘的方向键就可以控制游戏对象的移动了。这时若是把moveX的值打印出来就会发现，当按下方向键时，其值是从-1~ 1之间平滑过渡的。接下来运行下面的代码片段。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">float</span> moveX = Input.GetAxisRaw(<span class="string">"Horizontal"</span>); <span class="comment">// 获取水平轴的值</span></span><br><span class="line">    Debug.Log(moveX);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这段代码使用了GetAxisRaw方法，运行后按下方向键就会观察到moveX的值只会有-1、0、1三种变化，没有中间的过渡值。这是因为GetAxisRaw方法没有使用平滑滤波器。在需要自定义差值的情况下可以使用GetAxisRaw方法。</p>
+<p>7.GetButton方法、GetButtonDown方法与GetButtonUp方法</p>
+<p>这3种方法用于监听虚拟按钮的按下状态，包括按钮按下时、按钮按下中、按钮抬起时3个状态。开发人员需要在Update方法中回调这些方法来判断按钮的状态。其中的区别可以参看下面的功能代码片段。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">InputTest</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span> (Input.GetButton(<span class="string">"Fire1"</span>)) <span class="comment">// 使用GetButton监听“Fire1”按键</span></span><br><span class="line">        &#123;</span><br><span class="line">            Debug.Log(<span class="string">"Fire GetButton"</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(Input.GetButtonDown(<span class="string">"Fire1"</span>)) <span class="comment">// 使用GetButtonDown监听“Fire1”按键</span></span><br><span class="line">        &#123;</span><br><span class="line">            Debug.Log(<span class="string">"Fire GetButtonDown"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (Input.GetButtonUp(<span class="string">"Fire1"</span>)) <span class="comment">// 使用GetButtonUp监听“Fire1”按键</span></span><br><span class="line">        &#123;</span><br><span class="line">            Debug.Log(<span class="string">"Fire GetButtonUp"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>将上述脚本挂载到主摄像机上，按住鼠标左键不放，就会发现第6行的打印始终在被回调，而第8行的打印代码仅在按下时回调了两次。当松开鼠标左键时，才会发现第12行代码被回调。通过这个简单的脚本，读者应该已经可以区分这3种方法的区别了。</p>
+<p>8.GetKey方法、GetKeyDown方法与GetKeyUp方法</p>
+<p>这3种方法用于监听键盘上的按键的状态，开发人员需要在Update方法中调用这些方法，并传入想要监听的键名或键码。每个按钮的状态也分为按下、抬起、按住3种，使用者可以根据需要进行选用，使用方法如下面的代码片段所示。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">InputTest</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span> (Input.Getkey(<span class="string">"up"</span>)) <span class="comment">// 使用GetKey监听“↑”按键</span></span><br><span class="line">        &#123;</span><br><span class="line">            Debug.Log(<span class="string">"up arrow Getkey"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (Input.GetKeyDown(KeyCode.UpArrow))  <span class="comment">// 使用GetKeyDown监听“↑”按键</span></span><br><span class="line">        &#123;</span><br><span class="line">            Debug.Log(<span class="string">"up arrow GetKeyDown"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (Input.GetKeyUp(KeyCode.UpArrow))  <span class="comment">// 使用GetKeyUp监听“↑”按键</span></span><br><span class="line">        &#123;</span><br><span class="line">            Debug.Log(<span class="string">"up arrow GetKeyUp"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>第5行和第8行分别使用了键名和键码两种方式来监听方向上键，其效果是相同的。将上面的脚本挂载到摄像机上运行场景，点击“方向上键”就会看到相应的打印信息，可见GetKey是按住时始终回调的，GetKeyDown和GetKeyUp分别只有按下和抬起时的一帧调用。</p>
+<p>9.GetMouseButton方法、GetMouseButtonDown方法和GetMouseButtonUp方法</p>
+<p>当开发计算机端的游戏时，肯定需要监听鼠标的操控。Input输入对象中包含了GeMouseButton、GetMouseButtonbDown和GetMouseButtonUp三种方法，用它们来监听鼠标按键。在使用时只要在Update方法中传入鼠标按键的索引，就可以对鼠标进行监听了。与前面介绍的方法类似，这3种方法也分别监听了鼠标按键的3个状态。使用方法见如下代码。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (Input.GetMouseButton(<span class="number">0</span>)) <span class="comment">// GetMouseButton监听鼠标左键</span></span><br><span class="line">    &#123;</span><br><span class="line">        Debug.Log(<span class="string">"left mouseButton GetMouseButton"</span>); <span class="comment">// 打印信息</span></span><br><span class="line">    &#125; </span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> (Input.GetMouseButtonDown(<span class="number">0</span>)) <span class="comment">// GetMouseButtonDown监听鼠标左键</span></span><br><span class="line">    &#123;</span><br><span class="line">        Debug.Log(<span class="string">"left mouseButton GetMouseButtonDown"</span>); <span class="comment">// 打印信息</span></span><br><span class="line">    &#125;  </span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> (Input.GetMouseButtonUp(<span class="number">0</span>)) <span class="comment">// GetMouseButtonUp监听鼠标左键</span></span><br><span class="line">    &#123;</span><br><span class="line">        Debug.Log(<span class="string">"left mouseButton GetMouseButtonUp"</span>); <span class="comment">// 打印信息</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这三种方法的参数是一个int类型的索引。常用的鼠标按键索引为0，1，2，分别监听了鼠标的左键、右键、中键。需要使用的时候传入相应的索引就可以监听对应的按键了。</p>
+<p>10.GetTouch方法</p>
+<p>前面已经介绍过了Touch输入对象，使用其参数时需要获取一个Touch类型的变量。Input.GetTouch方法就是用于获取Touch输入对象的引用，在使用时应传入一个索引值代表要获取的触控索引，使用方式见如下代码片段。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (Input.touchCount != <span class="number">0</span>) <span class="comment">// 当前发生触控</span></span><br><span class="line">    &#123;</span><br><span class="line">        Vector3 touchPOS = Input.GetTouch(<span class="number">0</span>).position; <span class="comment">// 记录下触控点的位置</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面的代码片段获取了发生触控时的首个触控点，并将其位置记录了下来。注意这个方法只有在支持触摸的移动设备上运行才会生效。</p>
+<h1 id="与销毁相关的方法"><a href="#与销毁相关的方法" class="headerlink" title="与销毁相关的方法"></a>与销毁相关的方法</h1><p>在游戏的开发过程中，经常会遇到对象、组件、资源等在使用完毕后就失去了作用的情况，放任其不管的话轻则影响项目运行效率，重则可能影响到项目的正常运行。所以必须有一类方法来管理（删除）这些没有用的资源。在本节中将要介绍Unity中的各类删除方法。</p>
+<p>Unity中有很多Destroy方法，不同功能的Destroy方法用于销毁不同类型的资源，下面将主要讲解常用的各个类型的Destroy方法的区别以及使用，不同功能的Destroy方法如下表所示。</p>
+<table>
+<thead>
+<tr>
+<th align="left">函数</th>
+<th align="left">功能</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Object.Destroy</td>
+<td align="left">删除游戏对象、组件或资源</td>
+</tr>
+<tr>
+<td align="left">NetWork.Destroy</td>
+<td align="left">销毁网络对象</td>
+</tr>
+<tr>
+<td align="left">MonoBehavior.OnDestroy</td>
+<td align="left">脚本被销毁时间</td>
+</tr>
+</tbody></table>
+<h2 id="Object-Destroy方法"><a href="#Object-Destroy方法" class="headerlink" title="Object.Destroy方法"></a>Object.Destroy方法</h2><p>Object.Destroy方法可以将对象立即销毁，也可以设置时间后销毁。如果删除的对象是一个组件，则该组件会被移除。下面将通过一个具体的代码片段来说明Object.Destroy的使用方式。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Destroy(ball.GetComponent&lt;Rigidbody&gt;());</span><br><span class="line">    Destroy(ball, <span class="number">5</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个代码片段中，ball是场景中的一个挂有Rigidbody组件的游戏对象。在Start方法中，首先删除掉ball上挂载的刚体组件，然后在5s后删除ball游戏对象。</p>
+<h2 id="NetWork-Destroy方法"><a href="#NetWork-Destroy方法" class="headerlink" title="NetWork.Destroy方法"></a>NetWork.Destroy方法</h2><p>NetWork.Destroy方法可以销毁网络对象，该方法包含了如下两种重载方式。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> function <span class="title">Destroy</span>(<span class="params">viewID : NetworkViewID</span>) : <span class="keyword">void</span></span></span><br><span class="line"><span class="function"><span class="keyword">static</span> function <span class="title">Destroy</span>(<span class="params">gameObject : GameObject</span>) : <span class="keyword">void</span></span></span><br></pre></td></tr></table></figure>
+
+<p>当使用第一种方法重载方式时，需要给出网络对象的viewID，然后系统会删除所有和该viewID相关的物体。需要注意的是，本地的和远端的物体都会被销毁。使用方法见如下代码片段。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">example</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//通过网络销毁拥有该脚本的物体，必须具备Networkview离性</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> timer= <span class="number">0</span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Awake</span> (<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        timer = Time.time;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 计时器</span></span><br><span class="line">    <span class="comment">// 记录下开始时间</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span> (Time.time-timer&gt;<span class="number">2</span>) <span class="comment">// 2s后</span></span><br><span class="line">        &#123;</span><br><span class="line">            Network.Destroy(GetComponent&lt;NetworkView&gt;().viewID) ; <span class="comment">// 删除具有NetworkView的物体</span></span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>NetWork.Destroy方法还可以使用第二种重载方式来销毁网络上的游戏对象，下面将用一段代码片段来说明。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">example</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> timer = <span class="number">0</span>; <span class="comment">// 声明计时器</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Awake</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        timer = Time.time; <span class="comment">// 记录下开始时间</span></span><br><span class="line">        </span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">if</span> (Time.time - timer &gt;<span class="number">2</span>) <span class="comment">// 2s后</span></span><br><span class="line">            &#123;</span><br><span class="line">                Network.Destroy(gameObject); <span class="comment">// 删除gameObject</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这段代码的主要功能就是自脚本唤醒后2s删除游戏对象“gameObject”，其中Time.time代表游戏开始后的真实时间。</p>
+<h2 id="MonoBehaviour-OnDestroy方法"><a href="#MonoBehaviour-OnDestroy方法" class="headerlink" title="MonoBehaviour.OnDestroy方法"></a>MonoBehaviour.OnDestroy方法</h2><p>MonoBehaviour.OnDestroy方法是MonoBehaviour中的销毁回调方法。类似于脚本中常见的Update()、Start()方法，该方法也由系统自动回调，这个方法的回调条件是当该脚本被移除时系统回调。具体实现方法如下面代码片段所示。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">DestroyTest</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Destroy(<span class="keyword">this</span>.GetComponent&lt;DestroyTest&gt;(), <span class="number">5</span>); <span class="comment">// 移除该脚本</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">OnDestroy</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Debug.Log(<span class="string">"this script has been destroy"</span>); <span class="comment">//移除该脚本时回调</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>将该脚本挂载到摄像机上后运行场景，在这段代码中首先在第5行指定5s后从摄像机上删除这个脚本，所以等到5后删除脚本时就会看到第8行的打印，这是因为OnDestroy()方法在移除该脚本时被自动回调了。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Unity游戏开发技术详解与典型案例/" rel="tag"># Unity游戏开发技术详解与典型案例</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/21/光照与着色器/" rel="next" title="光照与着色器">
+                <i class="fa fa-chevron-left"></i> 光照与着色器
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/25/Redis-主从配置（Windows版）/" rel="prev" title="Redis 主从配置（Windows版）">
+                Redis 主从配置（Windows版） <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">269</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">29</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2019/07/21/存储器和指针：指向何方？/" title="存储器和指针：指向何方？" target="_blank">存储器和指针：指向何方？</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/07/20/结构、联合与位字段：创建自己的字段/" title="结构、联合与位字段：创建自己的字段" target="_blank">结构、联合与位字段：创建自己的字段</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/07/20/第2章-算法/" title="第2章 算法" target="_blank">第2章 算法</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/07/20/C语言入门：进入C语言的世界/" title="C语言入门：进入C语言的世界" target="_blank">C语言入门：进入C语言的世界</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/07/19/多路查找树（B树）/" title="多路查找树（B树）" target="_blank">多路查找树（B树）</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#预制体（prefab）资源的应用"><span class="nav-number">1.</span> <span class="nav-text">预制体（prefab）资源的应用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#预制件（prefab）资源的创建"><span class="nav-number">1.1.</span> <span class="nav-text">预制件（prefab）资源的创建</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#通过prefab资源进而实例化对象"><span class="nav-number">1.1.1.</span> <span class="nav-text">通过prefab资源进而实例化对象</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#常用的输入对象"><span class="nav-number">2.</span> <span class="nav-text">常用的输入对象</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Touch输入对象"><span class="nav-number">2.1.</span> <span class="nav-text">Touch输入对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Input输入对象"><span class="nav-number">2.2.</span> <span class="nav-text">Input输入对象</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#与销毁相关的方法"><span class="nav-number">3.</span> <span class="nav-text">与销毁相关的方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Object-Destroy方法"><span class="nav-number">3.1.</span> <span class="nav-text">Object.Destroy方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NetWork-Destroy方法"><span class="nav-number">3.2.</span> <span class="nav-text">NetWork.Destroy方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MonoBehaviour-OnDestroy方法"><span class="nav-number">3.3.</span> <span class="nav-text">MonoBehaviour.OnDestroy方法</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">1.3m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">20:03</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

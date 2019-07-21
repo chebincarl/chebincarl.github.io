@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="游戏中持久化数据一般可分为两种：第一种是静态数据，例如Excel数据表中由策划人员编辑的数据，其特点是运行期间程序只需要读取，不需要修改；另一种是游戏存档数据，例如记录玩家在游戏过程中的进度，其特点是运行期间既需要读取，也需要修改，并且在版本升级的时候需要考虑老数据是否需要删除或者重置。">
+<meta name="keywords" content="Unity3D游戏开发第2版-宣雨松">
+<meta property="og:type" content="article">
+<meta property="og:title" content="持久化数据">
+<meta property="og:url" content="http://chebincarl.github.io/2018/11/30/持久化数据-1/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="游戏中持久化数据一般可分为两种：第一种是静态数据，例如Excel数据表中由策划人员编辑的数据，其特点是运行期间程序只需要读取，不需要修改；另一种是游戏存档数据，例如记录玩家在游戏过程中的进度，其特点是运行期间既需要读取，也需要修改，并且在版本升级的时候需要考虑老数据是否需要删除或者重置。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://chebincarl.github.io/2018/11/30/持久化数据-1/1.png">
+<meta property="og:image" content="http://chebincarl.github.io/2018/11/30/持久化数据-1/2.png">
+<meta property="og:image" content="http://chebincarl.github.io/2018/11/30/持久化数据-1/3.png">
+<meta property="og:image" content="http://chebincarl.github.io/2018/11/30/持久化数据-1/5.png">
+<meta property="og:image" content="http://chebincarl.github.io/2018/11/30/持久化数据-1/4.png">
+<meta property="og:image" content="http://chebincarl.github.io/2018/11/30/持久化数据-1/6.png">
+<meta property="og:updated_time" content="2019-07-17T14:44:48.983Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="持久化数据">
+<meta name="twitter:description" content="游戏中持久化数据一般可分为两种：第一种是静态数据，例如Excel数据表中由策划人员编辑的数据，其特点是运行期间程序只需要读取，不需要修改；另一种是游戏存档数据，例如记录玩家在游戏过程中的进度，其特点是运行期间既需要读取，也需要修改，并且在版本升级的时候需要考虑老数据是否需要删除或者重置。">
+<meta name="twitter:image" content="http://chebincarl.github.io/2018/11/30/持久化数据-1/1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2018/11/30/持久化数据-1/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>持久化数据 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">文章看10遍，动手做10遍，自然就会了</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2018/11/30/持久化数据-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">持久化数据
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2018-11-30 21:35:37" itemprop="dateCreated datePublished" datetime="2018-11-30T21:35:37+08:00">2018-11-30</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-07-17 22:44:48" itemprop="dateModified" datetime="2019-07-17T22:44:48+08:00">2019-07-17</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Unity/" itemprop="url" rel="index"><span itemprop="name">Unity</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">14k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">13 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>游戏中持久化数据一般可分为两种：第一种是静态数据，例如Excel数据表中由策划人员编辑的数据，其特点是运行期间程序只需要读取，不需要修改；另一种是游戏存档数据，例如记录玩家在游戏过程中的进度，其特点是运行期间既需要读取，也需要修改，并且在版本升级的时候需要考虑老数据是否需要删除或者重置。</p>
+<a id="more"></a>
+
+<h1 id="Excel"><a href="#Excel" class="headerlink" title="Excel"></a>Excel</h1><p>策划人员通常都会在Excel中配置静态数据，例如道具表，它由主键、道具名称、描述、功能和参数等一系列数据组成。前后端使用道具主键来进行数据的通信，最终前端将主键所包含的整个数据信息展示在游戏中。</p>
+<h2 id="EPPlus"><a href="#EPPlus" class="headerlink" title="EPPlus"></a>EPPlus</h2><p>在Windows下，提供了很多解析Excel的方法。但是作为一个跨平台引擎，可能需要在多个平台都能解析Excel，所以我们需要引用一个第三方DLL库EPPlus来处理跨平台解析Excel，首先，需要从它的网站上将其下载下来，接着将DLL文件拖入Unity即可使用了。也可以直接NuGet安装，新建一个项目，然后工具-&gt;NuGet包管理器-&gt;管理解决方案的NuGet程序包，最后将项目路径\packages\EPPlus.4.5.2.1\lib\net35下的EPPlus.dll放进Assets/Plugins下。</p>
+<h2 id="读取Excel"><a href="#读取Excel" class="headerlink" title="读取Excel"></a>读取Excel</h2><p>首先，我们需要创建Excel文件。如下图所示，可以分别在不同的工作表中添加数据，接着在代码中读取这两个工作表中的所有数据。</p>
+<img src="/2018/11/30/持久化数据-1/1.png">   
+<img src="/2018/11/30/持久化数据-1/2.png">
+
+<p>如ExcelDemo.cs代码所示，根据Excel文件的路径得到FileStream，并且创建ExcelPackage对象，接着就可以用它对Excel进行读取了。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> UnityEditor;</span><br><span class="line"><span class="keyword">using</span> System.IO;</span><br><span class="line"><span class="keyword">using</span> OfficeOpenXml;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ExcelDemo</span></span><br><span class="line">&#123;</span><br><span class="line">    [<span class="meta">MenuItem(<span class="meta-string">"Excel/Load Excel"</span>)</span>]</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">LoadExcel</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">string</span> path = Application.dataPath + <span class="string">"/Excel/test.xlsx"</span>;</span><br><span class="line">        <span class="comment">// 读取Excel文件</span></span><br><span class="line">        <span class="keyword">using</span> (FileStream fs = <span class="keyword">new</span> FileStream(path, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">using</span> (ExcelPackage excel = <span class="keyword">new</span> ExcelPackage(fs))</span><br><span class="line">            &#123;</span><br><span class="line">                ExcelWorksheets workSheets = excel.Workbook.Worksheets;</span><br><span class="line">                <span class="comment">// 遍历所有工作表</span></span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt;= workSheets.Count; i++)</span><br><span class="line">                &#123;</span><br><span class="line">                    ExcelWorksheet workSheet = workSheets[i];</span><br><span class="line">                    <span class="keyword">int</span> colCount = workSheet.Dimension.End.Column;</span><br><span class="line">                    <span class="comment">// 获取当前工作表的名字</span></span><br><span class="line">                    Debug.LogFormat(<span class="string">"Sheet &#123;0&#125;"</span>, workSheet.Name);</span><br><span class="line">                    <span class="keyword">for</span> (<span class="keyword">int</span> row = <span class="number">1</span>, count = workSheet.Dimension.End.Row; row &lt;= count; row++)</span><br><span class="line">                    &#123;</span><br><span class="line">                        <span class="keyword">for</span> (<span class="keyword">int</span> col = <span class="number">1</span>; col &lt;= colCount; col++)</span><br><span class="line">                        &#123;</span><br><span class="line">                            <span class="comment">// 读取每个单元格中的数据</span></span><br><span class="line">                            <span class="keyword">var</span> text = workSheet.Cells[row, col].Text ?? <span class="string">""</span>;</span><br><span class="line">                            Debug.LogFormat(<span class="string">"下标:&#123;0&#125;, &#123;1&#125; 内容:&#123;2&#125;"</span>, row, col, text);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在导航菜单栏中选择Excel-&gt;Load Excel命令，数据已经全部读取出来了，如下图所示。</p>
+<img src="/2018/11/30/持久化数据-1/3.png">
+
+<h2 id="写入Excel"><a href="#写入Excel" class="headerlink" title="写入Excel"></a>写入Excel</h2><p>首先，需要使用FileInfo来创建一个Excel文件，接着使用ExcelPackage来向Excel文件中写入数据，如下所示。</p>
+<img src="/2018/11/30/持久化数据-1/5.png">
+
+<p>如代码所示，在ExcelPackage对象中添加worksheet后，即可调用worksheet.Cells对每个单元格的行、列赋值，最终保存即可。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> UnityEditor;</span><br><span class="line"><span class="keyword">using</span> System.IO;</span><br><span class="line"><span class="keyword">using</span> OfficeOpenXml;</span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">WriteExcel</span> </span><br><span class="line">&#123;</span><br><span class="line">    [<span class="meta">MenuItem(<span class="meta-string">"Excel/Write Excel"</span>)</span>]</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">LoadExcel</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">//创建Excel文件</span></span><br><span class="line">        <span class="keyword">string</span> path = Application.dataPath + <span class="string">"/Excel/"</span> + DateTime.Now.ToString(<span class="string">"yyyy-MM-dd--hh-mm-ss"</span>) + <span class="string">".xlsx"</span>;</span><br><span class="line">        <span class="keyword">var</span> file = <span class="keyword">new</span> FileInfo(path);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">using</span> (ExcelPackage excel = <span class="keyword">new</span> ExcelPackage(file))</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">//向表格中写入数据</span></span><br><span class="line">            ExcelWorksheet worksheet = excel.Workbook.Worksheets.Add(<span class="string">"sheet1"</span>);</span><br><span class="line">            worksheet.Cells[<span class="number">1</span>, <span class="number">1</span>].Value = <span class="string">"Company name1"</span>;</span><br><span class="line">            worksheet.Cells[<span class="number">1</span>, <span class="number">2</span>].Value = <span class="string">"Address1"</span>;</span><br><span class="line"></span><br><span class="line">            worksheet = excel.Workbook.Worksheets.Add(<span class="string">"sheet2"</span>);</span><br><span class="line">            worksheet.Cells[<span class="number">1</span>, <span class="number">1</span>].Value = <span class="string">"Company name2"</span>;</span><br><span class="line">            worksheet.Cells[<span class="number">1</span>, <span class="number">2</span>].Value = <span class="string">"Address2"</span>;</span><br><span class="line">            <span class="comment">// 保存</span></span><br><span class="line">            excel.Save();</span><br><span class="line">        &#125;</span><br><span class="line">        AssetDatabase.Refresh();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>保存完单元格后，为了在Unity中立刻看到效果，需要调用AssetDatabase.Refresh()方法进行刷新。</p>
+<h1 id="JSON"><a href="#JSON" class="headerlink" title="JSON"></a>JSON</h1><p>游戏运行时，我们是无法通过EPPlus读取Excel的，不过我们可以将它保存成自定义格式，例如CSV、JSON和ScriptableObject等，使用的时候将它读取进来就可以了。Unity支持JSON的序列化和反序列化。需要注意的是，参与序列化的类必须在上方声明[Serializable]属性，并且支持类对象的相互嵌套。我们可以使用JsonUtility.ToJson()以及JsonUtility.FromJson&lt;T&gt;()来进行序列化以及反序列化。比较遗憾的是，它并不支持字典类型的序列化。相关代码如下所示。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> UnityEditor;</span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">JsonDemo</span></span><br><span class="line">&#123;</span><br><span class="line">    [<span class="meta">MenuItem(<span class="meta-string">"Excel/Json"</span>)</span>]</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">LoadJson</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Data data = <span class="keyword">new</span> Data();</span><br><span class="line">        data.name = <span class="string">"Data"</span>;</span><br><span class="line">        data.subData.Add(<span class="keyword">new</span> SubData() &#123; intValue = <span class="number">1</span>, boolValue = <span class="literal">true</span>, floatValue = <span class="number">0.1f</span>, stringValue = <span class="string">"one"</span> &#125;);</span><br><span class="line">        data.subData.Add(<span class="keyword">new</span> SubData() &#123; intValue = <span class="number">2</span>, boolValue = <span class="literal">true</span>, floatValue = <span class="number">0.1f</span>, stringValue = <span class="string">"two"</span> &#125;);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">string</span> json = JsonUtility.ToJson(data);</span><br><span class="line">        Debug.Log(json);</span><br><span class="line">        data = JsonUtility.FromJson&lt;Data&gt;(json);</span><br><span class="line">        Debug.LogFormat(<span class="string">"name = &#123;0&#125;"</span>, data.name);</span><br><span class="line">        <span class="keyword">foreach</span> (<span class="keyword">var</span> item <span class="keyword">in</span> data.subData) </span><br><span class="line">        &#123;</span><br><span class="line">            Debug.LogFormat(<span class="string">"intValue = &#123;0&#125; boolValue=&#123;0&#125; floatValue=&#123;0&#125; stringValue=&#123;0&#125;"</span>, item.intValue, item.boolValue, item.floatValue, item.stringValue);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    [<span class="meta">Serializable</span>]</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Data</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">string</span> name;</span><br><span class="line">        <span class="keyword">public</span> List&lt;SubData&gt; subData = <span class="keyword">new</span> List&lt;SubData&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    [<span class="meta">Serializable</span>]</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">SubData</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">int</span> intValue;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">bool</span> boolValue;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">float</span> floatValue;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">string</span> stringValue;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如下图所示，将数据对象转成JSON字符串，再从JSON字符串还原数据对象，并且将数据输出。</p>
+<img src="/2018/11/30/持久化数据-1/4.png">
+
+<h2 id="JSON支持字典"><a href="#JSON支持字典" class="headerlink" title="JSON支持字典"></a>JSON支持字典</h2><p>Unity的JSON是不支持字典的，不过可以继承ISerializationCallbackReceiver接口，间接地实现字典序列化，相关代码如下所示。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> UnityEditor;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">DictionaryJson</span></span><br><span class="line">&#123;</span><br><span class="line">    [<span class="meta">MenuItem(<span class="meta-string">"Excel/Load Dictionary"</span>)</span>]</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">SerializableDictionary</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        SerializableDictionary&lt;<span class="keyword">int</span>, <span class="keyword">string</span>&gt; serializableDictionary = <span class="keyword">new</span> SerializableDictionary&lt;<span class="keyword">int</span>, <span class="keyword">string</span>&gt;();</span><br><span class="line">        serializableDictionary[<span class="number">100</span>] = <span class="string">"Unity"</span>;</span><br><span class="line">        serializableDictionary[<span class="number">200</span>] = <span class="string">"好好学习"</span>;</span><br><span class="line">        serializableDictionary[<span class="number">300</span>] = <span class="string">"天天向上"</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">string</span> json = JsonUtility.ToJson(serializableDictionary);</span><br><span class="line">        Debug.Log(json);</span><br><span class="line">            </span><br><span class="line">        serializableDictionary = JsonUtility.FromJson&lt;SerializableDictionary&lt;<span class="keyword">int</span>, <span class="keyword">string</span>&gt;&gt;(json);</span><br><span class="line">        Debug.Log(serializableDictionary[<span class="number">100</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如下SerializableDictionary.cs代码所示，序列化两个List元素来保存键和值，接着将C#的泛型传入，这样键和值就更加灵活了，在OnBeforeSerialize()和OnAfterDeserialize()进行序列化和反序列化赋值操作。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"></span><br><span class="line">public class SerializableDictionary&lt;K, V&gt; : ISerializationCallbackReceiver</span><br><span class="line">&#123;</span><br><span class="line">    [<span class="meta">SerializeField</span>]</span><br><span class="line">    <span class="keyword">private</span> List&lt;K&gt; m_keys;</span><br><span class="line">    [<span class="meta">SerializeField</span>]</span><br><span class="line">    <span class="keyword">private</span> List&lt;V&gt; m_values;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Dictionary&lt;K, V&gt; m_Dictionary = <span class="keyword">new</span> Dictionary&lt;K, V&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> V <span class="keyword">this</span>[K key]</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">get</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (!m_Dictionary.ContainsKey(key))</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">default</span>(V);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> m_Dictionary[key];</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">set</span> &#123;</span><br><span class="line">            m_Dictionary[key] = <span class="keyword">value</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">OnAfterDeserialize</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">int</span> length = m_keys.Count;</span><br><span class="line">        m_Dictionary = <span class="keyword">new</span> Dictionary&lt;K, V&gt;();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>;i&lt;length;i++)</span><br><span class="line">        &#123;</span><br><span class="line">            m_Dictionary[m_keys[i]] = m_values[i];</span><br><span class="line">        &#125;</span><br><span class="line">        m_keys = <span class="literal">null</span>;</span><br><span class="line">        m_values = <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">OnBeforeSerialize</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_keys = <span class="keyword">new</span> List&lt;K&gt;();</span><br><span class="line">        m_values = <span class="keyword">new</span> List&lt;V&gt;();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">foreach</span> (<span class="keyword">var</span> item <span class="keyword">in</span> m_Dictionary)</span><br><span class="line">        &#123;</span><br><span class="line">            m_keys.Add(item.Key);</span><br><span class="line">            m_values.Add(item.Value);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="文件读取与写入"><a href="#文件读取与写入" class="headerlink" title="文件读取与写入"></a>文件读取与写入</h1><p>游戏中有很多数据需要在运行期间读取或者写入，最典型的就是游戏存档功能。Unity自己也提供了一套存档的API，但是功能比较单一，只支持保存int、float和string这三种类型。不过C#支持文件的读写，我们可以灵活地扩展它。</p>
+<h2 id="PlayerPrefs"><a href="#PlayerPrefs" class="headerlink" title="PlayerPrefs"></a>PlayerPrefs</h2><p>PlayerPrefs是Unity自带的存档方法，它的优点是使用起来非常方便。引擎已经封装好GetKey以及SetKey的方法，并且还做保存数据的优化。由于保存数据可能是个耗时操作，频繁地保存可能会带来卡顿，所以Unity默认会在应用程序将切入后台时统一保存文件，开发者也可以强制调用PlayerPrefs.Save()来保存。<br>然而它的缺点就是，编辑模式下查看存档非常不方便， Windows的存档在HKCU\Software\[company name]\[product name]注册表中。如下代码所示，我们使用PlayerPrefs对数据进行保存和读取操作。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">PlayerPrefsDemo</span> : <span class="title">MonoBehaviour</span> </span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span> (<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        PlayerPrefs.SetInt(<span class="string">"MyInt"</span>, <span class="number">100</span>);</span><br><span class="line">        PlayerPrefs.SetFloat(<span class="string">"MyFloat"</span>, <span class="number">200f</span>);</span><br><span class="line">        PlayerPrefs.SetString(<span class="string">"MyString"</span>, <span class="string">"Unity"</span>);</span><br><span class="line"></span><br><span class="line">        Debug.Log(PlayerPrefs.GetInt(<span class="string">"MyInt"</span>, <span class="number">0</span>));</span><br><span class="line">        Debug.Log(PlayerPrefs.GetFloat(<span class="string">"MyFloat"</span>, <span class="number">0f</span>));</span><br><span class="line">        Debug.Log(PlayerPrefs.GetString(<span class="string">"MyString"</span>, <span class="string">"没有返回默认值"</span>));</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 判断是否有某个键</span></span><br><span class="line">        <span class="keyword">if</span> (PlayerPrefs.HasKey(<span class="string">"MyInt"</span>))</span><br><span class="line">        &#123;</span><br><span class="line">            Debug.Log(<span class="string">"has MyInt"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 删除某个键</span></span><br><span class="line">        PlayerPrefs.DeleteKey(<span class="string">"MyInt"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 删除所有键</span></span><br><span class="line">        PlayerPrefs.DeleteAll();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 强制保存数据</span></span><br><span class="line">        PlayerPrefs.Save();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="EditorPrefs"><a href="#EditorPrefs" class="headerlink" title="EditorPrefs"></a>EditorPrefs</h2><p>在编辑器模式下，Unity也提供了一组存档功能，它不需要考虑运行时的效率，所有没有采用PlayerPrefs优化的方式，而是立即就保存了。相关代码如下所示。 </p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> UnityEditor;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Script_08_06</span></span><br><span class="line">&#123;</span><br><span class="line">    [<span class="meta">MenuItem(<span class="meta-string">"Tools/Save"</span>)</span>]</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Save</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        EditorPrefs.SetInt(<span class="string">"MyInt"</span>, <span class="number">100</span>);</span><br><span class="line">        EditorPrefs.SetFloat(<span class="string">"MyFloat"</span>, <span class="number">200f</span>);</span><br><span class="line">        EditorPrefs.SetString(<span class="string">"MyString"</span>, <span class="string">"Unity"</span>);</span><br><span class="line"></span><br><span class="line">        Debug.Log(EditorPrefs.GetInt(<span class="string">"MyInt"</span>, <span class="number">0</span>));</span><br><span class="line">        Debug.Log(EditorPrefs.GetFloat(<span class="string">"MyFloat"</span>, <span class="number">0f</span>));</span><br><span class="line">        Debug.Log(EditorPrefs.GetString(<span class="string">"MyString"</span>, <span class="string">"没有返回默认值"</span>));</span><br><span class="line"></span><br><span class="line">        <span class="comment">//判断是否有某个键  </span></span><br><span class="line">        <span class="keyword">if</span> (EditorPrefs.HasKey(<span class="string">"MyInt"</span>))</span><br><span class="line">        &#123;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//删除某个键  </span></span><br><span class="line">        EditorPrefs.DeleteKey(<span class="string">"MyInt"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//删除所有键  </span></span><br><span class="line">        EditorPrefs.DeleteAll();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="PlayerPrefs保存复杂结构"><a href="#PlayerPrefs保存复杂结构" class="headerlink" title="PlayerPrefs保存复杂结构"></a>PlayerPrefs保存复杂结构</h2><p>PlayerPrefs可以保存字符串，结合JSON的序列化和反序列功能，它就可以保存各种复杂的数据结构了。另外，保存存档取决于硬件当时的条件，完全有保存不上的情况，所以可以通过try…catch来捕获保存时的错误异常。</p>
+<p>如下代码所示，使用JsonUtility.ToJson()方法将对象保存成JSON字符串，读取的时候再使用JsonUtility.FromJson将JSON字符串还原为类对象。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Script_08_07</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">//保存游戏存档  </span></span><br><span class="line">        Record record = <span class="keyword">new</span> Record();</span><br><span class="line">        record.stringValue = <span class="string">"Unity"</span>;</span><br><span class="line">        record.intValue = <span class="number">200</span>;</span><br><span class="line">        record.names = <span class="keyword">new</span> List&lt;<span class="keyword">string</span>&gt;() &#123; <span class="string">"test1"</span>， <span class="string">"test2"</span> &#125;;</span><br><span class="line">        <span class="keyword">string</span> json = JsonUtility.ToJson(record);</span><br><span class="line">        <span class="comment">//可以使用try…catch来捕获异常  </span></span><br><span class="line">        <span class="keyword">try</span></span><br><span class="line">        &#123;</span><br><span class="line">            PlayerPrefs.SetString(<span class="string">"record"</span>, json);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">catch</span> (System.Exception err)</span><br><span class="line">        &#123;</span><br><span class="line">            Debug.Log(<span class="string">"Got: "</span> + err);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//读取存档  </span></span><br><span class="line">        record = JsonUtility.FromJson&lt;Record&gt;(PlayerPrefs.GetString(<span class="string">"record"</span>));</span><br><span class="line">        Debug.LogFormat(<span class="string">"stringValue = &#123;0&#125; intValue=&#123;1&#125;"</span>, record.stringValue, record.intValue);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 存档对象</span></span><br><span class="line">    [<span class="meta">System.Serializable</span>]</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Record</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">string</span> stringValue;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">int</span> intValue;</span><br><span class="line">        <span class="keyword">public</span> List&lt;<span class="keyword">string</span>&gt; names;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>需要注意的是，凡是参与JSON序列化的对象都需要标记[System.Serializable]对象。</p>
+<h2 id="TextAsset"><a href="#TextAsset" class="headerlink" title="TextAsset"></a>TextAsset</h2><p>TextAsset是Unity提供的一个文本对象，它可以通过Resources.Load()或者AssetBundle来读取数据，其中数据是string格式的。当然，我们也可以按byte[]读取。它支持读取的文本格式包括.txt，.html，.htm，.xml，.bytes，.json，.csv，.yaml和.fnt。如下代码所示，我们来读取Resources目录下的MyText文本。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Script_08_08</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)  </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Debug.Log(Resources.Load&lt;TextAsset&gt;(<span class="string">"MyText"</span>).text);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="编辑期读写文本"><a href="#编辑期读写文本" class="headerlink" title="编辑期读写文本"></a>编辑期读写文本</h2><p>Unity可以利用C#的File类来读写文本，此时只需要提供一个目录即可。这里需要注意的是，编辑器模式下读写文本是很方便的，但是一旦打包发布， Assets/目录都不存在了，运行时是无法读取它目录下的文本的。如下代码所示，通过File.WriteAllText()和File.ReadAllText()来对文本进行读取和写入。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System.Collections;  </span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;  </span><br><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Script_08_09</span></span><br><span class="line">&#123;</span><br><span class="line">   [<span class="meta">MenuItem(<span class="meta-string">"Tool/File"</span>)</span>]  </span><br><span class="line">   <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Start</span> (<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>   &#123;</span><br><span class="line">        <span class="keyword">string</span> path = Path.Combine(Application.dataPath, <span class="string">"test.txt"</span>);  </span><br><span class="line">        <span class="comment">//如果文件存在，就删除它  </span></span><br><span class="line">        <span class="keyword">if</span> (File.Exists(path)) </span><br><span class="line">        &#123;  </span><br><span class="line">            File.Delete(path);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//写入文件  </span></span><br><span class="line">        StringBuilder sb = <span class="keyword">new</span> StringBuilder();  </span><br><span class="line">        sb.AppendFormat(<span class="string">"第一行:&#123;0&#125;"</span>, <span class="number">100</span>).AppendLine();  </span><br><span class="line">        sb.AppendFormat(<span class="string">"第二行:&#123;0&#125;"</span>, <span class="number">200</span>).AppendLine();  </span><br><span class="line">        File.WriteAllText(path, sb.ToString());</span><br><span class="line">        </span><br><span class="line">        <span class="comment">//读取文件  </span></span><br><span class="line">        Debug.Log(File.ReadAllText(path)); </span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="运行期读写文本"><a href="#运行期读写文本" class="headerlink" title="运行期读写文本"></a>运行期读写文本</h2><p><font color="red">在游戏运行期间，只有Resources和StreamingAssets目录具有读取权限</font>，其中Resources用来读取游戏资源，而StreamingAssets可使用File类来读取文件（除了个别平台外），但都是只读的，并不能写。<font color="red">只有Application.persistentDataPath目录是可读、可写的。</font>分别在Resources和StreamingAssets目录下新建test.txt，分别写入“我是Resources目录”，“我是StreamingAssets目录”。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.IO;</span><br><span class="line"><span class="keyword">using</span> System.Text;</span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Script_08_10</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//可读不可写  </span></span><br><span class="line">    <span class="keyword">string</span> m_ResourcesTxt = <span class="keyword">string</span>.Empty;</span><br><span class="line">    <span class="comment">//可读不可写  </span></span><br><span class="line">    <span class="keyword">string</span> m_StreamingAssetsTxt = <span class="keyword">string</span>.Empty;</span><br><span class="line">    <span class="comment">//可读可写  </span></span><br><span class="line">    <span class="keyword">string</span> m_PersistentDataTxt = <span class="keyword">string</span>.Empty;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_ResourcesTxt = Resources.Load&lt;TextAsset&gt;(<span class="string">"test"</span>).text;</span><br><span class="line">        m_StreamingAssetsTxt = File.ReadAllText(System.IO.Path.Combine(Application.streamingAssetsPath, <span class="string">"test.txt"</span>));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">OnGUI</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        GUILayout.Label(<span class="keyword">string</span>.Format(<span class="string">"&lt;size=50&gt;Resources : &#123;0&#125;&lt;/size&gt;"</span>, m_ResourcesTxt));</span><br><span class="line">        GUILayout.Label(<span class="keyword">string</span>.Format(<span class="string">"&lt;size=50&gt;StreamingAssets : &#123;0&#125;&lt;/size&gt;"</span>, m_StreamingAssetsTxt));</span><br><span class="line">        GUILayout.Label(<span class="keyword">string</span>.Format(<span class="string">"&lt;size=50&gt;PersistentDataPath : &#123;0&#125;&lt;/size&gt;"</span>, m_PersistentDataTxt));</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (GUILayout.Button(<span class="string">"&lt;size=50&gt;写入并读取时间&lt;/size&gt;"</span>))</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">string</span> path = Path.Combine(Application.persistentDataPath, <span class="string">"test.txt"</span>);</span><br><span class="line">            File.WriteAllText(path, DateTime.Now.ToString());</span><br><span class="line">            m_PersistentDataTxt = File.ReadAllText(path);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>执行如下：</p>
+<img src="/2018/11/30/持久化数据-1/6.png">
+
+<h2 id="PersistentDataPath目录"><a href="#PersistentDataPath目录" class="headerlink" title="PersistentDataPath目录"></a>PersistentDataPath目录</h2><p>PersistentDataPath目录本身并没有什么问题，但是如果平常开发中也在这个目录下进行读写操作的话，就会比较麻烦，因为它在Windows以及Mac下的目录是很难找的。例如，开发过程中需要验证一下保存的文件是否正确，我们随时都需要很快地找到它。调用EditorUtility.RevealInFinder()方法，就可以立即定位到指定目录。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System.Collections;  </span><br><span class="line"><span class="keyword">using</span> UnityEngine;  </span><br><span class="line"><span class="keyword">using</span> UnityEditor;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Script_08_11</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    [<span class="meta">MenuItem(<span class="meta-string">"Assets/Open Persistent DataPath"</span>)</span>]</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Open</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        EditorUtility.RevealInFinder(Application.persistentDataPath);</span><br><span class="line">    &#125;    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Unity3D游戏开发第2版-宣雨松/" rel="tag"># Unity3D游戏开发第2版-宣雨松</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/11/30/MySQL备份/" rel="next" title="MySQL备份">
+                <i class="fa fa-chevron-left"></i> MySQL备份
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/11/30/MySQL系统函数/" rel="prev" title="MySQL系统函数">
+                MySQL系统函数 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">269</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">29</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2019/07/21/存储器和指针：指向何方？/" title="存储器和指针：指向何方？" target="_blank">存储器和指针：指向何方？</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/07/20/结构、联合与位字段：创建自己的字段/" title="结构、联合与位字段：创建自己的字段" target="_blank">结构、联合与位字段：创建自己的字段</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/07/20/第2章-算法/" title="第2章 算法" target="_blank">第2章 算法</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/07/20/C语言入门：进入C语言的世界/" title="C语言入门：进入C语言的世界" target="_blank">C语言入门：进入C语言的世界</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/07/19/多路查找树（B树）/" title="多路查找树（B树）" target="_blank">多路查找树（B树）</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Excel"><span class="nav-number">1.</span> <span class="nav-text">Excel</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#EPPlus"><span class="nav-number">1.1.</span> <span class="nav-text">EPPlus</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#读取Excel"><span class="nav-number">1.2.</span> <span class="nav-text">读取Excel</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#写入Excel"><span class="nav-number">1.3.</span> <span class="nav-text">写入Excel</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#JSON"><span class="nav-number">2.</span> <span class="nav-text">JSON</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#JSON支持字典"><span class="nav-number">2.1.</span> <span class="nav-text">JSON支持字典</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#文件读取与写入"><span class="nav-number">3.</span> <span class="nav-text">文件读取与写入</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#PlayerPrefs"><span class="nav-number">3.1.</span> <span class="nav-text">PlayerPrefs</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#EditorPrefs"><span class="nav-number">3.2.</span> <span class="nav-text">EditorPrefs</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PlayerPrefs保存复杂结构"><span class="nav-number">3.3.</span> <span class="nav-text">PlayerPrefs保存复杂结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#TextAsset"><span class="nav-number">3.4.</span> <span class="nav-text">TextAsset</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编辑期读写文本"><span class="nav-number">3.5.</span> <span class="nav-text">编辑期读写文本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#运行期读写文本"><span class="nav-number">3.6.</span> <span class="nav-text">运行期读写文本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PersistentDataPath目录"><span class="nav-number">3.7.</span> <span class="nav-text">PersistentDataPath目录</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">1.3m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">20:03</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

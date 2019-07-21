@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="思考并回答以下问题：1.如何创建一个空表？">
+<meta name="keywords" content="大话Unity2018">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Lua编程7之metatable">
+<meta property="og:url" content="http://chebincarl.github.io/2019/06/23/Lua编程7之metatable/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="思考并回答以下问题：1.如何创建一个空表？">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-07-17T14:44:48.103Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Lua编程7之metatable">
+<meta name="twitter:description" content="思考并回答以下问题：1.如何创建一个空表？">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/06/23/Lua编程7之metatable/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Lua编程7之metatable | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">文章看10遍，动手做10遍，自然就会了</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/06/23/Lua编程7之metatable/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Lua编程7之metatable
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-06-23 22:47:23" itemprop="dateCreated datePublished" datetime="2019-06-23T22:47:23+08:00">2019-06-23</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-07-17 22:44:48" itemprop="dateModified" datetime="2019-07-17T22:44:48+08:00">2019-07-17</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Unity/" itemprop="url" rel="index"><span itemprop="name">Unity</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">7.6k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">7 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>思考并回答以下问题：<br>1.如何创建一个空表？</p>
+<a id="more"></a>
+
+<p>在 Lua table 中可以访问对应的key来得到value值，但是却无法对两个 table 进行操作。要实现两个table的操作就要使用Lua提供的元表(Metatable)，元表允许我们改变table的行为，每个行为关联了对应的元方法。</p>
+<h1 id="Lua元表"><a href="#Lua元表" class="headerlink" title="Lua元表"></a><span style="color:#039BE5;">Lua元表</span></h1><p>Lua中每一个值都有metatable。metatable是一个普通的table，定义了一个值在特定情况下的操作。你可以通过修改值的metatable来修改这些操作。</p>
+<blockquote>
+<p>在Lua代码中，只能设置table的元表，若要设置其它类型值的元表，则必须通过C代码来完成。</p>
+</blockquote>
+<p>table和userdata可以有各自独立的元表，而其它数据类型的值则共享其类型所属的单一元表。缺省情况下，table在创建时没有元表。</p>
+<p>任何table都可以作为任何值的元表，而一组相关的table也可以共享一个通用的元表，此元表将描述了它们共同的行为。一个table甚至可以作为它自己的元表，用于描述其特有的行为。</p>
+<p>例如，使用元表我们可以定义Lua如何计算两个table的相加操作a+b。</p>
+<p>当Lua试图对两个表进行相加时，先检查两者之一是否有元表，之后检查是否有一个叫<span style="color:red">__add</span>的字段，若找到，则调用对应的值。<span style="color:red">__add</span>等字段其对应的值（往往是一个函数或是table）就是<span style="color:red">** 元方法 ** </span>，前面有两个下划线。</p>
+<p>有两个很重要的函数来处理元表：</p>
+<ul>
+<li><span style="color:red">setmetatable(table,metatable)</span>: 对指定 table 设置元表(metatable)，如果元表(metatable)中存在 __metatable 键值，setmetatable 会失败。</li>
+<li><span style="color:red">getmetatable(table)</span>: 返回对象的元表(metatable)。</li>
+</ul>
+<p>以下实例演示了如何对指定的表设置元表：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">mytable = &#123;&#125;                      <span class="comment">-- 普通表 </span></span><br><span class="line">mymetatable = &#123;&#125;                  <span class="comment">-- 元表</span></span><br><span class="line"><span class="built_in">setmetatable</span>(mytable,mymetatable) <span class="comment">-- 把 mymetatable 设为 mytable 的元表</span></span><br></pre></td></tr></table></figure>
+
+<p>以上代码也可以直接写成一行：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mytable = <span class="built_in">setmetatable</span>(&#123;&#125;,&#123;&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>以下为返回对象元表：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">getmetatable</span>(mytable) <span class="comment">-- 这会返回mymetatable</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="算术类的元方法"><a href="#算术类的元方法" class="headerlink" title="算术类的元方法"></a><span style="color:#EF7060;">算术类的元方法</span></h2><p>在下面的示例代码中，将用table来表示集合，并且有一些函数用来计算集合的并集和交集等。</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line">Set = &#123;&#125;</span><br><span class="line"><span class="keyword">local</span> metatable = &#123;&#125; <span class="comment">--元表</span></span><br><span class="line"></span><br><span class="line"><span class="comment">--根据参数列表中的值创建一个新的集合</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Set.new</span><span class="params">(l)</span></span></span><br><span class="line">    <span class="keyword">local</span> set = &#123;&#125;</span><br><span class="line">    <span class="comment">--将所有由该方法创建的集合的元表都指定到metatable</span></span><br><span class="line">    <span class="built_in">setmetatable</span>(set, metatable)</span><br><span class="line">    <span class="keyword">for</span> _, v <span class="keyword">in</span> <span class="built_in">ipairs</span>(l) <span class="keyword">do</span></span><br><span class="line">        set[v] = <span class="literal">true</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">return</span> set</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">--取两个集合并集的函数</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Set.union</span><span class="params">(a, b)</span></span></span><br><span class="line">    <span class="keyword">local</span> res = Set.new &#123;&#125;</span><br><span class="line">    <span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">pairs</span>(a) <span class="keyword">do</span></span><br><span class="line">        res[k] = <span class="literal">true</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">pairs</span>(b) <span class="keyword">do</span></span><br><span class="line">        res[k] = <span class="literal">true</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">return</span> res</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">--取两个集合交集的函数</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Set.intersection</span><span class="params">(a, b)</span></span></span><br><span class="line">    <span class="keyword">local</span> res = Set.new &#123;&#125;</span><br><span class="line">    <span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">pairs</span>(a) <span class="keyword">do</span></span><br><span class="line">        res[k] = b[k]</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">return</span> res</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Set.tostring</span><span class="params">(set)</span></span></span><br><span class="line">    <span class="keyword">local</span> l = &#123;&#125;</span><br><span class="line">    <span class="keyword">for</span> e <span class="keyword">in</span> <span class="built_in">pairs</span>(set) <span class="keyword">do</span></span><br><span class="line">        l[#l + <span class="number">1</span>] = e</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"&#123;"</span> .. <span class="built_in">table</span>.<span class="built_in">concat</span>(l, <span class="string">", "</span>) .. <span class="string">"&#125;"</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Set.print</span><span class="params">(s)</span></span></span><br><span class="line">    <span class="built_in">print</span>(Set.<span class="built_in">tostring</span>(s))</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">--最后将元方法加入到元表中，这样当两个由Set.new方法创建出来的集合进行</span></span><br><span class="line"><span class="comment">--加运算时，将被重定向到Set.union方法，乘法运算将被重定向到Set.intersection</span></span><br><span class="line">metatable.<span class="built_in">__add</span> = Set.union</span><br><span class="line">metatable.<span class="built_in">__mul</span> = Set.intersection</span><br><span class="line"></span><br><span class="line"><span class="comment">--下面为测试代码</span></span><br><span class="line">s1 = Set.new &#123;<span class="number">10</span>, <span class="number">20</span>, <span class="number">30</span>, <span class="number">50</span>&#125;</span><br><span class="line">s2 = Set.new &#123;<span class="number">30</span>, <span class="number">1</span>&#125;</span><br><span class="line">s3 = s1 + s2</span><br><span class="line">Set.<span class="built_in">print</span>(s3)</span><br><span class="line">Set.<span class="built_in">print</span>(s3 * s1)</span><br><span class="line"></span><br><span class="line"><span class="comment">--输出结果为：</span></span><br><span class="line"><span class="comment">--&#123;1, 30, 10, 50, 20&#125;</span></span><br><span class="line"><span class="comment">--&#123;30, 10, 50, 20&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>在元表中，每种算术操作符都有对应的字段名，对应的操作列表如下：(注意：__是两个下划线)</p>
+<table>
+<thead>
+<tr>
+<th align="left"><center>** 模式 ** </center></th>
+<th align="left"><center>** 描述 ** </center></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">__add</td>
+<td align="left">对应的运算符 ‘+’.</td>
+</tr>
+<tr>
+<td align="left">__sub</td>
+<td align="left">对应的运算符 ‘-‘.</td>
+</tr>
+<tr>
+<td align="left">__mul</td>
+<td align="left">对应的运算符 ‘*’.</td>
+</tr>
+<tr>
+<td align="left">__div</td>
+<td align="left">对应的运算符 ‘/‘.</td>
+</tr>
+<tr>
+<td align="left">__mod</td>
+<td align="left">对应的运算符 ‘%’.</td>
+</tr>
+<tr>
+<td align="left">__unm</td>
+<td align="left">对应的运算符 ‘-‘.</td>
+</tr>
+<tr>
+<td align="left">__concat</td>
+<td align="left">对应的运算符 ‘..’.</td>
+</tr>
+<tr>
+<td align="left">__eq</td>
+<td align="left">对应的运算符 ‘==’.</td>
+</tr>
+<tr>
+<td align="left">__lt</td>
+<td align="left">对应的运算符 ‘&lt;’.</td>
+</tr>
+<tr>
+<td align="left">__le</td>
+<td align="left">对应的运算符 ‘&lt;=’.</td>
+</tr>
+</tbody></table>
+<p>对于上面的示例代码，我们在算术运算符的两侧均使用了table类型的操作数。那么如果为s1 = s1 + 8，Lua是否还能正常工作呢？答案是肯定的，因为Lua定位元表的步骤为，如果第一个值有元表，且存在__add字段，那么Lua将以这个字段为元方法，否则会再去查看第二个值否是有元表且包含__add字段，如果有则以此字段为元方法。最后，如果两个值均不存在元方法，Lua就引发一个错误。然而对于上例中的Set.union函数，如果执行s1 = s1 + 8将会引发一个错误，因为8不是table对象，不能基于它执行pairs方法调用。为了得到更准确的错误信息，我们需要给Set.union函数做如下的修改，如：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Set.union</span><span class="params">(a,b)</span></span></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">getmetatable</span>(a) ~= metatable <span class="keyword">or</span> <span class="built_in">getmetatable</span>(b) ~= metatable <span class="keyword">then</span></span><br><span class="line">        <span class="built_in">error</span>(<span class="string">"attempt to 'add' a set with a non-set value"</span>)</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">    <span class="comment">--后面的代码与上例相同。</span></span><br><span class="line">    ... ...</span><br><span class="line"><span class="keyword">end</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="关系类的元方法"><a href="#关系类的元方法" class="headerlink" title="关系类的元方法"></a><span style="color:#EF7060;">关系类的元方法</span></h2><p>元表还可以指定关系操作符的含义，元方法分别为__eq(等于)、__lt(小于)和__le(小于等于)，至于另外3个关系操作符，Lua没有提供相关的元方法，可以通过前面3个关系运算符的取反获得。</p>
+<table>
+<thead>
+<tr>
+<th align="left"><center>** 模式 ** </center></th>
+<th align="left"><center>** 描述 ** </center></th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">__eq</td>
+<td align="left">对应的运算符 ‘==’.</td>
+</tr>
+<tr>
+<td align="left">__lt</td>
+<td align="left">对应的运算符 ‘&lt;’.</td>
+</tr>
+<tr>
+<td align="left">__le</td>
+<td align="left">对应的运算符 ‘&lt;=’.</td>
+</tr>
+</tbody></table>
+<p>与算术类的元方法不同，关系类的元方法不能应用于混合的类型。</p>
+<p>示例如下：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">Set = &#123;&#125;</span><br><span class="line"><span class="keyword">local</span> metatable = &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Set.new</span><span class="params">(l)</span></span></span><br><span class="line">    <span class="keyword">local</span> set = &#123;&#125;</span><br><span class="line">    <span class="built_in">setmetatable</span>(set,metatable)</span><br><span class="line">    <span class="keyword">for</span> _, v <span class="keyword">in</span> <span class="built_in">ipairs</span>(l) <span class="keyword">do</span></span><br><span class="line">        set[v] = <span class="literal">true</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">return</span> set</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">metatable.<span class="built_in">__le</span> = <span class="function"><span class="keyword">function</span><span class="params">(a,b)</span></span> </span><br><span class="line">    <span class="keyword">for</span> k <span class="keyword">in</span> <span class="built_in">pairs</span>(a) <span class="keyword">do</span></span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> b[k] <span class="keyword">then</span> <span class="keyword">return</span> <span class="literal">false</span> <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">true</span></span><br><span class="line"><span class="keyword">end</span></span><br><span class="line">metatable.<span class="built_in">__lt</span> = <span class="function"><span class="keyword">function</span><span class="params">(a,b)</span></span> <span class="keyword">return</span> a &lt;= b <span class="keyword">and</span> <span class="keyword">not</span> (b &lt;= a) <span class="keyword">end</span></span><br><span class="line">metatable.<span class="built_in">__eq</span> = <span class="function"><span class="keyword">function</span><span class="params">(a,b)</span></span> <span class="keyword">return</span> a &lt;= b <span class="keyword">and</span> b &lt;= a <span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="comment">--下面是测试代码：</span></span><br><span class="line">s1 = Set.new&#123;<span class="number">2</span>,<span class="number">4</span>&#125;</span><br><span class="line">s2 = Set.new&#123;<span class="number">4</span>,<span class="number">10</span>,<span class="number">2</span>&#125;</span><br><span class="line"><span class="built_in">print</span>(s1 &lt;= s2) <span class="comment">--true</span></span><br><span class="line"><span class="built_in">print</span>(s1 &lt; s2)  <span class="comment">--true</span></span><br><span class="line"><span class="built_in">print</span>(s1 &gt;= s1) <span class="comment">--true</span></span><br><span class="line"><span class="built_in">print</span>(s1 &gt; s1)  <span class="comment">--false</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="库定义的元方法"><a href="#库定义的元方法" class="headerlink" title="库定义的元方法"></a><span style="color:#EF7060;">库定义的元方法</span></h2><p>除了上述基于操作符的元方法外，Lua还提供了一些针对框架的元方法，如print函数总是调用tostring来格式化其输出。如果当前对象存在__tostring元方法时，tostring将用该元方法的返回值作为自己的返回值，如：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">Set = &#123;&#125;</span><br><span class="line"><span class="keyword">local</span> metatable = &#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Set.new</span><span class="params">(l)</span></span></span><br><span class="line">    <span class="keyword">local</span> set = &#123;&#125;</span><br><span class="line">    <span class="built_in">setmetatable</span>(set,metatable)</span><br><span class="line">    <span class="keyword">for</span> _, v <span class="keyword">in</span> <span class="built_in">ipairs</span>(l) <span class="keyword">do</span></span><br><span class="line">        set[v] = <span class="literal">true</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">return</span> set</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Set.tostring</span><span class="params">(set)</span></span></span><br><span class="line">    <span class="keyword">local</span> l = &#123;&#125;</span><br><span class="line">    <span class="keyword">for</span> e <span class="keyword">in</span> <span class="built_in">pairs</span>(set) <span class="keyword">do</span></span><br><span class="line">        l[#l + <span class="number">1</span>] = e</span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">    <span class="keyword">return</span> <span class="string">"&#123;"</span> .. <span class="built_in">table</span>.<span class="built_in">concat</span>(l,<span class="string">", "</span>) .. <span class="string">"&#125;"</span>;</span><br><span class="line"><span class="keyword">end</span></span><br><span class="line"></span><br><span class="line">metatable.<span class="built_in">__tostring</span> = Set.<span class="built_in">tostring</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">--下面是测试代码：</span></span><br><span class="line">s1 = Set.new&#123;<span class="number">4</span>,<span class="number">5</span>,<span class="number">10</span>&#125;</span><br><span class="line"><span class="built_in">print</span>(s1) <span class="comment">--&#123;5,10,4&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p>函数setmetatable和getmetatable也会用到元表中的一个字段(__metatable)，用于保护元表，如：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">mt.<span class="built_in">__metatable</span> = <span class="string">"not your business"</span></span><br><span class="line">s1 = Set.new&#123;&#125;</span><br><span class="line"><span class="built_in">print</span>(<span class="built_in">getmetatable</span>(s1))   <span class="comment">--此时将打印"not your business"</span></span><br><span class="line"><span class="built_in">setmetatable</span>(s1,&#123;&#125;)  <span class="comment">--此时将输出错误信息："cannot change protected metatable"</span></span><br></pre></td></tr></table></figure>
+
+<p>从上述代码的输出结果即可看出，一旦设置了__metatable字段，getmetatable就会返回这个字段的值，而setmetatable将引发一个错误。</p>
+<h2 id="table访问的元方法"><a href="#table访问的元方法" class="headerlink" title="table访问的元方法"></a><span style="color:#EF7060;">table访问的元方法</span></h2><p>算术类和关系类运算符的元方法都为各种错误情况定义了行为，它们不会改变语言的常规行为。但是Lua还提供了一种可以改变table行为的方法。有两种可以改变的table行为：查询table及修改table中不存在的字段。</p>
+<p>** __index 元方法 **</p>
+<p>这是 metatable 最常用的键（key）。</p>
+<p>当你通过键来访问 table 的时候，如果这个键没有值，那么Lua就会寻找该table的metatable（假定有metatable）中的__index键。如果__index包含一个表，Lua会在表中查找相应的键。</p>
+<p>例如：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">other = &#123; foo = <span class="number">3</span> &#125; </span><br><span class="line">t = <span class="built_in">setmetatable</span>(&#123;&#125;, &#123; <span class="built_in">__index</span> = other &#125;) </span><br><span class="line"><span class="built_in">print</span>(t.foo) <span class="comment">-- 3</span></span><br><span class="line"><span class="built_in">print</span>(t.bar) <span class="comment">-- nil</span></span><br></pre></td></tr></table></figure>
+
+<p>如果__index包含一个函数的话，Lua就会调用那个函数，table和键会作为参数传递给函数。</p>
+<p>__index 元方法查看表中元素是否存在，如果不存在，返回结果为 nil；如果存在则由 __index 返回结果。</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">mytable = <span class="built_in">setmetatable</span>(&#123;key1 = <span class="string">"value1"</span>&#125;, &#123;</span><br><span class="line">  <span class="built_in">__index</span> = <span class="function"><span class="keyword">function</span><span class="params">(mytable, key)</span></span></span><br><span class="line">    <span class="keyword">if</span> key == <span class="string">"key2"</span> <span class="keyword">then</span></span><br><span class="line">      <span class="keyword">return</span> <span class="string">"metatablevalue"</span></span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">      <span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(mytable.key1,mytable.key2)</span><br></pre></td></tr></table></figure>
+
+<p>实例输出结果为：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">value1    metatablevalue</span><br></pre></td></tr></table></figure>
+
+<p>实例解析：</p>
+<ul>
+<li>mytable 表赋值为 {key1 = “value1”}。</li>
+<li>mytable 设置了元表，元方法为 __index。</li>
+<li>在mytable表中查找 key1，如果找到，返回该元素，找不到则继续。</li>
+<li>在mytable表中查找 key2，如果找到，返回 metatablevalue，找不到则继续。</li>
+<li>判断元表有没有__index方法，如果__index方法是一个函数，则调用该函数。</li>
+<li>元方法中查看是否传入 “key2” 键的参数（mytable.key2已设置），如果传入 “key2” 参数返回 “metatablevalue”，否则返回 mytable 对应的键值。</li>
+</ul>
+<p>我们还可以将以上代码简单写成：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">mytable = <span class="built_in">setmetatable</span>(&#123;key1 = <span class="string">"value1"</span>&#125;, &#123; <span class="built_in">__index</span> = &#123; key2 = <span class="string">"metatablevalue"</span> &#125; &#125;)</span><br><span class="line"><span class="built_in">print</span>(mytable.key1,mytable.key2)</span><br></pre></td></tr></table></figure>
+
+<p>如果想在访问table时禁用__index元方法，可以通过函数rawget(table,key)完成。通过该方法并不会加速table的访问效率。</p>
+<p>** 总结 **</p>
+<p>Lua查找一个表元素时的规则，其实就是如下3个步骤:</p>
+<ul>
+<li>在表中查找，如果找到，返回该元素，找不到则下一步</li>
+<li>判断该表是否有元表，如果没有元表，返回nil，有元表则下一步</li>
+<li>判断元表有没有__index方法，如果__index方法为nil，则返回nil；如果__index方法是一个表，则重复1、2、3；如果__index方法是一个函数，则返回该函数的返回值。</li>
+</ul>
+<p>** __newindex 元方法 **<br>__newindex 元方法用来对表更新，__index则用来对表访问 。</p>
+<p>当你给表的一个缺少的索引赋值，解释器就会查找__newindex元方法：如果存在则调用这个函数而不进行赋值操作。</p>
+<p>以下实例演示了 __newindex 元方法的应用：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">mymetatable = &#123;&#125;</span><br><span class="line">mytable = <span class="built_in">setmetatable</span>(&#123;key1 = <span class="string">"value1"</span>&#125;, &#123; <span class="built_in">__newindex</span> = mymetatable &#125;)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(mytable.key1)</span><br><span class="line"></span><br><span class="line">mytable.newkey = <span class="string">"新值2"</span></span><br><span class="line"><span class="built_in">print</span>(mytable.newkey,mymetatable.newkey)</span><br><span class="line"></span><br><span class="line">mytable.key1 = <span class="string">"新值1"</span></span><br><span class="line"><span class="built_in">print</span>(mytable.key1,mymetatable.key1)</span><br></pre></td></tr></table></figure>
+
+<p>以上实例执行输出结果为：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">value1</span><br><span class="line"><span class="literal">nil</span>    新值<span class="number">2</span></span><br><span class="line">新值<span class="number">1</span>    <span class="literal">nil</span></span><br></pre></td></tr></table></figure>
+
+<p>以上实例中表设置了元方法__newindex，在对新索引键（newkey）赋值时（mytable.newkey = “新值2”），会调用元方法，而不进行赋值。而如果对已存在的索引键（key1），则会进行赋值，而不调用元方法 __newindex。</p>
+<p>以下实例使用了 rawset 函数来更新表：</p>
+<blockquote>
+<p><span style="color:red"> ** rawset (table, index, value) ** </span><br>将table[index]的值直接设为value，不调用__newindex元方法。</p>
+</blockquote>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">mytable =</span><br><span class="line">    <span class="built_in">setmetatable</span>(</span><br><span class="line">    &#123;key1 = <span class="string">"value1"</span>&#125;,</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">__newindex</span> = <span class="function"><span class="keyword">function</span><span class="params">(mytable, key, value)</span></span></span><br><span class="line">            <span class="built_in">rawset</span>(mytable, key, <span class="string">'"'</span> .. value .. <span class="string">'"'</span>)</span><br><span class="line">        <span class="keyword">end</span></span><br><span class="line">    &#125;</span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">mytable.key1 = <span class="string">"new value"</span></span><br><span class="line">mytable.key2 = <span class="number">4</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(mytable.key1, mytable.key2)</span><br></pre></td></tr></table></figure>
+
+<p>以上实例执行输出结果为：</p>
+<figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">new value    <span class="string">"4"</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a><span style="color:#039BE5;">总结</span></h1><p>从本文中可以知道元表可以很好的简化我们的代码功能，所以了解 Lua 的元表，可以让我们写出更加简单优秀的 Lua 代码。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/大话Unity2018/" rel="tag"># 大话Unity2018</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/06/23/Lua编程6之table/" rel="next" title="Lua编程6之table">
+                <i class="fa fa-chevron-left"></i> Lua编程6之table
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/06/23/Lua编程8之面向对象/" rel="prev" title="Lua编程8之面向对象">
+                Lua编程8之面向对象 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">269</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">29</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2019/07/21/存储器和指针：指向何方？/" title="存储器和指针：指向何方？" target="_blank">存储器和指针：指向何方？</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/07/20/结构、联合与位字段：创建自己的字段/" title="结构、联合与位字段：创建自己的字段" target="_blank">结构、联合与位字段：创建自己的字段</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/07/20/第2章-算法/" title="第2章 算法" target="_blank">第2章 算法</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/07/20/C语言入门：进入C语言的世界/" title="C语言入门：进入C语言的世界" target="_blank">C语言入门：进入C语言的世界</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/07/19/多路查找树（B树）/" title="多路查找树（B树）" target="_blank">多路查找树（B树）</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Lua元表"><span class="nav-number">1.</span> <span class="nav-text">Lua元表</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#算术类的元方法"><span class="nav-number">1.1.</span> <span class="nav-text">算术类的元方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关系类的元方法"><span class="nav-number">1.2.</span> <span class="nav-text">关系类的元方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#库定义的元方法"><span class="nav-number">1.3.</span> <span class="nav-text">库定义的元方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#table访问的元方法"><span class="nav-number">1.4.</span> <span class="nav-text">table访问的元方法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">2.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">1.3m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">20:03</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

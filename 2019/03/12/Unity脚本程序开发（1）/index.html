@@ -1,0 +1,1795 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Unity中的脚本程序如果要起作用，主要途径为将脚本附加到特定的游戏对象上。这样，脚本中不同的方法在特定的情况下会被回调，实现特定的功能。下面给出几个最常用的回调方法。">
+<meta name="keywords" content="Unity游戏开发技术详解与典型案例">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Unity脚本程序开发（1）">
+<meta property="og:url" content="http://chebincarl.github.io/2019/03/12/Unity脚本程序开发（1）/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="Unity中的脚本程序如果要起作用，主要途径为将脚本附加到特定的游戏对象上。这样，脚本中不同的方法在特定的情况下会被回调，实现特定的功能。下面给出几个最常用的回调方法。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-07-17T14:44:48.604Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Unity脚本程序开发（1）">
+<meta name="twitter:description" content="Unity中的脚本程序如果要起作用，主要途径为将脚本附加到特定的游戏对象上。这样，脚本中不同的方法在特定的情况下会被回调，实现特定的功能。下面给出几个最常用的回调方法。">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/03/12/Unity脚本程序开发（1）/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Unity脚本程序开发（1） | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">文章看10遍，动手做10遍，自然就会了</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/03/12/Unity脚本程序开发（1）/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Unity脚本程序开发（1）
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-03-12 07:43:41" itemprop="dateCreated datePublished" datetime="2019-03-12T07:43:41+08:00">2019-03-12</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-07-17 22:44:48" itemprop="dateModified" datetime="2019-07-17T22:44:48+08:00">2019-07-17</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Unity/" itemprop="url" rel="index"><span itemprop="name">Unity</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">20k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">18 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Unity中的脚本程序如果要起作用，主要途径为将脚本附加到特定的游戏对象上。这样，脚本中不同的方法在特定的情况下会被回调，实现特定的功能。下面给出几个最常用的回调方法。</p>
+<a id="more"></a>
+<ul>
+<li>Start：在游戏场景加载时被调用，在该方法内可以写一些游戏场景初始化之类的代码。</li>
+<li>Update：会在每一帧渲染之前被调用，大部分游戏代码在这里执行，除了物理部分的代码。</li>
+<li>FixedUpdate：会在固定的物理时间步调调用一次。这里也是基本物理行为代码执行的地方。</li>
+</ul>
+<p>同时，还有一种可以称为方法外部代码的源代码，其在物理加载时运行，还可以用于初始化脚本状态，有点类似于C#里面的成员变量声明。</p>
+<p>开发人员还可以重写一些处理特定事件的回调方法，这类方法一般以On前缀开头，如OnCollisionEnter方法（此方法在系统检测到碰撞开始时被回调）等。</p>
+<p>其实上述的方法与代码在开发中一般都是位于MonoBehaviour类的子类中的，也就是说开发脚本代码时，主要是继承MonoBehaviour类并重写其中特定的方法。</p>
+<h2 id="继承自MonoBehaviour类"><a href="#继承自MonoBehaviour类" class="headerlink" title="继承自MonoBehaviour类"></a>继承自MonoBehaviour类</h2><p>Unity中所有挂载到游戏对象上的脚本中的类必须继承MonoBehaviour类（直接的或间接的）。MonoBehaviour类中定义了各种回调方法，如Start，Update和FixedUpdate等回调方法。</p>
+<h2 id="类名字必须匹配文件名"><a href="#类名字必须匹配文件名" class="headerlink" title="类名字必须匹配文件名"></a>类名字必须匹配文件名</h2><p>C#脚本中类名需要手动编写，而且类名还必须和文件名相同，否则当脚本挂载到游戏对象时，在控制台会报错。</p>
+<h2 id="使用Awake或Start方法初始化"><a href="#使用Awake或Start方法初始化" class="headerlink" title="使用Awake或Start方法初始化"></a>使用Awake或Start方法初始化</h2><p>用于初始化脚本的代码必须置于Awake或Start方法中。两者的不同之处在于，Awake方法是在加载场景时运行；Start方法是在第一次调用Update或FixedUpdate方法之前被调用；Awake方法运行在所有Start方法之前。</p>
+<h2 id="Unity脚本中协同程序有不同的语法规则"><a href="#Unity脚本中协同程序有不同的语法规则" class="headerlink" title="Unity脚本中协同程序有不同的语法规则"></a>Unity脚本中协同程序有不同的语法规则</h2><p>Unity脚本中协同程序（Coroutines）必须是IEnumerator返回类型，并且yield被yield return替代，具体操作时可以使用如下的C#代码片段来实现。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine; <span class="comment">//导入系统包</span></span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">NewBehaviourScript</span> : <span class="title">MonoBehaviour</span>  <span class="comment">// 声明类</span></span><br><span class="line">&#123;</span><br><span class="line">    IEnumerator SomeCoroutine&#123; <span class="comment">// C#协同程序</span></span><br><span class="line">        <span class="keyword">yield</span> <span class="keyword">return</span> <span class="number">0</span>; <span class="comment">// 等待1帧</span></span><br><span class="line">        <span class="function"><span class="keyword">yield</span> return new <span class="title">WaitForSeconds</span>(<span class="params"><span class="number">2</span></span>)</span>; <span class="comment">// 等待2s</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="只有满足特定情况变量才能显示在属性查看器中"><a href="#只有满足特定情况变量才能显示在属性查看器中" class="headerlink" title="只有满足特定情况变量才能显示在属性查看器中"></a>只有满足特定情况变量才能显示在属性查看器中</h2><p>只有序列化的成员变量才能显示在属性查看器中，而private和protected类型的成员变量只能在专家模式中显示，而且，其属性不被序列化或显示在属性查看器中。如果属性想在属性查看器中显示，其必须是public类型的。</p>
+<h2 id="尽量避免使用构造函数"><a href="#尽量避免使用构造函数" class="headerlink" title="尽量避免使用构造函数"></a>尽量避免使用构造函数</h2><p>不要在构造函数中初始化任何变量，要用Awake或Start方法来实现。即便是在编辑模式，Unity仍会自动调用构造函数，这通常是在一个脚本编译之后，因为需要调用脚本的构造函数来取回脚本的默认值。无法预计何时调用构造函数，它或许会被预制件或未激活的游戏对象所调用。而在单一模式下使用构造函数可能会导致严重后果，会带来类似随机的空引用异常。因此，如果想实现单一模式就不要用构造函数，要用Awake或Start方法。事实上，没必要在继承自MonoBehaviour类的构造函数中写任何代码。</p>
+<h2 id="断点"><a href="#断点" class="headerlink" title="断点"></a>断点</h2><p>Unity中通过Debug.Break()设置断点，如果想查看特定情况发生时对象属性的变化时，用断点可以快速地完成。</p>
+<h1 id="常用操作"><a href="#常用操作" class="headerlink" title="常用操作"></a>常用操作</h1><p>Unity中很多对游戏对象的操作都是通过在脚本中修改对象的Transform（变换属性）与Rigidbody（刚体属性）参数来实现的，上述属性的参数可以非常方便地通过脚本编程实现修改。例如，让物体绕x轴顺时针旋转20°，则可以使用如下的C#代码片段来实现。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">NewBehaviourScript</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">this</span>.transform.Rotate(<span class="number">20</span>, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>脚本开发完成后，将这个脚本挂载到需要旋转的游戏对象上，在项目运行时即可实现所需功能。如果希望游戏对象沿z轴正方向移动，则可以使用如下的C#代码片段来实现。该代码运行时可以实现游戏对象GameObject每帧向前移动1个单位。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">NewBehaviourScript</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">this</span>.transform.Translate(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>一般情况下，在Unity中，x轴为红色的轴表示左右，y轴为绿色的轴表示上下，z轴为蓝色的轴表示前后。</p>
+<p>用于旋转的Rotate方法和用于移动的Translate方法都有4个参数的重载形式。第四个参数为Space枚举类型，如果设置为“Space.Self”，变换被应用相对于自身轴；如果设置为“Space. World”，<br>变换被应用相对于世界坐标系统。如果不设置第四个参数，则默认设置为“Space.Self”。</p>
+<h2 id="记录时间"><a href="#记录时间" class="headerlink" title="记录时间"></a>记录时间</h2><p>在Unity中记录时间需要用到Time类。Time类中比较重要的变量为deltaTime（只读），它指的是从最近一次调用Update或者FixedUpdate方法到现在的时间，如果想均匀地旋转一个物体，不考虑帧速率的情况下，可以乘以Time.deltaTime，具体操作时可以使用如下的C#代码片段来实现。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">NewBehaviourScript</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">this</span>.transform.Rotate(<span class="number">10</span> * Time.deltaTime, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果想每秒增加或者减少一个值，需要乘以Time.delaTime，同时也要明确在游戏中是需要每秒1个单位还是每帧1个单位的效果。如果是乘以Time.deltaTime，那么，游戏对象就会按固定的节奏运动而不是依赖游戏的帧速率，因此，游戏对象的运动变得更容易控制。</p>
+<p>例如，想让游戏对象沿y轴正方向每秒上升5个单位，具体操作时可以使用如下的C#代码片段来实现。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">NewBehaviourScript</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> GameObject gameObject; <span class="comment">// 声明游戏对象</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Vector3 te = gameObject.transform.position; <span class="comment">// 获取游戏对象的位置坐标</span></span><br><span class="line">        te.y += <span class="number">5</span> * Time.deltaTime; <span class="comment">// 沿y轴每秒上升5个单位</span></span><br><span class="line">        gameObject.transform.position = te; <span class="comment">// 设置游戏对象的位置坐标</span></span><br><span class="line">    &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果涉及刚体时，可以写在FixedUpdate方法里面。在FixedUpdate方法里面，如果想每秒增加或者减少一个值，需要乘以TimefixedDeltaTime。例如，想让刚体沿y轴正方向每秒上升5个单位，具体操作时可以使用如下的C#代码片段来实现。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">NewBehaviourScript</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> GameObject gameObject; <span class="comment">// 声明游戏对象</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">FixedUpdate</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Vector3 te = gameObject.GetComponent&lt;Rigidbody&gt;().transform.position; <span class="comment">// 获取刚体的位置坐标</span></span><br><span class="line">        te.y += <span class="number">5</span> * Time.fixedDeltaTime; <span class="comment">// 刚体沿y轴每秒上升5个单位</span></span><br><span class="line">        gameObject.GetComponent&lt;Rigidbody&gt;().transform.position = te; <span class="comment">// 设置刚体的位置坐标</span></span><br><span class="line">    &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>FixedUpdate方法是按固定的物理时间被系统回调执行的，其中代码的执行和游戏的帧速率无关。</p>
+<h2 id="访问游戏对象组件"><a href="#访问游戏对象组件" class="headerlink" title="访问游戏对象组件"></a>访问游戏对象组件</h2><p>组件属于游戏对象，比如把一个Renderer（渲染器）组件附加到游戏对象上，可以使游戏对象显示到游戏场景中；把Camera（摄像机）组件附加到游戏对象上可以使该对象具有摄像机的所有属性。由于所有的脚本都是组件，因此一般的脚本都可以附加到游戏对象上。</p>
+<p>常用的组件可以通过简单的成员变量取得。下面介绍了一些常见的成员变量，如下表所示。<br>|  组件名称 | 变量名称  |<br>| :———— | :———— |<br>| Transform  | transform  |<br>| Rigidbody  | rigidbody  |<br>| Renderer  |  renderer |<br>| Camera  | camera（只在摄像机对象有效） |<br>| Light  | light（只在光源对象有效） |<br>| Animation  | animation  |<br>| Collider  | collider  |</p>
+<p>这里的组件体现在属性查看器上，而变量是在脚本中体现的。一个游戏对象的所有组件及其所带的属性参数都能够在属性查看器中查看。如果想通过挂载在游戏对象上的脚本代码来实现获得该游戏对象上的对应组件及其属性，可以通过变量名来获得。</p>
+<p>如果想查看所有的预定义成员变量，可以查看关于Component、Behaviour和MonoBehaviour类的文档。如果游戏对象中没有想要取得的值，那么上面的变量将为null。在Unity中，附加到游戏对象上的组件可以通过GetComponent方法获得，具体操作时可以使用如下的C#代码片段来实现。代码中第4行和第5行代码功能是一样的，都是使游戏对象沿x轴正方向移动，而第5行代码通过获取Transform组件来使游戏对象移动。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">NewBehaviourScript</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        transform.Translate(<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>); <span class="comment">// 沿x轴移动一个单位</span></span><br><span class="line">        GetComponent&lt;Transform&gt;().Translate(<span class="number">1</span>, <span class="number">0</span>, <span class="number">0</span>); <span class="comment">// 沿x轴移动一个单位</span></span><br><span class="line">    &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>同样地，也可以通过GetComponent方法获取其他的脚本。比如有一个HelloWorld的脚本，里面有一个sayHello方法。HelloWorld脚本要与调用它的脚本附加在同一游戏对象上，具体操作时可以使用如下的C#代码片段来实现。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">NewBehaviourScript</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        HelloWorld helloWorld = GetComponent&lt;HelloWorld&gt;(); <span class="comment">// 获取"HelloWorld"脚本组件</span></span><br><span class="line">        helloWorld.sayHello();</span><br><span class="line">    &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在C#代码中只有public类型的变量和方法才能在所有其他类中使用，private类型的变量和方法只能在自身类中使用，protected类型的变量和方法只能在子类和同命名空间下的类中使用，而不写类型的变量和方法只能在同命名空间下的类中使用。</p>
+<h2 id="访问其他游戏对象"><a href="#访问其他游戏对象" class="headerlink" title="访问其他游戏对象"></a>访问其他游戏对象</h2><p>大部分脚本不单单控制其附加到的游戏对象。Unity脚本中有很多方法访问其他的游戏对象和游戏组件，可以通过属性查看器指定参数的方法来获取游戏对象，也可以通过Find()方法来获取游戏对象。下面将对这几种方法进行详细介绍。</p>
+<h3 id="通过属性查看器指定参数"><a href="#通过属性查看器指定参数" class="headerlink" title="通过属性查看器指定参数"></a>通过属性查看器指定参数</h3><p>代码中声明public类型的游戏对象引用，在属性查看器中就会显示这个游戏对象参数，然后就可以将需要获取的游戏对象拖曳到属性查看器的相关参数位置，具体操作时可以使用如下的C#代码片段来实现。代码获取游戏对象上的{“Test”脚本组件，然后执行doSomething方法。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">NewBehaviourScript</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;   </span><br><span class="line">    <span class="keyword">public</span> GameObject otherObject;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Test test = otherObject.GetComponent&lt;Test&gt;(); <span class="comment">// 获取“Test”脚本组件</span></span><br><span class="line">        test.doSomething(); <span class="comment">// 执行doSomething方法</span></span><br><span class="line">    &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="确定对象的层次关系"><a href="#确定对象的层次关系" class="headerlink" title="确定对象的层次关系"></a>确定对象的层次关系</h3><p>游戏对象在游戏组成对象列表中存在父子关系，在代码中可以通过获取Transform组件来找到子对象或者父对象。具体操作时可以使用如下的C#代码片段来获取游戏对象的子对象和父对象。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">NewBehaviourScript</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;   </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        transform.Find(<span class="string">"hand"</span>).Translate(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>); <span class="comment">// 其沿z轴每帧移动1个单位</span></span><br><span class="line">        transform.parent.Translate(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>); <span class="comment">// 每帧移动1个单位</span></span><br><span class="line">    &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>一旦读者成功获取到“hand”子对象，就可以通过GetComponent方法获取“hand”对象的其他组件。例如，有一个Test脚本挂载在子对象“hand”上，具体操作时可以使用如下的C#代码来实现。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">NewBehaviourScript</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;   </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        transform.Find(<span class="string">"hand"</span>).GetComponent&lt;Test&gt;().a = <span class="number">2</span>; <span class="comment">// 找到子对象“hand”，同时设置“Test”脚本中的变量a为2</span></span><br><span class="line">        transform.Find(<span class="string">"hand"</span>).GetComponent&lt;Test&gt;().doSomething(); <span class="comment">// 执行doSomething方法</span></span><br><span class="line">        transform.Find(<span class="string">"hand"</span>).GetComponent&lt;Rigidbody&gt;().AddForce(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>); <span class="comment">// 为“hand”子对象的刚体属性上加一个沿z轴的大小为2的力</span></span><br><span class="line">    &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>也可以使用脚本来循环获取到所有的子对象，然后对子对象做某种操作，如平移、旋转等。具体操作时可以使用如下的C#代码片段来实现。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">NewBehaviourScript</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;   </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">foreach</span>(Transform child <span class="keyword">in</span> transform) <span class="comment">// 循环获取所有的子对象</span></span><br><span class="line">        &#123;</span><br><span class="line">            child.Translate(<span class="number">0</span>, <span class="number">5</span>, <span class="number">0</span>); <span class="comment">// 沿y轴每帧移动5个单位</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="通过名字或标签获取游戏对象"><a href="#通过名字或标签获取游戏对象" class="headerlink" title="通过名字或标签获取游戏对象"></a>通过名字或标签获取游戏对象</h3><p>Unity脚本中可以使用FindWithTag方法和Find方法来获取游戏对象，FindWithTag方法获取指定标签的游戏对象，Find方法获取指定名字的游戏对象。具体操作时可以使用如下的C#代码片段。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">NewBehaviourScript</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;   </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">    	GameObject name = GameObject.Find(<span class="string">"somename"</span>); <span class="comment">// 获取名称为“somename”的游戏对象</span></span><br><span class="line">    	name.GetComponent&lt;Test&gt;().doSomething(); </span><br><span class="line">    	name.transform.Translate(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>); <span class="comment">// 沿z轴平移</span></span><br><span class="line"></span><br><span class="line">    	GameObject tag = GameObject.FindWithTag(<span class="string">"sometag"</span>); <span class="comment">// 获取标签为“sometag”的游戏对象</span></span><br><span class="line">    	tag.transform.Translate(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>); <span class="comment">// 沿z轴平移</span></span><br><span class="line">    	tag.GetComponent&lt;Test&gt;().doSomething();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样，通过GetComponent方法就能得到指定游戏对象上的任意脚本或组件。</p>
+<h3 id="通过传递参数来获取游戏对象"><a href="#通过传递参数来获取游戏对象" class="headerlink" title="通过传递参数来获取游戏对象"></a>通过传递参数来获取游戏对象</h3><p>一些事件回调方法的参数中包含了特殊的游戏对象或组件信息，例如触发碰撞事件的Collider组件。在OnTiggerStay方法的参数中有一个碰撞体参数，通过这个参数能得到碰撞的刚体。具体代码如下。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">NewBehaviourScript</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">OnTriggerStay</span>(<span class="params">Collider other</span>) <span class="comment">// 重写OnTriggerStay方法</span></span></span><br><span class="line"><span class="function"></span>	&#123;</span><br><span class="line">		<span class="keyword">if</span> (other.GetComponent&lt;Rigidbody&gt;()) <span class="comment">// 如果该游戏对象上有刚体组件</span></span><br><span class="line">		&#123;</span><br><span class="line">			other.GetComponent&lt;Rigidbody&gt;().AddForce(<span class="number">0</span>, <span class="number">0</span>, <span class="number">2</span>); <span class="comment">// 给刚体施加一个力</span></span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="keyword">if</span> (other.GetComponent&lt;Test&gt;()) <span class="comment">// 如果该游戏对象上有“Test”脚本组件</span></span><br><span class="line">		&#123;</span><br><span class="line">			other.GetComponent&lt;Test&gt;().doSomething();</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="通过组件名称获取游戏对象"><a href="#通过组件名称获取游戏对象" class="headerlink" title="通过组件名称获取游戏对象"></a>通过组件名称获取游戏对象</h3><p>Unity脚本中可以通过FindObjectsOfType方法和FindObjectOfType方法来找到挂载特定类型组件的游戏对象。FindObjectsOfType方法可以获取所有挂载指定类型组件的游戏对象，而FindObjectOfType方法获取挂载指定类型组件的第一个游戏对象。具体操作时可以使用如下的C#代码来实现。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">NewBehaviourScript</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>) <span class="comment">// 重写Start方法</span></span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Test test = FindObjectOfType&lt;Test&gt;(); <span class="comment">// 获取第一个找到的“Test”组件</span></span><br><span class="line">        Debug.Log(test.gameObject.name); <span class="comment">// 打印挂载“Test”组件的第一个游戏对象的名称</span></span><br><span class="line"></span><br><span class="line">        Test[] tests = FindObjectsOfType&lt;Test&gt;(); <span class="comment">// 获取所有的“Test”组件</span></span><br><span class="line">        <span class="keyword">foreach</span>( Test te <span class="keyword">in</span> tests)</span><br><span class="line">        &#123;</span><br><span class="line">            Debug.Log(te.gameObject.name); <span class="comment">// 打印挂载“Test”组件所有的游戏对象的名称</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="向量"><a href="#向量" class="headerlink" title="向量"></a>向量</h3><p>3D游戏开发中经常需要用到向量和向量的运算，Unity中提供了完整的向量以及向量操纵方法,分别为表示二维向量的Vector2类和表示三维向量的Vector3类,因为二维向量和三维向量的使用方法相同,下面将以三维向量为例详细介绍Unity中向量的使用方法。</p>
+<p>Vector3类可以在实例化时进行赋值，也可以实例化后给x、y、z分别进行赋值。具体操作时可以使用如下的C#代码片段来实现。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">NewBehaviourScript</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> Vector3 position1 = <span class="keyword">new</span> Vector3(); <span class="comment">// 实例化Vector3</span></span><br><span class="line">    <span class="keyword">public</span> Vector3 position2 = <span class="keyword">new</span> Vector3(<span class="number">1</span>, <span class="number">2</span>, <span class="number">2</span>); <span class="comment">// 实例化Vector3并赋值</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>) <span class="comment">// 重写Start方法</span></span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        position1.x = <span class="number">1</span>; </span><br><span class="line">        position1.y = <span class="number">2</span>;</span><br><span class="line">        position1.z = <span class="number">2</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Vector3类中也定义了一些常量，例如Vector.up等同于Vector(0, 1, 0)，这样可以简化代码。这些常量对应的值如下表所示。</p>
+<table>
+<thead>
+<tr>
+<th align="left">常量</th>
+<th align="left">值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Vector3.zero</td>
+<td align="left">Vector(0,0,0)</td>
+</tr>
+<tr>
+<td align="left">Vector3.one</td>
+<td align="left">Vector(1,1,1)</td>
+</tr>
+<tr>
+<td align="left">Vector3.forward</td>
+<td align="left">Vector(0,0,1)</td>
+</tr>
+<tr>
+<td align="left">Vector3.up</td>
+<td align="left">Vector(0,1,0)</td>
+</tr>
+<tr>
+<td align="left">Vector3.right</td>
+<td align="left">Vector(1,0,0)</td>
+</tr>
+</tbody></table>
+<p>Vector3类中有很多对向量进行操纵的方法，例如想要获得两点之间的距离时，可以使用Distance方法来完成。这些方法的具体作用如下表所示。<br>| 方法  | 作用 |<br>| :———— | :———— |<br>| Lerp  | 两个向量之间的线性插值  |<br>| Slerp  | 在两个向量之间进行球形插值  |<br>| OrthoNormalize  | 使向量规范化并且彼此相互垂直  |<br>| MoveTowards  | 从当前的位置移向目标  |<br>| RotateTowards  | 当前的向量转向目标  |<br>| SmoothDamp  | 随着时间的推移，逐渐改变一个向量朝向预期的目标  |<br>| Scale  | 两个矢量组件对应相乘  |<br>| Cross  | 两个向量的交叉乘积  |<br>| Reflect | 沿着法线反射向量  |<br>| Dot  | 两个向量的点乘积  |<br>| Project  | 投影一个向量到另一个向量  |<br>| Angle  | 返回两个向量的夹角  |<br>| Distance  |  返回两点之间的距离 |<br>| ClampMagnitude  | 返回向量的长度，最大不超过maxLength所指示的长度 |<br>| Min  | 返回两个向量中长度较小的向量  |<br>| Max  | 返回两个向量中长度较大的向量  |<br>| operator +  | 两个向量相加  |<br>| operaton -  | 两个向量相减  |<br>| operatos *  | 两个向量相乘  |<br>| operator /  | 两个向量相除  |<br>| operator ==  | 两个向量是否相等  |<br>| operastor !=  | 两个向量是否不相等  |</p>
+<h3 id="成员变量和静态成员变量"><a href="#成员变量和静态成员变量" class="headerlink" title="成员变量和静态成员变量"></a>成员变量和静态成员变量</h3><p>一般情况下，定义在方法体外的变量是成员变量，如果这个变量为public类型的，就可以在属性查看器看到，若在属性查看器对它的值进行修改，它的值就会随着项目一起自动保存。C#脚本如下。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">int</span> a = <span class="number">1</span>;</span><br></pre></td></tr></table></figure>
+
+<p>可以在属性查看器中看到这个变量，名字为“a”，它默认显示的值为“1”，读者可以随时在属性查看器中修改它的值。</p>
+<p>如果声明的是一个组件类型的变量（类似GameObject、Transform、Rigidbody等），需要在属性查看器中拖曳游戏对象到变量处并确定它的值。具体操作时可以使用如下的C#代码片段来实现。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">NewBehaviourScript</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> Transform ren; <span class="comment">// 声明一个Transform组件</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span> (Vector3.Distance(ren.position, transform.position) &lt; <span class="number">10</span>)  <span class="comment">// 如果ren和transform的距离小于10</span></span><br><span class="line">        &#123;</span><br><span class="line">            Debug.Log(ren.position);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以通过private关键字创建私有变量，此时在属性查看器中就不会显示该变量，避免其被错误地修改，具体操作时可以使用如下的C#代码片段来实现。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">NewBehaviourScript</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> Collider collider; <span class="comment">// 声明私有的collider组件</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">OnCollisionEnter</span>(<span class="params">Collision, collisionInfo</span>) <span class="comment">// 重写OnCollisionEnter方法</span></span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        collider = collisionInfo.collider; <span class="comment">// 获取Collider组件</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在C#脚本中可以通过static关键字来创建全局变量，这样就可以在不同脚本间调用这个变量。具体操作时可以使用如下的C#代码片段来实现。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> test;</span><br></pre></td></tr></table></figure>
+
+<p>如果想从另外一个脚本中调用变量“Test”，读者可以通过“脚本名.变量名”的方法来调用。具体操作时可以使用如下的C#代码片段来实现。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">HelloWorld</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Test.test = <span class="number">1</span>; <span class="comment">// 为“Test”脚本中的“test”变量赋值</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="实例化游戏对象"><a href="#实例化游戏对象" class="headerlink" title="实例化游戏对象"></a>实例化游戏对象</h3><p>Unity中如果想创建游戏对象，可以通过创建游戏对象菜单在场景中创建游戏对象（这些游戏对象在场景加载的时候被创建出来），也可以在脚本中动态地创建游戏对象。在游戏运行的过程中，根据需要在脚本中实例化游戏对象的这些方法更加灵活。</p>
+<p>Unity中如果想创建很多相同的物体（如射击出去的子弹、保龄球瓶等）时，可以通过实例化（Instantiate）快速实现，而且实例化出来的游戏对象包含了这个对象所有的属性，就能保证原封不动地创建所需的对象。实例化在Unity中有很多用途，充分地使用它非常必要。</p>
+<p>例如，创建一个脚本“Hit.cs”，该脚本的功能为当一个碰撞体撞击到一个物体时，销毁这个物体，并在原来的位置实例化一个损坏的物体。该脚本的代码如下所示。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">NewBehaviourScript</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> GameObject explosion; <span class="comment">// 声明游戏对象引用</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">OnCollisionEnter</span>(<span class="params"></span>) <span class="comment">// 重写OnCollisionEnter方法</span></span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Destroy(gameObject, <span class="number">1</span>); <span class="comment">// 撞击发生1s后销毁对象</span></span><br><span class="line">        GameObject theClonedExplosion = Instantiate(explosion, transform.position, transform.rotation) <span class="keyword">as</span> GameObject; <span class="comment">// 在物体原来的位置实例化一个损坏的物体</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Destroy(gameObject,n)方法是在ns后销毁物体。如果想立刻销毁物体可以使用DestroyImmediate(gameObject.boolean)，如果参数的布尔值为true，就会立刻销毁物体。</p>
+<h3 id="协同程序和中断"><a href="#协同程序和中断" class="headerlink" title="协同程序和中断"></a>协同程序和中断</h3><p>协同程序，即在主程序运行时同时开启另一段逻辑处理，来协同当前程序的执行，但它与多线程程序不同，所有的协同程序都是在主线程中运行的，它还是一个单线程程序。在Unity中可以通过StartCoroutine方法来启动一个协同程序。</p>
+<p>StartCoroutine方法为MonoBehaviour类中的一个方法，也就是说该方法必须在MonoBehaviour或维承于MonoBehaviour的类中调用。StartCoroutine方法可以使用返回值作为IEnumerator类型方法的参数。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">NewBehaviourScript</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        StartCoroutine(doThing());  <span class="comment">// 开启协同程序</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">IEnumerator <span class="title">doThing</span>(<span class="params"></span>) <span class="comment">// 声明doThing方法</span></span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Debug.Log(<span class="string">"dothing"</span>); </span><br><span class="line">        <span class="keyword">yield</span> <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>协同程序中可以使用yield关键字来中断协同程序，也可以使用WaitForSeconds类的实例化对象让协同程序休眠。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">yield</span> return new <span class="title">WaitForSeconds</span>(<span class="params"><span class="number">2</span></span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>可以将多个协同程序进行连接，创建一个脚本，该脚本功能为在Start方法开启doThing1协同程序，在doThing1协同程序中开启并等待执行doThing2协同程序，doThing2协同程序休眠2s然后打印“doThing2”提示信息，doThing2协同程序执行完后返回doThing1协同程序然后打印“doThing1”提示信息，具体代码如下。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">NewBehaviourScript</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        StartCoroutine(doThing1()); <span class="comment">// 开启doThing1协同程序</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">IEnumerator <span class="title">doThing1</span>(<span class="params"></span>) <span class="comment">// 声明doThing1方法</span></span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">yield</span> return <span class="title">StartCoroutine</span>(<span class="params">doThing2</span>)</span>; <span class="comment">// 开启doThing2协同程序</span></span><br><span class="line">        Debug.Log(<span class="string">"dothing1"</span>); </span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">IEnumerator <span class="title">doThing2</span>(<span class="params"></span>) <span class="comment">// 声明doThing2方法</span></span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">yield</span> return new <span class="title">WaitForSeconds</span>(<span class="params"><span class="number">2</span></span>)</span>; <span class="comment">// 协同程序休眠2s</span></span><br><span class="line">        Debug.Log(<span class="string">"dothing2"</span>); </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="一些重要的类"><a href="#一些重要的类" class="headerlink" title="一些重要的类"></a>一些重要的类</h3><h4 id="MonoBehaviour类"><a href="#MonoBehaviour类" class="headerlink" title="MonoBehaviour类"></a>MonoBehaviour类</h4><p>MonoBehaviour类是每个脚本的基类，其继承自Behaviour类。在C#脚本中，必须直接或间接地继承MonoBehaviour类，MonoBehaviour类中的一些方法可以重写，这些方法会被系统在固定的时间回调，常用的可以重写的方法如下表所示。<br>| 方法  | 说明  |<br>| :———— | :———— |<br>| Update  | 当脚本启用后，该方法在每一帧被调用  |<br>| FixedUpdate  | 当脚本启用后，这个方法会在固定的物理时间步调调用一次  |<br>| Awake  | 当一个脚本实例被载入时该方法被调用  |<br>| Start  | 该方法仅在Update方法第一次被调用前调用 |<br>| OnCollisionEnter  | 当刚体撞击碰撞体或碰撞体撞击刚体时该方法被调用  |<br>| OnEnable  | 当对象变为可用或激活状态时该方法被调用  |<br>| OnDisable  | 当对象变为不可用或非激活状态时该方法被调用  |<br>| OnDestroy  | 当对象被销毁时该方法被调用  |<br>| OnGUI  | 渲染和处理GUI事件时调用  |</p>
+<p>MonoBehaviour类中有许多可以被子类继承的成员变量，这些成员变量可以在脚本中直接使用，常用的可继承的成员变量如下表所示。<br>| 成员变量  | 说明  |<br>| :———— | :———— |<br>| enabled  | 启用行为被更新，禁用行为不更新 |<br>| transform  | 附加到游戏物体的Transform组件（如无附加则为空）  |<br>| rigidbody  | 附加到游戏物体的Rigidbody组件（如无謝加则为空）  |<br>| camera  | 附加到游戏物体的Camera组件（如无附加则为空）  |<br>| light  | 附加到游戏物体的Light组件（如无附加则为空)  |<br>| animation  | 附加到游戏物体的Animation组件（如无附加则为空）  |<br>| constantForce  | 附加到游戏物体的ConstantForce组件（如无附加则为空）  |<br>| renderer  | 附加到游戏物体的Renderer组件（如无附加则为空）  |<br>| audio Source  | 附加到游戏物体的AndioSource组件（如无附加则为空）  |<br>| guiText  | 附加到游戏物体的GUIText组件（如无附加则为空）  |<br>| collider  | 附加到游戏物体的Collider组件（如无附加则为空） |<br>| particleEmitter  | 附加到游戏物体的ParticleEmitter组件（如无附加则为空） |<br>| gameObject  | 组件附加的游戏物体，一个组件总是被附加到一个游戏物体  |<br>| tag  | 游戏物体的标签  |</p>
+<p>MonoBehaviour类中有许多可以被子类继承的成员方法，这些成员方法可以直接在子类中使用。常用的可继承的成员方法如下表所示。</p>
+<table>
+<thead>
+<tr>
+<th align="left">成员方法</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">GetComnonent</td>
+<td align="left">返阿游戏物体上指定名称的组作</td>
+</tr>
+<tr>
+<td align="left">GetComponentInChildren</td>
+<td align="left">返回游戏对象及其子对象上指定类型的第一个找到的组件</td>
+</tr>
+<tr>
+<td align="left">GetComponents</td>
+<td align="left">返回游戏物体上指定名称的全部组件</td>
+</tr>
+<tr>
+<td align="left">SendMessage</td>
+<td align="left">在游戏物体每一个脚本上调用指定名称的方法</td>
+</tr>
+<tr>
+<td align="left">Instantiate</td>
+<td align="left">实例化游戏对象</td>
+</tr>
+<tr>
+<td align="left">Destroy</td>
+<td align="left">删除一个游戏物体、组件或资源</td>
+</tr>
+<tr>
+<td align="left">DestroyImmediate</td>
+<td align="left">立即销效物体</td>
+</tr>
+<tr>
+<td align="left">FindObjectsOfType</td>
+<td align="left">返回指定类型的所有激活的加载的物体列表</td>
+</tr>
+<tr>
+<td align="left">FindObjectOType</td>
+<td align="left">返同指定类型第一个激活的加载的物体</td>
+</tr>
+</tbody></table>
+<h4 id="Transform类"><a href="#Transform类" class="headerlink" title="Transform类"></a>Transform类</h4><p>场景中的每一个物体都有一个“Transform”组件，它就是Transform类实例化的对象，用于储存并操控物体的位置、旋转和缩放，每一个Transform可以有一个父级，允许分层次应用位置、旋转和缩放。可以在“Hierarchy”面板查看层次关系。Transform类中包含了很多的成员变量，常用的成员变量如下表所示。<br>| 成员方法  | 说明  |<br>| :———— | :———— |<br>| position  | 在世界空间坐标中游戏对象的位置  |<br>| localPosition  | 相对于父级的变换的位置  |<br>| eulerAngles  | 物体旋转的欧拉角  |<br>| localEulerAngles  | 相对于父级旋转的欧拉角  |<br>| right  | 在世界空间坐标变换的红色轴。也就是x轴  |<br>| up  | 在世界空间坐标变换的绿色轴。也就是y轴  |<br>| forward  | 在世界空间坐标变换的蓝色轴。也就是z轴  |<br>| rotation  | 在世界空间坐标物体变换的旋转角度  |<br>| localRotation  | 物体变换的旋转角度相对于父级的物体变换的旋转角度  |<br>| localScale  | 相对于父级物体变换的缩放  |<br>| parent  | 物体变换的父级 |<br>| worldToLocalMatrix  | 从世界坐标转为自身坐标的矩阵变换（只读）  |<br>| localToWorldMatrix  | 从自身坐标转为世界坐标的矩阵变换（只读）  |<br>| childCount  | 变换的子物体数量  |<br>| lossyScale  | 物体的全局缩放（只读）  |</p>
+<p>Transform类中也包含了很多的成员方法。常用的成员方法如下表所示。<br>| 成员方法  | 说明  |<br>| :———— | :———— |<br>| Translate  | 移动游戏对象的方向和距离  |<br>| Rotate  | 应用一个欧拉角的旋转角度  |<br>| RotateAround  | 按照指定角度通过在世界坐标轴旋转物体  |<br>| LookAt  | 旋转物体，这样指向目标的当前位置  |<br>| TransformDirection  | 从自身坐标到世界坐标变换方向  |<br>| InverseTransformDirection  | 变换方向从世界坐标到自身坐标  |<br>| TransformPoint  | 变换位置从自身坐标到世界坐标  |<br>| InverseTransformPoint  | 变换位置从世界坐标到自身坐标  |<br>| DetachChildren  | 所有子物体解除父子关系  |<br>| IsChildOf  | 这个变换是否是父级的子物体  |</p>
+<h4 id="Rigidbody类"><a href="#Rigidbody类" class="headerlink" title="Rigidbody类"></a>Rigidbody类</h4><p>“Rigidbody”组件可以模拟物体在物理效果下的状态，它就是Rigidbody类实例化的对象，它可以让物体接受力和扭矩，让物体相对真实地移动，如果一个物体想被重力所约束，其必须含有Rigidbody组件。<br>Rigidbody类中包含了很多的成员变量，常用的成员变量如下表所示。</p>
+<table>
+<thead>
+<tr>
+<th align="left">成员变量</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">velocity</td>
+<td align="left">刚体的速度向量</td>
+</tr>
+<tr>
+<td align="left">angularVelocity</td>
+<td align="left">刚体的角速度向量</td>
+</tr>
+<tr>
+<td align="left">drag</td>
+<td align="left">物体的阻力</td>
+</tr>
+<tr>
+<td align="left">angularDrag</td>
+<td align="left">物体的角阻力</td>
+</tr>
+<tr>
+<td align="left">mass</td>
+<td align="left">刚体的质量</td>
+</tr>
+<tr>
+<td align="left">useGravity</td>
+<td align="left">控制重力是否影响整个刚体</td>
+</tr>
+<tr>
+<td align="left">isKinematic</td>
+<td align="left">控制物理是否影响这个刚体</td>
+</tr>
+<tr>
+<td align="left">freezeRotation</td>
+<td align="left">控制物理是否改变物体的旋转</td>
+</tr>
+<tr>
+<td align="left">collisionDetectionMode</td>
+<td align="left">刚体的碰撞检测模式</td>
+</tr>
+<tr>
+<td align="left">centerOfMass</td>
+<td align="left">相对于变换原点的重心</td>
+</tr>
+<tr>
+<td align="left">worldCenterOfMass</td>
+<td align="left">在世界坐标空间的刚体的重心（只读）</td>
+</tr>
+<tr>
+<td align="left">inertiaTensorRotation</td>
+<td align="left">惯性张量的旋转</td>
+</tr>
+<tr>
+<td align="left">inertiaTensor</td>
+<td align="left">相对于重心的质量的惯性张量对角线</td>
+</tr>
+<tr>
+<td align="left">detectCollisions</td>
+<td align="left">碰撞检测应否启用（默认总是启用的）</td>
+</tr>
+<tr>
+<td align="left">useConeFriction</td>
+<td align="left">用于该刚体的锥形摩擦力</td>
+</tr>
+<tr>
+<td align="left">position</td>
+<td align="left">该刚体的位置</td>
+</tr>
+<tr>
+<td align="left">rotation</td>
+<td align="left">该刚体的旋转</td>
+</tr>
+<tr>
+<td align="left">interpolation</td>
+<td align="left">插值允许你以固定的帧率平滑物理运行效果</td>
+</tr>
+<tr>
+<td align="left">solverIterationCount</td>
+<td align="left">允许覆盖每个刚体的求解迭代次数</td>
+</tr>
+<tr>
+<td align="left">sleepVelocity</td>
+<td align="left">线性速度，低于该值的物体将开始休眠</td>
+</tr>
+<tr>
+<td align="left">sleepAngularVelocity</td>
+<td align="left">角速度，低于该值的物体将开始休眠</td>
+</tr>
+<tr>
+<td align="left">MaxAngularVelocity</td>
+<td align="left">刚体的最大角速度</td>
+</tr>
+</tbody></table>
+<p>Rigidbody类中也包含了很多的成员方法，常用的成员方法如下表所示。</p>
+<table>
+<thead>
+<tr>
+<th align="left">成员方法</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">SetDensity</td>
+<td align="left">基于附加的碰撞器假设一个固定的密度设置质量</td>
+</tr>
+<tr>
+<td align="left">AddForce</td>
+<td align="left">施加一个力到刚体</td>
+</tr>
+<tr>
+<td align="left">AddRelativeForce</td>
+<td align="left">施加一个力到刚体，相对于自身的系统坐标</td>
+</tr>
+<tr>
+<td align="left">AddTorque</td>
+<td align="left">施加一个力矩到刚体</td>
+</tr>
+<tr>
+<td align="left">AddRelativeTorque</td>
+<td align="left">施加一个力矩到刚体，相对于自身的系统坐标</td>
+</tr>
+<tr>
+<td align="left">AddForceAtPosition</td>
+<td align="left">在指定位置施加一个力</td>
+</tr>
+<tr>
+<td align="left">AddExplosionForce</td>
+<td align="left">施加一个力到刚体来模拟爆炸效果，爆炸力将随着到刚体的距离线性衰减</td>
+</tr>
+<tr>
+<td align="left">ClosestPointOnBounds</td>
+<td align="left">到附加的碰撞器包围盒上的最近点</td>
+</tr>
+<tr>
+<td align="left">GetRelativePointVelocity</td>
+<td align="left">相对于刚体在指定点的速度</td>
+</tr>
+<tr>
+<td align="left">GetPointVelocity</td>
+<td align="left">刚体在世界坐标空间中指定点的速度</td>
+</tr>
+<tr>
+<td align="left">MovePosition</td>
+<td align="left">移动刚体到指定位置</td>
+</tr>
+<tr>
+<td align="left">MoveRotation</td>
+<td align="left">旋转刚体到指定角度</td>
+</tr>
+<tr>
+<td align="left">Sleep</td>
+<td align="left">强制一个刚体休眠至少一帧</td>
+</tr>
+<tr>
+<td align="left">IsSleeping</td>
+<td align="left">判断刚体是否在休眠</td>
+</tr>
+<tr>
+<td align="left">WakeUp</td>
+<td align="left">强制唤解在休眠状态中的刚体</td>
+</tr>
+</tbody></table>
+<h4 id="CharacterController类"><a href="#CharacterController类" class="headerlink" title="CharacterController类"></a>CharacterController类</h4><p>角色控制器是CharacterController类的实例化对象，用于第三人称或第一人称游戏角色控制。它可以根据碰撞检测判断是否能够移动，而不必添加刚体和碰撞器。而且角色控制器不会受到力的影响。 CharacterController 类包含了很多的成员变量，常用的成员变量如下表所示。</p>
+<table>
+<thead>
+<tr>
+<th align="left">成员变量</th>
+<th align="left">说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">isGrounded</td>
+<td align="left">角色控制器是否触碰地面</td>
+</tr>
+<tr>
+<td align="left">velocity</td>
+<td align="left">角色控制器当前的相对速度</td>
+</tr>
+<tr>
+<td align="left">collisionFlags</td>
+<td align="left">在最近一次角色控制器移动方法调用时，角色控制器的哪个部分与周围环境相碰撞</td>
+</tr>
+<tr>
+<td align="left">radius</td>
+<td align="left">角色控制器的半径</td>
+</tr>
+<tr>
+<td align="left">height</td>
+<td align="left">角色控制器的高度</td>
+</tr>
+<tr>
+<td align="left">center</td>
+<td align="left">角色控制器的中心位置</td>
+</tr>
+<tr>
+<td align="left">slopeLimit</td>
+<td align="left">角色控制器的坡度度数限制</td>
+</tr>
+<tr>
+<td align="left">stepOffset</td>
+<td align="left">角色控制器的台阶偏移量（台阶高度）</td>
+</tr>
+<tr>
+<td align="left">detectCollisions</td>
+<td align="left">其他的刚体和角色控制器是否能够与本角色控制器相碰撞</td>
+</tr>
+</tbody></table>
+<p>CharacterController类中也包含了很多的成员方法，常用的成员方法如下表所示。<br>| 成员方法  | 说明  |<br>| :———— | :———— |<br>| SimpleMove  | 以一定的速度移动角色  |<br>| Move  | 一个更加复杂的移动函数，每次都绝对移动  |</p>
+<h2 id="性能优化"><a href="#性能优化" class="headerlink" title="性能优化"></a>性能优化</h2><p>Unity本身已经针对各个平台在功能上进行了大量的优化，保证了程序的顺利运行，但在使用Unity开发软件的过程中，培养良好的开发习惯，积累编程技巧，对开发人员是至关重要的。良好的开发习惯不仅能帮助开发人员编写健康的程序，还能达到事半功倍的效果。下面将介绍一些针对Unity开发的优化措施。<br>1.缓存组件查询<br>当通过GetComponent获取一个组件时，Unity必须从游戏物体里查找目标组件，如果是在Update方法中进行查找，就会影响运行速度。可以设置一个私有变量去储存这个组件，这样，Unity无需在每一帧中去查询组件。实现方法可以参考如下代码片段。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">NewBehaviourScript</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> Transform m_transform;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_transform = <span class="keyword">this</span>.transform;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_transform.Translate(<span class="keyword">new</span> Vector3(<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>2.使用内建数组<br>虽然ArrayList和Array用起来容易并且方便，但是相比较内建数组而言，前者和后者的速度还是有很大的差异。内建数组直接嵌入struct数据类型存入第一缓冲区里，不需要其他类型信息或者其他资源，因此用作缓存遍历更加快捷。实现代码如下。</p>
+<p>脚本编译</p>
+<p>作为一名Unity开发者，熟悉Unity脚本的编译步骤是很有必要的。这样可以让我们更加高效地编写自己的代码，如果代码出现了问题，还能有效地改正错误。由于脚本的编译顺序会涉及特殊文件夹，所以脚本的放置位置就非常重要了。<br>根据官方的解释，脚本的具体编译需要以下4步。</p>
+<p>(1)所有在Standard Assets. Pro Standard Assets和Plugins中的脚本将被首先编译。在这些文件夹之内的脚本不能直接访问这些文件夹以外的脚本,不能直接引用类或它的变量,但是可以使用GameObject.SendMessage与它们通信。</p>
+<p>(2)所有在Standard Assets/Editor, Pro Standard Assets/Editor和Plugins/Editor中的脚本接着被编译。如果想要使用UnityEditor命名空间,必须将你的脚本放置到这些文件夹。</p>
+<p>(3)然后所有在Assets/Editor外面的,并且不在(1)、 (2)中的脚本文件被编译。</p>
+<p>(4)所有在Assets/Editor中的脚本,最后被编译。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Unity游戏开发技术详解与典型案例/" rel="tag"># Unity游戏开发技术详解与典型案例</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/11/SceneManager-LoadScene/" rel="next" title="SceneManager.LoadScene">
+                <i class="fa fa-chevron-left"></i> SceneManager.LoadScene
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/12/创建第三人称3D游戏：玩家移动和动画/" rel="prev" title="创建第三人称3D游戏：玩家移动和动画">
+                创建第三人称3D游戏：玩家移动和动画 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">269</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">29</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2019/07/21/存储器和指针：指向何方？/" title="存储器和指针：指向何方？" target="_blank">存储器和指针：指向何方？</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/07/20/结构、联合与位字段：创建自己的字段/" title="结构、联合与位字段：创建自己的字段" target="_blank">结构、联合与位字段：创建自己的字段</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/07/20/第2章-算法/" title="第2章 算法" target="_blank">第2章 算法</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/07/20/C语言入门：进入C语言的世界/" title="C语言入门：进入C语言的世界" target="_blank">C语言入门：进入C语言的世界</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/07/19/多路查找树（B树）/" title="多路查找树（B树）" target="_blank">多路查找树（B树）</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#继承自MonoBehaviour类"><span class="nav-number">1.</span> <span class="nav-text">继承自MonoBehaviour类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#类名字必须匹配文件名"><span class="nav-number">2.</span> <span class="nav-text">类名字必须匹配文件名</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用Awake或Start方法初始化"><span class="nav-number">3.</span> <span class="nav-text">使用Awake或Start方法初始化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Unity脚本中协同程序有不同的语法规则"><span class="nav-number">4.</span> <span class="nav-text">Unity脚本中协同程序有不同的语法规则</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#只有满足特定情况变量才能显示在属性查看器中"><span class="nav-number">5.</span> <span class="nav-text">只有满足特定情况变量才能显示在属性查看器中</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#尽量避免使用构造函数"><span class="nav-number">6.</span> <span class="nav-text">尽量避免使用构造函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#断点"><span class="nav-number">7.</span> <span class="nav-text">断点</span></a></li></ol><li class="nav-item nav-level-1"><a class="nav-link" href="#常用操作"><span class="nav-number"></span> <span class="nav-text">常用操作</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#记录时间"><span class="nav-number">1.</span> <span class="nav-text">记录时间</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#访问游戏对象组件"><span class="nav-number">2.</span> <span class="nav-text">访问游戏对象组件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#访问其他游戏对象"><span class="nav-number">3.</span> <span class="nav-text">访问其他游戏对象</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#通过属性查看器指定参数"><span class="nav-number">3.1.</span> <span class="nav-text">通过属性查看器指定参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#确定对象的层次关系"><span class="nav-number">3.2.</span> <span class="nav-text">确定对象的层次关系</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过名字或标签获取游戏对象"><span class="nav-number">3.3.</span> <span class="nav-text">通过名字或标签获取游戏对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过传递参数来获取游戏对象"><span class="nav-number">3.4.</span> <span class="nav-text">通过传递参数来获取游戏对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#通过组件名称获取游戏对象"><span class="nav-number">3.5.</span> <span class="nav-text">通过组件名称获取游戏对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#向量"><span class="nav-number">3.6.</span> <span class="nav-text">向量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#成员变量和静态成员变量"><span class="nav-number">3.7.</span> <span class="nav-text">成员变量和静态成员变量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实例化游戏对象"><span class="nav-number">3.8.</span> <span class="nav-text">实例化游戏对象</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#协同程序和中断"><span class="nav-number">3.9.</span> <span class="nav-text">协同程序和中断</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#一些重要的类"><span class="nav-number">3.10.</span> <span class="nav-text">一些重要的类</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#MonoBehaviour类"><span class="nav-number">3.10.1.</span> <span class="nav-text">MonoBehaviour类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Transform类"><span class="nav-number">3.10.2.</span> <span class="nav-text">Transform类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Rigidbody类"><span class="nav-number">3.10.3.</span> <span class="nav-text">Rigidbody类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CharacterController类"><span class="nav-number">3.10.4.</span> <span class="nav-text">CharacterController类</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#性能优化"><span class="nav-number">4.</span> <span class="nav-text">性能优化</span></a></li></ol></li></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">1.3m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">20:03</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

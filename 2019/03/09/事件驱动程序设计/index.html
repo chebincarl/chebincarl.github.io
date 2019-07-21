@@ -1,0 +1,1483 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="对于一段时间内按一定规律执行的代码，MonoBehaviour对象的Update事件提供了一个较为方便的环境，并可跨越多个帧以及多个场景。当创建某些持久行为时，例如针对敌方角色或连续运动的人工智能行为，除了编写Update函数之外似乎别无他法，其中包含了大量的if和switch语句，取决于对象的当前需求，以使代码分支于不同的方向。当通过该方式考察Update事件时，即作为默认函数实现某些复杂行为，">
+<meta name="keywords" content="Unity脚本设计">
+<meta property="og:type" content="article">
+<meta property="og:title" content="事件驱动程序设计">
+<meta property="og:url" content="http://chebincarl.github.io/2019/03/09/事件驱动程序设计/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="对于一段时间内按一定规律执行的代码，MonoBehaviour对象的Update事件提供了一个较为方便的环境，并可跨越多个帧以及多个场景。当创建某些持久行为时，例如针对敌方角色或连续运动的人工智能行为，除了编写Update函数之外似乎别无他法，其中包含了大量的if和switch语句，取决于对象的当前需求，以使代码分支于不同的方向。当通过该方式考察Update事件时，即作为默认函数实现某些复杂行为，">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-07-17T14:44:48.616Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="事件驱动程序设计">
+<meta name="twitter:description" content="对于一段时间内按一定规律执行的代码，MonoBehaviour对象的Update事件提供了一个较为方便的环境，并可跨越多个帧以及多个场景。当创建某些持久行为时，例如针对敌方角色或连续运动的人工智能行为，除了编写Update函数之外似乎别无他法，其中包含了大量的if和switch语句，取决于对象的当前需求，以使代码分支于不同的方向。当通过该方式考察Update事件时，即作为默认函数实现某些复杂行为，">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/03/09/事件驱动程序设计/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>事件驱动程序设计 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">文章看10遍，动手做10遍，自然就会了</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/03/09/事件驱动程序设计/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">事件驱动程序设计
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-03-09 10:53:28" itemprop="dateCreated datePublished" datetime="2019-03-09T10:53:28+08:00">2019-03-09</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-07-17 22:44:48" itemprop="dateModified" datetime="2019-07-17T22:44:48+08:00">2019-07-17</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Unity/" itemprop="url" rel="index"><span itemprop="name">Unity</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">24k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">22 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>对于一段时间内按一定规律执行的代码，MonoBehaviour对象的Update事件提供了一个较为方便的环境，并可跨越多个帧以及多个场景。当创建某些持久行为时，例如针对敌方角色或连续运动的人工智能行为，除了编写Update函数之外似乎别无他法，其中包含了大量的if和switch语句，取决于对象的当前需求，以使代码分支于不同的方向。当通过该方式考察Update事件时，即作为默认函数实现某些复杂行为，对于大型、复杂场景，这将会产生性能问题。当对此经过深入分析后，不难发现其中所隐藏的原因。一般情况下，游戏中涵盖了大量的行为，场景中时刻会出现各种事件，仅在Update函数中对此予以实现往往不切实际。例如，考察某一敌方角色，此类角色需要了解玩家何时进入或离开其视线，何时生命值处于危险状态，何时武器失效，何时身处于危险的地形中，何时遭受攻击，何时应处于运动状态等。初看之下，由于敌方角色需要及时了解此类属性的变化时机（作为玩家输入结果），因而需对此予以持续关注，这也是Update函数的主要适用原因。但这里存在一类较好的替代方案，即事件驱动编程。当采用事件方式考察游戏和应用程序时，性能将得到极大的提升。本章主要讨论事件问题，以及如何在游戏中对其加以管理。</p>
+<a id="more"></a>
+
+<h1 id="事件"><a href="#事件" class="headerlink" title="事件"></a>事件</h1><p>游戏场景世界可表示为一个确定性系统。在Unity中，场景定义为3D笛卡尔空间和时间轴，其中包含了某些GameObject。各种事件在游戏逻辑和代码的支配下产生于该空间内。例如，对象仅可在代码和特定条件允许时方可处于运动状态，如玩家按下某个键时。从中可以看出，行为并非是随机状态而是彼此间相互关联的–对象仅在产生键盘事件时处于运动状态。因此，动作间往往存在一个重要的连接，且动作间存在某种传递行为。这一类连接称作事件，各个独立的连接表示为独立的事件。事件往往表示为被动状态（非主动态），体现了某种时机而非自身动作，例如按下某个键、鼠标单击操作、对象进入碰撞器空间、玩家遭受攻击等，这均可视为事件的各种示例，但并未表明程序的执行内容，只是展现了所发生的某种情形。作为一类通用概念，事件驱动编程始于事件的识别，并将游戏中的各种情形视为事件的实例化结果。也就是说，事件与时间相关，理解游戏事件对于后续内容的学习十分有帮助，游戏中的全部动作均直接响应于特别的事件。特别地，事件连接于响应行为，即事件发生后将触发某一响应操作。进一步讲，该响应结果可再次形成某一事件，并触发后续响应行为等。换而言之，游戏场景表示为一个完整的、由事件和响应构成的集成系统。通过这一方式考察游戏场景时，随之而来的问题则是，如何通过Update函数提升性能，并使得各种行为在各帧中向前推进。对此，需要获取对应方式以降低事件的频度。该方案略显抽象，但却十分重要。为了进一步展示这一概念，下面对敌方角色进行考察。在于玩家战斗过程中，该角色将对玩家开火射击。</p>
+<p>在游戏体验中，敌方角色需要跟踪多个属性。首先是生命值，当该值较小时，敌方角色会搜寻医药箱，在其辅助下，其生命值将得到迅速提升。其次是弹药量，若该值较小，该敌方角色将收集更多的弹药。另外，该角色还需判断何时向玩家射击。例如，仅当视线未被阻挡时，敌方角色即向玩家射击。通过上述方案，可在动作间确定某些连接，即事件。但在进一步讨论之前，还需查看基于Update函数的、此类行为的实现方式，如下代码所示。随后，还将进一步讨论事件对于该实现方案的改进方法。此代码绑定在敌方角色的对象上。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;	</span><br><span class="line">	<span class="comment">// 检查血量</span></span><br><span class="line">	<span class="keyword">if</span> (Health &lt; <span class="number">0</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		Die();</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// 血量低就寻找医药箱</span></span><br><span class="line">	<span class="keyword">if</span> (Health &lt; <span class="number">20</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		RunAndFindHealthRestore();</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 子弹没有了就寻找</span></span><br><span class="line">	<span class="keyword">if</span> (Ammo &lt;= <span class="number">0</span>)</span><br><span class="line">	&#123;</span><br><span class="line">		SearchMore();</span><br><span class="line">		<span class="keyword">return</span>;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 看见游戏玩家就射击</span></span><br><span class="line">	<span class="keyword">if</span> (HaveLineOfSight)</span><br><span class="line">	&#123;</span><br><span class="line">		FireAtPlayer();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上述代码中，Update函数包含了大量的条件检测和响应操作。实际上，Update函数希望将事件处理和响应行为合二为一，但实际结果则包含了某些冗余处理过程。当考察不同处理间的事件连接时（生命值和弹药量检测），将会发现代码可实现进一步的优化。例如，弹药量仅在两种情形下发生变化：敌方角色射击时，或者弹药被再次填充时。类似地，生命值的变化也包含两种情形：当敌方角色遭受玩家攻击时，或者该角色找到了第一个医药箱。对于前者，生命值将有所减少；而对于后者，生命值将增加。</p>
+<p>鉴于属性发生变化（事件），因而对应值需要得到进一步确认。如下代码重构了敌方角色对象，其中包含了C#属性以及简化后的Update函数。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">EnemyObject</span> : <span class="title">MonoBehaviour</span> </span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">// C# accessors for private variable</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">int</span> Health</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">get</span>&#123; <span class="keyword">return</span> _health;&#125;</span><br><span class="line">		<span class="keyword">set</span> </span><br><span class="line">		&#123;</span><br><span class="line">			<span class="comment">// Clamp(固定) health between 0-100 </span></span><br><span class="line">			_health = Mathf.Clamp(<span class="keyword">value</span>, <span class="number">0</span>, <span class="number">100</span>);</span><br><span class="line">			<span class="comment">// Check if dead</span></span><br><span class="line">			<span class="keyword">if</span> (_health &lt;= <span class="number">0</span>)</span><br><span class="line">			&#123;</span><br><span class="line">				OnDead();</span><br><span class="line">				<span class="keyword">return</span>;</span><br><span class="line">			&#125;</span><br><span class="line">			<span class="comment">// Check health and raise event if required</span></span><br><span class="line">			<span class="keyword">if</span> (_health &lt;= <span class="number">20</span>)</span><br><span class="line">			&#123;</span><br><span class="line">				OnHealthLow();</span><br><span class="line">				<span class="keyword">return</span>;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">int</span> Ammo</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="keyword">get</span> &#123;<span class="keyword">return</span> _ammo;&#125;</span><br><span class="line">		<span class="keyword">set</span> </span><br><span class="line">		&#123;</span><br><span class="line">			<span class="comment">// Clamp ammo between 0-50</span></span><br><span class="line">			_ammo = Mathf.Clamp(<span class="keyword">value</span>, <span class="number">0</span>, <span class="number">50</span>);</span><br><span class="line">			<span class="comment">// Check if ammo empty</span></span><br><span class="line">			<span class="keyword">if</span>(_ammo &lt;= <span class="number">0</span>)</span><br><span class="line">			&#123;</span><br><span class="line">				<span class="comment">// Call expired event</span></span><br><span class="line">				OnAmmoExpired();</span><br><span class="line">				<span class="keyword">return</span>;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// Internal variables for health and ammo</span></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> _health = <span class="number">100</span>;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> _ammo = <span class="number">50</span>;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>	&#123;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">OnHealthLow</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>	&#123;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">OnDead</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>	&#123;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">OnAmmoExpired</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>	&#123;</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>敌方角色类重新设计为事件驱动模式，Ammo和Health这一类属性不再设置于Update函数中，而是采用了赋值操作。自此，根据最新赋值结果将生成相关事件（函数触发写在了属性里）。当采用事件驱动设计时，性能将得到优化，同时代码将更为简洁。具体而言，在4-1代码中，Update函数的内容将大大减少，并消除了某些数值检测操作。相反，示例代码4-2中采用了特定的数值事件驱动代码，且仅在相关时刻对其进行调用。</p>
+<h1 id="事件管理"><a href="#事件管理" class="headerlink" title="事件管理"></a>事件管理</h1><p>事件驱动程序设计大大简化了操作过程，但问题也随之而来。特别地，在上面的代码中，基于生命值和弹药量的C#属性用于检测、验证相关变化，并于随后生成相关事件（例如OnDead事件）。该过程理论上工作良好，至少可将自身事件告知自身。然而，如果该角色需要了解另一个敌方角色的生命值，或者需要知晓其他角色何时被射杀，情况又当如何？当然，对于特定情况，可返回至上面代码中的敌方角色类并对其进行修正，随后可利用相关函数，例如SendMessage函数，针对其他角色（而非仅针对当前角色）调用OnDead事件，但这依然无法解决一般意义上的问题。理想状态下，各个对象应可随意监听各种事件类型并被告知，仿佛是自身事件一样。因而，当前问题则是如何对优化后的系统进行编码，并按照当前方式简化事件管理系统。简而言之，需要一个允许对象倾听特定事件的EventManager类（新的专门管理的类），该系统依赖于下列3个核心概念。</p>
+<ul>
+<li><p>EventListener：监听器是指需要被告知所发生的事件，甚至是自身事件的对象。在实际操作过程中，几乎每个对象均可针对至少一个事件定义为监听器。例如，某一敌方角色需要了解其他角色的生命值和弹药量。此时，该对象应至少针对两个独立事件定义为一个监听器。因此，无论何时对象需要被告知所发生的事件时，该对象均可定义为一个监听器。</p>
+</li>
+<li><p>EventPoster：与监听器相比，当对象检测到所发生的事件后，应发送与其相关的消息，并告知全部监听器。在上面的代码中，敌方角色类通过相关属性检测Ammo和Health事件，并于随后在必要时调用内部事件。对此，对象需要在全局层次上生成相关事件。</p>
+</li>
+<li><p>EventManager：最后，还需定义一个单例持久对象EventManager，并提供全局访问行为。该对象可将监听器连接至消息传递者。另外，该对象接收传递者发送的事件消息，并于随后将其以事件形式传递至相应的监听器中。</p>
+</li>
+</ul>
+<h2 id="基于接口的事件管理"><a href="#基于接口的事件管理" class="headerlink" title="基于接口的事件管理"></a>基于接口的事件管理</h2><p>事件处理系统中的基本实体是监听器–可向其通知特定的事件。如果可能，任意对象和类均可定义为监听器，并简单地向其通知特定的事件。简单地讲，监听器需要通过EventManager并针对一个或多个特定事件注册为监听器。当产生相关事件时，可通过函数调用消息监听器。因此，从技术角度上讲，对于EventManager而言这将会产生类型问题。也就是说，如果监听器可表示为任意类型的对象，管理器如何在其上调用某一事件？当然，前述内容中曾提到，可利用SendMessage或BroadcastMessage函数解决这一问题。实际上，网络上的某些事件处理系统即采用了这种处理方式，例如NotificationCenter，然而，鉴于SendMessage或BroadcastMessage函数过度依赖于反射机制，本章将避免使用，而是采用了多态机制。特别地，本章将定义一个接口，且全部监听器对象均继承自该接口。</p>
+<p>在C#语言中，接口类似于一个空的抽象基类。接口将方法和函数集整合至单一模板单元中，这一点与类十分相似。然而，与类结构不同，接口仅可定义函数原型，例如名称、返回类型以及函数的参数，且不可于其中定义函数体。其原因在于，接口仅定义了派生类应有的全部函数集。派生类在必要时须实现对应函数，接口的存在使得其他类可通过多态机制调用函数，且无须了解各个派生类的具体类型。据此，接口适用于创建Listener对象。通过定义Listener接口（全部对象均继承自该接口），各对象均可定义为事件监听器。示例代码显示了简单的Listener接口。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"> </span><br><span class="line"><span class="comment">//Enum defining all possible game events</span></span><br><span class="line"><span class="comment">//More events should be added to the list</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span> EVENT_TYPE&#123;</span><br><span class="line">    GAME_INIT,</span><br><span class="line">    GAME_END,</span><br><span class="line">    AMMO_EMPTY,</span><br><span class="line">    HEALTH_CHANGE,</span><br><span class="line">    DEAD</span><br><span class="line">&#125;;</span><br><span class="line"> </span><br><span class="line"><span class="comment"><span class="doctag">///</span>Listener interface to be implemented on Listener classes</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title">IListener</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//Notification function invoked when events happen.</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">OnEvent</span>(<span class="params">EVENT_TYPE Event_Type, Component Sender, Object Param = <span class="literal">null</span></span>)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>示例代码中的部分解释内容如下所示。</p>
+<ul>
+<li><p>第6到10行代码：枚举结构定义了可能发生的、完整的游戏事件列表。相应地，代码中仅列出了5种游戏事件，即GAME_INIT、GAME_END、AMMO_EMPTY、HEALTH_CHANGE以及DEAD，当然，用户还可定义多种事件。另外，也可仅采用整数对事件进行编码，此处采用枚举结构旨在提高代码的可读性。</p>
+</li>
+<li><p>第13到17行代码：监听器接口定义为IListener（C#接口），且仅支持一个事件，即OnEvent。该函数被全部派生类继承，针对注册的监听器，当产生某一事件时该函数将被管理器所调用。需注意的是，OnEvent仅表示为函数原型，而非函数体。</p>
+</li>
+</ul>
+<p>通过IListener接口，仅利用类继承机制即可根据任意对象创建监听器。也就是说，任意对象均可声明为监听器并接收事件。例如，MonoBehaviour组件可通过如下代码转化为监听器，并采用了多重继承机制，即继承自两个类。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">MyCustomListener</span> : <span class="title">MonoBehaviour</span>, <span class="title">IListener</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//Use this for initialization</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span> &#123;&#125;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">//Update is called once per frame</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span> &#123;&#125;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">//Implement OnEvent function to receive Events</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">OnEvent</span>(<span class="params">EVENT_TYPE Event_Type, Component Sender, Object Param= <span class="literal">null</span></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;   </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="定义EventManager"><a href="#定义EventManager" class="headerlink" title="定义EventManager"></a>定义EventManager</h2><p>如前所述，任意对象均可转化为监听器，但监听器自身仍需通过某种类型的管理器对象进行注册。因此，当产生相关事件时，管理器负责调用监听器上的事件。下面讨论管理器的具体实现细节。此处，管理器类称作EventManager，如示例代码所示。作为持久性单例对象，该类绑定至空场景对象GameObject上，并可通过静态实例属性被其他对象直接访问。代码中的注释内容列出了该类及其应用的更多信息。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Singleton EventManager to send events to listeners</span></span><br><span class="line"><span class="comment">// Works with IListener implementations</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">EventManager</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="meta">#<span class="meta-keyword">region</span> C# properties</span></span><br><span class="line">    <span class="comment">// Public access to instance.</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> EventManager Instance</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">get</span> &#123; <span class="keyword">return</span> instance; &#125;</span><br><span class="line">        <span class="keyword">set</span> &#123; &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">#<span class="meta-keyword">endregion</span></span></span><br><span class="line"> </span><br><span class="line">    <span class="meta">#<span class="meta-keyword">region</span> variables</span></span><br><span class="line">    <span class="comment">// Notifications Manager instance (singleton design pattern)</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> EventManager instance = <span class="literal">null</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// Array of listeners (all obiects registered for events).</span></span><br><span class="line">    <span class="keyword">private</span> Dictionary&lt;EVENT_TYPE, List&lt;IListener&gt;&gt; Listeners = <span class="keyword">new</span> Dictionary&lt;EVENT_TYPE, List&lt;IListener&gt;&gt;();</span><br><span class="line">    <span class="meta">#<span class="meta-keyword">endregion</span></span></span><br><span class="line"> </span><br><span class="line">    <span class="meta">#<span class="meta-keyword">region</span> methods</span></span><br><span class="line">    <span class="comment">// Called at start-up to initialize.</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Awake</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// If no instance exists, then assign this instance</span></span><br><span class="line">        <span class="keyword">if</span> (instance == <span class="literal">null</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            instance = <span class="keyword">this</span>;</span><br><span class="line">            DontDestroyOnLoad(gameObject);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            DestroyImmediate(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> Function to add listener to array of listeners</span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name = "Event_Type" &gt;</span>Event to Listen for<span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name = "Listener"&gt;</span>Object to listen for event<span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">AddListener</span>(<span class="params">EVENT_TYPE Event_Type, IListener Listener</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// List of listeners for this event</span></span><br><span class="line">        List&lt;IListener&gt; ListenList = <span class="literal">null</span>;</span><br><span class="line"> </span><br><span class="line">        <span class="comment">// Check existing event type key. If exists, add to list</span></span><br><span class="line">        <span class="keyword">if</span> (Listeners.TryGetValue(Event_Type, <span class="keyword">out</span> ListenList))</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// List exists, so add new item</span></span><br><span class="line">            ListenList.Add(Listener);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">        <span class="comment">// Otherwise create new list as dictionary key</span></span><br><span class="line">        ListenList = <span class="keyword">new</span> List&lt;IListener&gt;();</span><br><span class="line">        ListenList.Add(Listener);</span><br><span class="line">        Listeners.Add(Event_Type, ListenList);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> Function to post event to listeners</span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="Event_Type"&gt;</span>Event to invoke<span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name-"Sender"&gt;</span>Object invoking event<span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="Param"&gt;</span>Optional argument<span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">PostNotification</span>(<span class="params">EVENT_TYPE Event_Type, Component Sender, Object Param = <span class="literal">null</span></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// Notify all listeners of an event</span></span><br><span class="line"> </span><br><span class="line">        <span class="comment">// List of listeners for this event only.</span></span><br><span class="line">        List&lt;IListener&gt; ListenList = <span class="literal">null</span>;</span><br><span class="line"> </span><br><span class="line">        <span class="comment">// If no event exists, then exit</span></span><br><span class="line">        <span class="keyword">if</span> (!Listeners.TryGetValue(Event_Type, <span class="keyword">out</span> ListenList))</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line"> </span><br><span class="line">        <span class="comment">// Entry exists. Now notify appropriate listeners</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i &lt; ListenList.Count; i++)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (!ListenList[i].Equals(<span class="literal">null</span>))</span><br><span class="line">                ListenList[i].OnEvent(Event_Type, Sender, Param);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// Remove event from dictionary, including all listeners</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">RemoveEvent</span>(<span class="params">EVENT_TYPE Event_Type</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// Remove entry from dictionary</span></span><br><span class="line">        Listeners.Remove(Event_Type);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// Remove all redundant（多余的） entries from the Dictionary</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">RemoveRedundancies</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// Create new dictionary</span></span><br><span class="line">        Dictionary&lt;EVENT_TYPE, List&lt;IListener&gt;&gt; TmpListeners = <span class="keyword">new</span> Dictionary&lt;EVENT_TYPE, List&lt;IListener&gt;&gt;();</span><br><span class="line">        <span class="comment">// Cycle through all dictionary entries</span></span><br><span class="line">        <span class="keyword">foreach</span> (KeyValuePair&lt;EVENT_TYPE, List&lt;IListener&gt;&gt; Item <span class="keyword">in</span> Listeners)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// Cycle all listeners, remove null objects</span></span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = Item.Value.Count - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="comment">// If null, then remove item</span></span><br><span class="line">                <span class="keyword">if</span> (Item.Value[i].Equals(<span class="literal">null</span>))</span><br><span class="line">                    Item.Value.RemoveAt(i);</span><br><span class="line">            &#125;</span><br><span class="line"> </span><br><span class="line">            <span class="comment">// If items remain in list, then add to tmp dictionary</span></span><br><span class="line">            <span class="keyword">if</span> (Item.Value.Count &gt; <span class="number">0</span>)</span><br><span class="line">                TmpListeners.Add(Item.Key, Item.Value);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// Replace listeners object with new dictionary</span></span><br><span class="line">        Listeners = TmpListeners;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// Called on scene change. Clean up dictionary</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">OnLevelWasLoaded</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        RemoveRedundancies();</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="meta">#<span class="meta-keyword">endregion</span></span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>示例代码4-5中的部分解释内容如下所示。</p>
+<ul>
+<li><p>第3行：System.Collections.Generic命名空间可访问附加的Mono类，同时还包括Dictionary类。该类贯穿于整个EventManager类。简单地讲，Dictionary表示为2D数组，并根据键值对存储数值的数据库。</p>
+</li>
+<li><p>第3行：EventManager类继承自MonoBehaviour，且应与场景中的空GameObject绑定，并作为持久性单例对象存在。</p>
+</li>
+<li><p>第3行：private成员变量Listeners采用Dictionary类声明，该结构用于维护键中值对的哈希表数组，并可像数据库那样执行查找和搜索行为。EventManager类的键值对接收形如EVENT_TYPE和List<component>的参数。这意味着，可存储事件类型列表（例如HEALTH_CHANGE），且针对各个类型，可存在0个、1个或多个监听组件，并在产生相关事件时被通知。实际上，Listener成员表示为主数据结构，EventManager以此维护监听目标。</component></p>
+</li>
+<li><p>第3行：Awake函数负责实现单例功能，即EventManager表示为单例对象，并在场景中持久存在。</p>
+</li>
+<li><p>第3行：针对各个监听事件，EventManager的AddListener方法通过Listener对象调用，该方法接收两个参数，即监听的事件（Event_Type）和监听器对象的引用（继承自IListener），并在产生事件时被通知。AddListener函数负责访问Listener字典，生成新的键值对，并存储事件和监听器之间的连接。</p>
+</li>
+<li><p>第3行：当检测到某一事件时，PostNotification函数可通过任意对象（无论是否为监听器）加以调用。随后，EventManager遍历字典中的全部匹配项，搜索与当前事件连接的所有监听器，通过IListener接口调用OnEvent方法，进而对其予以通知。</p>
+</li>
+<li><p>第3行：EventManager类中的最后一个方法维护Listener结构的数据完整性（场景产生变化，且EventManager类具有持久性特征）。虽然EventManager类在不同场景间具有持久性特征，但Listener变量中的监听器对象则并非如此。当场景变化时，此类对象将被销毁。对此，场景变化会使某些监听器处于失效状态，从而使得EventManager包含了无效项。因此，可调用RemoveRedundancies方法搜索并消除全部无效项。另外，当场景发生变化时，Unity将自动调用OnLevelWasLoaded事件。</p>
+</li>
+</ul>
+<p>字典的优势不仅体现于作为动态数组的快速访问能力，同时，用户还可通过对象类型和下标操作符与其协同工作。在常规数组中，各数据元素可采用整型索引予以访问，例如MyArray[0]和MyArray[1]。当采用字典时，情况则有所不同。特别地，用户可利用EVENT_TYPE对象访问数据元素，即键值对中的“键”，例如MyArray[EVENT_TYPE.HEALTH_CHANGE]。</p>
+<h2 id="代码折叠-region和-endregion"><a href="#代码折叠-region和-endregion" class="headerlink" title="代码折叠#region和#endregion"></a>代码折叠#region和#endregion</h2><p>region和#endregion预处理器指令（与代码折叠特性结合使用）对于改善代码的可读性，以及源代码的浏览速度十分有效。在不影响源代码的有效性和执行结果准确性的前提下，可向源代码添加重组和结构化功能。其中，#region标记于代码块的上方，而#endregion则标注于结尾处。当某一区域按照这一方式标记后，该区域将呈现为折叠状态。在代码编辑器中，将显示为收缩状态。当收缩某一代码区域后，其内容将隐藏于视图中，用户可仅关注特定的代码区域。</p>
+<h1 id="使用EventManager"><a href="#使用EventManager" class="headerlink" title="使用EventManager"></a>使用EventManager</h1><p>下面考察如何从监听器和传送对象的角度将EventManager置于实际工作环境中。首先，事件监听器需要利用EventManager单例实例进行注册。一般情况下，该操作仅在前期执行一次，例如在Start函数中。此处不可使用Awake函数，该函数用于对象的内部初始化行为。示例代码采用了Instance静态属性获取指向处于活动状态的、EventManager单例对象的引用。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Called at start-up</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// Add myself as listener for health change events</span></span><br><span class="line">    EventManager.Instance.AddListener(EVENT_TYPE.HEALTH_CHANGE, <span class="keyword">this</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当对一个或多个事件注册了监听器后，若检测到事件，对象可向EventManager发送消息，如以下代码所示。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">int</span> Health</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">get</span> &#123;<span class="keyword">return</span> _health;&#125;</span><br><span class="line">    <span class="keyword">set</span></span><br><span class="line">    &#123;</span><br><span class="line">    <span class="comment">// Clamp health between 0-100</span></span><br><span class="line">    _health = Mathf.clamp(<span class="keyword">value</span>, <span class="number">0</span>, <span class="number">100</span>);</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// Post notification - health has been changed</span></span><br><span class="line">    EventManager.Instance.PostNotification(EVENT_TYPE.HEALTH_CHANGE, <span class="keyword">this</span>, _health);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最后，事件消息经传递后，与其关联的监听器通过EventManager自动更新。特别地，EventManager将调用各个监听器的OnEvent函数，解释事件数据并在对应处予以响应，如以下代码所示。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Called when events happen</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">OnEvent</span>(<span class="params">EVENT_TYPE EVENT_TYPE, Component Sender,<span class="keyword">object</span> Param = <span class="literal">null</span></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// Detect event type</span></span><br><span class="line">    <span class="keyword">switch</span> (EVENT_TYPE)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">case</span> EVENT_TYPE.HEALTH_CHANGE:</span><br><span class="line">            OnHealthChange(Sender, (<span class="keyword">int</span>)Param);</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="基于委托机制的替代方案"><a href="#基于委托机制的替代方案" class="headerlink" title="基于委托机制的替代方案"></a>基于委托机制的替代方案</h2><p>接口可视为一类高效方案，并简化了事件处理系统的实现过程，但并非是唯一的处理方案。除此之外，还可利用C#语言中的委托机制。实际上，用户可定义一个函数，并在变量中存储指向该函数的引用。该变量可将函数视为引用类型的变量。也就是说，当采用委托机制时，用户可存储指向函数的引用，在后续操作中，可以此调用该函数。其他语言则通过函数指针提供了类似的功能，例如C++语言。当采用委托机制实现事件系统时，可不再使用接口。作为替代方案，示例代码通过委托实现了EventManager。其中，调整内容采用黑体表示，以彰显接口和委托实现之间的差别。除了与委托机制对应的变化内容之外，其他函数均保持不变。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"></span><br><span class="line"><span class="comment">//Enum defining all possible game events</span></span><br><span class="line"><span class="comment">//More events should be added to the list</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span> EVENT_TYPE &#123;GAME_INIT, </span><br><span class="line">    GAME_END,</span><br><span class="line">    AMMO_CHANGE,</span><br><span class="line">    HEALTH_CHANGE,</span><br><span class="line">    DEAD</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">//Singleton EventManager to send events to listeners</span></span><br><span class="line"><span class="comment">//Works with IListener implementations</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">EventManager</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="meta">#<span class="meta-keyword">region</span> C# properties</span></span><br><span class="line">    <span class="comment">//Public access to instance</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> EventManager Instance</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">get</span>&#123;<span class="keyword">return</span> instance;&#125;</span><br><span class="line">        <span class="keyword">set</span>&#123;&#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="meta">#<span class="meta-keyword">endregion</span></span></span><br><span class="line"> </span><br><span class="line">    <span class="meta">#<span class="meta-keyword">region</span> variables</span></span><br><span class="line">    <span class="comment">//Internal reference to Notifications Manager instance (singleton design pattern)</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> EventManager instance = <span class="literal">null</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// Declare a delegate type for events</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">delegate</span> <span class="keyword">void</span> <span class="title">OnEvent</span>(<span class="params">EVENT_TYPE Event_Type, Component Sender, <span class="keyword">object</span> Param = <span class="literal">null</span></span>)</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">//Array of listener objects (all objects registered to listen for events)</span></span><br><span class="line">    <span class="keyword">private</span> Dictionary&lt;EVENT_TYPE, List&lt;OnEvent&gt;&gt; Listeners = <span class="keyword">new</span> Dictionary&lt;EVENT_TYPE, List&lt;OnEvent&gt;&gt;();</span><br><span class="line">    <span class="meta">#<span class="meta-keyword">endregion</span></span></span><br><span class="line"></span><br><span class="line">    <span class="meta">#<span class="meta-keyword">region</span> methods</span></span><br><span class="line">    <span class="comment">//Called at start-up to initialize</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Awake</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">//If no instance exists, then assign this instance</span></span><br><span class="line">        <span class="keyword">if</span>(instance == <span class="literal">null</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            instance = <span class="keyword">this</span>;</span><br><span class="line">            DontDestroyOnLoad(gameObject); <span class="comment">//Prevent object from being destroyed on scene exit</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="comment">//Instance already exists, so destroy this one. This should be a singleton object</span></span><br><span class="line">            DestroyImmediate(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> Function to add specified listener-object to array of listeners</span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="Event_Type"&gt;</span>Event to Listen for<span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="Listener"&gt;</span>Object to listen for event<span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">AddListener</span>(<span class="params">EVENT_TYPE Event_Type, OnEvent Listener</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">//List of listeners for this event</span></span><br><span class="line">        List&lt;OnEvent&gt; ListenList = <span class="literal">null</span>;</span><br><span class="line"> </span><br><span class="line">        <span class="comment">//New item to be added. Check for existing event type key. If one exists, add to list</span></span><br><span class="line">        <span class="keyword">if</span>(Listeners.TryGetValue(Event_Type, <span class="keyword">out</span> ListenList))</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">//List exists, so add new item</span></span><br><span class="line">            ListenList.Add(Listener);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">        <span class="comment">//Otherwise create new list as dictionary key</span></span><br><span class="line">        ListenList = <span class="keyword">new</span> List&lt;OnEvent&gt;();</span><br><span class="line">        ListenList.Add(Listener);</span><br><span class="line">        Listeners.Add(Event_Type, ListenList); <span class="comment">//Add to internal listeners list</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> Function to post event to listeners</span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="Event_Type"&gt;</span>Event to invoke<span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="Sender"&gt;</span>Object invoking event<span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="Param"&gt;</span>Optional argument<span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">PostNotification</span>(<span class="params">EVENT_TYPE Event_Type, Component Sender, <span class="keyword">object</span> Param = <span class="literal">null</span></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">//Notify all listeners of an event</span></span><br><span class="line"> </span><br><span class="line">        <span class="comment">//List of listeners for this event only</span></span><br><span class="line">        List&lt;OnEvent&gt; ListenList = <span class="literal">null</span>;</span><br><span class="line"> </span><br><span class="line">        <span class="comment">//If no event entry exists, then exit because there are no listeners to notify</span></span><br><span class="line">        <span class="keyword">if</span>(!Listeners.TryGetValue(Event_Type, <span class="keyword">out</span> ListenList))</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line"> </span><br><span class="line">        <span class="comment">//Entry exists. Now notify appropriate listeners</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;ListenList.Count; i++)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(!ListenList[i].Equals(<span class="literal">null</span>)) <span class="comment">//If object is not null, then send message via interfaces</span></span><br><span class="line">                ListenList[i](Event_Type, Sender, Param);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//Remove event type entry from dictionary, including all listeners</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">RemoveEvent</span>(<span class="params">EVENT_TYPE Event_Type</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">//Remove entry from dictionary</span></span><br><span class="line">        Listeners.Remove(Event_Type);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//Remove all redundant entries from the Dictionary</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">RemoveRedundancies</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">//Create new dictionary</span></span><br><span class="line">        Dictionary&lt;EVENT_TYPE, List&lt;OnEvent&gt;&gt; TmpListeners = <span class="keyword">new</span> Dictionary&lt;EVENT_TYPE, List&lt;OnEvent&gt;&gt;();</span><br><span class="line">         </span><br><span class="line">        <span class="comment">//Cycle through all dictionary entries</span></span><br><span class="line">        <span class="keyword">foreach</span>(KeyValuePair&lt;EVENT_TYPE, List&lt;OnEvent&gt;&gt; Item <span class="keyword">in</span> Listeners)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">//Cycle through all listener objects in list, remove null objects</span></span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> i = Item.Value.Count<span class="number">-1</span>; i&gt;=<span class="number">0</span>; i--)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="comment">//If null, then remove item</span></span><br><span class="line">                <span class="keyword">if</span>(Item.Value[i].Equals(<span class="literal">null</span>))</span><br><span class="line">                    Item.Value.RemoveAt(i);</span><br><span class="line">            &#125;</span><br><span class="line">             </span><br><span class="line">            <span class="comment">//If items remain in list for this notification, then add this to tmp dictionary</span></span><br><span class="line">            <span class="keyword">if</span>(Item.Value.Count &gt; <span class="number">0</span>)</span><br><span class="line">                TmpListeners.Add (Item.Key, Item.Value);</span><br><span class="line">        &#125;</span><br><span class="line">         </span><br><span class="line">        <span class="comment">//Replace listeners object with new, optimized dictionary</span></span><br><span class="line">        Listeners = TmpListeners;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//Called on scene change. Clean up dictionary</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">OnLevelWasLoaded</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        RemoveRedundancies();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">#<span class="meta-keyword">endregion</span></span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>示例代码中的部分解释内容如下所示。</p>
+<ul>
+<li><p>第1行：事件类型枚举结构替换为源自原IListener类的EventManager文件。委托实现避免使用接口和IListener，因而枚举结构转换为管理器源文件。</p>
+</li>
+<li><p>第1行：public成员变量OnEvent声明为委托类型。需注意的是，声明采用了混合方式，并结合了变量声明和函数原型。这确定了函数原型，并可赋予委托变量中；基于该结构的任意函数可通过类或脚本文件进行赋值。因此，OnEvent函数演变为委托类型，并用于下一条语句中，进而创建内部字典。</p>
+</li>
+<li><p>第1行：声明了private字典；同时，针对各个事件类型，存储了一个委托数组（而非接口）；各个委托将引用一个函数，该函数在产生事件时被调用。</p>
+</li>
+<li><p>第1行：严格地讲，PostNotification函数在EventManager上被调用，当产生事件时将调用全部委托（监听器函数）。该行为出现于处，即“ListenList<a href="Event-Type,Sender,Param">i</a>;”语句。这将像调用函数一样调用委托。</p>
+</li>
+</ul>
+<h2 id="MonoBehaviour事件"><a href="#MonoBehaviour事件" class="headerlink" title="MonoBehaviour事件"></a>MonoBehaviour事件</h2><p>下面讨论Unity中已经提供的使用事件驱动编程的事件。MonoBehaviour类定义了多种事件，并可在特定条件下自动被调用。这一类函数或事件始于前缀On，并包含了诸如OnGUI、OnMouseEnter、OnMouseDown、OnParticleCollision等事件。</p>
+<h2 id="鼠标事件"><a href="#鼠标事件" class="headerlink" title="鼠标事件"></a>鼠标事件</h2><p>鼠标输入和触摸输入事件集十分有用，其中包含了OnMouseDown、OnMouseEnter和OnMouseExit。在Unity的早期版本中，此类事件仅通过鼠标事件触发，且不包括触摸输入。近期，触摸输入也加入其中，这也意味着，默认条件下，触击行为注册为鼠标事件。具体而言，按下鼠标键时（同时鼠标指针悬停于某一对象上），OnMouseDown将被调用。然而，该事件并不会重复被调用，直至按键被释放。类似地，当鼠标指针悬停于某一对象上时，OnMouseEnter将被调用；而鼠标指针离开该对象时，OnMouseExit将被调用。这一类事件的成功与否取决于与对象绑定的碰撞器组件，并在鼠标事件检测过程中靠近其空间体。也就是说，如果对象未绑定碰撞器，则不会触发鼠标事件。</p>
+<p>然而，某些场合下，MouseEvents并不会被触发，即使相关对象绑定了碰撞器。其原因在于，根据当前活动相机的视角，其他对象（包含碰撞器）遮挡了所单击的对象，即可单击对象位于背景中。当然，存在多种方式可处理这一类问题，例如，可简单地将前景对象赋予Ignore aycast层中，以使其免受物理光线操作的影响。</p>
+<p>在将某一对象赋予Ignore Raycast层时，可选择该场景对象，单击Object Inspector中的Layer下拉列表，并将当前对象置于Ignore Raycast层中，如下图所示。</p>
+<p>在某些情况下，上述措施同样也会失效。通常，这会涉及多部相机以及多个包含碰撞器的对象，并遮挡希望选取或调整的对象（根据鼠标输入事件）。对此，用户需要手动处理鼠标事件。示例代码根据输入内容，以手动方式调用特定的鼠标事件。实际上，代码使用了Raycast（射线）系统，并将手动检测到的输入事件重定向至MonoBehaviour鼠标事件。除此之外，代码还使用了系统程序。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ManualMouse</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//Get collider attached to this object</span></span><br><span class="line">    <span class="keyword">private</span> Collider Col = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//Awake function - called at start up</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Awake</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">//Get collider</span></span><br><span class="line">        Col = GetComponent&lt;Collider&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//Start Coroutine</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        StartCoroutine(UpdateMouse());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IEnumerator <span class="title">UpdateMouse</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">//Are we being intersected</span></span><br><span class="line">        <span class="keyword">bool</span> bIntersected = <span class="literal">false</span>;</span><br><span class="line"> </span><br><span class="line">        <span class="comment">//Is button down or up</span></span><br><span class="line">        <span class="keyword">bool</span> bButtonDown = <span class="literal">false</span>;</span><br><span class="line"> </span><br><span class="line">        <span class="comment">//Loop forever</span></span><br><span class="line">        <span class="keyword">while</span>(<span class="literal">true</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">//Get mouse screen position in terms of X and Y</span></span><br><span class="line">            <span class="comment">//You may need to use a different camera, if you have multiple</span></span><br><span class="line">            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);</span><br><span class="line">            RaycastHit hit;</span><br><span class="line">             </span><br><span class="line">            <span class="comment">//Test ray for collision against this collider</span></span><br><span class="line">            <span class="keyword">if</span> (Col.Raycast(ray, <span class="keyword">out</span> hit, Mathf.Infinity))</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="comment">//Object was intersected - if not previous intersecting, then send on enter message</span></span><br><span class="line">                <span class="keyword">if</span>(!bIntersected) SendMessage(<span class="string">"OnMouseEnter"</span>, SendMessageOptions.DontRequireReceiver);</span><br><span class="line"> </span><br><span class="line">                bIntersected = <span class="literal">true</span>;</span><br><span class="line"> </span><br><span class="line">                <span class="comment">//Test for mouse events</span></span><br><span class="line">                <span class="keyword">if</span>(!bButtonDown &amp;&amp; Input.GetMouseButton(<span class="number">0</span>))&#123;bButtonDown = <span class="literal">true</span>; SendMessage(<span class="string">"OnMouseDown"</span>, SendMessageOptions.DontRequireReceiver);&#125;</span><br><span class="line">                <span class="keyword">if</span>(bButtonDown &amp;&amp; !Input.GetMouseButton(<span class="number">0</span>))&#123;bButtonDown = <span class="literal">false</span>; SendMessage(<span class="string">"OnMouseUp"</span>, SendMessageOptions.DontRequireReceiver);&#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="comment">//Was previously entered and now leaving</span></span><br><span class="line">                <span class="keyword">if</span>(bIntersected) SendMessage(<span class="string">"OnMouseExit"</span>, SendMessageOptions.DontRequireReceiver);</span><br><span class="line"> </span><br><span class="line">                bIntersected = <span class="literal">false</span>;</span><br><span class="line">                bButtonDown = <span class="literal">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line"> </span><br><span class="line">            <span class="comment">//Wait until next frame</span></span><br><span class="line">            <span class="keyword">yield</span> <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>协同程序表示为一种特定类型的函数，从某种程度上讲，其行为类似于线程，并相对于主游戏循环并行或异步运行。也就是说，一旦处于执行状态，协同程序仿佛在后台运行。执行过程并不会暂停或等待，直至该程序像常规函数那样执行完毕。因此，协同程序适用于创建具有异步外观的行为。</p>
+<p>从技术角度上讲，全部协同程序需要返回IEnumerator类型，并在程序体中至少包含一条yield语句，并通过StartCoroutine函数进行发布。yield语句表示为一类特殊的语句，并可暂停协同程序的执行，直至其条件得到满足。yield语句返回WaitForSeconds（x），将暂停执行流程x秒，并在间隔后（下一行处）恢复执行。相比较而言，yield语句返回null将针对当前帧延缓执行，并在下一帧恢复执行流程（下一行处）。</p>
+<h2 id="应用程序焦点和暂停"><a href="#应用程序焦点和暂停" class="headerlink" title="应用程序焦点和暂停"></a>应用程序焦点和暂停</h2><p>读者应注意3个额外的MonoBehaviour事件，其操作容易引起混淆并产生未知结果，即OnApplicationPause、OnApplicationFocus和OnApplicationQuit事件。</p>
+<p>OnApplicationQuit将在游戏退出前发送至场景中的全部对象中，随后，场景及其全<br>部内容将被销毁。如果游戏在编辑器中进行测试，则播放停止时将调用OnApplicationQuit事件。值得注意的是，OnApplicationQuit不会针对iOS设备被调用，此时应用程序处于暂停状态，同时用户可执行其他操作，最终返回至中断点并恢复执行。如果用户希望或需要接收包含暂停态的OnApplicationQuit，则需要在Player Settings窗口中启用相关选项。具体来说，可在应用菜单中选择Edit-&gt;Project Settings-&gt;Player命令，随后可在ObjectInspector中针对iOS版本打开Other Settings选项卡，并选中Exiton Suspend复选框。</p>
+<p>当游戏失去焦点时，事件OnApplicationFocus将传递至全部场景对象中。通常在多任务系统中，游戏窗口将会处于非激活状态。这可视为一类较为重要的游戏事件，特别是在多玩家游戏中。其中，公共场景中的动作和事件将持续进行，即使玩家并未实际参与。在这一类情形中，用户需要暂停、恢复特定行为，或者淡入、淡出游戏音乐。</p>
+<p>OnApplicationPause表示为一类模糊事件，其原因在于，Unity中的暂停概念并未加以清晰定义。相应地，存在两种暂停方式，即最终（ultimate）暂停和相对暂停。对于前者，游戏中的各项活动和事件均处于暂停状态。期间，时间处于停止状态，且全部事物均呈现为静止状态。相比较而言，相对暂停则更为常见。其中，游戏知晓自身处于暂停状态，并中止某些事件，例如场景中的事件，同时可使其他事件继续执行，例如GUI交互或用户输入，进而可解除游戏的暂停状态。OnApplicationPause事件表示为第一类暂停，（而非后者）。当满足多个条件时，该事件将被调用，稍后将对此予以介绍。</p>
+<p>首先，如果Run In Background选项在选项卡中未被选中（位于Resolution分组内），如图4-5所示，则OnApplicationPause仅实现了桌面级调用。当禁用该选项后，且窗口失去焦点时，这将自动暂停桌面游戏。这也意味着，OnApplicationPause将随OnApplicationFocus事件被调用。</p>
+<p>当实现自己的相对暂停功能时，应尽量避免使用OnApplicationPause事件。相应地，可使用Time.timeScale变量，或者对更为复杂的综合系统进行编码，进而可对暂停，元素有选择性地加以控制。</p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>本章主要通过EventManager讨论事件驱动框架针对应用程序的各种优势。当实现此类管理器时，可采用接口或委托机制，二者均功能强大且兼具可扩展性。特别地，Update函数中可加入诸多功能项，但也会产生性能问题。较好的方法是分析各功能之间的连接，并将其重构为事件驱动框架。实际上，事件表示为事件驱动系统中的原始资料，体现了动作（起因和响应）间的必要连接。当对事件进行管理时，可创建EventManager类–将传递者链接至监听器的集成类或系统，从传递者处接收与事件相关的消息，并于随后将函数调用分发至基于该事件的全部监听器上。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Unity脚本设计/" rel="tag"># Unity脚本设计</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/08/GameObject、场景世界以及单例模式/" rel="next" title="GameObject、场景世界以及单例模式">
+                <i class="fa fa-chevron-left"></i> GameObject、场景世界以及单例模式
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/09/与Mono协同工作/" rel="prev" title="与Mono协同工作">
+                与Mono协同工作 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">269</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">6</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">29</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2019/07/21/存储器和指针：指向何方？/" title="存储器和指针：指向何方？" target="_blank">存储器和指针：指向何方？</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/07/20/结构、联合与位字段：创建自己的字段/" title="结构、联合与位字段：创建自己的字段" target="_blank">结构、联合与位字段：创建自己的字段</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/07/20/第2章-算法/" title="第2章 算法" target="_blank">第2章 算法</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/07/20/C语言入门：进入C语言的世界/" title="C语言入门：进入C语言的世界" target="_blank">C语言入门：进入C语言的世界</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/07/19/多路查找树（B树）/" title="多路查找树（B树）" target="_blank">多路查找树（B树）</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#事件"><span class="nav-number">1.</span> <span class="nav-text">事件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#事件管理"><span class="nav-number">2.</span> <span class="nav-text">事件管理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#基于接口的事件管理"><span class="nav-number">2.1.</span> <span class="nav-text">基于接口的事件管理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#定义EventManager"><span class="nav-number">2.2.</span> <span class="nav-text">定义EventManager</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#代码折叠-region和-endregion"><span class="nav-number">2.3.</span> <span class="nav-text">代码折叠#region和#endregion</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用EventManager"><span class="nav-number">3.</span> <span class="nav-text">使用EventManager</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#基于委托机制的替代方案"><span class="nav-number">3.1.</span> <span class="nav-text">基于委托机制的替代方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#MonoBehaviour事件"><span class="nav-number">3.2.</span> <span class="nav-text">MonoBehaviour事件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#鼠标事件"><span class="nav-number">3.3.</span> <span class="nav-text">鼠标事件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#应用程序焦点和暂停"><span class="nav-number">3.4.</span> <span class="nav-text">应用程序焦点和暂停</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#小结"><span class="nav-number">4.</span> <span class="nav-text">小结</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">1.3m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">20:03</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>
