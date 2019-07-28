@@ -103,18 +103,18 @@
 
 
 
-  <meta name="description" content="思考并回答以下问题：  什么是结构？使用场景是什么？">
+  <meta name="description" content="思考并回答以下问题：  为什么要使用结构？怎么使用？ 为什么要为结构创建别名？怎么创建？ 参数太多和多个函数参数相同有什么弊端？ 为什么不能使用数组？ 结构是自定义数据类型怎么理解？ 结构中会保存字符串吗？如何保存？ 把参数封装在结构中有什么好处？ 为什么要使用联合？">
 <meta name="keywords" content="C语言">
 <meta property="og:type" content="article">
 <meta property="og:title" content="结构、联合与位字段：创建自己的字段">
 <meta property="og:url" content="http://chebincarl.github.io/2019/07/20/结构、联合与位字段：创建自己的字段/index.html">
 <meta property="og:site_name" content="车斌的博客">
-<meta property="og:description" content="思考并回答以下问题：  什么是结构？使用场景是什么？">
+<meta property="og:description" content="思考并回答以下问题：  为什么要使用结构？怎么使用？ 为什么要为结构创建别名？怎么创建？ 参数太多和多个函数参数相同有什么弊端？ 为什么不能使用数组？ 结构是自定义数据类型怎么理解？ 结构中会保存字符串吗？如何保存？ 把参数封装在结构中有什么好处？ 为什么要使用联合？">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-07-21T14:43:28.111Z">
+<meta property="og:updated_time" content="2019-07-24T13:23:40.566Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="结构、联合与位字段：创建自己的字段">
-<meta name="twitter:description" content="思考并回答以下问题：  什么是结构？使用场景是什么？">
+<meta name="twitter:description" content="思考并回答以下问题：  为什么要使用结构？怎么使用？ 为什么要为结构创建别名？怎么创建？ 参数太多和多个函数参数相同有什么弊端？ 为什么不能使用数组？ 结构是自定义数据类型怎么理解？ 结构中会保存字符串吗？如何保存？ 把参数封装在结构中有什么好处？ 为什么要使用联合？">
 
 
 
@@ -440,7 +440,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-07-21 22:43:28" itemprop="dateModified" datetime="2019-07-21T22:43:28+08:00">2019-07-21</time>
+                <time title="修改时间：2019-07-24 21:23:40" itemprop="dateModified" datetime="2019-07-24T21:23:40+08:00">2019-07-24</time>
               
             
           </span>
@@ -486,7 +486,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">3.1k</span>
+                <span title="本文字数">4.7k</span>
               
 
               
@@ -500,7 +500,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">3 分钟</span>
+                <span title="阅读时长">4 分钟</span>
               
             </div>
           
@@ -522,24 +522,30 @@
       
         <p>思考并回答以下问题：</p>
 <ul>
-<li>什么是结构？使用场景是什么？</li>
+<li>为什么要使用结构？怎么使用？</li>
+<li>为什么要为结构创建别名？怎么创建？</li>
+<li>参数太多和多个函数参数相同有什么弊端？</li>
+<li>为什么不能使用数组？</li>
+<li>结构是自定义数据类型怎么理解？</li>
+<li>结构中会保存字符串吗？如何保存？</li>
+<li>把参数封装在结构中有什么好处？</li>
+<li>为什么要使用联合？</li>
 </ul>
 <a id="more"></a>
 
-<p>到目前为止，只接触过C语言的基本数据类型，但如果想表示数字、文本以外的其他东西呢，或为现实世界中的事物建立模型，怎么办？结构将帮你创建自己的结构，模拟现实世界中错综复杂的事物。在本章中，你将学习如何把基本数据类型组成结构以及用联合处理生活的不确定性。如果你想简单地模拟“是”或“非”，可以用位字段。</p>
+<p>到目前为止，只接触过C语言的基本数据类型，但如果想表示数字、文本以外的其他东西呢，或为现实世界中的事物建立模型（用C语言的一条数据来描述一个人的信息，例如姓名，性别，年龄等），怎么办？结构将帮你创建自己的结构，模拟现实世界中错综复杂的事物。在本章中，你将学习如何把基本数据类型组成结构以及用联合处理生活的不确定性。如果你想简单地模拟“是”或“非”，可以用位字段。</p>
 <h1 id="有时要传很多数据"><a href="#有时要传很多数据" class="headerlink" title="有时要传很多数据"></a>有时要传很多数据</h1><p>C语言可以处理很多不同类型的数据：小数字、大数字、浮点数、字符与文本。但现实世界中的事物往往需要一条以上的数据来记录。比如下面这个例子，两个函数处理同一个东西，因此需要接收相同的数据。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 下面两个函数接收相同的参数。</span></span><br><span class="line"><span class="comment">/* 打印目录项 */</span></span><br><span class="line"><span class="comment">// const char *用来保存你不想修改的字符串，也就是字符串字面值。</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">catalog</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *name, <span class="keyword">const</span> *species, <span class="keyword">int</span> teeth, <span class="keyword">int</span> age)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">"%s is a %s with %i teeth, he is %i\n"</span>, name, species, teeth, age);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/* 打印贴在水缸上的标签 */</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">label</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *name, <span class="keyword">const</span> *species, <span class="keyword">int</span> teeth, <span class="keyword">int</span> age)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">"Name:%s\nSpecies:%s\n%i years old, %i teeth\n"</span>, name, species, teeth, age);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 下面两个函数接收相同的参数。</span></span><br><span class="line"><span class="comment">/* 打印目录项 */</span></span><br><span class="line"><span class="comment">// const char *用来保存你不想修改的字符串，也就是字符串字面值。</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">catalog</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *name, <span class="keyword">const</span> *species, <span class="keyword">int</span> teeth, <span class="keyword">int</span> age)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"%s is a %s with %i teeth, he is %i\n"</span>, name, species, teeth, age);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/* 打印贴在水缸上的标签 */</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">label</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *name, <span class="keyword">const</span> *species, <span class="keyword">int</span> teeth, <span class="keyword">int</span> age)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"Name:%s\nSpecies:%s\n%i years old, %i teeth\n"</span>, name, species, teeth, age);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>虽然只传了4个参数，但代码已经有点乱了：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="comment">// 两次都传了相同的4个参数。而且只有一条鱼，但参数有四个。</span></span><br><span class="line">	catalog(<span class="string">"Snappy"</span>, <span class="string">"Piranha"</span>, <span class="number">69</span>, <span class="number">4</span>);</span><br><span class="line">	label(<span class="string">"Snappy"</span>, <span class="string">"Piranha"</span>, <span class="number">69</span>, <span class="number">4</span>);</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// 两次都传了相同的4个参数。而且只有一条鱼，但参数有四个。</span></span><br><span class="line">    catalog(<span class="string">"Snappy"</span>, <span class="string">"Piranha"</span>, <span class="number">69</span>, <span class="number">4</span>);</span><br><span class="line">    label(<span class="string">"Snappy"</span>, <span class="string">"Piranha"</span>, <span class="number">69</span>, <span class="number">4</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>怎么才能解决这个问题？只是想描述一样东西而已，有没有办法可以不用传那么多数据？</p>
 <p>有些人认为4个参数也没有什么，但是如果修改程序，给鱼多加一条数据呢？我们要把它加到每一个接收鱼作为参数的函数中。对一个大程序来说，这样的函数可能有上百个。</p>
 <p>为了修改简单，只要把这些数据组合成一样东西就行了，类似数组。但数组通常保存相同类型的数据，现在要同时保存字符串和整型，所以我们不能把它们放进一个数组。</p>
 <p>需要一样东西，能让你在一条大数据中记录多条数据，能让我们同时引用一组不同类型的数据，仿佛它们是一条数据。</p>
-<p>C语言可以处理很多不同类型的数据</p>
 <h1 id="用结构创建结构化数据类型"><a href="#用结构创建结构化数据类型" class="headerlink" title="用结构创建结构化数据类型"></a>用结构创建结构化数据类型</h1><p>如果需要把一批数据打包成一样东西，就可以使用结构（struct）。struct是structured data type（结构化数据类型）的缩写。有了结构，就可以像下面这样把不同类型的数据写在一起，封装成一个新的大数据类型：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">fish</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	<span class="keyword">const</span> <span class="keyword">char</span> *name; </span><br><span class="line">	<span class="keyword">const</span> <span class="keyword">char</span> *species;</span><br><span class="line">	<span class="keyword">int</span> teeth;</span><br><span class="line">	<span class="keyword">int</span> age;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">fish</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span> *name; </span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span> *species;</span><br><span class="line">    <span class="keyword">int</span> teeth;</span><br><span class="line">    <span class="keyword">int</span> age;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 
 <p>这段代码会创建一个新的自定义数据类型，它由一批其他数据组成。事实上，结构与数组有些相似，除了以下两点：</p>
 <ul>
@@ -551,13 +557,13 @@
 
 <p>在这个例子中，fish结构不会保存字符串，这里的fish结构中只保存了字符串指针，也就是字符串的地址，字符串保存在存储器中其他位置。只要把字符串定义成字符数组，像char name[20]，还是可以把字符串保存在结构中。</p>
 <h1 id="只要把鱼给函数就行了"><a href="#只要把鱼给函数就行了" class="headerlink" title="只要把鱼给函数就行了"></a>只要把鱼给函数就行了</h1><p>现在，你只要把新的自定义数据传给函数就行了，而不必传递一大批零散的数据。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 打印目录项 */</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">catalog</span><span class="params">(struct fish f)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/* 打印贴在水缸上的标签 */</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">label</span><span class="params">(struct fish f)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 打印目录项 */</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">catalog</span><span class="params">(struct fish f)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/* 打印贴在水缸上的标签 */</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">label</span><span class="params">(struct fish f)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>是不是简单多了？现在函数只需接收一条数据，而且调用函数的代码也更易读了：</p>
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span>  <span class="title">fish</span> <span class="title">snappy</span> = &#123;</span><span class="string">"Snappy"</span>, <span class="string">"Piranha"</span>, <span class="number">69</span>, <span class="number">4</span>&#125;;</span><br><span class="line">catalog(snappy);</span><br><span class="line">label(snappy);</span><br></pre></td></tr></table></figure>
 
 <p>把数据放在结构中传递有一个好处，就是修改结构的内容时，不必修改使用它的函数。比如要在fish中多加一个字段：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">fish</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	<span class="keyword">const</span> <span class="keyword">char</span> *name;</span><br><span class="line">	<span class="keyword">const</span> <span class="keyword">char</span> *species;</span><br><span class="line">	<span class="keyword">int</span> teeth;</span><br><span class="line">	<span class="keyword">int</span> age;</span><br><span class="line">	<span class="keyword">int</span> favorite_music;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">fish</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span> *name;</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span> *species;</span><br><span class="line">    <span class="keyword">int</span> teeth;</span><br><span class="line">    <span class="keyword">int</span> age;</span><br><span class="line">    <span class="keyword">int</span> favorite_music;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
 
 <p>catalog()和label()知道有人会给它们一条fish，但却不知道fish中现在有了更多的数据，它们也不关心，只要fish有它们需要的所有字段就行了。</p>
 <p>这就意味着，使用结构，不但代码更好读，而且能够更好地应对变化。</p>
@@ -571,9 +577,48 @@
 <figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span>  <span class="title">fish</span> <span class="title">snappy</span> = &#123;</span><span class="string">"Snappy"</span>, <span class="string">"piranha"</span>, <span class="number">69</span>, <span class="number">4</span>&#125;;</span><br><span class="line"><span class="built_in">printf</span>(<span class="string">"Name = %s\n"</span>, snappy.name); <span class="comment">// 将返回字符串“Snappy”。</span></span><br></pre></td></tr></table></figure>
 
 <p>下面是新版的catalog()函数，函数将使用fish结构。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">catalog</span><span class="params">(struct fish f)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="built_in">printf</span>(<span class="string">"%s is a %s with %i teeth, he is %i\n"</span>, f.name, f.species, f.teeth, f.age);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">fish</span> <span class="title">Snappy</span> = &#123;</span><span class="string">"Snappy"</span>, <span class="string">"Piranha"</span>, <span class="number">69</span>, <span class="number">4</span>&#125;;</span><br><span class="line">	catalog(snappy);</span><br><span class="line">	<span class="comment">/* 暂时先跳过调用label函数的代码 */</span></span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">catalog</span><span class="params">(struct fish f)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">"%s is a %s with %i teeth, he is %i\n"</span>, f.name, f.species, f.teeth, f.age);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">fish</span> <span class="title">Snappy</span> = &#123;</span><span class="string">"Snappy"</span>, <span class="string">"Piranha"</span>, <span class="number">69</span>, <span class="number">4</span>&#125;;</span><br><span class="line">    catalog(snappy);</span><br><span class="line">    <span class="comment">/* 暂时先跳过调用label函数的代码 */</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h1 id="用typedef为结构命名。"><a href="#用typedef为结构命名。" class="headerlink" title="用typedef为结构命名。"></a>用typedef为结构命名。</h1>
+<h1 id="用typedef为结构命名。"><a href="#用typedef为结构命名。" class="headerlink" title="用typedef为结构命名。"></a>用typedef为结构命名。</h1><p>当创建内置数据类型变量时，只要写int或double就行了，但每次创建结构变量时，不得不加上struct关键字。（fish是和int，double一样的，但是声明和赋值整型变量只要写int a = 1;就OK了。但是struct要写struct fish = {…}，不能直接写fish。）</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>在C语言中可以为结构创建别名，你只要在struct关键字前加上typedef，并在右花括号后写上类型名，就可以在任何地方使用这种新类型。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> <span class="title">cell_phone</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">int</span> cell_no;</span><br><span class="line">    <span class="keyword">const</span> <span class="keyword">char</span> *wallpaper;</span><br><span class="line">    <span class="keyword">float</span> minutes_of_charge;</span><br><span class="line">&#125; phone;</span><br><span class="line"></span><br><span class="line">phone p = &#123;<span class="number">5557879</span>, <span class="string">"sinatra.png"</span>, <span class="number">1.35</span>&#125;;</span><br></pre></td></tr></table></figure>
+
+<p>typedef可以用来缩短代码长度，并让代码更容易阅读。试试在代码中加入typedef。</p>
+<h1 id="联合"><a href="#联合" class="headerlink" title="联合"></a>联合</h1><h2 id="不同数据类型"><a href="#不同数据类型" class="headerlink" title="不同数据类型"></a>不同数据类型</h2><p><strong>同一类事物，不同数据类型</strong></p>
+<p>可以用结构来模拟现实世界中错综复杂的事物，但有些数据不止一种数据类型：</p>
+<p>假如想记录某样东西的“量”，既可以用个数，也可以用重量，或者用容积。所以大可在一个结构中创建多个字段：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="class"><span class="keyword">struct</span> &#123;</span></span><br><span class="line">    <span class="keyword">short</span> count;</span><br><span class="line">    <span class="keyword">float</span> weight;</span><br><span class="line">    <span class="keyword">float</span> volume;</span><br><span class="line">&#125; fruit;</span><br></pre></td></tr></table></figure>
+
+<p>这不是好主意，原因有以下几点：</p>
+<ul>
+<li>结构在存储器中占了更多空间。</li>
+<li>用户可以设置多个值。</li>
+<li>没有叫“量”的字段。</li>
+</ul>
+<p>要是能这样就好了：定义一种叫“量”的数据类型，然后根据特定的数据决定要保存个数、重量还是容积。</p>
+<p>在C语言中，可以用<strong>联合</strong>做到这点。</p>
+<h2 id="联合可以有效使用存储器空间"><a href="#联合可以有效使用存储器空间" class="headerlink" title="联合可以有效使用存储器空间"></a>联合可以有效使用存储器空间</h2><p>每次创建结构实例，计算机都会在存储器中相继摆放字段：</p>
+<p>联合则不同。当定义联合时，计算机只为其中一个字段分配空间。假设你有一个叫quantity的联合，它有三个字段、分别是count、weight和volume，那么计算机就会为其中最大的字段分配空间，然后由你决定里面保存什么值。无论设置了count、weight和volume中的哪个字段，数据都会保存在存储器中同一个地方。</p>
+<h2 id="如何使用联合"><a href="#如何使用联合" class="headerlink" title="如何使用联合"></a>如何使用联合</h2><p>声明联合变量后，有很多方法设置它的值。</p>
+<p><strong>C89方式</strong></p>
+<p>如果联合要保存<strong>第一个字段</strong>的值，就可以用C89表示法，只要用花括号把值括起来，就可以把值赋给联合中第一个字段。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">quantity = &#123;<span class="number">4</span>&#125;; <span class="comment">// 表示“量”是4个。</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>指定初始化器</strong></p>
+<p>指定初始化器（designated initializer）按<strong>名</strong>设置联合字段的值：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">quantity q = &#123;.weight = <span class="number">1.5</span>&#125;; <span class="comment">// 把联合设为浮点型的重量值</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>“点”表示法</strong></p>
+<p>第三种设置联合值得方法是在第一行创建变量，然后在第二行设置字段的值。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">quantity q;</span><br><span class="line">q.volume = <span class="number">3.7</span>;</span><br></pre></td></tr></table></figure>
+
+<h1 id="自己的总结"><a href="#自己的总结" class="headerlink" title="自己的总结"></a>自己的总结</h1><p>struct像C#中的委托一样，需要先定义，然后就可以像int一样使用了。但是C#中的委托使用，例如：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">delegate</span> <span class="keyword">void</span> <span class="title">MyDelegate</span>(<span class="params"></span>)</span>;</span><br><span class="line">MyDelegate del;</span><br></pre></td></tr></table></figure>
+
+<p>在声明变量的时候没有加上delegate，而C语言则加上了，不合理，所以需要去掉。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">fish</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    </span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">fish</span></span></span><br></pre></td></tr></table></figure>
       
     </div>
 
@@ -619,8 +664,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2019/07/21/存储器和指针：指向何方？/" rel="prev" title="存储器和指针：指向何方？">
-                存储器和指针：指向何方？ <i class="fa fa-chevron-right"></i>
+              <a href="/2019/07/21/内存和指针：指向何方？/" rel="prev" title="内存和指针：指向何方？">
+                内存和指针：指向何方？ <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -692,7 +737,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">269</span>
+                    <span class="site-state-item-count">280</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -721,7 +766,11 @@
                     
                       
                     
-                    <span class="site-state-item-count">6</span>
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -796,7 +845,17 @@
                     
                       
                     
-                    <span class="site-state-item-count">29</span>
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">34</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -827,23 +886,23 @@
                 
                 
                   <li>
-                    <a href="/2019/07/21/存储器和指针：指向何方？/" title="存储器和指针：指向何方？" target="_blank">存储器和指针：指向何方？</a>
+                    <a href="/2019/07/27/TimeLine-Cinemachine技术/" title="TimeLine&Cinemachine技术" target="_blank">TimeLine&Cinemachine技术</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/07/20/结构、联合与位字段：创建自己的字段/" title="结构、联合与位字段：创建自己的字段" target="_blank">结构、联合与位字段：创建自己的字段</a>
+                    <a href="/2019/07/27/基于Unity3D的策略养成类游戏设计与实现/" title="基于Unity3D的策略养成类游戏设计与实现" target="_blank">基于Unity3D的策略养成类游戏设计与实现</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/07/20/第2章-算法/" title="第2章 算法" target="_blank">第2章 算法</a>
+                    <a href="/2019/07/27/基于XLua的Unity脚本框架的设计与实现/" title="基于XLua的Unity脚本框架的设计与实现" target="_blank">基于XLua的Unity脚本框架的设计与实现</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/07/20/C语言入门：进入C语言的世界/" title="C语言入门：进入C语言的世界" target="_blank">C语言入门：进入C语言的世界</a>
+                    <a href="/2019/07/25/事件-1/" title="事件" target="_blank">事件</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/07/19/多路查找树（B树）/" title="多路查找树（B树）" target="_blank">多路查找树（B树）</a>
+                    <a href="/2019/07/25/观察者模式/" title="观察者模式" target="_blank">观察者模式</a>
                   </li>
                 
               </ul>
@@ -869,7 +928,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#有时要传很多数据"><span class="nav-number">1.</span> <span class="nav-text">有时要传很多数据</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#用结构创建结构化数据类型"><span class="nav-number">2.</span> <span class="nav-text">用结构创建结构化数据类型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#只要把鱼给函数就行了"><span class="nav-number">3.</span> <span class="nav-text">只要把鱼给函数就行了</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用“-”运算符读取结构字段"><span class="nav-number">4.</span> <span class="nav-text">使用“.”运算符读取结构字段</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#用typedef为结构命名。"><span class="nav-number">5.</span> <span class="nav-text">用typedef为结构命名。</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#有时要传很多数据"><span class="nav-number">1.</span> <span class="nav-text">有时要传很多数据</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#用结构创建结构化数据类型"><span class="nav-number">2.</span> <span class="nav-text">用结构创建结构化数据类型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#只要把鱼给函数就行了"><span class="nav-number">3.</span> <span class="nav-text">只要把鱼给函数就行了</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用“-”运算符读取结构字段"><span class="nav-number">4.</span> <span class="nav-text">使用“.”运算符读取结构字段</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#用typedef为结构命名。"><span class="nav-number">5.</span> <span class="nav-text">用typedef为结构命名。</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#联合"><span class="nav-number">6.</span> <span class="nav-text">联合</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#不同数据类型"><span class="nav-number">6.1.</span> <span class="nav-text">不同数据类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#联合可以有效使用存储器空间"><span class="nav-number">6.2.</span> <span class="nav-text">联合可以有效使用存储器空间</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何使用联合"><span class="nav-number">6.3.</span> <span class="nav-text">如何使用联合</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#自己的总结"><span class="nav-number">7.</span> <span class="nav-text">自己的总结</span></a></li></ol></div>
             
 
           </div>
@@ -904,7 +963,7 @@
     
       <span class="post-meta-item-text">站点总字数：</span>
     
-    <span title="站点总字数">1.3m</span>
+    <span title="站点总字数">1.4m</span>
   
 
   
@@ -915,7 +974,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">20:03</span>
+    <span title="站点阅读时长">21:02</span>
   
 </div>
 

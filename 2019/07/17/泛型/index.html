@@ -103,18 +103,22 @@
 
 
 
-  <meta name="description" content="思考并回答以下问题：">
-<meta name="keywords" content="Unity">
+  <meta name="description" content="思考并回答以下问题：  泛型让数据类型就不用硬编码怎么理解？ 什么是构造类型？">
+<meta name="keywords" content="C#图解教程">
 <meta property="og:type" content="article">
 <meta property="og:title" content="泛型">
 <meta property="og:url" content="http://chebincarl.github.io/2019/07/17/泛型/index.html">
 <meta property="og:site_name" content="车斌的博客">
-<meta property="og:description" content="思考并回答以下问题：">
+<meta property="og:description" content="思考并回答以下问题：  泛型让数据类型就不用硬编码怎么理解？ 什么是构造类型？">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-07-19T15:25:16.797Z">
+<meta property="og:image" content="http://chebincarl.github.io/2019/07/17/泛型/1.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/07/17/泛型/2.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/07/17/泛型/3.png">
+<meta property="og:updated_time" content="2019-07-24T13:40:40.222Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="泛型">
-<meta name="twitter:description" content="思考并回答以下问题：">
+<meta name="twitter:description" content="思考并回答以下问题：  泛型让数据类型就不用硬编码怎么理解？ 什么是构造类型？">
+<meta name="twitter:image" content="http://chebincarl.github.io/2019/07/17/泛型/1.png">
 
 
 
@@ -440,11 +444,29 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-07-19 23:25:16" itemprop="dateModified" datetime="2019-07-19T23:25:16+08:00">2019-07-19</time>
+                <time title="修改时间：2019-07-24 21:40:40" itemprop="dateModified" datetime="2019-07-24T21:40:40+08:00">2019-07-24</time>
               
             
           </span>
 
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C#</span></a></span>
+
+                
+                
+              
+            </span>
           
 
           
@@ -468,7 +490,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">97</span>
+                <span title="本文字数">2.9k</span>
               
 
               
@@ -482,7 +504,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">1 分钟</span>
+                <span title="阅读时长">3 分钟</span>
               
             </div>
           
@@ -503,24 +525,104 @@
 
       
         <p>思考并回答以下问题：</p>
+<ul>
+<li>泛型让数据类型就不用硬编码怎么理解？</li>
+<li>什么是构造类型？</li>
+</ul>
 <a id="more"></a>
+<p>本章涵盖：</p>
+<ul>
+<li>1.什么是泛型</li>
+<li>2.C中的泛型</li>
+<li>3.泛型类</li>
+<li>4.声明泛型类</li>
+<li>5.创建构造类型</li>
+<li>6.创建变量和实例</li>
+<li>7.类型参数的约束</li>
+<li>8.泛型方法</li>
+<li>9.扩展方法和泛型类</li>
+<li>10.泛型结构</li>
+<li>11.泛型委托</li>
+<li>12.泛型接口</li>
+<li>13.协变</li>
+<li>14.逆变</li>
+</ul>
+<h1 id="什么是泛型"><a href="#什么是泛型" class="headerlink" title="什么是泛型"></a><span style="color:#0300DC;">什么是泛型</span></h1><p>使用已经学习的语言结构，我们已经可以建立多种不同类型的强大对象。大部分情况下是声明类，然后封装需要的行为，最后创建这些类的实例。</p>
+<p>到现在为止，所有在类声明中用到的类型都是特定的类型--或许是程序员定义的，或许是语言或BCL定义的。然而，很多时候，如果我们可以把类的行为提取或重构出来，使之不仅能应用到它们编码的数据类型上，而且还能应用到其他类型上的话，类就会更有用。</p>
+<p>有了泛型就可以做到这一点了。我们可以重构代码并且额外增加一个抽象层，对于这样的代码来说，数据类型就不用硬编码了。这是专门为多段代码在不同的数据类型上执行相同指令的情况专门设计的。</p>
+<p><strong>一个栈的示例</strong></p>
+<p>假设我们首先创建了如下的代码，它声明了一个叫做MyIntStack的类，该类实现了一个int类型的栈。它允许我们把int压入栈中，以及把它们弹出。顺便说一下，这不是系统定义的栈。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">MyIntStack</span> <span class="comment">// int类型的栈</span></span><br><span class="line">&#123; </span><br><span class="line">    <span class="keyword">int</span> StackPointer = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span>[] StackArray; <span class="comment">// int类型的数组</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Push</span>(<span class="params"><span class="keyword">int</span> x</span>) <span class="comment">// 输入类型：int</span></span></span><br><span class="line"><span class="function"></span>    &#123; </span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">Pop</span>(<span class="params"></span>) <span class="comment">// 返回类型：int</span></span></span><br><span class="line"><span class="function"></span>    &#123; </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
+<p>假设现在希望将相同的功能应用于float类型的值，可以有几种方式来实现，一种方式是按照下面的步骤产生后续的代码。</p>
+<ul>
+<li>剪切并粘贴MyIntStack类的代码。</li>
+<li>把类名改为MyFloatStack。</li>
+<li>把整个类声明中相应的int声明改为float声明。<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">MyFloatStack</span> <span class="comment">// float类型的栈</span></span><br><span class="line">&#123; </span><br><span class="line">    <span class="keyword">int</span> StackPointer = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">float</span>[] StackArray; <span class="comment">// float类型的数组</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Push</span>(<span class="params"><span class="keyword">float</span> x</span>) <span class="comment">// 输入类型：float</span></span></span><br><span class="line"><span class="function"></span>    &#123; </span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">float</span> <span class="title">Pop</span>(<span class="params"></span>) <span class="comment">// 返回类型：float</span></span></span><br><span class="line"><span class="function"></span>    &#123; </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>这个方法当然可行，但是很容易出错而且有如下缺点。</p>
+<ul>
+<li>我们需要仔细检查类的每一个部分来看哪些类型的声明需要修改，哪些类型的声明需要保留。</li>
+<li>每次需要新类型(long、double、string等)的栈类时，我们都需要重复这个过程。</li>
+<li>在这些过程后，我们有了很多几乎具有相同代码的副本，占据了额外的空间。</li>
+<li>调试和维护这些相似的实现不但复杂而且容易出错。</li>
+</ul>
+<h1 id="C-中的泛型"><a href="#C-中的泛型" class="headerlink" title="C#中的泛型"></a><span style="color:#0300DC;">C#中的泛型</span></h1><p>泛型（generic）特性提供了一种更优雅的方式，可以让多个类型共享一组代码。泛型允许我们声明类型参数化（type-parameterized）的代码，可以用不同的类型进行实例化。也就是说，我们可以用“类型占位符”来写代码，然后在创建类的实例时指明真实的类型。</p>
+<p>我们应该很清楚类型不是对象而是对象的模板这个概念了。同样地，泛型类型也不是类型，而是类型的模板。图1演示了这点。</p>
+<blockquote>
+<p>图1 泛型类型是类型的模板</p>
+</blockquote>
+<img src="/2019/07/17/泛型/1.png">
+
+<p>C#提供了5种泛型：类、结构、接口、委托和方法。注意，前面4个是类型，而方法是成员。图2演示了泛型类型如何用于其他类型。</p>
+<blockquote>
+<p>图2 泛型和用户自定义类型</p>
+</blockquote>
+<img src="/2019/07/17/泛型/2.png">
+
+<p><strong>继续栈的示例</strong></p>
+<p>在栈的示例中，MyIntStack和MyFloatStack两个类的主体声明都差不多，只不过在处理由栈保存的类型时有点不同。</p>
+<ul>
+<li>在MyIntStack中，这些位置使用int类型占据。</li>
+<li>在MyFloatStack中，这些位置被float占据。</li>
+</ul>
+<p>通过如下步骤我们可以从MyIntStack创建一个泛型类。</p>
+<p>(1)在MyIntStack类定义中，使用类型占位符T而不是float来替换int.<br>(2)修改类名称为MyStack.<br>(3)在类名后放置<t>。</t></p>
+<p>结果就是如下的泛型类声明。由尖括号和T构成的字符串表明T是类型的占位符。(也不一定是字母T，它可以是任何标识符。)在类声明的主体中，每一个T都会被编译器替换为实际类型。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">MyStack</span> </span><br><span class="line">&#123; </span><br><span class="line">    <span class="keyword">int</span> StackPointer = <span class="number">0</span>;</span><br><span class="line">    T[] StackArray; </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Push</span>(<span class="params">T x</span>) </span></span><br><span class="line"><span class="function"></span>    &#123; </span><br><span class="line">        </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> T <span class="title">Pop</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123; </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h1 id="泛型类"><a href="#泛型类" class="headerlink" title="泛型类"></a><span style="color:#0300DC;">泛型类</span></h1><p>既然已经见过了泛型类，让我们再来详细了解一下它，并看看如何创建和使用它。</p>
+<p>创建和使用常规的、非泛型的类有两个步骤：声明类和创建类的实例。但是泛型类不是实际的类，而是类的模板，所以我们必须先从它们构建实际的类类型，然后创建这个构建后的类类型的实例。</p>
+<p>图3从一个较高的层面上演示了这个过程。</p>
+<blockquote>
+<p>图3</p>
+</blockquote>
+<img src="/2019/07/17/泛型/3.png">
 
 <ul>
-<li>什么是泛型</li>
-<li>C中的泛型</li>
-<li>泛型类</li>
-<li>声明泛型类</li>
-<li>创建构造类型</li>
-<li>创建变量和实例</li>
-<li>类型参数的约束</li>
-<li>泛型方法</li>
-<li>扩展方法和泛型类</li>
-<li>泛型结构</li>
-<li>泛型委托</li>
-<li>泛型接口</li>
-<li>协变<pre><code>* 逆变</code></pre></li>
+<li>在某些类型上使用占位符来声明一个类。</li>
+<li>为占位符提供<strong>真实类型</strong>。这样就有了真实类的定义，填补了所有的“空缺”。该类型称为<strong>构造类型（constructed type）</strong>。</li>
+<li>创建构造类型的实例。</li>
 </ul>
+<h1 id="声明泛型类"><a href="#声明泛型类" class="headerlink" title="声明泛型类"></a><span style="color:#0300DC;">声明泛型类</span></h1><p>声明一个简单的泛型类和声明普通类差不多，区别如下。</p>
+<ul>
+<li>在类名之后放置一组尖括号。</li>
+<li>在尖括号中用逗号分隔的占位符字符串来表示希望提供的类型。这叫做类型参数(type parameter).</li>
+<li>在泛型类声明的主体中使用类型参数来表示应该替代的类型</li>
+</ul>
+<p>例如，如下代码声明了一个叫做SomeClass的泛型类。类型参数列在尖括号中，然后当作真实类型在声明的主体中使用。</p>
+<p>类型参数</p>
+<pre><code class="cs">class SomeClass&lt;T1, T2&gt;
+{
+    <span class="comment">//通常在这些位置使用类型</span>
+    <span class="keyword">public</span> T1 SomeVar = <span class="keyword">new</span> T1();
+    <span class="keyword">public</span> T2 OtherVar = <span class="keyword">new</span> T2();
+} </code></pre>
+<p>在泛型类型声明中并没有特殊的关键字。取而代之的是尖括号中的类型参数列表，它可以区分泛型类与普通类的声明。</p>
+<h1 id="创建构造类型"><a href="#创建构造类型" class="headerlink" title="创建构造类型"></a><span style="color:#0300DC;">创建构造类型</span></h1><p>一旦创建了泛型类型，我们就需要告诉编译器能使用哪些真实类型来替代占位符(类型参数)，编译器获取这些真实类型并创建构造类型(用来创建真实类对象的模板)。</p>
+<p>创建构造类型的语法如下，包括列出类名并在尖括号中提供真实类型来替代类型参数。要替代类型参数的真实类型叫做类型实参(type argument )。</p>
 
       
     </div>
@@ -541,6 +643,12 @@
     
 
     <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C-图解教程/" rel="tag"># C#图解教程</a>
+          
+        </div>
       
 
       
@@ -607,8 +715,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <div class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -625,7 +742,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">269</span>
+                    <span class="site-state-item-count">280</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -654,7 +771,11 @@
                     
                       
                     
-                    <span class="site-state-item-count">6</span>
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -729,7 +850,17 @@
                     
                       
                     
-                    <span class="site-state-item-count">29</span>
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">34</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -760,23 +891,23 @@
                 
                 
                   <li>
-                    <a href="/2019/07/21/存储器和指针：指向何方？/" title="存储器和指针：指向何方？" target="_blank">存储器和指针：指向何方？</a>
+                    <a href="/2019/07/27/TimeLine-Cinemachine技术/" title="TimeLine&Cinemachine技术" target="_blank">TimeLine&Cinemachine技术</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/07/20/结构、联合与位字段：创建自己的字段/" title="结构、联合与位字段：创建自己的字段" target="_blank">结构、联合与位字段：创建自己的字段</a>
+                    <a href="/2019/07/27/基于Unity3D的策略养成类游戏设计与实现/" title="基于Unity3D的策略养成类游戏设计与实现" target="_blank">基于Unity3D的策略养成类游戏设计与实现</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/07/20/第2章-算法/" title="第2章 算法" target="_blank">第2章 算法</a>
+                    <a href="/2019/07/27/基于XLua的Unity脚本框架的设计与实现/" title="基于XLua的Unity脚本框架的设计与实现" target="_blank">基于XLua的Unity脚本框架的设计与实现</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/07/20/C语言入门：进入C语言的世界/" title="C语言入门：进入C语言的世界" target="_blank">C语言入门：进入C语言的世界</a>
+                    <a href="/2019/07/25/事件-1/" title="事件" target="_blank">事件</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/07/19/多路查找树（B树）/" title="多路查找树（B树）" target="_blank">多路查找树（B树）</a>
+                    <a href="/2019/07/25/观察者模式/" title="观察者模式" target="_blank">观察者模式</a>
                   </li>
                 
               </ul>
@@ -791,6 +922,23 @@
         </div>
       </div>
 
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#什么是泛型"><span class="nav-number">1.</span> <span class="nav-text">什么是泛型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#C-中的泛型"><span class="nav-number">2.</span> <span class="nav-text">C#中的泛型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#泛型类"><span class="nav-number">3.</span> <span class="nav-text">泛型类</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#声明泛型类"><span class="nav-number">4.</span> <span class="nav-text">声明泛型类</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#创建构造类型"><span class="nav-number">5.</span> <span class="nav-text">创建构造类型</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
       
 
       
@@ -820,7 +968,7 @@
     
       <span class="post-meta-item-text">站点总字数：</span>
     
-    <span title="站点总字数">1.3m</span>
+    <span title="站点总字数">1.4m</span>
   
 
   
@@ -831,7 +979,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">20:03</span>
+    <span title="站点阅读时长">21:02</span>
   
 </div>
 

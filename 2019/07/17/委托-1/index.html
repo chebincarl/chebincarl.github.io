@@ -103,18 +103,21 @@
 
 
 
-  <meta name="description" content="思考并回答以下问题：***">
-<meta name="keywords" content="Unity">
+  <meta name="description" content="思考并回答以下问题：  多播委托的返回值是什么样的？ 调用带引用参数的委托是什么样的？">
+<meta name="keywords" content="C#图解教程">
 <meta property="og:type" content="article">
 <meta property="og:title" content="委托">
 <meta property="og:url" content="http://chebincarl.github.io/2019/07/17/委托-1/index.html">
 <meta property="og:site_name" content="车斌的博客">
-<meta property="og:description" content="思考并回答以下问题：***">
+<meta property="og:description" content="思考并回答以下问题：  多播委托的返回值是什么样的？ 调用带引用参数的委托是什么样的？">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-07-21T09:59:11.715Z">
+<meta property="og:image" content="http://chebincarl.github.io/2019/07/17/委托-1/10.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/07/17/委托-1/11.png">
+<meta property="og:updated_time" content="2019-07-25T14:36:04.632Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="委托">
-<meta name="twitter:description" content="思考并回答以下问题：***">
+<meta name="twitter:description" content="思考并回答以下问题：  多播委托的返回值是什么样的？ 调用带引用参数的委托是什么样的？">
+<meta name="twitter:image" content="http://chebincarl.github.io/2019/07/17/委托-1/10.png">
 
 
 
@@ -440,11 +443,29 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-07-21 17:59:11" itemprop="dateModified" datetime="2019-07-21T17:59:11+08:00">2019-07-21</time>
+                <time title="修改时间：2019-07-25 22:36:04" itemprop="dateModified" datetime="2019-07-25T22:36:04+08:00">2019-07-25</time>
               
             
           </span>
 
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C#</span></a></span>
+
+                
+                
+              
+            </span>
           
 
           
@@ -468,7 +489,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">282</span>
+                <span title="本文字数">2.3k</span>
               
 
               
@@ -482,7 +503,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">1 分钟</span>
+                <span title="阅读时长">2 分钟</span>
               
             </div>
           
@@ -502,15 +523,52 @@
       
 
       
-        <p>思考并回答以下问题：<br>*<br>*<br>*</p>
+        <p>思考并回答以下问题：</p>
+<ul>
+<li>多播委托的返回值是什么样的？</li>
+<li>调用带引用参数的委托是什么样的？</li>
+<li></li>
+</ul>
 <a id="more"></a>
+
+<p>本章涵盖：<br>*<br>*</p>
+<h1 id="调用带返回值的委托"><a href="#调用带返回值的委托" class="headerlink" title="调用带返回值的委托"></a><span style="color:#0300DC;">调用带返回值的委托</span></h1><p>如果委托有返回值并且在调用列表中有一个以上的方法，会发生下面的情况。</p>
+<ul>
+<li>调用列表中最后一个方法返回的值就是委托调用返回的值。</li>
+<li>调用列表中所有其他方法的返回值都会被忽略。</li>
+</ul>
+<p>例如，如下代码声明了返回int值的委托。Main创建了委托对象并增加了另外两个方法。然后，它在WriteLine语句中调用委托并打印了它的返回值。图10演示了代码的图形表示。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">Test</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">delegate</span> <span class="keyword">int</span> <span class="title">MyDel</span>(<span class="params"></span>)</span>; <span class="comment">// 声明有返回值的方法</span></span><br><span class="line">    <span class="keyword">class</span> <span class="title">MyClass</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">int</span> IntValue = <span class="number">5</span>;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">Add2</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            IntValue += <span class="number">2</span>;</span><br><span class="line">            <span class="keyword">return</span> IntValue;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">Add3</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            IntValue += <span class="number">3</span>;</span><br><span class="line">            <span class="keyword">return</span> IntValue;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="keyword">string</span>[] args</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            MyClass mc = <span class="keyword">new</span> MyClass();</span><br><span class="line">            MyDel mDel = mc.Add2; <span class="comment">// 创建并初始化委托</span></span><br><span class="line">            mDel += mc.Add3; <span class="comment">// 增加方法</span></span><br><span class="line">            mDel += mc.Add2; <span class="comment">// 增加方法</span></span><br><span class="line"></span><br><span class="line">            Console.WriteLine(<span class="string">"Value:&#123;0&#125;"</span>, mDel()); <span class="comment">// 调用委托并使用返回值</span></span><br><span class="line">            Console.ReadKey();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这段代码产生了如下的输出：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">value</span>:<span class="number">12</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>图10 最后一个方法执行的返回值是委托返回的值</p>
+</blockquote>
+<img src="/2019/07/17/委托-1/10.png">
+
+<h1 id="调用带引用参数的委托-lt-span"><a href="#调用带引用参数的委托-lt-span" class="headerlink" title="调用带引用参数的委托&lt;/span"></a><span style="color:#0300DC;">调用带引用参数的委托&lt;/span</span></h1><p>如果委托有引用参数，参数值会根据调用列表中的一个或多个方法的返回值而改变。</p>
+<ul>
+<li>在调用委托列表中的下一个方法时，参数的<strong>新值</strong>（不是初始值）会传给下一个方法。</li>
+</ul>
+<p>例如，如下代码调用了具有引用参数的委托。图11演示了这段代码。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">Test</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">delegate</span> <span class="keyword">void</span> <span class="title">MyDel</span>(<span class="params"><span class="keyword">ref</span> <span class="keyword">int</span> x</span>)</span>; </span><br><span class="line">    <span class="keyword">class</span> <span class="title">MyClass</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Add2</span>(<span class="params"><span class="keyword">ref</span> <span class="keyword">int</span> x</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            x += <span class="number">2</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Add3</span>(<span class="params"><span class="keyword">ref</span> <span class="keyword">int</span> x</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            x += <span class="number">3</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            MyClass mc = <span class="keyword">new</span> MyClass();</span><br><span class="line"></span><br><span class="line">            MyDel mDel = mc.Add2; <span class="comment">// 创建并初始化委托</span></span><br><span class="line">            mDel += mc.Add3; <span class="comment">// 增加方法</span></span><br><span class="line">            mDel += mc.Add2; <span class="comment">// 增加方法</span></span><br><span class="line"></span><br><span class="line">            <span class="keyword">int</span> x = <span class="number">20</span>;</span><br><span class="line">            mDel(<span class="keyword">ref</span> x);</span><br><span class="line"></span><br><span class="line">            Console.WriteLine(<span class="string">"Value:&#123;0&#125;"</span>, x); <span class="comment">// 调用委托</span></span><br><span class="line">            Console.ReadKey();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这段代码产生了如下的输出：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">value</span>:<span class="number">12</span></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>图11 引用参数的值会在调用间发生改变</p>
+</blockquote>
+<img src="/2019/07/17/委托-1/11.png">
 
 <h1 id="自己的理解和总结"><a href="#自己的理解和总结" class="headerlink" title="自己的理解和总结"></a>自己的理解和总结</h1><p>学习委托一定要明确使用场景。设计模式也是。为了解决什么问题而使用委托。</p>
 <p>这边举个例子。写日志问题。日志从一处产生。产生之后可以有很多种处理。比如写进数据库，比如发送邮件，比如直接展示。</p>
 <p>没有委托之前，如果需要增加一个日志处理，则需要在日志产生的代码处改动增加代码。</p>
 <p>有委托后，只需要在日志产生的地方直接调用委托就OK了。想再增加处理方式可以在外面扩展。写好一个方法后再追加进委托即可。</p>
 <p>目的就是为了解耦合，对修改关闭，对扩展开放。</p>
-<p>目前对事件的理解是对委托的简化，默认让委托为Private，然后省略了+=的过程。</p>
+<p>事件是对委托的进一步封装，增强了委托的安全性，实现了发布/订阅。</p>
 
       
     </div>
@@ -532,6 +590,12 @@
 
     <footer class="post-footer">
       
+        <div class="post-tags">
+          
+            <a href="/tags/C-图解教程/" rel="tag"># C#图解教程</a>
+          
+        </div>
+      
 
       
       
@@ -551,8 +615,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2019/07/17/事件/" rel="prev" title="事件">
-                事件 <i class="fa fa-chevron-right"></i>
+              <a href="/2019/07/17/PHP的依赖注入-DI-和控制反转-IoC/" rel="prev" title="PHP的依赖注入(DI)和控制反转(IoC)">
+                PHP的依赖注入(DI)和控制反转(IoC) <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -624,7 +688,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">269</span>
+                    <span class="site-state-item-count">280</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -653,7 +717,11 @@
                     
                       
                     
-                    <span class="site-state-item-count">6</span>
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -728,7 +796,17 @@
                     
                       
                     
-                    <span class="site-state-item-count">29</span>
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">34</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -759,23 +837,23 @@
                 
                 
                   <li>
-                    <a href="/2019/07/21/存储器和指针：指向何方？/" title="存储器和指针：指向何方？" target="_blank">存储器和指针：指向何方？</a>
+                    <a href="/2019/07/27/TimeLine-Cinemachine技术/" title="TimeLine&Cinemachine技术" target="_blank">TimeLine&Cinemachine技术</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/07/20/结构、联合与位字段：创建自己的字段/" title="结构、联合与位字段：创建自己的字段" target="_blank">结构、联合与位字段：创建自己的字段</a>
+                    <a href="/2019/07/27/基于Unity3D的策略养成类游戏设计与实现/" title="基于Unity3D的策略养成类游戏设计与实现" target="_blank">基于Unity3D的策略养成类游戏设计与实现</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/07/20/第2章-算法/" title="第2章 算法" target="_blank">第2章 算法</a>
+                    <a href="/2019/07/27/基于XLua的Unity脚本框架的设计与实现/" title="基于XLua的Unity脚本框架的设计与实现" target="_blank">基于XLua的Unity脚本框架的设计与实现</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/07/20/C语言入门：进入C语言的世界/" title="C语言入门：进入C语言的世界" target="_blank">C语言入门：进入C语言的世界</a>
+                    <a href="/2019/07/25/事件-1/" title="事件" target="_blank">事件</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/07/19/多路查找树（B树）/" title="多路查找树（B树）" target="_blank">多路查找树（B树）</a>
+                    <a href="/2019/07/25/观察者模式/" title="观察者模式" target="_blank">观察者模式</a>
                   </li>
                 
               </ul>
@@ -801,7 +879,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#自己的理解和总结"><span class="nav-number">1.</span> <span class="nav-text">自己的理解和总结</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#调用带返回值的委托"><span class="nav-number">1.</span> <span class="nav-text">调用带返回值的委托</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#调用带引用参数的委托-lt-span"><span class="nav-number">2.</span> <span class="nav-text">调用带引用参数的委托&lt;/span</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#自己的理解和总结"><span class="nav-number">3.</span> <span class="nav-text">自己的理解和总结</span></a></li></ol></div>
             
 
           </div>
@@ -836,7 +914,7 @@
     
       <span class="post-meta-item-text">站点总字数：</span>
     
-    <span title="站点总字数">1.3m</span>
+    <span title="站点总字数">1.4m</span>
   
 
   
@@ -847,7 +925,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">20:03</span>
+    <span title="站点阅读时长">21:02</span>
   
 </div>
 
