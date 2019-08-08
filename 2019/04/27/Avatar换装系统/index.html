@@ -103,13 +103,13 @@
 
 
 
-  <meta name="description" content="换装系统又称纸娃娃系统，是运用在游戏开发上的关键技术。市面上关于换装的游戏非常多，3D MMORPG游戏中也使用了角色换装技术，所以掌握换装技术是非常重要的。换装系统原理也同样适用于换武器、换表情等。本章先讲换装实现原理，再讲换装的编程实现，最后提醒读者在运用该技术解决问题时应注意的事项。">
+  <meta name="description" content="思考并回答以下问题：  直接更换Mesh的方法有什么缺点？">
 <meta name="keywords" content="Unity 3D实战核心技术详解">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Avatar换装系统">
 <meta property="og:url" content="http://chebincarl.github.io/2019/04/27/Avatar换装系统/index.html">
 <meta property="og:site_name" content="车斌的博客">
-<meta property="og:description" content="换装系统又称纸娃娃系统，是运用在游戏开发上的关键技术。市面上关于换装的游戏非常多，3D MMORPG游戏中也使用了角色换装技术，所以掌握换装技术是非常重要的。换装系统原理也同样适用于换武器、换表情等。本章先讲换装实现原理，再讲换装的编程实现，最后提醒读者在运用该技术解决问题时应注意的事项。">
+<meta property="og:description" content="思考并回答以下问题：  直接更换Mesh的方法有什么缺点？">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://chebincarl.github.io/2019/04/27/Avatar换装系统/1.png">
 <meta property="og:image" content="http://chebincarl.github.io/2019/04/27/Avatar换装系统/2.png">
@@ -121,10 +121,10 @@
 <meta property="og:image" content="http://chebincarl.github.io/2019/04/27/Avatar换装系统/8.png">
 <meta property="og:image" content="http://chebincarl.github.io/2019/04/27/Avatar换装系统/9.png">
 <meta property="og:image" content="http://chebincarl.github.io/2019/04/27/Avatar换装系统/12.png">
-<meta property="og:updated_time" content="2019-07-17T14:44:47.972Z">
+<meta property="og:updated_time" content="2019-08-05T13:36:55.958Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Avatar换装系统">
-<meta name="twitter:description" content="换装系统又称纸娃娃系统，是运用在游戏开发上的关键技术。市面上关于换装的游戏非常多，3D MMORPG游戏中也使用了角色换装技术，所以掌握换装技术是非常重要的。换装系统原理也同样适用于换武器、换表情等。本章先讲换装实现原理，再讲换装的编程实现，最后提醒读者在运用该技术解决问题时应注意的事项。">
+<meta name="twitter:description" content="思考并回答以下问题：  直接更换Mesh的方法有什么缺点？">
 <meta name="twitter:image" content="http://chebincarl.github.io/2019/04/27/Avatar换装系统/1.png">
 
 
@@ -451,7 +451,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-07-17 22:44:47" itemprop="dateModified" datetime="2019-07-17T22:44:47+08:00">2019-07-17</time>
+                <time title="修改时间：2019-08-05 21:36:55" itemprop="dateModified" datetime="2019-08-05T21:36:55+08:00">2019-08-05</time>
               
             
           </span>
@@ -531,9 +531,19 @@
       
 
       
-        <p>换装系统又称纸娃娃系统，是运用在游戏开发上的关键技术。市面上关于换装的游戏非常多，3D MMORPG游戏中也使用了角色换装技术，所以掌握换装技术是非常重要的。换装系统原理也同样适用于换武器、换表情等。本章先讲换装实现原理，再讲换装的编程实现，最后提醒读者在运用该技术解决问题时应注意的事项。</p>
+        <p>思考并回答以下问题：</p>
+<ul>
+<li>直接更换Mesh的方法有什么缺点？</li>
+</ul>
 <a id="more"></a>
 
+<p>本章涵盖：</p>
+<ul>
+<li>换装原理</li>
+<li>换装代码实现</li>
+<li>小结</li>
+</ul>
+<p>换装系统又称纸娃娃系统，是运用在游戏开发上的关键技术。市面上关于换装的游戏非常多，3D MMORPG游戏中也使用了角色换装技术，所以掌握换装技术是非常重要的。换装系统原理也同样适用于换武器、换表情等。本章先讲换装实现原理，再讲换装的编程实现，最后提醒读者在运用该技术解决问题时应注意的事项。</p>
 <h1 id="换装原理"><a href="#换装原理" class="headerlink" title="换装原理"></a>换装原理</h1><p>游戏内的角色，能够像纸娃娃换装那样让玩家为自己的角色改变外观，一直深受广大玩家欢迎。一般而言，建好的3D模型，如果要将其中一个部位换成另外一个形状，最直接的做法是将该物件的模型Mesh替换掉，那么外观就改变了，但这种方法如果运用在需要做动作的模型上，被置换的部位可能就不会正常做动作了，更糟的状况是可能连模型显示的位置及方向都是错误的，所以，直接更换Mesh的方法只适用于静态模型物件。为此，必须找出更深入的方法来实现换装的功能。</p>
 <p>首先看看模型的结构。在Hierarchy视窗中将物件展开，我们会发现几个名称相同并使用数字区别的物件，它们分別代表人物各部位的模型。由此可知，整个人物包含多个相同部位的模型，其在Unity中的表现如下图所示。对象FemaleAvatar的子节点Famale_Bip01是整个人物的骨架结构，人物的动作组件则设置在顶层对象（FemaleAvatar）的Animation组件中，这个模型是资源模型，而不是实际上要放在场景中的目标物件。模型的制作是需要美术将其呈现出来的，最后交付给程序使用。在这里给读者介绍模型资源结构的主要目的是希望读者了解模型制作要求。</p>
 <img src="/2019/04/27/Avatar换装系统/1.png">
@@ -596,7 +606,7 @@
 
 <p>换装后的材质发生了改变，通过上图可以看出，有不同部位的裤子材质。</p>
 <p>以上介绍主要是为了帮助读者了解换装所需要做的工作，实际项目开发时，不太可能把游戏中的角色全身各部位的模型资料全部都载入作为来源资料。例如游戏中的武器有100种，角色背包中有3种武器，但为了换装却把100种武器都载入到游戏中，而实际上此角色最多也只能变换背包中的3种武器而已，这样无疑是浪费了97种武器所占用的资源。所以在了解如何换装后，实际操作时应该尽量把来源资源包装起来，只取出需要的资源来进行换装。</p>
-<p>#　小结<br>本章的Avatar换装技术，是针对3D游戏设计的，2D游戏只需要换材质就可以了，比较简单，这里就不介绍了。3D的Avatar换装技术是作为游戏开发者和VR/AR开发者必须要掌握的技能之一。要想掌握Avatar技术主要从两方面入手：一是技术实现，Mesh是绑定到骨骼上的；二是3D MAX建模的要求，或者说是规范，要告诉美工如何建模。希望通过本章的学习，读者可以举一反三做一套更换面部表情的换装系统。</p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>本章的Avatar换装技术，是针对3D游戏设计的，2D游戏只需要换材质就可以了，比较简单，这里就不介绍了。3D的Avatar换装技术是作为游戏开发者和VR/AR开发者必须要掌握的技能之一。要想掌握Avatar技术主要从两方面入手：一是技术实现，Mesh是绑定到骨骼上的；二是3D MAX建模的要求，或者说是规范，要告诉美工如何建模。希望通过本章的学习，读者可以举一反三做一套更换面部表情的换装系统。</p>
 
       
     </div>
@@ -716,7 +726,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">280</span>
+                    <span class="site-state-item-count">326</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -834,7 +844,15 @@
                     
                       
                     
-                    <span class="site-state-item-count">34</span>
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">38</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -865,23 +883,23 @@
                 
                 
                   <li>
-                    <a href="/2019/07/27/TimeLine-Cinemachine技术/" title="TimeLine&Cinemachine技术" target="_blank">TimeLine&Cinemachine技术</a>
+                    <a href="/2019/08/08/Transform-API/" title="Transform API" target="_blank">Transform API</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/07/27/基于Unity3D的策略养成类游戏设计与实现/" title="基于Unity3D的策略养成类游戏设计与实现" target="_blank">基于Unity3D的策略养成类游戏设计与实现</a>
+                    <a href="/2019/08/08/GameObject-API/" title="GameObject API" target="_blank">GameObject API</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/07/27/基于XLua的Unity脚本框架的设计与实现/" title="基于XLua的Unity脚本框架的设计与实现" target="_blank">基于XLua的Unity脚本框架的设计与实现</a>
+                    <a href="/2019/08/07/获取游戏服务的唯一对象--单例模式/" title="获取游戏服务的唯一对象--单例模式" target="_blank">获取游戏服务的唯一对象--单例模式</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/07/25/事件-1/" title="事件" target="_blank">事件</a>
+                    <a href="/2019/08/07/游戏主要类--外观模式（Facade）/" title="游戏主要类--外观模式（Facade）" target="_blank">游戏主要类--外观模式（Facade）</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/07/25/观察者模式/" title="观察者模式" target="_blank">观察者模式</a>
+                    <a href="/2019/08/07/动态配置图片/" title="动态配置图片" target="_blank">动态配置图片</a>
                   </li>
                 
               </ul>
@@ -907,7 +925,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#换装原理"><span class="nav-number">1.</span> <span class="nav-text">换装原理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#换装代码实现"><span class="nav-number">2.</span> <span class="nav-text">换装代码实现</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#换装原理"><span class="nav-number">1.</span> <span class="nav-text">换装原理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#换装代码实现"><span class="nav-number">2.</span> <span class="nav-text">换装代码实现</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#小结"><span class="nav-number">3.</span> <span class="nav-text">小结</span></a></li></ol></div>
             
 
           </div>
@@ -942,7 +960,7 @@
     
       <span class="post-meta-item-text">站点总字数：</span>
     
-    <span title="站点总字数">1.4m</span>
+    <span title="站点总字数">1.7m</span>
   
 
   
@@ -953,7 +971,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">21:03</span>
+    <span title="站点阅读时长">25:01</span>
   
 </div>
 

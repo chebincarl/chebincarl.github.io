@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="思考并回答以下问题：">
+<meta name="keywords" content="设计模式与游戏完美开发">
+<meta property="og:type" content="article">
+<meta property="og:title" content="获取游戏服务的唯一对象--单例模式">
+<meta property="og:url" content="http://chebincarl.github.io/2019/08/07/获取游戏服务的唯一对象--单例模式/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="思考并回答以下问题：">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/07/获取游戏服务的唯一对象--单例模式/1.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/07/获取游戏服务的唯一对象--单例模式/2.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/07/获取游戏服务的唯一对象--单例模式/4.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/07/获取游戏服务的唯一对象--单例模式/5.png">
+<meta property="og:updated_time" content="2019-08-08T13:55:37.357Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="获取游戏服务的唯一对象--单例模式">
+<meta name="twitter:description" content="思考并回答以下问题：">
+<meta name="twitter:image" content="http://chebincarl.github.io/2019/08/07/获取游戏服务的唯一对象--单例模式/1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/08/07/获取游戏服务的唯一对象--单例模式/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>获取游戏服务的唯一对象--单例模式 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">文章看10遍，动手做10遍，自然就会了</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/08/07/获取游戏服务的唯一对象--单例模式/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">获取游戏服务的唯一对象--单例模式
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-08-07 15:23:42" itemprop="dateCreated datePublished" datetime="2019-08-07T15:23:42+08:00">2019-08-07</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-08-08 21:55:37" itemprop="dateModified" datetime="2019-08-08T21:55:37+08:00">2019-08-08</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Unity/" itemprop="url" rel="index"><span itemprop="name">Unity</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">12k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">11 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>思考并回答以下问题：</p>
+<a id="more"></a>
+
+<h1 id="游戏实现中的唯一对象"><a href="#游戏实现中的唯一对象" class="headerlink" title="游戏实现中的唯一对象"></a><span style="color:#039BE5;">游戏实现中的唯一对象</span></h1><p>生活中的许多物品都是唯一的，地球是唯一的、太阳是唯一的等。软件设计上也会有唯一对象的需求，例如：服务器端的程序只能连接到一个数据库、只能有一个日志产生器；游戏世界也是一样的，同时间只能有一个关卡正在进行、只能连线到一台游戏服务器、只能同时操作一个角色等。</p>
+<p>在《P级阵地》中，也存在唯一的对象，例如上一章提到的，用来包含所有游戏子系统的PBaseDefenseGame类，它负责游戏中几个主要功能之间的串接，外界通过它的接口就能存取《P级阵地》的主要游戏服务，可以称这个PBaseDefenseGame类为“游戏服务”的提供者。因为它提供了运行这个游戏所需要的功能，所以PBaseDefenseGame类的对象只需要一个，并且由这个唯一的对象来负责游戏的运行。另外，PBaseDefenseGame类实现了外观模式（Facade），包含了游戏中大部分的操作接口。因此，在实际应用上，会希望有一种方法能够快速获取这个唯一的对象。在实现上，程序设计师会希望这个PBaseDefenseGame类具备两项特质：</p>
+<ul>
+<li>（1）同时间只存在一个对象；</li>
+<li>（2）提供一个快速获取这个对象的方法。</li>
+</ul>
+<p>如果使用比较直接的方式来实现，可能会使用程序设计语言中的“全局静态变量”功能来满足上述两项需求。若以C#来编写的话，可能会是如下这样：</p>
+<blockquote>
+<p>Listing 5-1 使用全局静态对象的实现方式</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title">GlobalObject</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> PBaseDefenseGame GameInstance = <span class="keyword">new</span> PBaseDefenseGame();</span><br><span class="line">&#125;</span><br><span class="line">GlobalObject.GameInstance.Update(); <span class="comment">// 使用方法</span></span><br></pre></td></tr></table></figure>
+
+<p>在一个静态类中，声明类对象为一个静态成员，这样实现的方式虽然可以满足“容易获取对象”的需求，但无法避免刻意或无意地产生第二个对象，而且像这种使用全局变量的实现方式，也容易产生全局变量命名重复的问题。</p>
+<p>所以，最好的实现方式是，让PBaseDefenseGame类只产生一个对象，并提供便利的方法来获取这唯一的对象。GoF中的单例模式（Singleton）讲述的就是如何满足上述需求的模式。</p>
+<h1 id="单例模式"><a href="#单例模式" class="headerlink" title="单例模式"></a><span style="color:#039BE5;">单例模式</span></h1><p>单例模式是笔者过去常使用的设计模式，单例模式确实令人“着迷”，因为它能够让程序设计师快速获取提供某项服务或功能的对象，可以省去层层传递对象的困扰。</p>
+<h2 id="单例模式的定义"><a href="#单例模式的定义" class="headerlink" title="单例模式的定义"></a><span style="color:#00ACC1;">单例模式的定义</span></h2><p>单例模式在GoF中的定义是：</p>
+<p>“确认类只有一个对象，并提供一个全局的方法来获取这个对象”。</p>
+<p>单例模式在实现时，需要程序设计语言的支持。只要具有静态类属性、静态类方法和重新定义类建造者存取层级。</p>
+<p>3项语句功能的程序设计语言，就可以实现出单例模式。本书使用的C#具备这3项条件，可以用来实现单例模式。</p>
+<p>不过单例模式也是许多设计模式推广人士不建议大量使用的模式，详细的原因会在本章后面加以说明。</p>
+<h2 id="单例模式的说明"><a href="#单例模式的说明" class="headerlink" title="单例模式的说明"></a><span style="color:#00ACC1;">单例模式的说明</span></h2><p>单例模式的结构如图5-1所示。</p>
+<blockquote>
+<p>单例模式的结构示意图</p>
+</blockquote>
+<img src="/2019/08/07/获取游戏服务的唯一对象--单例模式/1.png">
+
+<p>Singleton参与的角色说明如下：</p>
+<ul>
+<li>能产生唯一对象的类，并且提供“全局方法”让外界可以方便获取唯一的对象。</li>
+<li>通常会把唯一的类对象设置为“静态类属性”。</li>
+<li>习惯上会使用Instance作为全局静态方法的名称，通过这个静态函数可能获取“静态类属性”。</li>
+</ul>
+<h2 id="单例模式的实现范例"><a href="#单例模式的实现范例" class="headerlink" title="单例模式的实现范例"></a><span style="color:#00ACC1;">单例模式的实现范例</span></h2><p>C#支持实现单例模式（Singleton Pattern）的特性，以下是使用C#实现的方式之一：</p>
+<blockquote>
+<p>Listing 5-2 单例模式的实现范例（Singleton.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Singleton</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span> Name &#123;<span class="keyword">get</span>; <span class="keyword">set</span>;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Singleton _instance;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Singleton Instance</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">get</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (_instance == <span class="literal">null</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                Debug.Log(<span class="string">"产生Singleton"</span>);</span><br><span class="line">                _instance = <span class="keyword">new</span> Singleton();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> _instance;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">Singleton</span>(<span class="params"></span>)</span>&#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在类内定义一个Singleton类的“静态属性成员”_instance，并定义一个“静态成员方法”Instance，用来获取_instance属性。这里也应用了C#的getter存取运算符功能来实现Instance方法，让原本Singleton.Instance()的调用方式可以改为Singleton.Instance方式，虽然只是少了对小括号()，但以笔者的开发经验来说，少打一对小括号对于程序编写及后续维护上仍有不少的帮助。</p>
+<p>Instance的getter存取运算符中，先判断_instance是否已被产生过，如果没有，才继续下面的new Singleton()，之后再返回_instance。</p>
+<p>最后，将建造者Singleton()声明为私有成员，这个声明主要是让建造者Singletion()无法被外界调用。一般来说，有了这个声明就可以确保该类只能产生一个对象，因为建造者是私有成员无法被调用，因此可以防止其他客户端有意或无意地产生其他类对象。</p>
+<p>打开测试类SingletonTest，测试程序代码如下：</p>
+<blockquote>
+<p>Listing 5-3 单例模式测试方法（SingletonTest.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">UnitTest</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Singleton.Instance.Name = <span class="string">"Hello"</span>;</span><br><span class="line">    Singleton.Instance.Name = <span class="string">"World"</span>;</span><br><span class="line">    Debug.Log(Singleton.Instance.Name);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//Singleton TempSingleton = new Singleton();</span></span><br><span class="line">    <span class="comment">/*错误error CS0122:</span></span><br><span class="line"><span class="comment">    `DesignPattern_Singleton.Singleton.Singleton()` is inaccessible due to its protection level */</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在范例中，分别使用Singleton.Instance来获取类属性Name，从输出信息中可以看到：</p>
+<blockquote>
+<p>执行结果：产生Singleton测试范例产生的信息<br>World</p>
+</blockquote>
+<p>使用两次Singleton.Instance只会产生一个对象，从Name属性最后显示的是World也可以证实存取的是同一个对象。</p>
+<p>测试程序代码，最后试着再产生另一个Singleton对象：</p>
+<blockquote>
+<p>执行结果 再产生另一个Singleton对象时，产生的错误信息<br>error CS0122: ‘DesignPattern_Singleton.Singleton.Singleton()’ is inaccessible due to its protection level.</p>
+</blockquote>
+<p>但从C#编译报错的信息可以看出，构建式Singleton()是在保护阶段，无法被调用，所以无法产生对象。</p>
+<h1 id="使用单例模式获取唯一的游戏服务对象"><a href="#使用单例模式获取唯一的游戏服务对象" class="headerlink" title="使用单例模式获取唯一的游戏服务对象"></a><span style="color:#039BE5;">使用单例模式获取唯一的游戏服务对象</span></h1><p>游戏系统中哪些类适合以单例模式实现，必须经过挑选，至少要确认的是，它只能产生一个对象且不能够被继承。笔者过去的许多经验中，都会遇到必须将原本是单例模式的类改回非单例模式，而且还必须开放继承的情况。强制修改之下会使得程序代码变得不易维护，所以分析上需要多加注意。</p>
+<h2 id="游戏服务类的单例模式实现"><a href="#游戏服务类的单例模式实现" class="headerlink" title="游戏服务类的单例模式实现"></a><span style="color:#00ACC1;">游戏服务类的单例模式实现</span></h2><p>在《P级阵地》中，因为PBaseDefenseGame类包含了游戏大部分的功能和操作，因此希望只产生一个对象，并提供方便的方法来取用PBaseDefenseGame功能，所以将该类运用单例模式，设计如图5-2所示。</p>
+<blockquote>
+<p>图5-2 游戏服务类的单例模式实现示例</p>
+</blockquote>
+<img src="/2019/08/07/获取游戏服务的唯一对象--单例模式/2.png">
+
+<p>参与者的说明如下：</p>
+<ul>
+<li>PBaseDefenseGame<ul>
+<li>游戏主程序，内部包含了类型为PBaseDefenseGame的静态成员属性instance，作为该类唯一的对象。</li>
+<li>提供使用C# getter实现的静态成员方法Instance，用它来获取唯一的静态成员属性_instance。</li>
+</ul>
+</li>
+<li>BattleState<ul>
+<li>PBaseDefenseGame类的客户端，使用PBaseDefenseGame.Instance来获取唯一的对象。</li>
+</ul>
+</li>
+</ul>
+<h2 id="实现说明"><a href="#实现说明" class="headerlink" title="实现说明"></a><span style="color:#00ACC1;">实现说明</span></h2><p>在《P级阵地》范例中，只针对PBaseDefenseGame类运用单例模式，实现方式如下：</p>
+<blockquote>
+<p>Listing 5-4 将游戏服务类以单例模式实现（PBaseDefenseGame.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">PBaseDefenseGame</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// Singleton模式</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> PBaseDefenseGame _instance;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> PBaseDefenseGame Instance</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">get</span> </span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(_instance == <span class="literal">null</span>)</span><br><span class="line">                _instance = <span class="keyword">new</span> PBaseDefenseGame();</span><br><span class="line">            <span class="keyword">return</span> _instance;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">PBaseDefenseGame</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>按照之前说明的步骤，实现时先声明一个PBaseDefenseGame类的静态成员属性_instance，同时提供一个用来存取这个静态成员属性的“静态成员方法”Instance。在静态成员方法中，实现时必须确保只会有一个PBaseDefenseGame类对象被产生出来。最后，将建造者PBaseDefenseGame()设置为私有成员。</p>
+<p>在实际应用中，直接通过PBaseDefenseGame.Instance获取对象，立即可以使用类功能：</p>
+<blockquote>
+<p>Listing 5-5 战斗状态中以单例的方式使用PBaseDefenseGame对象（BatleState.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">BattleState</span> : <span class="title">ISceneState</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 开始</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">StateBegin</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        PBaseDefenseGame.Instance.Initinal();</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在《P级阵地》中，除了BattleState类会使用到PBaseDefenseGame对象之外，在后续的说明中也会看到其他类的使用情况。以下是另一个使用的例子：</p>
+<blockquote>
+<p>Listing 5-6 兵营用户界面中以单例的方式使用PBaseDefenseGame对象（SoldierClickScript.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">SoldierOnclick</span>: <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">OnClick</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// Debug.Log("CharacterOnClick.OnClick:" + gameObject.name);</span></span><br><span class="line">        PBaseDefenseGame.Instance.ShowSoldierInfo(Soldier);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在SoliderOnClick中完全不需要设置PBaseDefenseGame对象的引用来源，直接调用PBaseDefenseGame.Instance就可以马上获取对象并调用类方法。</p>
+<h2 id="使用单例模式后的比较"><a href="#使用单例模式后的比较" class="headerlink" title="使用单例模式后的比较"></a><span style="color:#00ACC1;">使用单例模式后的比较</span></h2><p>对于需要特别注意“对象产生数量”的类，单例模式通过将“类建造者私有化”，让类对象只能在“类成员方法”中产生，再配合“静态成员属性”，在每一个类中只会存在一个的限制，让系统可以有效地限制产生数量（有需要时可以放宽一个的限制），在两者配合下，单例模式可以有效地限制类对象产生的地点和时间，也可以防止类对象被任意产生而造成系统错误。</p>
+<h2 id="反对使用单例模式的原因"><a href="#反对使用单例模式的原因" class="headerlink" title="反对使用单例模式的原因"></a><span style="color:#00ACC1;">反对使用单例模式的原因</span></h2><p>按照笔者过去的开发经验，单例模式好用的原因之一是：可以马上获取类对象，不必为了“安排对象传递”或“设置引用”而伤脑筋，想使用类对象时，调用类的Instance方法就可以马上获取对象，非常方便。</p>
+<p>如果不想使用单例模式或全局变量，最简单的对象引用方式就是：将对象当成“方法参数”，一路传递到最后需要使用该对象的方法中。但此时若存在设计不当的程序代码，那么方法的参数数量就会容易失控而变多，造成难以维护的情况。</p>
+<p>而程序设计师一旦发现这个“马上获取”的好处时，就很容易在整个项目中看到许多单例模式的应用（包含实现与调用），这种情况使开发者过于沉迷于使用单例模式。</p>
+<p>很不幸，笔者在过去的开发经验中也有过这个“症状”，大多是为了想“省略参数传递”及“能够快速获取唯一对象”等原因。所以在实现上，只要发现“游戏子系统类”或“用户界面类”的对象，在整个游戏运行中是唯一时，就会将单例模式运用在该类上，因此项目内处处可见标示为Singleton的类。</p>
+<p>单例模式之所以被滥用，是开发时过度使用“全局变量”及不仔细思考对象的“适当可视性”所造成的产物，因此这是可以避免的。提供了另一种模型来避开使用单例模式。</p>
+<p>归咎滥用单例模式的主要原因，多数还是认为是在设计上出现了问题。大多数情况是不需要使用单例模式的，开发者只需要再多花点时间重新思考、更改设计，就可避免使用。</p>
+<p>再深入探讨的话，单例模式还违反了“开—闭原则（OCP）”，因为，通过Instance方法获取对象是“实现类”而不是“接口类”，该方法返回的对象包含了实现细节的实体类。因此，当设计变更或需求增加时，程序设计师无法将其替代为其他类，只能更改原有实现类内的程序代码，所以无法满足“对修改关闭”的要求。</p>
+<p>当然，如果真的要让单例模式返回接口类——即父类为单例模式类型，并让子类继承实现，并不是没有办法，有以下两种方式可以实现：</p>
+<ul>
+<li>子类向父类注册实体对象，让父类的Instance方法返回对象时，按条件查表返回对应的子类对象。</li>
+<li>每个子类都实现单例模式，再由父类的Instance去获取这些子类。（《P级阵地》采用类似的方式来实现）。</li>
+</ul>
+<p>不过“返回子类的单例模式的对象”有时会引发“白马非马”的逻辑诡辩问题——返回的对象是否就能代表父类呢？举一个实例来说明会发生逻辑诡辩的设计方式：</p>
+<p>今天服务器端的系统有项设计需求，需要连线到某一个数据库服务，并要求同时只能存在个连接。程序设计师们经过设计分析后，决定使用单例模式只能产生唯一对象的特性，来满足只能存在一条连接的需求。接着定义数据库连接操作的接口，并运用单例模式，如图5-3所示。</p>
+<blockquote>
+<p>图5-4 实现“子类向父类注册实体对象”的方式</p>
+</blockquote>
+<img src="/2019/08/07/获取游戏服务的唯一对象--单例模式/4.png">
+
+<p>客户端现在可以按当前的设计结果，获取某一种数据库的连接对象，并同时确保只存在一条连接。</p>
+<p>经过多次需求追加后，服务器数据库功能的操作需求也增加了，这次希望的需求是：每次的数据库操作能够被记录下来，即当数据库完成操作后必须将操作记录写入“日志数据库”中。但由于“日志数据库”具有“只写不读”的特性，在实现上会选择再启用另一条连接，连接到另一组数据库（有针对“只写不读”特性进行优化的数据库），这样除了可以减少每次操作记录写入时的延迟,也不会增加主数据库的负担。</p>
+<p>所以，如果要在不更改原有接口的要求下实现新的功能，最简单的方式就是再从MySQLConnect和OracleConnect各自继承一个子类，并在子类中增加另一条“日志数据连接”和日志操作方法，类结构如图5-5所示。</p>
+<blockquote>
+<p>图5-5 从MySQLConnect和OracleConnect各自继承一个子类后的类结构图</p>
+</blockquote>
+<img src="/2019/08/07/获取游戏服务的唯一对象--单例模式/5.png">
+
+<p>现在获取的MySQLConnectWithLog或OracleConnectWithLog对象，是否还是IDBConnect对象？从IDBConnect的设计需求来看：</p>
+<ul>
+<li>数据库连接——有；</li>
+<li>只能有一个对象——有；</li>
+<li>一个对象代表一条连接——没有。</li>
+</ul>
+<p>因为有两条连接存在…，所以MySQLConnectWithLog还是IDBConnect对象吗？</p>
+<p>赞同方会说：“因为单例模式负责产生的对象只有一个，不会去管数据库的连接数量，所以还是单例对象”；反对方则会说：“当初就是希望利用单例模式只能产生唯一对象的特性，来限制数据库的同时连接数，现在子类却有两条连接，所以当然不是”…，白马是不是马的辩论就这样产生了。而笔者认为，花点时间修改原有的设计，让这种辩论消失才是真正解决的方式。</p>
+<h1 id="少用单例模式时如何方便地引用到单一对象"><a href="#少用单例模式时如何方便地引用到单一对象" class="headerlink" title="少用单例模式时如何方便地引用到单一对象"></a><span style="color:#039BE5;">少用单例模式时如何方便地引用到单一对象</span></h1><p>单例模式包含两个重要特性：唯一的对象和容易获取对象。那么要如何减少单例模式的使用呢？可以从分析类的“使用需求”开始，先确认程序设计师在使用这个类时，是希望同时获得上述两个好处还是只需要其中一个。若是只需要其中一个，那么下面几种方式可以用来设计系统。</p>
+<p>让类具有计数功能来限制对象数量</p>
+<p>在有数量限制的类中加上“计数器”（静态成员属性）。每当类建造者被调用时，就让计数器增加1，然后判断有没有超过限制的数量，如果超过使用上限，那么该对象就会被标记为无法使用，后续的对象功能也不可以被执行。适当地在类建造者中加入警告或Assert，也有助于调试分析，范例程序如下:</p>
+<blockquote>
+<p>Listing 5-7 有计数功能的类（ClassWithCounter.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ClassWithCounter</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">static</span> <span class="keyword">int</span> m_ObjCounter = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">bool</span> m bEnable = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ClassWithCounter</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_Objcounter++;</span><br><span class="line">        m_bEnable= (m Obicounter=<span class="number">1</span> )? <span class="literal">true</span>: <span class="literal">false</span> ;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>( m_bEnable==<span class="literal">false</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            Debug.LogError(<span class="string">"当前对象数["</span>+m objCounter+<span class="string">"]超过1个!!"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Operator</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span>( m bEnable ==<span class="literal">false</span>)</span><br><span class="line">            <span class="keyword">return</span> ;</span><br><span class="line">        Debug. Log (<span class="string">"可以执行"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>Listing 5-8 有计数功能类的测试方法(SingletonTest.cs)</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> UnitTest <span class="title">classwithcounter</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>&#123;   <span class="comment">//有计数功能的类</span></span><br><span class="line">    ClassWithCounter pobj1 = <span class="keyword">new</span> ClassWithcounter();</span><br><span class="line">    pobj1.<span class="keyword">operator</span>();</span><br><span class="line">    ClassWithcounter pobj2 = <span class="keyword">new</span> classWithcounter();</span><br><span class="line">    pobj2.Operator();</span><br><span class="line">    pobj1.Operator();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>设置成为类的引用，让对象可以被取用</p>
+<p>某个类的功能被大量使用时，可以将这个类对象设置为其他类中的成员，方便直接引用这些类。而这种实现方法是“依赖性注入”的方式之一，可以让被引用的对象不必通过参数传递的方式,就能被类的其他方法引用。按照设置的方式又可以分为“分别设置”和“指定类静态成员”两种。</p>
+<p>1.分别设置</p>
+<p>在《P级阵地》中，PBaseDefenseGame是最常被引用的。虽然已经运用了单例模式，但笔者还是以此来示范如何通过设置它成为其他类引用的方式，来减少对单例模式的使用。</p>
+<p>由于在《P级阵地》中，每个游戏子系统都会使用PBaseDefenseGame类的功能，所以在各个游戏系统初始化设置时，就将PBaseDefenseGame对象指定给每一个游戏系统，并让游戏系统设置为类成员。那么，后面若有游戏系统的方法需要使用PBaseDefenseGame的功能时，就可以直接使用这个类成员来调用PBaseDefenseGame的方法;</p>
+<blockquote>
+<p>Listing 5-9 将PBaseDefenseGame设置为其他类中的对象引用</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">PBaseDefenseGame</span></span><br><span class="line">...</span><br><span class="line">/<span class="number">1</span>初始化P-BaseDefense游戏相关设置<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Initinal</span>(<span class="params"></span>) t</span></span><br><span class="line"><span class="function"><span class="comment">//游戏系统</span></span></span><br><span class="line"><span class="function">m GameEventSystem</span> = <span class="keyword">new</span> GameEventSystem (<span class="keyword">this</span>); <span class="comment">//游戏事件系统:</span></span><br><span class="line">m CampSystem-<span class="keyword">new</span> CampSystem (<span class="keyword">this</span>):  <span class="comment">//兵营系统</span></span><br><span class="line">m stagesyatem-<span class="function">hew <span class="title">stagesystem</span> (<span class="params"><span class="keyword">this</span></span>)</span>;  <span class="comment">//关卡系统</span></span><br><span class="line"><span class="comment">// PbaseDefenseGame.cs</span></span><br><span class="line"><span class="comment">//游戏子系统共享接口</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">IGameSystem</span></span><br><span class="line"><span class="title">protected</span> <span class="title">PBasepefenseGame</span> <span class="title">m</span> <span class="title">PBDGame</span> <span class="title">nul1</span>:</span><br><span class="line">    -</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">IGameSystem</span> (<span class="params"> PBaseDefenseGame PBDGame</span>) t</span></span><br><span class="line"><span class="function">    m PBDGame s PBDGame:</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">Initialize</span>(<span class="params"></span>)0)<span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">Release</span>(<span class="params"></span>)t)<span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">Update</span> (<span class="params"></span>)11 <span class="comment">// IGameSystem.cs</span></span></span><br><span class="line"><span class="function"><span class="comment">//兵营系统</span></span></span><br><span class="line"><span class="function"><span class="keyword">public</span> class CampSystem: IGameSystem</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">CampSystem</span> (<span class="params">PBaseDefenseGame PBDGame</span>) :<span class="title">base</span> (<span class="params">PBDGame</span>) <span class="title">Initialize</span> (<span class="params"></span>)</span>;</span><br><span class="line"><span class="comment">//显示场景中的俘兵营</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ShowCaptivecamp</span> (<span class="params"></span>).</span></span><br><span class="line"><span class="function">m CaptiveCamps [ENUM Enemy.E1f).<span class="title">SetVisible</span> (<span class="params"><span class="literal">true</span></span>)</span>;m PBDGame . ShowGameMsg (<span class="string">"获得俘兵营"</span>);</span><br><span class="line">F<span class="comment">// CampSystem.cs</span></span><br></pre></td></tr></table></figure>
+
+<p>在上面的范例中，兵营系统的建造者将传入的PBaseDefenseGame对象设置类成员mPBDGame，并在有需求时(ShowCaptiveCamp)通过m-PBDGame来调用PBaseDefenseGame的方法。</p>
+<p>2,指定类的静态成员</p>
+<p>A类的功能中若需要使用到B类的方法，并且A类在产生其对象时具有下列几种情况:<br>产生对象的位置不确定;有多个地方可以产生对象；生成的位置无法引用到;有众多子类。</p>
+<p>当满足上述情况之一时，可以直接将B类对象设置为A类中的“静态成员属性”，让该类的对象都可以直接使用:</p>
+<p>Listing 5-10将PBaseDefenseGame设置为类的静态引用成员</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">PBaseDefenseGame</span></span><br><span class="line"><span class="comment">//初始P-BaseDefense游戏相关设置</span></span><br><span class="line">public void Initinal() f</span><br><span class="line">    m StageSystem=<span class="keyword">new</span> StageSystem (<span class="keyword">this</span>) ;<span class="comment">//关卡系统</span></span><br><span class="line"><span class="comment">//注入其他系统</span></span><br><span class="line">EnemyAI.SetstageSystem ( m stageSystem);</span><br><span class="line">&#125;<span class="comment">// PBaseDefenseGame.cs</span></span><br></pre></td></tr></table></figure>
+
+<p>举例来说，敌方单位AI类(EnemyAl)，在运行时需要使用关卡系统(StageSystem )的信息，但EnemyA1对象产生的位置是在敌方单位建造者(EnemyBuilder)之下:</p>
+<blockquote>
+<p>Listing 5-11 Enemy各部位的建立</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">EnemyBuilder</span>: <span class="title">TCharacterBuilder</span></span><br><span class="line"><span class="comment">//加入A1</span></span><br><span class="line">public override void AddAI() t</span><br><span class="line">EnemyAI theAI = <span class="keyword">new</span> EnemyAI( n BuildParam. NewCharacter,</span><br><span class="line">    m BuildParam. AttackPosition).m BuildParam.NewCharacter. SetAI ( theAl);</span><br><span class="line"><span class="comment">// EnemyBuilder.cs</span></span><br></pre></td></tr></table></figure>
+
+<p>按照“最少知识原则（LKP）”，会希望敌方单位的建造者（EnemyBuilder）减少对其他无关类的引用。因此，在产生敌方单位AI(EnemyAl)对象时，敌方单位建造者(EnemyBuilder)无法将关卡系统(Stagesystem)对象设置给敌方单位AI，这是属于上述“生成的位置无法引用到”的情况。所以,可以在敌方单位Al (EnemyAl)类中，提供一个静态成员属性和静态方法，让关卡系统(StageSystem)对象产生的当下，就设置给敌方单位Al (EnemyAl)类:</p>
+<blockquote>
+<p>Listing 5-12 敌方Al的类(EnemyAl.cs)</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">EnemyAI</span>: <span class="title">ICharacterAl</span></span><br><span class="line"><span class="title">private</span> <span class="title">static</span> <span class="title">stageSystem</span> <span class="title">m</span> <span class="title">StageSystem</span> =<span class="literal">null</span>;</span><br><span class="line"><span class="comment">//将关卡系统直接注入给EnemyAI类使用public static void SetstageSystem (StageSystem stageSystem)</span></span><br><span class="line">    m StageSystem = stageSystem,</span><br><span class="line">/<span class="number">1</span>是否可以攻击Heart</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">bool</span> <span class="title">CanAttackHeart</span>(<span class="params"></span>) (<span class="params">//通知少一个Heart</span></span></span><br><span class="line"><span class="function"><span class="params">m StageSystem. LoseHeart (</span>).</span></span><br><span class="line"><span class="function">return <span class="literal">true</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>使用类的静态方法</p>
+<p>每当增加一个类名称就等同于又少了一个可以使用的全局名称,但如果是在类下增加“静态方法”就不会减少可使用的全局名称数量,而且还能马上增加这个静态类方法的“可视性”-也就是全局都可以引用这个静态类方法。如果在项目开发时,不存在限制全局引用的规则,或者已经没有更好的设计方法时,使用“类静态方法”来获取某一系统功能的接口,应该就是最佳的方式了。它有着单例模式(Singleton)的第二个特性:方便获取对象。</p>
+<p>举例来说,在《P级阵地》中,有一个静态类PBDFactory就是按照这个概念去设计的。由于它在《P级阵地》中负责的是所有资源的产生,所以将其定义为“全局引用的类”并不违反这个游戏项目的设计原则。它的每一个静态方法都负责返回一个“资源生成工厂接口”,注意,是“接口”,所以在以后的系统维护更新中,是可以按照需求的改变来替换子类而不影响其他客户端:</p>
+<blockquote>
+<p>Listing 5-13 获取P-BaseDefenseGame中所使用的工厂(PBDFactory.cs)</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">class</span> <span class="title">PBDFactory</span></span><br><span class="line">private static IAssetFactory m AssetFactory - null;</span><br><span class="line"><span class="comment">//获取将Unity Asset实现化的工厂public static IAssetFactory GetAssetFactory() t</span></span><br><span class="line">    <span class="keyword">if</span>( m AssetFactory = nul1)</span><br><span class="line"><span class="keyword">if</span> ( m bLoadFromResource</span><br><span class="line">m AssetFactory = <span class="keyword">new</span> ResourceAssetFactory();</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line"><span class="function">m AssetFactory new <span class="title">RemoteAssetFactory</span>(<span class="params"></span>)</span>;</span><br><span class="line"><span class="keyword">return</span> m AssetFactory;</span><br></pre></td></tr></table></figure>
+
+<p>但如果在系统设计的需求上,又要求每个游戏资源工厂都“必须是唯一的”,那么此时可以在各个子类中运用单例模式(Singleton),或者采取前面提到的“让类具有计数功能来限制对象数量”的方式来满足需求。</p>
+<h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a><span style="color:#039BE5;">结论</span></h1><p>单例模式的优点是：可以限制对象的产生数量；提供方便获取唯一对象的方法。单例模式的缺点是容易造成设计思考不周和过度使用的问题，但并不是要求设计者完全不使用这个模式，而是应该在仔细设计和特定的前提之下，适当地采用单例模式。</p>
+<p>在《P级阵地》中，只有少数地方引用到单例类PBaseDefenseGame，而引用点可以视为单例模式优点的呈现。</p>
+<p><strong>其他应用方式</strong></p>
+<ul>
+<li>网络在线游戏的客户端，可以使用单例模式来限制连接数，以预防误用而产生过多连接，避免服务器端因此失效。</li>
+<li>日志工具是比较不受项目类型影响的功能之一，所以可以设计为跨项目共享使用。此外，日志工具大多使用在调试或重要信息的输出上，而单例模式能让程序设计师方便快速地获取日志工具，所以是个不错的设计方式。</li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/设计模式与游戏完美开发/" rel="tag"># 设计模式与游戏完美开发</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/08/07/游戏主要类--外观模式（Facade）/" rel="next" title="游戏主要类--外观模式（Facade）">
+                <i class="fa fa-chevron-left"></i> 游戏主要类--外观模式（Facade）
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/08/08/GameObject-API/" rel="prev" title="GameObject API">
+                GameObject API <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">326</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">38</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2019/08/08/Transform-API/" title="Transform API" target="_blank">Transform API</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/08/08/GameObject-API/" title="GameObject API" target="_blank">GameObject API</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/08/07/获取游戏服务的唯一对象--单例模式/" title="获取游戏服务的唯一对象--单例模式" target="_blank">获取游戏服务的唯一对象--单例模式</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/08/07/游戏主要类--外观模式（Facade）/" title="游戏主要类--外观模式（Facade）" target="_blank">游戏主要类--外观模式（Facade）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/08/07/动态配置图片/" title="动态配置图片" target="_blank">动态配置图片</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#游戏实现中的唯一对象"><span class="nav-number">1.</span> <span class="nav-text">游戏实现中的唯一对象</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#单例模式"><span class="nav-number">2.</span> <span class="nav-text">单例模式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#单例模式的定义"><span class="nav-number">2.1.</span> <span class="nav-text">单例模式的定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#单例模式的说明"><span class="nav-number">2.2.</span> <span class="nav-text">单例模式的说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#单例模式的实现范例"><span class="nav-number">2.3.</span> <span class="nav-text">单例模式的实现范例</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用单例模式获取唯一的游戏服务对象"><span class="nav-number">3.</span> <span class="nav-text">使用单例模式获取唯一的游戏服务对象</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#游戏服务类的单例模式实现"><span class="nav-number">3.1.</span> <span class="nav-text">游戏服务类的单例模式实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现说明"><span class="nav-number">3.2.</span> <span class="nav-text">实现说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用单例模式后的比较"><span class="nav-number">3.3.</span> <span class="nav-text">使用单例模式后的比较</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#反对使用单例模式的原因"><span class="nav-number">3.4.</span> <span class="nav-text">反对使用单例模式的原因</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#少用单例模式时如何方便地引用到单一对象"><span class="nav-number">4.</span> <span class="nav-text">少用单例模式时如何方便地引用到单一对象</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#结论"><span class="nav-number">5.</span> <span class="nav-text">结论</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">1.7m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">25:01</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

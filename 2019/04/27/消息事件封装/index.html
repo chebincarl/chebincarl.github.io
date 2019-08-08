@@ -111,7 +111,7 @@
 <meta property="og:site_name" content="车斌的博客">
 <meta property="og:description" content="思考并回答以下问题：">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-07-25T13:17:51.864Z">
+<meta property="og:updated_time" content="2019-08-05T13:36:55.990Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="消息事件封装">
 <meta name="twitter:description" content="思考并回答以下问题：">
@@ -440,7 +440,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-07-25 21:17:51" itemprop="dateModified" datetime="2019-07-25T21:17:51+08:00">2019-07-25</time>
+                <time title="修改时间：2019-08-05 21:36:55" itemprop="dateModified" datetime="2019-08-05T21:36:55+08:00">2019-08-05</time>
               
             
           </span>
@@ -486,7 +486,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">2.4k</span>
+                <span title="本文字数">7.1k</span>
               
 
               
@@ -500,7 +500,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">2 分钟</span>
+                <span title="阅读时长">6 分钟</span>
               
             </div>
           
@@ -526,7 +526,7 @@
 
 <p>本章涵盖：</p>
 <ul>
-<li>1.消息类型定义和封装</li>
+<li>消息类型定义和封装</li>
 </ul>
 <p>Unity游戏中通常使用的消息事件是直接使用委托实现的，这对用户来说使用起来不是很方便，因为游戏开发不是一个人可以完成的，需要一个团队的力量。所以需要封装一个统一的接口供开发者使用，使用事件机制的优点是不需要在UI上直接挂接代码。</p>
 <p>本章实现的消息事件封装采用的是监听和分发机制，它主要运用在逻辑判断时。比如数据加载完成后需要触发某个事件，遇到这种情况我们就可以使用监听和分发机制，方便逻辑判断，减少程序之间的耦合度，而且使用起来非常方便。监听服务器消息也可以运用事件监听机制，收到服务器的信息后可以执行某个事件。本章的消息事件封装主要是围绕客户端的事件封装，首先介绍消息类型定义和封装。</p>
@@ -537,6 +537,28 @@
 <figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">CBaseEvent</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">protected</span> Hashtable arguments;</span><br><span class="line">    <span class="keyword">protected</span> CEventType type;</span><br><span class="line">    <span class="keyword">protected</span> Object sender;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">public</span> CEventType Type</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">get</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">this</span>.type;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">set</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">this</span>.type = <span class="keyword">value</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">public</span> IDictionary Params</span><br><span class="line">    &#123;</span><br><span class="line">       <span class="keyword">get</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">this</span>.arguments;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">set</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">this</span>.arguments = (<span class="keyword">value</span> <span class="keyword">as</span> Hashtable);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">public</span> Object Sender</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">get</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">this</span>.sender;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">set</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">this</span>.sender = <span class="keyword">value</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">string</span> <span class="title">ToString</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">this</span>.type + <span class="string">" [ "</span> + ((<span class="keyword">this</span>.sender == <span class="literal">null</span>) ? <span class="string">"null"</span> : <span class="keyword">this</span>.sender.ToString()) + <span class="string">" ] "</span>;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> CBaseEvent <span class="title">Clone</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> CBaseEvent(<span class="keyword">this</span>.type, <span class="keyword">this</span>.arguments, Sender);</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">CBaseEvent</span>(<span class="params">CEventType type, Object sender</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">this</span>.Type = type;</span><br><span class="line">        Sender = sender;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.arguments == <span class="literal">null</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">this</span>.arguments = <span class="keyword">new</span> Hashtable();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">CBaseEvent</span>(<span class="params">CEventType type, Hashtable args, Object sender</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">this</span>.Type = type;</span><br><span class="line">        <span class="keyword">this</span>.arguments = args;</span><br><span class="line">        Sender = sender;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.arguments == <span class="literal">null</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">this</span>.arguments = <span class="keyword">new</span> Hashtable();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>下面开始讲最核心的部分，消息事件的监听和分发。其实，监听和分发就是事先把消息事件注册到已定义好的Dictionary字典中，当需要触发时将其从字典中取出。</p>
+<p>消息事件的监听与分发<br>事件的监听和分发接口封装在游戏逻辑中经常被调用，同时也是对外提供的接口。完整代码如下所示。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">delegate</span> <span class="keyword">void</span> <span class="title">CEventListenerDelegate</span>(<span class="params">CBaseEvent evt</span>)</span>;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">CEventDispatcher</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">static</span> CEventDispatcher instance;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> CEventDispatcher <span class="title">GetInstance</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span> (instance == <span class="literal">null</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            instance = <span class="keyword">new</span> CEventDispatcher();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> instance;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">private</span> Hashtable listeners = <span class="keyword">new</span> Hashtable();</span><br><span class="line"><span class="comment">//增加事件监听</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">AddEventListener</span>(<span class="params">CEventType eventType, CEventListenerDelegate listener</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        CEventListenerDelegate ceventListenerDelegate = <span class="keyword">this</span>.listeners[eventType] <span class="keyword">as</span> CEventListenerDelegate;</span><br><span class="line">        ceventListenerDelegate = (CEventListenerDelegate)Delegate.Combine(ceventListenerDelegate, listener);</span><br><span class="line">        <span class="keyword">this</span>.listeners[eventType] = ceventListenerDelegate;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="comment">//移除事件监听</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">RemoveEventListener</span>(<span class="params">CEventType eventType, CEventListenerDelegate listener</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        CEventListenerDelegate ceventListenerDelegate = <span class="keyword">this</span>.listeners[eventType] <span class="keyword">as</span> CEventListenerDelegate;</span><br><span class="line">        <span class="keyword">if</span> (ceventListenerDelegate != <span class="literal">null</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            ceventListenerDelegate = (CEventListenerDelegate)Delegate.Remove(ceventListenerDelegate, listener);</span><br><span class="line">        &#125;</span><br><span class="line"> </span><br><span class="line">        <span class="keyword">this</span>.listeners[eventType] = ceventListenerDelegate;</span><br><span class="line">    &#125;</span><br><span class="line"><span class="comment">//分发事件消息</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">DispatchEvent</span>(<span class="params">CBaseEvent evt</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        CEventListenerDelegate ceventListenerDelegate = <span class="keyword">this</span>.listeners[evt.Type] <span class="keyword">as</span> CEventListenerDelegate;</span><br><span class="line"> </span><br><span class="line">        <span class="keyword">if</span> (ceventListenerDelegate != <span class="literal">null</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">try</span></span><br><span class="line">            &#123;</span><br><span class="line">                ceventListenerDelegate(evt);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">catch</span> (System.Exception e)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> System.Exception( <span class="keyword">string</span>.Concat(<span class="keyword">new</span> <span class="keyword">string</span>[]</span><br><span class="line">                    &#123;</span><br><span class="line">                        <span class="string">"Error dispatching event"</span>,</span><br><span class="line">                        evt.Type.ToString(),</span><br><span class="line">                        <span class="string">": "</span>,</span><br><span class="line">                        e.Message,</span><br><span class="line">                        <span class="string">" "</span>,</span><br><span class="line">                        e.StackTrace</span><br><span class="line">                    &#125;),e);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">RemoveAll</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">this</span>.listeners.Clear();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>下面把代码的核心部分介绍一下，在代码中定义了一个委托函数用于事件消息回调：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">delegate</span> <span class="keyword">void</span> <span class="title">CEventListenerDelegate</span>(<span class="params">CBaseEvent evt</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>这个委托函数大家应该非常熟悉，下面介绍事件监听的接口函数实现，如下所示。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">AddEventListener</span>(<span class="params">CEventType eventType, CEventListenerDelegate listener</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    CEventListenerDelegate ceventListenerDelegate = <span class="keyword">this</span>.listeners[eventType] <span class="keyword">as</span> CEventListenerDelegate;</span><br><span class="line">    ceventListenerDelegate = (CEventListenerDelegate)Delegate.Combine(ceventListenerDelegate, listener);</span><br><span class="line">    <span class="keyword">this</span>.listeners[eventType] = ceventListenerDelegate;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>该函数事先将消息放到列表中，便于后面分发时从列表中取出数据。分发函数的封装代码如下所示。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">DispatchEvent</span>(<span class="params">CBaseEvent evt</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    CEventListenerDelegate ceventListenerDelegate = <span class="keyword">this</span>.listeners[evt.Type] <span class="keyword">as</span> CEventListenerDelegate;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (ceventListenerDelegate != <span class="literal">null</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">try</span></span><br><span class="line">        &#123;</span><br><span class="line">            ceventListenerDelegate(evt);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">catch</span> (System.Exception e)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> System.Exception( <span class="keyword">string</span>.Concat(<span class="keyword">new</span> <span class="keyword">string</span>[]</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="string">"Error dispatching event"</span>,</span><br><span class="line">                    evt.Type.ToString(),</span><br><span class="line">                    <span class="string">": "</span>,</span><br><span class="line">                    e.Message,</span><br><span class="line">                    <span class="string">" "</span>,</span><br><span class="line">                    e.StackTrace</span><br><span class="line">                &#125;),e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这两个函数最重要，它们在代码中是成对出现的。下面就说说它们在项目中的应用。</p>
+<p>事件的监听与分发在游戏中是如何使用的？下面通过案例给大家介绍一下，首先在代码中加入监听事件，事例代码如下：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    CEventDispatcher.GetInstance().AddEventListener(CEventType.NEXT_BATTALE_START, StartKongxi);</span><br><span class="line">    CEventDispatcher.GetInstance().AddEventListener(CEventType.GAME_WIN, StopKongxi);</span><br><span class="line">    CEventDispatcher.GetInstance().AddEventListener(CEventType.GAME_OVER, StopKongxi);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>粗体部分是加入了监听事件，有监听的类型和监听需要触发的函数，如果需要触发该函数，需要去调用事件的分发函数，代码如下：</p>
+<p>CEventDispatcher.GetInstance().DispatchEvent(newCBaseEvent(CEventType.NEXT_BATTALE_START, this));<br>这样就会触发监听事件的StartKongxi函数。如果需要移除该监听事件，调用函数如下所示。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">OnDestroy</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    CEventDispatcher.GetInstance().RemoveEventListener(CEventType.NEXT_BATTALE_START, StartKongxi);</span><br><span class="line">    CEventDispatcher.GetInstance().RemoveEventListener(CEventType.GAME_WIN, StopKongxi);</span><br><span class="line">    CEventDispatcher.GetInstance().RemoveEventListener(CEventType.GAME_OVER, StopKongxi);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>以上就是事件监听的使用案例。其实设计事件的监听和分发功能主要是为了模块之间解耦合以及逻辑判断使用的。在游戏逻辑开发中还是很方便的，当然实现方式有很多种，只要满足条件的都可以称为事件机制。</p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>我以前做事件系统时主要使用的还是委托，扩展起来比较麻烦，每一个回调都要重新封装一个函数。最初的事件机制是应用在服务器上发送消息给客户端，客户端监听服务器发送给客户端的消息，使用起来非常方便，扩展也方便。后期又把它应用到了客户端自己的事件监听上，其实它就是把委托封装了一下，将事件的监听函数存放到了表中。掌握事件监听原理，再将其应用到游戏中，这样你才能真正掌握事件监听机制。</p>
 
       
     </div>
@@ -656,7 +678,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">280</span>
+                    <span class="site-state-item-count">326</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -774,7 +796,15 @@
                     
                       
                     
-                    <span class="site-state-item-count">34</span>
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">38</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -805,23 +835,23 @@
                 
                 
                   <li>
-                    <a href="/2019/07/27/TimeLine-Cinemachine技术/" title="TimeLine&Cinemachine技术" target="_blank">TimeLine&Cinemachine技术</a>
+                    <a href="/2019/08/08/Transform-API/" title="Transform API" target="_blank">Transform API</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/07/27/基于Unity3D的策略养成类游戏设计与实现/" title="基于Unity3D的策略养成类游戏设计与实现" target="_blank">基于Unity3D的策略养成类游戏设计与实现</a>
+                    <a href="/2019/08/08/GameObject-API/" title="GameObject API" target="_blank">GameObject API</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/07/27/基于XLua的Unity脚本框架的设计与实现/" title="基于XLua的Unity脚本框架的设计与实现" target="_blank">基于XLua的Unity脚本框架的设计与实现</a>
+                    <a href="/2019/08/07/获取游戏服务的唯一对象--单例模式/" title="获取游戏服务的唯一对象--单例模式" target="_blank">获取游戏服务的唯一对象--单例模式</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/07/25/事件-1/" title="事件" target="_blank">事件</a>
+                    <a href="/2019/08/07/游戏主要类--外观模式（Facade）/" title="游戏主要类--外观模式（Facade）" target="_blank">游戏主要类--外观模式（Facade）</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/07/25/观察者模式/" title="观察者模式" target="_blank">观察者模式</a>
+                    <a href="/2019/08/07/动态配置图片/" title="动态配置图片" target="_blank">动态配置图片</a>
                   </li>
                 
               </ul>
@@ -847,7 +877,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#消息类型定义和封装"><span class="nav-number">1.</span> <span class="nav-text">消息类型定义和封装</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#消息类型定义和封装"><span class="nav-number">1.</span> <span class="nav-text">消息类型定义和封装</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#小结"><span class="nav-number">2.</span> <span class="nav-text">小结</span></a></li></ol></div>
             
 
           </div>
@@ -882,7 +912,7 @@
     
       <span class="post-meta-item-text">站点总字数：</span>
     
-    <span title="站点总字数">1.4m</span>
+    <span title="站点总字数">1.7m</span>
   
 
   
@@ -893,7 +923,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">21:03</span>
+    <span title="站点阅读时长">25:01</span>
   
 </div>
 

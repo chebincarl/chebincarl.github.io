@@ -1,0 +1,1585 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="思考并回答以下问题：  什么是Draw Call？为什么Draw Call那么重要？">
+<meta name="keywords" content="Unity3D&#x2F;2D游戏开发从0到1">
+<meta property="og:type" content="article">
+<meta property="og:title" content="项目研发常用优化策略">
+<meta property="og:url" content="http://chebincarl.github.io/2019/07/29/项目研发常用优化策略/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="思考并回答以下问题：  什么是Draw Call？为什么Draw Call那么重要？">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-08-06T13:33:35.550Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="项目研发常用优化策略">
+<meta name="twitter:description" content="思考并回答以下问题：  什么是Draw Call？为什么Draw Call那么重要？">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/07/29/项目研发常用优化策略/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>项目研发常用优化策略 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">文章看10遍，动手做10遍，自然就会了</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/07/29/项目研发常用优化策略/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">项目研发常用优化策略
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-07-29 21:49:13" itemprop="dateCreated datePublished" datetime="2019-07-29T21:49:13+08:00">2019-07-29</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-08-06 21:33:35" itemprop="dateModified" datetime="2019-08-06T21:33:35+08:00">2019-08-06</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Unity/" itemprop="url" rel="index"><span itemprop="name">Unity</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">10k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">9 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>思考并回答以下问题：</p>
+<ul>
+<li>什么是Draw Call？为什么Draw Call那么重要？</li>
+</ul>
+<a id="more"></a>
+
+<p>本章涵盖：</p>
+<h1 id="项目优化策略"><a href="#项目优化策略" class="headerlink" title="项目优化策略"></a><span style="color:#039BE5;">项目优化策略</span></h1><p>项目优化技能是优秀研发人员的基本素质，除了以上我们介绍的两种主要性能优化方式与性能检测工具，下面还有非常丰富的经验与优化建议与大家分享。现在针对这些优化建议，结合自身研发经验分以下6个方面进行归纳与总结。</p>
+<ul>
+<li>Draw Call</li>
+<li>模型/图像方面</li>
+<li>光照与摄像机处理</li>
+<li>程序优化方面</li>
+<li>Unity系统设置</li>
+<li>开发与使用习惯</li>
+</ul>
+<h2 id="项目优化之Draw-Call"><a href="#项目优化之Draw-Call" class="headerlink" title="项目优化之Draw Call"></a>项目优化之Draw Call</h2><p>对于Unity研发人员而言，系统的性能优化几乎等同于“Draw Call”的优化，其重要性可见一般。那么，对于初学者而言，究竟什么是Draw Call？为什么Draw Call那么重要？下面针对其概念与重要性进行探讨。</p>
+<p>1.Draw Call概述与基本原理</p>
+<p><span style="color:red"><strong>一个模型的数据经过CPU传输到GPU，并命令GPU进行绘制，称为一个Draw Call。</strong></span></p>
+<p>Unity引擎准备数据并渲染游戏对象的过程是逐个游戏对象进行的，所以对于每个游戏对象，不仅GPU的渲染很耗时，引擎重设材质与Shader也是一项非常耗时的操作。因此每帧的Draw Call次数是一项非常重要的系统性能指标。</p>
+<p>降低Draw Call的基本原理基于Draw Call是CPU调用底层图形接口，对于GPU来说，一个游戏对象与大量游戏对象，其图形处理的工作量是一样的。所以对Draw Call的优化，主要工作量就是为尽量减少CPU在调用图形接口上的开销而努力。针对Draw Call，我们的主要思路是，每个游戏对象尽量减少渲染次数，多个游戏对象尽量一起渲染。</p>
+<p>2.降低Draw Call的主要途径</p>
+<p>一般项目中，角色和场景是最消耗资源的两个方面，其中角色是CPU的瓶颈，场景是GPU的瓶颈。所以项目的优化就是降低Draw Call，其总体思路就是对美术资源进行梳理、大量合并Draw Call、人物角色减少材质与纹理的依赖、简化多余特效等。当然也可以允许玩家在部分低端设备平台上选择关闭某些功能与特效来换取更流畅的帧速率与性能。</p>
+<p>以下分10个途径来进行详细讨论。</p>
+<ul>
+<li>途径1：Draw Call批处理（Draw Call Batching）技术</li>
+</ul>
+<p>Unity运行时可以将一些游戏对象进行合并，也就是把多个游戏对象打包，然后再使用一个Draw Call来渲染它们，这一操作被称为“批处理”（Draw Call Batching）。</p>
+<p>Draw Call批处理技术的核心就是在可见性测试之后，检查所有要绘制的对象材质，把相同材质分为一组，然后把它们组合成一个对象，这样就可以在一个Draw Call中处理多个了（实际上是组合后的一个对象）。</p>
+<p>Unity提供了“动态批处理”（Dynamic Batching）和“静态批处理”（Static Batching）两种方式。“动态批处理”是完全自动进行的，不需要也无法进行任何干预，对于顶点数在900以内的可移动物体，只要使用相同的材质，就会组成“批处理”（Batching）。“静态批处理”（Static Batching）则需要把静止的物体标记为“静态”（Static），然后无论大小，都会组成“批处理”（Batch）。</p>
+<p>为了更好地使用静态批处理（Static Batching），需要明确指出哪些物体是静止的，并且在游戏中永远不会移动、旋转和缩放。在属性窗口中将“Static”复选框勾选即可。非运动物体尽量打上Static标签。Unity在运行时会对“Static”物体进行自动优化处理，所以应该尽可能将非运动游戏对象勾选静态”Static”标签，如图所示。</p>
+<ul>
+<li>途径2：使用图集（Texture Packing或者Texture Allasing）减少材质的使用</li>
+</ul>
+<p>Unity判断对哪些游戏对象进行批处理时，一般是根据这些对象是否具有共同的材质和贴图，也就是说拥有相同材质的对象才可以进行批处理。因此，如果想要得到更好的批处理效果，需要在场景中尽可能复用材质到不同的对象上。</p>
+<p>有效利用Draw Call批处理，首先应尽量减少场景中使用的材质数量，即尽量共享材质，对于仅纹理不同的材质，可以把纹理组合到一张更大的纹理中（称为“图集”，TexturePacking或者TextureAllasing），然后把不会移动的物体标记为“Static”。</p>
+<ul>
+<li><p>途径3：尽量少地使用反光、阴影，因为那会使物体多次渲染</p>
+</li>
+<li><p>途径4：视锥体合理裁剪（Frustum Culling）</p>
+</li>
+</ul>
+<p>视锥体合理裁剪（Frustum Culling）是Unity内建的功能，我们需要做的就是寻求一个合适的远裁剪平面。一般经验是，对于大型场景中的大量游戏对象进行合理分层（Layer），对于大型建筑物使用较大裁剪距离，而对于小游戏对象可以使用较小裁剪距离，场景中的粒子系统等可以使用更小的裁剪距离。</p>
+<ul>
+<li><p>途径5：遮挡剔除方法（Occlusion Culling)</p>
+</li>
+<li><p>途径6：网格渲染器（Mesh Renderer）的控制</p>
+</li>
+</ul>
+<p>只有处于摄像机视锥体内，且添加了网格渲染器（Mesh Renderer）组件的对象才会产生渲染的开销，而空的游戏对象并不会产生渲染开销。根据这个原理，我们可以对暂时无须显示的游戏对象通过使用脚本的方式进行控制，不进行渲染，需要的时候再渲染即可。</p>
+<ul>
+<li>途径7：减少游戏对象的缩放</li>
+</ul>
+<p>分别拥有缩放大小(1, 1, 1)和(2, 2, 2)的两个对象将不会进行批处理，统一缩放的对象不会与非统一缩放的对象进行批处理</p>
+<ul>
+<li>途径8：减少多通道Shader的使用</li>
+</ul>
+<p>多通道的Shader会妨碍批处理操作。例如，几乎Unity中所有的着色器在前向渲染（Forward Rendering）中都支持多个光源，因此为它们开辟多个通道，所以对批处理有影响。</p>
+<ul>
+<li>途径9：脚本访问材质方法</li>
+</ul>
+<p>如果需要通过脚本访问复用材质属性，如使用Renderer.material改变贴图，则将会造成一份材质。因此一般使用Renderer.sharedMaterial来保证材质的共享状态。</p>
+<ul>
+<li>途径10：尽量多使用“预设”（Prefab）</li>
+</ul>
+<p>使用预设生成的对象会自动使用相同的网格模型和材质，因此会自动被批处理。</p>
+<p>对于复杂的静态场景，还可以考虑自行设计遮挡剔除算法，尽量减少可见游戏对象数量，同时也可以减少Draw Call。总之理解Draw Call和Draw Call批处理的原理，根据场景的具体特点，设计相应的方案来尽量减少Draw Call，是项目性能优化策略中非常重要的一环。</p>
+<h2 id="项目优化之模型与图像方面"><a href="#项目优化之模型与图像方面" class="headerlink" title="项目优化之模型与图像方面"></a>项目优化之模型与图像方面</h2><p>“模型与图像方面”的优化分为以下6个途径进行探讨。</p>
+<ul>
+<li>途径1：模型优化</li>
+</ul>
+<p>(1)模型几何体的优化:图形渲染管线中模型的数据量越大，需要对这些数据进行处理的时间就会越长。当然，随着渲染技术的发展，处理模型数据的数量也在提升。但是毋庸置疑，经常使用经过优化的模型可以使游戏的运行更有效率。如何进行优化呢?对模型的优化主要是模型的顶点、三角形面片数目等不要太多。如果可能，把相邻的对象(网格)合并为一个，且只用一个材质的对象(网格)。例如，游戏场景中有一处森林，森林由大量树木与灌木组成，如果要进行优化，则完全可以在三维建模工具中将它们合并在一起，减少需要渲染的物体的数量，这样可极大地提高游戏性能。</p>
+<p>(2)蒙皮动画模型优化:蒙皮动画主要针对添加骨骼的模型，对这些模型的优化，也对渲染效率起到不可低估的提升作用。建议在Unity中的每个角色仅使用一个蒙皮网格渲染器skinned mesh renderer)来绘制，这是因为当角色仅有一个蒙皮网格渲染器时， Unity会使用可见性裁剪和包围体更新的方法来优化角色的运动，而这种优化只有在角色仅含有一个蒙皮网格渲染器时才会启动。角色的面数一般不要超过15* * ，骨骼数量少于3* ，角色材质数量一般1-2个为最佳。</p>
+<p>(3)压缩面片(Mesh): 3D模型导人Unity之后，在不影响显示效果的前提下，最好打开”Mesh Compression”、 “Off”、 “Low”、”Medium”、”High”这几项，具体分析，酌情选择。对于单个面片，最好仅使用一个材质，如图24所示。</p>
+<p>(4)避免大量使用Unity自带的Sphere等内建游戏对象：Unity内建的部分游戏对象，其多边形的数量比较大，如果物体不要求特别圆滑，可导人其他的简单3D模型代替(见图25)。</p>
+<ul>
+<li>途径2：贴图(纹理)优化</li>
+</ul>
+<p>(1)使用贴图压缩优化：尺寸越小、压缩比率越高可以降低对它的渲染处理时间，同时也会减少游戏文件的体积。修改贴图的尺寸及压缩格式，可以通过贴图的属性面板来设置。最后在整个场景中尽量减少贴图的数量。在外观不变的前提下，贴图大小越小越好。</p>
+<p>(2)贴图（纹理）压缩格式选择：纹理方面，建议使用压缩纹理。不透明贴图的压缩格式为ETC4bit，因为Android市场手机中的GPU有多种，每家的GPU支持不同的压缩格式，但它们都兼容ETC格式，如图26所示。对于透明贴图，我们只能选择RCBA 16bit或者RGBA 32hit。</p>
+<p>关于贴图的格式，如果读者从事的是手游开发，则建议使用PNG或TGA格式。如果发布ios，则不用转成i* s硬件支持的PVRTC格式，因为Uniy在发布时会帮你自动转换。贴图的长宽尽量小于1* 24b，同时应该尽可能小，够用就好，以保证贴图对内存带宽的影响达到最小。</p>
+<p>(3)选择支持“Mipmap”：建议生成Mipmap，虽然这种做法会增加一些应用程序的体积，但在游戏运行时，系统会根据需求应用Mipmap来渲染，从而减少内存带宽需求。</p>
+<ul>
+<li>途径3：材质</li>
+</ul>
+<p>尽量合并使用同贴图的材质球，合并使用相同材质球的对象。使用尽可能少的材质，尽可能减少网格所用材质的数量，除非想使用不同的着色器来实现不同部位的材质效果，这使得Unity更容易进行批处理。</p>
+<p>建议使用纹理（贴图）图集（Texture Packing或者Texture Allasing）来代替一系列单独的小贴图，它们可以更快地被加载，具有很少的状态转换，而且批处理更友好。在手游开发中尽量减少AlphaTest和AlphaBlend材质的使用，因为这对系统效率会造成很大影响</p>
+<ul>
+<li>途径4：(模型)碰撞体</li>
+</ul>
+<p>如果可以，尽量不用Mesh Collider，以节省不必要的开销。如果不能避免，则尽量减少Mesh的面片数，或用较少面片的代理体来代替。网格碰撞盒比基本碰撞盒需要更高的性能开销，因此应该尽量少使用。类似问题还有车轮碰撞盒（Wheel Collider）与布料模拟，它们都会造成很高的CPU开销。</p>
+<ul>
+<li>途径5：粒子系统</li>
+</ul>
+<p>屏幕上的最大粒子数建议小于200，每个粒子发射器发射的最大粒子数建议不超过50个。如果可以，粒子的size应该尽可能小，因为Unity粒子系统的Shader，无论是AlphaTest还是AlphaBlending，都是一笔不小的开销。同时，对于非常小的粒子，建议粒子纹理去掉Alpha通道。另外，尽量不要开启粒子的碰撞功能，因为这一功能非常耗时。</p>
+<ul>
+<li>途径6：其他</li>
+</ul>
+<p>建议场景中尽可能多地使用“预设体”（Prefab）。尽可能多地使用“预设”的实例化对象，以降低内存带宽的负担。</p>
+<p>非均匀缩放动画（Animation）在Unity中非常慢，建议将非均匀缩放都改为均匀缩放。不要在静态物体上附加Animation组件，虽然加了对结果没任何影响，但是会增加CPU开销。</p>
+<h2 id="项目优化之光照与摄像机方面"><a href="#项目优化之光照与摄像机方面" class="headerlink" title="项目优化之光照与摄像机方面"></a>项目优化之光照与摄像机方面</h2><p>“光照与摄像机”方面的优化分为以下3个途径进行探讨。</p>
+<ul>
+<li>途径1:渲染途径(Rendering Path)</li>
+</ul>
+<p>要想优化“渲染途径”，就必须先了解什么是渲染途径及其具体作用</p>
+<p>Unity提供了不同的渲染途径(Rendering Path)，这些渲染途径用于决定灯光和阴影在场景中的计算方法，不同的渲染途径具有不同的性能特性和渲染效果。Unity中提供了3种渲染途径，分别是“顶点光照” ( Vertex Lit)、“前向渲染” ( Forward Rendering)和“延时光照” (Deferred Lighting)。</p>
+<p>(1)延时光照:延时光照是具备最高的保真度与真实感的渲染途径。如果项目场景中需要开发绚丽多彩、具备较多实时灯光与阴影效果的场景时，最好使用延时光照。</p>
+<p>延迟光照的主要优点是对于能影响物体的光线数量没有上限，全部采用以每像素的方式进行光线计算。所有光线都可以使用灯光Cookie、产生阴影，光照计算的开销与屏幕的光线尺寸成正比，与所照射的物品的数量没有直接关系。</p>
+<p>延迟光照的缺点是需要消耗系统大量资源，需要较高水平的硬件支持。影响计算性能的因素分别是被照亮的物体在屏幕上的像素数量和投射阴影的灯光数量;延迟光照中实时光线的开销与光线照亮的像素数量成正比，但不取决于场景的复杂性。</p>
+<p>(2)前向渲染:前向渲染途径(Forward Rendering Path)是基于着色器的渲染途径。它支持逐像素计算光照(包括法线贴图和灯光Cookies)及支持一个来自平行光的实时阴影(即除唯一一个平行光外，不支持其他实时阴影)，这也是系统的默认光照模式，是一种保持较高光照效果与较高系统性能的综合平衡选项</p>
+<p>(3)顶点光照:顶点光照(Vertex Lit)是一种最低保真度光照，不支持实时阴影，只对所有对象渲染一遍，它是对硬件要求最低也是渲染速度最快的渲染途径。基于顶点光照的特点，所以它一般应用于发布到比较陈旧或者平台受限的设备上。</p>
+<p>针对不同渲染途径的特点与系统消耗，大型项目中可以使用多个摄像机。每个摄像机针对不同的场景，使用不同的渲染途径，以有效地进行有针对性的性能优化。</p>
+<p>图27中是摄像机关于渲染途径的选项，默认是“Use Player Setting”，如果没有更改，其实就是前向渲染路径。“Use Player Setting”可以在系统菜单”File””BuildingSetting”→”Player Setting” →”Other Setting”中进行设置，如图28所示。</p>
+<ul>
+<li>途径2：光照与阴影方面</li>
+</ul>
+<p>像素的动态光照将对顶点变换增加显著的开销，所以应该尽量避免任何给定的物体被多个光源同时照亮的情况。对于静态物体，可以采用“光照烘焙”方法，这是更为有效的方</p>
+<p>关于“光照烘焙”的知识点，见本书第22章的详细讲解</p>
+<p>光线性能的消耗占用顺序为“聚光灯” &gt; “点光源” &gt; “平行光”。所以一个好的点亮场景的方法就是先得到你想要的效果，然后看看哪些光更为重要，在保持光效的前提下去除多余光照。</p>
+<p>点光源和聚光灯只影响它们范围内的网格，所以如果一个网格处于点光源或者聚光灯的照射范围之外，那么这个网格将不会被光源所影响，这样就可以节省性能开销。因此，从理论上来讲可以使用很多小的点光源，而且依然能有一个好的性能，因为这些光源只影响一小部分物体。</p>
+<p>一个网格在有8个以上光源影响的时候，只响应前8个最亮的光源。</p>
+<p>如果硬阴影可以解决问题，就不要用软阴影，并且使用不影响效果的低分辨率阴影。实时阴影很耗性能，尽量减小产生阴影的距离，允许的话应在大场景中使用线性雾，这样可以使远距离对象或阴影不易察觉，因此可以通过减小摄像机的远裁剪距离和阴影距离提高性能。</p>
+<p>实时阴影一般开销较大，如果不正确使用，则可能造成大量的性能开销。在“质量设置” (Quality Settings)面板中的”Shadow Distance”属性上设置阴影的显示距离，该距离是根据当前摄像机作为参考的;当可以生成阴影的地方与当前摄像机之间的距离超过该值时，将不生成阴影，如图2* .29所示。</p>
+<p>图2* .29中是阴影的显示距离设置，在系统菜单”Edit”→”Projeet Setting”→&gt; “Quality”中进行设置。</p>
+<ul>
+<li>途径3:摄像机技巧</li>
+</ul>
+<p>将远平面设置成合适的距离，远平面过大会将一些不必要的物体加入渲染，降低效率。我们可以根据不同的物体来设置摄像机的远裁剪平面。Unity提供了可以根据不同的“层”(Layer)来设置不同的显示距离(View Distance)，所以我们可以实现将游戏对象进行分层，大物体层设置的可视距离大些，而小物体层设置小此，一些开销比较大的实体(如粒子系统)可以设置更小此，如图所示。</p>
+<h2 id="项目优化之程序优化方面"><a href="#项目优化之程序优化方面" class="headerlink" title="项目优化之程序优化方面"></a>项目优化之程序优化方面</h2><p>我们从“Draw Call”、“模型与图像”、“光照与摄像机”等方面讲解了性能优化策略，现在我们把重点放在脚本本身进行进一步探讨。</p>
+<p>下面我们从以下4个方面进行讨论。</p>
+<p>1.程序整体优化方面</p>
+<p>(1)<span style="color:red">如果项目的性能瓶颈不在渲染方面，则一定在脚本代码。</span>我们要删除脚本中为空或不需要的默认方法，尽量少在Update中做事情，脚本不用时把它禁用掉（Deactive）。</p>
+<p>(2)尽量不使用原生的GUI方法，而是用UGUI代替（或者NGUI）。</p>
+<p>(3)需要隐藏/显示或实例化来回切换的对象，尽量少用SetActiveRecursively或Active。而是改为将对象移出相机范围和移回原位的做法，这样性能更优一些；也可以选择使用脚本方式开启与关闭游戏对象的“Mesh Renderer”组件来进行优化。</p>
+<p>(4)不要频繁地获取组件，将其声明为全局变量。</p>
+<p>(5)脚本在不使用时禁用它，需要时再启用。</p>
+<p>(6)尽量直接声明脚本变量，而不使用GetComponent来获取脚本。因为GetComponent或内置组件访问器会产生明显的开销;可以通过一次获取组件的引用来避免开销，并将该引用分配给一个变量。</p>
+<p>(7)尽量少使用Update、LateUpdate、FixedUpdate等每帧处理的函数，这样也可以提升性能和节省电量。</p>
+<p>(8)使用C#中的委托与事件的机制，比使用SendMessage机制效率更高。</p>
+<p>2.事件函数方面</p>
+<p>(1)按照脚本生命周期的原理，对于“协程”与“调用函数”，一般在脚本禁用的时候，“协程”与“调用函数”不会自动禁用，需要使用脚本写明标示禁用，否则会出现空转现象，耗费资源。</p>
+<p>(2)同一脚本中频繁使用的变量，建议声明其为全局变量；脚本之间频繁调用的变量或方法，建议声明为全局静态变量或方法。</p>
+<p>(3)尽量避免每帧处理，可以每隔几帧处理一次。</p>
+<p>例如：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">function <span class="title">Update</span> (<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">if</span>(Time. frameCount % <span class="number">100</span>  == <span class="number">0</span>) </span><br><span class="line">		DoSomeThing();</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// Time.frameCount表明为“帧数量”</span></span><br></pre></td></tr></table></figure>
+
+<p>(4)可以使用“协同”（Coroutine）程序或者“调用函数“（InvokeRepeating）来代替不必每帧都执行的方法。</p>
+<p>(5)避免在Update或FixedUpdate中使用搜索方法，如GameObject.Find()。良好的代替方案是把搜索方法放在单次执行的事件函数中，如Start()事件函数中。</p>
+<p>3.数学计算方面</p>
+<p>尽量使用int类型来代替float类型，尽量少用复杂的数学函数，如sin，cos等函数；改除法为乘法，尽量少用模运算和除法运算。</p>
+<p>4.垃圾回收机制方面</p>
+<p>(1)尽量主动回收垃圾。<br>例如，给某个GameObject赋值以下代码:</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">function <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="keyword">if</span> (Time.frameCount % <span class="number">100</span> == <span class="number">0</span> ) </span><br><span class="line">		System.GC.Collect(); </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>(2)垃圾回收的“时机”很重要，尽量放在游戏场景的加载与场景结束的时候，主动卸载资源；而在场景人员的战斗中尽量不要主动卸载，否则会造成非连续性卡顿等问题。</p>
+<p>(3)避免频繁分配内存。应该避免分配新对象，除非你真的需要，因为它们不被使用时会增加垃圾回收系统的开销。您可以经常重复使用数组和其他对象，但不能分配新的数组或对象。这样做的好处是减少了垃圾的回收工作。这里可以采用“游戏对象缓存”的技术来提高系统效率，将在第27章详细论述。</p>
+<p>(4)在较大场景中，距离摄像机较远的游戏对象可以将GameObject上不必要的脚本禁用（Disable）掉。如果需要启用，则再使用GameObject.setctive()启用等。这也可以配合事件函数中的OnBecameInvisible()（当变为不可见）和OnBecameVisible()（当变成可见），使得游戏对象在不可见的时候自动禁用掉，可见的时候再启用。</p>
+<p>(5)善于使用OnBecameInVisible()和OnBecameVisible( )，控制物体Update()函数的执行，以减少开销。</p>
+<p>6)资源预加载技术的运用。“资源预加载”技术就是以空间换时间的方法。正式进入战斗场景前，可以在关卡之间的“战绩统计场景”中进行“预加载”操作（一般常用“协程”进行加载），这样正式游戏时就不会出现卡顿等现象。</p>
+<h2 id="项目优化之Unity系统设置方面"><a href="#项目优化之Unity系统设置方面" class="headerlink" title="项目优化之Unity系统设置方面"></a>项目优化之Unity系统设置方面</h2><p>Unity游戏引擎的性能优化有很多内容值得讨论，现就典型内容列举如下。</p>
+<p>1.限帧措施</p>
+<p>在以手机为代表的移动设备上运行游戏，主动减少“帧速率”（FPS）可以显著地减少    </p>
+<p>具体方法:菜单”Elit”→”ProjectSetting”→”Qualit”中的”VSync Count”参数会影响你的FPS.Every Blank相当于”FPS =60， Every Second VBlank =30”，这两种情况如果都不符合游戏的FPS，我们则需要手动调整FPS，首先关闭垂直同步这个功能，然后在代码的Awake方法里手动设置FPS(Application.targetFramelate =45)，如图31所示。</p>
+<p>2.物理性能优化</p>
+<p>1)增加固定时间步长</p>
+<p>对于台式机，稍微复杂一些的物理模拟运算是绰绰有余的，但是如果是开发移动终端的游戏，那么就需要更加注意物理性能的优化。当我们设置了FPS后，再调整一下Fixed Timestep这个参数，这个参数在”Edit”-，”ProjectSetting”-， “Time”中，目的是减少物理计算的次数，提高游戏性能。减少固定的增量时间，设置”Fixed Timestep”在0.04~0.0678之间(也就是每秒15-25顿之间，如图32所示)。这降低了FixedUpdate被调用与物理引擎执行碰撞检测和刚体更新的频率。</p>
+<p>如果为主角添加了刚体，可以在刚体组件中启用“插值(Interpolate )来平滑降低固定增量时间步长，如图33所示。</p>
+<p>2)设置“最大允许时钟步调” (Maximum Allowed Timestep)</p>
+<p>物理计算和FixedUpdate( )执行不会超过该指定的时间。一般在0. 1~0.125范围之内设定，使得在最坏的情况下封顶物理花费的时间</p>
+<p>3)设置“时间缩放因子” (Time Scale)<br>图32中的最后一个属性“时间缩放因子” (Time Scale)，如果该值为1，则表示按照正常时钟运行游戏；当该值为0时，游戏暂停运行;如果设置为2，游戏运行时间将加快到两倍；当为0.5时，运行时间减慢到一半，以减少对物理更新所花费的时间。增加时间步长将减少CPU开销，但物理模拟的精度会下降。通常情况下，为增加速度而降低精度是可以接受的折中方案。</p>
+<p>3.调整像素光数量</p>
+<p>像素光可以让你的游戏看起来效果绚丽多彩，但是不要使用过多的像素光。在游戏中可以使用质量管理器来调节像素光的数量，从而取得性能和质量的一个均衡点，如图34所示。</p>
+<h2 id="项目优化之良好开发与使用习惯"><a href="#项目优化之良好开发与使用习惯" class="headerlink" title="项目优化之良好开发与使用习惯"></a>项目优化之良好开发与使用习惯</h2><p>(1)养成良好的标签(Tags)、层次(Hieratchy)和图层(layer)的条理化习惯，将不同的对象置于不同的标签或图层，三者的有效结合将方便按名称、类别和属性进行查找。</p>
+<p>(2)项目研发的过程中养成经常通过States和Profile查看对效率影响最大的方面或对象，或者使用禁用部分模型的方式查看问题到底在哪里，而不是项目发布后再进行这一步骤。</p>
+<h1 id="本章练习与总结"><a href="#本章练习与总结" class="headerlink" title="本章练习与总结"></a>本章练习与总结</h1><p>对于游戏开发与虚拟现实领域有所作为的大家，本章所总结与探讨的领域是极其重要的。我们首先从Unity提供的两种大型优化手段（遮挡剔除、层级细节）与性能检测工具（Profiler）谈起，然后结合Unity官方文档与自身开发经验，分6个方面着重讨论了影响项目性能的方方面：“DrawCall”、“模型与图像”、“光照与摄像机”、“程序优化”、“系统设置”、“良好开发与使用习惯”等。</p>
+<p>项目优化策略是一个涉及知识体系庞大、影响广泛、需要深入研究的领域，希望广大读者能够在此基础之上举一反三，不断深入研究，开发出更加优秀的项目产品。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Unity3D-2D游戏开发从0到1/" rel="tag"># Unity3D/2D游戏开发从0到1</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/07/29/扩展方法/" rel="next" title="扩展方法">
+                <i class="fa fa-chevron-left"></i> 扩展方法
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/07/29/预加载与对象缓冲池技术/" rel="prev" title="预加载与对象缓冲池技术">
+                预加载与对象缓冲池技术 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">326</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">38</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2019/08/08/Transform-API/" title="Transform API" target="_blank">Transform API</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/08/08/GameObject-API/" title="GameObject API" target="_blank">GameObject API</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/08/07/获取游戏服务的唯一对象--单例模式/" title="获取游戏服务的唯一对象--单例模式" target="_blank">获取游戏服务的唯一对象--单例模式</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/08/07/游戏主要类--外观模式（Facade）/" title="游戏主要类--外观模式（Facade）" target="_blank">游戏主要类--外观模式（Facade）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/08/07/动态配置图片/" title="动态配置图片" target="_blank">动态配置图片</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#项目优化策略"><span class="nav-number">1.</span> <span class="nav-text">项目优化策略</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#项目优化之Draw-Call"><span class="nav-number">1.1.</span> <span class="nav-text">项目优化之Draw Call</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#项目优化之模型与图像方面"><span class="nav-number">1.2.</span> <span class="nav-text">项目优化之模型与图像方面</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#项目优化之光照与摄像机方面"><span class="nav-number">1.3.</span> <span class="nav-text">项目优化之光照与摄像机方面</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#项目优化之程序优化方面"><span class="nav-number">1.4.</span> <span class="nav-text">项目优化之程序优化方面</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#项目优化之Unity系统设置方面"><span class="nav-number">1.5.</span> <span class="nav-text">项目优化之Unity系统设置方面</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#项目优化之良好开发与使用习惯"><span class="nav-number">1.6.</span> <span class="nav-text">项目优化之良好开发与使用习惯</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#本章练习与总结"><span class="nav-number">2.</span> <span class="nav-text">本章练习与总结</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">1.7m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">25:01</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

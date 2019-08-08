@@ -1,0 +1,1635 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="思考并回答以下问题：  Action&amp;lt;float&amp;gt;是什么意思？ 事件提供了额外的“封装性”，使publish-subscribe模式更容易实现，更不容易出错怎么理解？ 单一事件（比如对象状态的改变）的通知可以发布给多个订阅者通过什么实现？ 为什么要再把一个委托变量再次赋一个新值？ 为什么可以调用thermostat.OnTemperatureChange += heater.OnTem">
+<meta name="keywords" content="C#本质论">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第13章-事件">
+<meta property="og:url" content="http://chebincarl.github.io/2019/07/25/第13章-事件/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="思考并回答以下问题：  Action&amp;lt;float&amp;gt;是什么意思？ 事件提供了额外的“封装性”，使publish-subscribe模式更容易实现，更不容易出错怎么理解？ 单一事件（比如对象状态的改变）的通知可以发布给多个订阅者通过什么实现？ 为什么要再把一个委托变量再次赋一个新值？ 为什么可以调用thermostat.OnTemperatureChange += heater.OnTem">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://chebincarl.github.io/2019/07/25/第13章-事件/3.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/07/25/第13章-事件/2.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/07/25/第13章-事件/5.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/07/25/第13章-事件/4.png">
+<meta property="og:updated_time" content="2019-07-29T13:13:43.058Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="第13章-事件">
+<meta name="twitter:description" content="思考并回答以下问题：  Action&amp;lt;float&amp;gt;是什么意思？ 事件提供了额外的“封装性”，使publish-subscribe模式更容易实现，更不容易出错怎么理解？ 单一事件（比如对象状态的改变）的通知可以发布给多个订阅者通过什么实现？ 为什么要再把一个委托变量再次赋一个新值？ 为什么可以调用thermostat.OnTemperatureChange += heater.OnTem">
+<meta name="twitter:image" content="http://chebincarl.github.io/2019/07/25/第13章-事件/3.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/07/25/第13章-事件/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>第13章-事件 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">文章看10遍，动手做10遍，自然就会了</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/07/25/第13章-事件/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">第13章-事件
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-07-25 19:47:19" itemprop="dateCreated datePublished" datetime="2019-07-25T19:47:19+08:00">2019-07-25</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-07-29 21:13:43" itemprop="dateModified" datetime="2019-07-29T21:13:43+08:00">2019-07-29</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C#</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">22k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">20 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>思考并回答以下问题：</p>
+<ul>
+<li>Action&lt;float&gt;是什么意思？</li>
+<li>事件提供了额外的“封装性”，使publish-subscribe模式更容易实现，更不容易出错怎么理解？</li>
+<li>单一事件（比如对象状态的改变）的通知可以发布给多个订阅者通过什么实现？</li>
+<li>为什么要再把一个委托变量再次赋一个新值？</li>
+<li>为什么可以调用thermostat.OnTemperatureChange += heater.OnTemperatureChanged;而不引发异常（即使thermostat.OnTemperatureChange尚未赋值）？</li>
+<li>一个订阅者引发了异常，链中的后续订阅者还能收到通知吗？怎么处理？</li>
+<li>OnTemperatureChange.GetInvocationList())是干嘛用的？</li>
+<li>赋值操作符会引发bug怎么理解？</li>
+<li>事件确保只有包容类才能触发事件通知是怎么实现的？</li>
+<li>订阅者订阅多个发布者，如何知道是哪个发布者发送的消息？</li>
+<li>第一个参数sender应包含调用委托的那个类的实例，为什么要这样规定？</li>
+</ul>
+<a id="more"></a>
+
+<p>本章涵盖：</p>
+<ul>
+<li>使用多播委托来编码Observer模式<ul>
+<li>定义订阅者方法</li>
+<li>定义发布者</li>
+<li>连接发布者和订阅者</li>
+<li>调用委托</li>
+<li>检查null值</li>
+<li>委托操作符</li>
+<li>顺序调用</li>
+<li>错误处理</li>
+<li>方法返回值和传引用</li>
+</ul>
+</li>
+<li>事件<ul>
+<li>事件的作用</li>
+<li>事件的声明</li>
+<li>编码规范</li>
+<li>泛型和委托</li>
+<li>自定义事件的实现</li>
+</ul>
+</li>
+<li>小结</li>
+</ul>
+<p>上一章讲述了如何用委托类型的实例引用方法，并通过委托来调用那个方法。委托本身又是一个更大的模式（pattern）的基本单位，这个模式称为publish-subscribe（发布—订阅）。委托的使用及其对publish-subscribe模式的支持是本章的重点。本章描述的所有内容几乎都可以单独使用委托来实现。然而，本章所着眼的事件构造提供了额外的“封装性”，使publish-subscribe模式更容易实现，更不容易出错。</p>
+<p>在上一章中，所有委托都只引用一个方法。然而，一个委托值是可以引用一系列方法的，这些方法将顺序调用。这样的委托称为<strong>多播委托</strong>（multicast delegate）。这样一来，单一事件（比如对象状态的改变）的通知就可以发布给多个订阅者。</p>
+<p>虽然事件在C# 1.0中就有了，但C# 2.0对泛型的引入极大地改变了编码规范，因为使用泛型委托数据类型意味着不再需要为每种可能的事件签名声明一个委托。所以，本章的最低起点是C# 2.0。但是，仍在使用C# 1.0的读者也不是不能使用事件，只是必须声明自己的委托数据类型(参见第12章)</p>
+<img src="/2019/07/25/第13章-事件/3.png">
+
+<h1 id="使用多播委托来编码Observer模式"><a href="#使用多播委托来编码Observer模式" class="headerlink" title="使用多播委托来编码Observer模式"></a><span style="color:#039BE5;">使用多播委托来编码Observer模式</span></h1><p>来考虑一个温度控制的例子。在这个假想的情形中，一个加热器（Heater）和一个冷却器（Cooler）连接到同一个自动调温器。为了控制加热器和冷却器的打开和关闭，要向它们通知温度的变化。自动调温器将温度的变化发布给多个订阅者——也就是加热器和冷却器。在C#中，多播委托的实现是一个通用的模式，目的是避免大量的手工编码。这个模式称为Observer（观察者）或者publish-subscribe模式，它要应对的是这样一种情形：需要将单一事件的通知（如对象状态发生的一个变化）广播给多个订阅者（subscriber）。</p>
+<h2 id="定义订阅者方法"><a href="#定义订阅者方法" class="headerlink" title="定义订阅者方法"></a>定义订阅者方法</h2><p>首先定义Heater和Cooler对象，如代码清单1所示。</p>
+<blockquote>
+<p>代码清单1 Heater和Cooler事件订阅者的实现</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">Test</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title">Cooler</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 私有成员以_开头</span></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">float</span> _Temperature;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">float</span> Temperature</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">get</span> &#123; <span class="keyword">return</span> _Temperature; &#125;</span><br><span class="line">            <span class="keyword">set</span> &#123; _Temperature = <span class="keyword">value</span>; &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 实例化时有一个默认的温度，大于该值则启动Cooler降温</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">Cooler</span>(<span class="params"><span class="keyword">float</span> temperature</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            Temperature = temperature;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">OnTemperatureChanged</span>(<span class="params"><span class="keyword">float</span> newTemperature</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">if</span> (newTemperature &gt; Temperature)</span><br><span class="line">            &#123;</span><br><span class="line">                Console.WriteLine(<span class="string">"Cooler: On"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> </span><br><span class="line">            &#123;</span><br><span class="line">                Console.WriteLine(<span class="string">"Cooler: Off"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">Test</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title">Heater</span></span><br><span class="line">    &#123;   </span><br><span class="line">        <span class="comment">// 私有成员以_开头</span></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">float</span> _Temperature;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">float</span> Temperature</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">get</span> &#123; <span class="keyword">return</span> _Temperature; &#125;</span><br><span class="line">            <span class="keyword">set</span> &#123; _Temperature = <span class="keyword">value</span>; &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 实例化时有一个默认的温度，小于该值则启动Heater升温</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">Heater</span>(<span class="params"><span class="keyword">float</span> temperature</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            Temperature = temperature;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">OnTemperatureChanged</span>(<span class="params"><span class="keyword">float</span> newTemperature</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">if</span> (newTemperature &lt; Temperature)</span><br><span class="line">            &#123;</span><br><span class="line">                Console.WriteLine(<span class="string">"Heater: On"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span> </span><br><span class="line">            &#123;</span><br><span class="line">                Console.WriteLine(<span class="string">"Heater: Off"</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>除了温度比较，两个类几乎完全一致（事实上，如果在OnTemperatureChanged方法中使用对一个比较方法的委托，两个类还可以再减少一个）。每个类都存储了启动设备所需的温度。此外，两个类都提供了OnTemperatureChanged()方法。调用OnTemperatureChanged()方法的目的是向Heater和Cooler类指出温度已发生改变。在方法的实现中，用newTemperature同存储好的触发温度进行比较，从而决定是否让设备启动。</p>
+<p>两个OnTemperatureChanged()方法都是订阅者方法。作为订阅者方法，很重要的一点在于，它们的参数和返回类型必须与来自Thermostat类的委托匹配。</p>
+<h2 id="定义发布者"><a href="#定义发布者" class="headerlink" title="定义发布者"></a>定义发布者</h2><p>Thermostat类负责向heater和cooler对象实例报告温度变化。代码清单2展示了Thermostat类。</p>
+<blockquote>
+<p>代码清单2 定义事件发布者Thermostat</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">Test</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title">Thermostat</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// Define the event publisher</span></span><br><span class="line">        <span class="comment">// 事件是成员，只能在类或结构中定义</span></span><br><span class="line">        <span class="comment">// 自动属性</span></span><br><span class="line">        <span class="keyword">public</span> Action&lt;<span class="keyword">float</span>&gt; OnTemperatureChange &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">float</span> _CurrentTemperature;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">float</span> CurrentTemperature</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">get</span> &#123; <span class="keyword">return</span> _CurrentTemperature; &#125;</span><br><span class="line">            <span class="keyword">set</span> &#123;</span><br><span class="line">                <span class="keyword">if</span> (<span class="keyword">value</span> != CurrentTemperature)</span><br><span class="line">                &#123;</span><br><span class="line">                    _CurrentTemperature = <span class="keyword">value</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Thermostat包含一个名为OnTemperatureChange的属性，它具有Action&lt;float&gt;委托类型。OnTemperatureChange存储了订阅者列表。注意，只需一个委托字段即可存储所有订阅者。换言之，来自同一个发布者的温度变化通知会同时被Cooler和Heater类接收。</p>
+<p>Thermostat的最后一个成员是CurrentTemperature属性。它负责设置和获取由客户端类报告的当前温度值。</p>
+<h2 id="连接发布者和订阅者"><a href="#连接发布者和订阅者" class="headerlink" title="连接发布者和订阅者"></a>连接发布者和订阅者</h2><p>最后，将所有这些东西都放到一个Main()方法中。代码清单3展示了一个示例Main()。</p>
+<blockquote>
+<p>代码清单3 连接发布者和订阅者</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">Test</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="keyword">string</span>[] args</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            Thermostat thermostat = <span class="keyword">new</span> Thermostat();</span><br><span class="line">            <span class="comment">// 60-80之间不需要打开任何一个</span></span><br><span class="line">            Heater heater = <span class="keyword">new</span> Heater(<span class="number">60</span>);</span><br><span class="line">            Cooler cooler = <span class="keyword">new</span> Cooler(<span class="number">80</span>);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">string</span> temperature;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 注册事件，也可以在Cooler或Heater的构造函数里注册</span></span><br><span class="line">            <span class="comment">// 则需要Heater heater = new Heater(thermostat);</span></span><br><span class="line">            thermostat.OnTemperatureChange += heater.OnTemperatureChanged;</span><br><span class="line">            thermostat.OnTemperatureChange += cooler.OnTemperatureChanged;</span><br><span class="line"></span><br><span class="line">            Console.WriteLine(<span class="string">"Enter temperature: "</span>);</span><br><span class="line">            temperature = Console.ReadLine();</span><br><span class="line"></span><br><span class="line">            thermostat.CurrentTemperature = <span class="keyword">int</span>.Parse(temperature);</span><br><span class="line"></span><br><span class="line">            Console.ReadKey();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上述代码使用+=操作符来直接赋值，向OnTemperatureChange委托注册了两个订阅者即heater.OnTemperatureChanged和cooler.OnTemperatureChanged。</p>
+<p>通过获取用户输入的温度值，可以设置thermostat（自动调温器）的CurrentTemperature（当前温度）。然而，目前还没有写任何代码将温度变化发布给订阅者。</p>
+<h2 id="调用委托"><a href="#调用委托" class="headerlink" title="调用委托"></a>调用委托</h2><p>Thermostat类的CurrentTemperature属性每次发生变化时，你都希望调用委托来通知订阅者（heater和cooler）温度的变化。为此，需要修改CurrentTemperature属性来保存新值，并向每个订阅者发出一个通知，如代码清单4所示。</p>
+<blockquote>
+<p>代码清单4 调用委托（不带有检查null值部分）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">Thermostat</span></span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> CurrentTemperature</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">get</span> &#123; <span class="keyword">return</span> _CurrentTemperature; &#125;</span><br><span class="line">        <span class="keyword">set</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">value</span> != CurrentTemperature)</span><br><span class="line">            &#123;</span><br><span class="line">                _CurrentTemperature = <span class="keyword">value</span>;</span><br><span class="line">                <span class="comment">// INCOMPLETE: Check for null needed</span></span><br><span class="line">                <span class="comment">// Call subscribers</span></span><br><span class="line">                OnTemperatureChange(<span class="keyword">value</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>现在，对CurrentTemperature的赋值包含了一些特殊的逻辑，可以向订阅者通知CurrentTemperature发生的变化。为了向所有订阅者发出通知，只需执行一个简单的C#语句，即OnTemperatureChange(value);。这个语句将温度的变化发布给cooler和heater对象。在此，只需执行一个调用，即可向多个订阅者发出通知——这正是将委托更明确地称为“多播委托”的原因。</p>
+<h2 id="检查null值"><a href="#检查null值" class="headerlink" title="检查null值"></a>检查null值</h2><p>在代码清单4中，遗漏了事件发布代码的一个重要部分。假如当前没有订阅者注册接收通知，则OnTemperatureChange为null，执行OnTemperatureChange(value)语句就会引发一个NullReferenceException异常。为了避免这个问题，有必要在触发事件之前检查null值。代码清单5演示了具体如何做。</p>
+<blockquote>
+<p>代码清单5 调用一个委托</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">Thermostat</span></span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> CurrentTemperature</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">get</span> &#123; <span class="keyword">return</span> _CurrentTemperature; &#125;</span><br><span class="line">        <span class="keyword">set</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">value</span> != CurrentTemperature)</span><br><span class="line">            &#123;</span><br><span class="line">                _CurrentTemperature = <span class="keyword">value</span>;</span><br><span class="line">                <span class="comment">// If there are any subscribers then notify them of changes in temperature</span></span><br><span class="line">                Action&lt;<span class="keyword">float</span>&gt; localOnChange = OnTemperatureChange;</span><br><span class="line">                <span class="keyword">if</span> (localOnChange != <span class="literal">null</span>)</span><br><span class="line">                &#123;</span><br><span class="line">                    localOnChange(<span class="keyword">value</span>);</span><br><span class="line">                &#125;</span><br><span class="line">                </span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我们并不是一开始就检查null值，而是首先将OnTemperatureChange赋给另一个委托变量localonChange。这个简单的修改可确保在检查null值和发送通知之间，假如所有OnTemperatureChange订阅者都（由一个不同的线程）移除，那么不会引发Nul1ReferenceException异常。</p>
+<blockquote>
+<p>规范<br>要在调用委托前检查它的值是不是null值。</p>
+</blockquote>
+<p><strong>高级主题：将“-=”操作符应用于委托会返回一个新实例</strong> </p>
+<p>既然<span style="color:red">委托是引用类型</span>，那么肯定有人会觉得奇怪：为什么赋值给一个局部变量，再用那个局部变量就可以保证null检查的线程安全性？由于localOnChange指向的位置就是OnTemperatureChange指向的位置，所以很自然的结论就是：OnTemperatureChange中发生的任何变化都会在localOnChange中反映出来。</p>
+<p>但实情并非如此。事实上，对OnTemperatureChange-=&lt;listener&gt;的任何调用都不会从OnTemperatureChange删除一个委托而使它的委托比之前少一个。相反，会赋值一个全新的多播委托，原始的多播委托不受任何影响（localOnChange也指向那个原始的多播委托）。</p>
+<p><strong>高级主题：线程安全的委托调用</strong></p>
+<p>如前所述，由于订阅者可以由不同的线程从委托中增加或删除，所以在进行null值检查前有必要将委托引用复制到一个局部变量中。但是，这虽然能防止调用空委托，却不能防止所有可能的竞态条件。例如，一个线程进行复制，另一个线程将这个委托重置为null，然后原始线程可以调用委托的前一个值，借此通知一个已经不再在订阅者列表中的订阅者。在多线程程序中，订阅者应确保在这种情况下的健壮性。一个“过气”的订阅者随时都可能被调用。</p>
+<blockquote>
+<p>Unity为什么避免使用多线程？<br>不只Unity，大多数游戏引擎都是单线程的，因为大多数引擎都是主循环结构，逻辑更新和画面更新的时间点要求有确定性，如果在逻辑更新和画面更新中引入多线程，就需要做同步而这加大了游戏性程序员（编程关卡的程序员）的开发难度。所以需要异步功能的时候，游戏引擎总是倾向于使用time slicing的策略而不是使用多线程，Unity中的协程（coroutine）yield语法本质就是time slicing。但是多线程也是有好处的，如果不是画面更新，也不是常规的逻辑更新（指包括AI、物理碰撞、角色控制这些），而是一些其他后台任务，比如网络传输，则可以将这个独立出来做成一个工作线程，这需要写Unity游戏的Native扩展。</p>
+</blockquote>
+<h2 id="委托操作符"><a href="#委托操作符" class="headerlink" title="委托操作符"></a>委托操作符</h2><p>为了合并Thermostat例子中的两个订阅者，要使用+=操作符。这样会获取第一个委托，并将第二个委托添加到委托链中。第一个委托的方法返回后，会调用第二个委托。从委托链中删除委托，则要使用-=操作符，如代码清单6所示。</p>
+<blockquote>
+<p>代码清单6 使用+=和-=委托操作符</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// ...</span></span><br><span class="line">Thermostat thermostat = <span class="keyword">new</span> Thermostat();</span><br><span class="line"></span><br><span class="line">Heater heater = <span class="keyword">new</span> Heater(<span class="number">60</span>);</span><br><span class="line">Cooler cooler = <span class="keyword">new</span> Cooler(<span class="number">80</span>);</span><br><span class="line"></span><br><span class="line">Action&lt;<span class="keyword">float</span>&gt; delegate1;</span><br><span class="line">Action&lt;<span class="keyword">float</span>&gt; delegate2;</span><br><span class="line">Action&lt;<span class="keyword">float</span>&gt; delegate3;</span><br><span class="line"></span><br><span class="line">delegate1 = heater.OnTemperatureChanged;</span><br><span class="line">delegate2 = cooler.OnTemperatureChanged;</span><br><span class="line"></span><br><span class="line">Console.WriteLine(<span class="string">"Invoke both delegates:"</span>);</span><br><span class="line">delegate3 = delegate1;</span><br><span class="line">delegate3 += delegate2;</span><br><span class="line">delegate3(<span class="number">90</span>);</span><br><span class="line"></span><br><span class="line">Console.WriteLine(<span class="string">"Invoke only delegate2"</span>);</span><br><span class="line">delegate3 -= delegate1;</span><br><span class="line">delegate3(<span class="number">30</span>);</span><br></pre></td></tr></table></figure>
+
+<p>代码清单6的输出结果如下：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Invoke both delegates:</span><br><span class="line">Heater: Off</span><br><span class="line">Cooler: On</span><br><span class="line">Invoke only delegate2</span><br><span class="line">Cooler: Off</span><br></pre></td></tr></table></figure>
+
+<p>除此之外，还可以使用+和-操作符来合并委托，如代码清单7所示。</p>
+<blockquote>
+<p>代码清单7 使用+和-委托操作符</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">Thermostat thermostat = <span class="keyword">new</span> Thermostat();</span><br><span class="line"></span><br><span class="line">Heater heater = <span class="keyword">new</span> Heater(<span class="number">60</span>);</span><br><span class="line">Cooler cooler = <span class="keyword">new</span> Cooler(<span class="number">80</span>);</span><br><span class="line"></span><br><span class="line">Action&lt;<span class="keyword">float</span>&gt; delegate1;</span><br><span class="line">Action&lt;<span class="keyword">float</span>&gt; delegate2;</span><br><span class="line">Action&lt;<span class="keyword">float</span>&gt; delegate3;</span><br><span class="line"></span><br><span class="line">delegate1 = heater.OnTemperatureChanged;</span><br><span class="line">delegate2 = cooler.OnTemperatureChanged;</span><br><span class="line"></span><br><span class="line">Console.WriteLine(<span class="string">"Combine delegates using + operator:"</span>);</span><br><span class="line">delegate3 = delegate1 + delegate2;</span><br><span class="line">delegate3(<span class="number">60</span>);</span><br><span class="line"></span><br><span class="line">Console.WriteLine(<span class="string">"Uncombine delegates using - operator:"</span>);</span><br><span class="line">delegate3 = delegate3 - delegate2;</span><br><span class="line">delegate3(<span class="number">60</span>);</span><br></pre></td></tr></table></figure>
+
+<p>代码清单7的输出结果如下：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Combine delegates <span class="keyword">using</span> + <span class="keyword">operator</span>:</span><br><span class="line">Heater: Off</span><br><span class="line">Cooler: Off</span><br><span class="line">Uncombine delegates <span class="keyword">using</span> - <span class="keyword">operator</span>:</span><br><span class="line">Cooler: Off</span><br></pre></td></tr></table></figure>
+
+<p>使用赋值操作符会清除之前的所有订阅者，并允许用新订阅者替换它们。这是委托很容易让人犯错的一个设计，因为在本来应该使用+=操作符的时候，很容易就会错误地写成=。解决这个问题的良方是事件，详情将在稍后讲述。</p>
+<p>应注意的是，无论+、-还是它们的复合赋值版本（+=和-=），在内部都是使用静态方法System.Delegate.Combine()和System.Delegate.Remove()来实现的。两个方法都获取delegate类型的两个参数。第一个方法Combine()会连接两个参数，将两个委托的调用列表按顺序连接到一起。第二个方法Remove()则搜索由第一个参数指定的委托链，删除由第二个参数指定的委托。</p>
+<p>对于Combine()方法，一个有趣的地方在于，它的两个参数都可以为null，如果其中任何一个参数为null，Combine()就返回非空的那个。如果两个都为null，则Combine()返回null。这就解释了为什么可以调用thermostat.OnTemperatureChange += heater.OnTemperatureChanged;而不引发异常（即使thermostat.OnTemperatureChange尚未赋值）。</p>
+<h2 id="顺序调用"><a href="#顺序调用" class="headerlink" title="顺序调用"></a>顺序调用</h2><p>图1展示了heater和cooler的顺序通知。</p>
+<img src="/2019/07/25/第13章-事件/2.png">
+
+<p>虽然代码中只包含一个简单的OnTemperatureChange()调用，但这个调用会广播给两个订阅者，使cooler和heater都会收到温度发生变化的通知。假如添加更多的订阅者，它们也会收到OnTemperatureChange()的通知。</p>
+<p>虽然一个OnTemperatureChange()调用造成每个订阅者都收到通知，但它们仍然是顺序调用的，而不是同时调用，因为它们全都在一个执行线程上调用。</p>
+<p><strong>高级主题：多播委托的内部机制</strong></p>
+<p>为了理解事件是如何工作的,你需要回顾第12章中我们第一次探讨System.Delegate类型的内部机制的部分。delegate关键字是派生自System.MulticastDelegate的一个类型的别名。System. MulticastDelegate则是从System. Delegate派生的,后者由一个对象引用(以满足非静态方法的需要)和一个方法引用构成。创建委托时,编译器自动使用System.MulticastDelegate类型而不是System. Delegate类型。MulticastDelegate类包含一个对象引用和一个方法引用,这和它的Delegate基类一样。但除此之外,它还包含对另一个System.MulticastDelegate对象的引用。</p>
+<p>向多播委托添加方法时, MulticastDelegate类会创建委托类型的一个新实例,在新实例中为新增的方法存储对象引用和方法引用,并在委托实例列表中添加新的委托实例作为下一项。实际上, MulticastDelegate类维护着一个Delegate对象链表。从概念上讲,可以像图13-2那样表示Thermostat的例子。</p>
+<h2 id="错误处理"><a href="#错误处理" class="headerlink" title="错误处理"></a>错误处理</h2><p>错误处理凸显了顺序通知可能造成的问题。假如一个订阅者引发了异常，链中的后续订阅者就收不到通知。例如，假定修改Heater的OnTemperatureChanged()方法，使它引发异常，那么会发生什么？如代码清单8所示。</p>
+<blockquote>
+<p>代码清单8 OnTemperatureChanged()引发异常</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="keyword">string</span>[] args</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Thermostat thermostat = <span class="keyword">new</span> Thermostat();</span><br><span class="line"></span><br><span class="line">        Heater heater = <span class="keyword">new</span> Heater(<span class="number">60</span>);</span><br><span class="line">        Cooler cooler = <span class="keyword">new</span> Cooler(<span class="number">80</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">string</span> temperature;</span><br><span class="line"></span><br><span class="line">        thermostat.OnTemperatureChange += heater.OnTemperatureChanged;</span><br><span class="line"></span><br><span class="line">        thermostat.OnTemperatureChange += (newTemperature) =&gt;</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> InvalidOperationException();</span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        thermostat.OnTemperatureChange += cooler.OnTemperatureChanged;</span><br><span class="line"></span><br><span class="line">        Console.WriteLine(<span class="string">"Enter temperature: "</span>);</span><br><span class="line">        temperature = Console.ReadLine();</span><br><span class="line"></span><br><span class="line">        thermostat.CurrentTemperature = <span class="keyword">int</span>.Parse(temperature);</span><br><span class="line"></span><br><span class="line">        Console.ReadKey();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>图3是更新过的顺序图。</p>
+<p>虽然cooler和heater已进行了订阅来接收消息,但Lambda表达式异常会使链发生中断,造成cooler对象收不到通知。</p>
+<p>为了避免这个问题,使所有订阅者都能收到通知(不管之前的订阅者有过什么行为) ,必须手动遍历订阅者列表,并单独调用它们。代码清单9展示了需要在CurrentTemperature属性中进行的更新。</p>
+<blockquote>
+<p>图3 委托调用顺序图（已添加异常）</p>
+</blockquote>
+<img src="/2019/07/25/第13章-事件/5.png">
+
+<blockquote>
+<p>代码清单9 处理来自订阅者的异常</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">Thermostat</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// Define the event publisher</span></span><br><span class="line">    <span class="keyword">public</span> Action&lt;<span class="keyword">float</span>&gt; OnTemperatureChange;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">float</span> _CurrentTemperature;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> CurrentTemperature</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">get</span> &#123; <span class="keyword">return</span> _CurrentTemperature; &#125;</span><br><span class="line">        <span class="keyword">set</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">value</span> != CurrentTemperature)</span><br><span class="line">            &#123;</span><br><span class="line">                _CurrentTemperature = <span class="keyword">value</span>;</span><br><span class="line">                <span class="keyword">if</span> (OnTemperatureChange != <span class="literal">null</span>)</span><br><span class="line">                &#123;</span><br><span class="line">                    List&lt;Exception&gt; exceptionCollection = <span class="keyword">new</span> List&lt;Exception&gt;();</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">foreach</span> (Action&lt;<span class="keyword">float</span>&gt; handler <span class="keyword">in</span> OnTemperatureChange.GetInvocationList())</span><br><span class="line">                    &#123;</span><br><span class="line">                        <span class="keyword">try</span></span><br><span class="line">                        &#123;</span><br><span class="line">                            handler(<span class="keyword">value</span>);</span><br><span class="line">                        &#125;</span><br><span class="line">                        <span class="keyword">catch</span> (Exception exception)</span><br><span class="line">                        &#123;</span><br><span class="line"></span><br><span class="line">                            exceptionCollection.Add(exception);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">if</span> (exceptionCollection.Count &gt; <span class="number">0</span>)</span><br><span class="line">                    &#123;</span><br><span class="line">                        <span class="keyword">throw</span> <span class="keyword">new</span> AggregateException(<span class="string">"There were exceptions thrown by OnTemperatureChange Event subscribers."</span>, exceptionCollection);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个代码清单演示了你可以从委托的GetInvocationList()方法获得一份订阅者列表。枚举该列表中的每一项，可以返回给单独的订阅者。如果随后将每个订阅者调用都放到一个try/catch块中，就可以先处理好任何出错的情形，再继续循环迭代。在这个例子中，尽管委托侦听者（delegate listener）引发了一个异常，但cooler仍会接收到温度发生改变的通知。所有通知都发送完毕之后，代码清单9通过引发一个AggregateException来报告所有已发生的异常。AggregateException包装了一个异常集合。集合中的异常可以通过InnerExceptions属性访问。用这种方法，所有异常都得到报告，同时所有订阅者都不会错过通知。</p>
+<h2 id="方法返回值和传引用"><a href="#方法返回值和传引用" class="headerlink" title="方法返回值和传引用"></a>方法返回值和传引用</h2><p>还有一种值得注意的情形，在这种情形下，也有必要遍历委托调用列表，而非直接激活一个通知。这种情形涉及的委托要么不返回void，要么有一个ref或out参数。在Thermostat例子中，OnTemperatureChange委托是Action&lt;float&gt;类型，它返回void，而且没有ref或out参数。其结果是没有数据返回给发布者。这一点相当重要，因为调用委托可能造成将一个通知发送给多个订阅者。假如订阅者会返回一个值，就无法确定应该使用哪个订阅者的返回值。</p>
+<p>假如修改OnTemperatureChange，让它不是返回void，而是返回枚举值，指出设备是否因温度的改变而启动，那么新委托就是Func&lt;float, Status&gt;类型，其中Status是包含元素On和Off的枚举。所有订阅者方法都要使用和委托相同的方法签名，所以都必须返回状态值。由于OnTemperatureChange潜在地对应于一个委托链，所以需要遵循和执行错误处理时相同的模式。也就是说，必须使用GetInvocationList()方法遍历每个委托调用列表来获取每个单独的返回值。类似地，使用ref和out参数的委托类型也需要特别对待。然而，虽然在极少数情况下需要，但一般原则是通过返回void来彻底避免该情形。</p>
+<h1 id="事件"><a href="#事件" class="headerlink" title="事件"></a><span style="color:#039BE5;">事件</span></h1><p>到目前为止，使用的委托都存在两个关键的问题。C#使用关键字event（事件）来解决这些问题。本节描述了如何使用事件，以及它们是如何工作的。</p>
+<h2 id="事件的作用"><a href="#事件的作用" class="headerlink" title="事件的作用"></a>事件的作用</h2><p>本章前面已全面描述了委托是如何工作的。然而，委托结构中存在的缺陷可能造成程序员在不经意中引入一个bug。这个问题和封装有关，无论事件的订阅还是发布，都不能得到充分的控制。</p>
+<p><strong>1.封装订阅</strong></p>
+<p>如前所述，可以使用赋值操作符将一个委托赋给另一个。遗憾的是，这同时可能造成bug。来看看代码清单10的例子。</p>
+<blockquote>
+<p>代码清单10 错误地使用赋值操作符=而不是+=</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="keyword">string</span>[] args</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Thermostat thermostat = <span class="keyword">new</span> Thermostat();</span><br><span class="line"></span><br><span class="line">        Heater heater = <span class="keyword">new</span> Heater(<span class="number">60</span>);</span><br><span class="line">        Cooler cooler = <span class="keyword">new</span> Cooler(<span class="number">80</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">string</span> temperature;</span><br><span class="line"></span><br><span class="line">        thermostat.OnTemperatureChange = heater.OnTemperatureChanged;</span><br><span class="line">        <span class="comment">// Bug: assignment operator overrides previous assignment.</span></span><br><span class="line">        thermostat.OnTemperatureChange = cooler.OnTemperatureChanged;</span><br><span class="line"></span><br><span class="line">        Console.WriteLine(<span class="string">"Enter temperature: "</span>);</span><br><span class="line">        temperature = Console.ReadLine();</span><br><span class="line"></span><br><span class="line">        thermostat.CurrentTemperature = <span class="keyword">int</span>.Parse(temperature);</span><br><span class="line"></span><br><span class="line">        Console.ReadKey();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>代码清单10的输出结果如下：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Enter temperature: </span><br><span class="line"><span class="comment">// 输入20</span></span><br><span class="line">Cooler: Off</span><br></pre></td></tr></table></figure>
+
+<p>代码清单10和代码清单6如出一辙，只是它不是使用+=操作符，而是使用一个简单赋值操作符。其结果就是，当代码将cooler.OnTemperatureChanged赋给OnTemperatureChange时，heater.OnTemperatureChanged会被清除，因为一个全新的委托链替代了之前的链。在本该使用+=操作符的地方使用了赋值操作符“=”，由于这是一个十分容易犯的错误，所以最好的解决方案就是仅为包容类内部的对象提供对赋值操作符的支持。event关键字的作用就是提供额外的封装，避免不小心地取消其他订阅者。（加了event后如果发现“=”给事件赋值会直接报错，如下图所示。而不加event不会报错，这样强制报错可以避免把+=写成=）。</p>
+<img src="/2019/07/25/第13章-事件/4.png">
+
+<p><strong>2.封装发布</strong></p>
+<p>委托和事件的第二个重要区别在于，事件确保只有包容类才能触发事件通知。来看看代码清单11的例子。</p>
+<blockquote>
+<p>代码清单11 从事件包容者的外部触发事件</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="keyword">string</span>[] args</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Thermostat thermostat = <span class="keyword">new</span> Thermostat();</span><br><span class="line"></span><br><span class="line">        Heater heater = <span class="keyword">new</span> Heater(<span class="number">60</span>);</span><br><span class="line">        Cooler cooler = <span class="keyword">new</span> Cooler(<span class="number">80</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">string</span> temperature;</span><br><span class="line"></span><br><span class="line">        thermostat.OnTemperatureChange += heater.OnTemperatureChanged;</span><br><span class="line"></span><br><span class="line">        thermostat.OnTemperatureChange += cooler.OnTemperatureChanged;</span><br><span class="line"></span><br><span class="line">        thermostat.OnTemperatureChange(<span class="number">42</span>);</span><br><span class="line"></span><br><span class="line">        Console.ReadKey();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>代码清单11的输出结果如下：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Heater: On</span><br><span class="line">Cooler: Off</span><br></pre></td></tr></table></figure>
+
+<p>在代码清单11中，即使thermostat的CurrentTemperature没有发生改变，Program也能调用OnTemperatureChange委托。因此，Program触发了对所有thermostat订阅者的一个通知，告诉它们温度已发生改变，而实际上thermostat的温度并没有变化。和之前一样，委托的问题在于封装不充分。Thermostat应禁止其他任何类调用OnTemperatureChange委托。</p>
+<h2 id="事件的声明"><a href="#事件的声明" class="headerlink" title="事件的声明"></a>事件的声明</h2><p>C#用event关键字解决了上述两个问题。虽然看起来像是一个字段修饰符，但event定义的是一个新的<span style="color:red"><strong>成员类型</strong></span>，如代码清单12所示。</p>
+<blockquote>
+<p>代码清单12 为Event-Coding（事件-编码）模式使用event关键字</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Thermostat</span></span><br><span class="line">&#123; </span><br><span class="line">    <span class="comment">// Define the event publisher</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">event</span> EventHandler&lt;TemperatureArgs&gt; OnTemperatureChange = <span class="keyword">delegate</span> &#123; &#125;;</span><br><span class="line">    public class TemperatureArgs : System.EventArgs</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">float</span> _newTemperature;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">float</span> NewTemperature</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">get</span> &#123; <span class="keyword">return</span> _newTemperature; &#125;</span><br><span class="line">            <span class="keyword">set</span> &#123; _newTemperature = <span class="keyword">value</span>; &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">TemperatureArgs</span>(<span class="params"><span class="keyword">float</span> newTemperature</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            NewTemperature = newTemperature;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">float</span> _CurrentTemperature;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> CurrentTemperature</span><br><span class="line">    &#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个新的Thermostat类进行了4处修改。首先，OnTemperatureChange属性被移除了。OnTemperatureChange被声明为一个public字段。从表面看，这似乎并不是在解决早先描述的封装问题。现在需要的是增强封装，而不是让一个字段变成public字段来削弱封装。然而，我们进行的第二处修改是在字段声明之前添加event关键字。这一处简单的修改提供了所需的全部封装。添加event关键字后，会禁止为一个public委托字段使用赋值操作符（比如thermostat.OnTemperaturechange = cooler.OnTemperatureChanged）。除此之外，只有包容类才能调用向所有订阅者发出通知的委托（例如，不允许在类的外部执行thermostat.OnTemperatureChange(42)）。换言之，event关键字提供了必要的封装来防止任何外部类发布一个事件或者取消之前不是由其添加的订阅者。这样，就完美地解决了普通委托存在的两个问题，这是在C#中提供event关键字的关键原因之一。</p>
+<p>普通委托的另一个不利之处在于，很容易忘记在调用委托之前检查null值。这会引发一个非预期的NullReferenceException异常。幸好，通过event关键字提供的封装，可以在声明时（或者在构造器中）采用一个替代方案，如代码清单12所示。注意在声明事件时，我们赋的值是delegate{}，它是一个空委托，代表由零个侦听者构成的一个集合。通过赋值一个空委托，就可以引发事件而不必检查是否有任何侦听者。（这个行为类似于向变量赋一个包含零个元素的数组。然后，在调用一个数组成员时，就不必先检查变量是否为null。）当然，如果委托存在被重新赋值为null的任何可能，那么仍需进行null值检查。不过，由于event关键字限制赋值只能在类的内部发生，所以要重新对委托进行赋值，只能在类中进行。如果从未在类中赋过null值，就不必在代码每次调用委托时检查null。</p>
+<h2 id="编码规范"><a href="#编码规范" class="headerlink" title="编码规范"></a>编码规范</h2><p>为了获得希望的功能，唯一要做的就是将原始委托变量声明更改为字段，然后添加event关键字。进行了这两处修改之后，就可以提供全部必要的封装。与此同时，其他所有功能都和以前一样。然而，在代码清单12中，委托声明还进行了另一处修改。为了遵循标准的C#编码规范，要将Action&lt;float&gt;替换成一个新的委托类型EventHandler&lt;TemperatureArgs&gt;，这是一个CLR类型，其声明如代码清单13所示（自NET Framework 2.0起添加）。</p>
+<blockquote>
+<p>代码清单13 声明一个泛型委托类型</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">delegate</span> <span class="keyword">void</span> EventHandler&lt;TEventArgs&gt; (<span class="keyword">object</span> sender, TEventArgs e) <span class="keyword">where</span> TEventArgs: EventArgs;</span><br></pre></td></tr></table></figure>
+
+<p>结果是Action<teventargs>委托类型中的单个温度参数被替换成两个新参数，一个代表发送者，另一个代表事件数据。这一处修改并不是C#编译器强制的。但是，声明一个打算作为事件来使用的委托时，规范是要求传递这些类型的两个参数。</teventargs></p>
+<p><span style="color:red">第一个参数sender应包含调用委托的那个类的实例。</span>假如一个订阅者方法注册了多个事件，这个参数就尤其有用。例如，假定两个Thermostat实例都订阅了heater.OnTemperatureChanged事件。在这种情况下，任何一个Thermostat实例都可能触发对heater.OnTemperatureChanged的调用。为了判断具体是哪个Thermostat实例触发了事件，要在Heater.OnTemperatureChanged()内部利用sender参数进行判断。如果事件是静态的，就无法做这种判断，所以要为sender传递null值作为实参。</p>
+<p>第二个参数TEventArgse是Thermostat.TemperatureArgs类型。关于TemperatureArgs，一个重点在于它是从System.EventArgs派生的。（事实上，一直到.NET Framework 4.5，都通过一个泛型约束来强制从System.EventArgs派生。）System.EventArgs唯一重要的属性是Empty，它用于指出不存在事件数据。然而，从System.EventArgs派生出TemperatureArgs时添加了一个额外的属性，名为NewTemperature，用于将温度从自动调温器传递给订阅者。</p>
+<p>这里简单总结一下事件的编码规范：第一个参数sender是object类型的，它包含对调用委托的那个对象的一个引用（静态事件则为null）。第二个参数是System.EventArgs类型的（或者从System.EventArgs派生，但包含了事件的附加数据）。调用委托的方式和以前几乎完全一样，只是要提供附加的参数。代码清单14展示了一个例子。</p>
+<blockquote>
+<p>代码清单14 触发事件通知</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">Thermostat</span></span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">float</span> _CurrentTemperature;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> CurrentTemperature</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">get</span> &#123; <span class="keyword">return</span> _CurrentTemperature; &#125;</span><br><span class="line">        <span class="keyword">set</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">value</span> != CurrentTemperature)</span><br><span class="line">            &#123;</span><br><span class="line">                _CurrentTemperature = <span class="keyword">value</span>;</span><br><span class="line">                <span class="comment">// If there are any subscribers then notify them of changes in temperature</span></span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (OnTemperatureChange != <span class="literal">null</span>)</span><br><span class="line">                &#123;</span><br><span class="line">                    OnTemperatureChange(<span class="keyword">this</span>, <span class="keyword">new</span> TemperatureArgs(<span class="keyword">value</span>));</span><br><span class="line">                &#125;</span><br><span class="line">                </span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通常将sender指定为容器类（this），因为它是唯一个能为事件调用委托的类。</p>
+<p>在这个例子中，订阅者可以将sender参数转型为Thermostat，并以那种方式访问当前温度，或者通过TemperatureArgs实例来访问。然而，Thermostat实例上的当前温度可能由一个不同的线程改变。在由于状态改变而发生事件的时候，连同新值传递前一个值是常见的编程模式，它可以控制哪些状态变化是允许的。</p>
+<blockquote>
+<p>规范<br>要在调用委托前检查它的值不为null。<br>不要为非静态事件的sender传递null值。<br>要为静态事件的sender传递nul1值。<br>不要为eventArgs传递null值。<br>要为事件使用EventHandler<teventargs>委托类型。<br>要为TEventArgs使用5ystem.EventArgs类型或者它的派生类型。<br>考虑使用System.EventArgs的子类作为事件的实参类型（TEventArgs），除非完全确定事件永远不需要携带任何数据。</teventargs></p>
+</blockquote>
+<h2 id="泛型和委托"><a href="#泛型和委托" class="headerlink" title="泛型和委托"></a>泛型和委托</h2><p>上一节指出，为事件定义类型的规范是使用EventHandler&lt;TEventArgs&gt;委托类型。理论上任何委托类型都可以使用，但根据约定，第一个参数sender是object类型，第二个参数e是从System.EventArgs派生的一个类型。对于C# 1.0中的委托来说，一个较大的麻烦在于，一旦事件处理程序的参数发生改变，就不得不声明一个新的委托类型。每次从System.EventArgs派生（这是相当常见的一个情形），都要声明一个新的委托数据类型来使用新的EventArgs派生类型。例如，为了使用代码清单14的事件通知代码中的TemperatureArgs，必须声明委托类型TemperatureChangeHandler，它以TemperatureArgs作为参数，如代码清单15所示。</p>
+<blockquote>
+<p>代码清单15 使用一个自定义委托类型</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>onTemperatureChange()。其中, OnTemperatureChange后缀是从原始事件名称中截取的。这两个方法分别负责实现“+=”和”–”赋值操作符。如代码清单13-17所示,这两个方法是使用本章前面讨论的静态方法system. Delegate. Combine ()和System. Delegate.Remove()来实现的。传给方法的第一个参数是私有的EventHandler&lt;TemperatureArgs)委托实例OnTemperatureChange。</p>
+<p>在从event关键字生成的代码中,或许最奇怪的就是最后一部分。其语法与属性的取值和赋值方法非常相似,只是方法名变成了add和remove,其中, add块负责处理”+=”操作符,将调用传给addonTemperaturechange()。类似地, remove块处理“-”操作符,将调用传给remove OnTemperatureChange()。</p>
+<p>必须重视这段代码与属性代码的相似性。本书前面讲过, C#在实现一个属性时,会创建get_<propertyname>和set-<propertyname>,然后将对get和set块的调用传给这些方法。显然,事件的语法与此非常相似</propertyname></propertyname></p>
+<p>另外要注意,在最终的CIL代码中,仍然保留了event关键字。换言之,事件是CIL代码能够显式识别的一样东西,并非只是一个C#构造。在CIL代码中保留一个等价的event关键字之后,所有语言和编辑器都能将事件识别为一个特殊的类成员,并正确地处理它。</p>
+<h2 id="自定义事件的实现"><a href="#自定义事件的实现" class="headerlink" title="自定义事件的实现"></a>自定义事件的实现</h2><p>编译器为+=和-=生成的代码是可以自定义的。例如，假定改变OnTemperatureChange委托的作用域，使它成为protected而不是private。这样一来，从Thermostat派生的类也能直接访问委托，而无需受到和外部类一样的限制。为此，C#允许使用和代码清单15一样的属性语法。换言之，C#允许添加自定义的add和remove块，为事件封装的各个组成部分提供你自己的实现。代码清单18展示了一个例子。</p>
+<blockquote>
+<p>代码清单18 自定义add和remove处理程序</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>在这个例子中，存储每个订阅者的委托OnTemperatureChange变成了protected。除此之外，在add块的实现中，我们交换了两个委托存储的位置，使添加到链中的最后一个委托是接收通知的第一个委托。</p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>本章描述了事件，值得一提的是，通常，方法引用是唯一可以在事件上下文的外部用到委托变量的情况。换句话说，由于事件提供了额外的封装性，而且允许在必要时对实现进行自定义，所以最佳做法就是始终为Observer模式使用事件。</p>
+<p>可能需要一段时间的练习，才能脱离示例代码，熟练地进行事件的编程。然而，事件编程正是以后要讲述的异步、多线程编程的重要基础。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C-本质论/" rel="tag"># C#本质论</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/07/25/观察者模式/" rel="next" title="观察者模式">
+                <i class="fa fa-chevron-left"></i> 观察者模式
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/07/27/基于XLua的Unity脚本框架的设计与实现/" rel="prev" title="基于XLua的Unity脚本框架的设计与实现">
+                基于XLua的Unity脚本框架的设计与实现 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">326</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">38</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2019/08/08/Transform-API/" title="Transform API" target="_blank">Transform API</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/08/08/GameObject-API/" title="GameObject API" target="_blank">GameObject API</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/08/07/获取游戏服务的唯一对象--单例模式/" title="获取游戏服务的唯一对象--单例模式" target="_blank">获取游戏服务的唯一对象--单例模式</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/08/07/游戏主要类--外观模式（Facade）/" title="游戏主要类--外观模式（Facade）" target="_blank">游戏主要类--外观模式（Facade）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/08/07/动态配置图片/" title="动态配置图片" target="_blank">动态配置图片</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#使用多播委托来编码Observer模式"><span class="nav-number">1.</span> <span class="nav-text">使用多播委托来编码Observer模式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#定义订阅者方法"><span class="nav-number">1.1.</span> <span class="nav-text">定义订阅者方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#定义发布者"><span class="nav-number">1.2.</span> <span class="nav-text">定义发布者</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#连接发布者和订阅者"><span class="nav-number">1.3.</span> <span class="nav-text">连接发布者和订阅者</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#调用委托"><span class="nav-number">1.4.</span> <span class="nav-text">调用委托</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#检查null值"><span class="nav-number">1.5.</span> <span class="nav-text">检查null值</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#委托操作符"><span class="nav-number">1.6.</span> <span class="nav-text">委托操作符</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#顺序调用"><span class="nav-number">1.7.</span> <span class="nav-text">顺序调用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#错误处理"><span class="nav-number">1.8.</span> <span class="nav-text">错误处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#方法返回值和传引用"><span class="nav-number">1.9.</span> <span class="nav-text">方法返回值和传引用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#事件"><span class="nav-number">2.</span> <span class="nav-text">事件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#事件的作用"><span class="nav-number">2.1.</span> <span class="nav-text">事件的作用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#事件的声明"><span class="nav-number">2.2.</span> <span class="nav-text">事件的声明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#编码规范"><span class="nav-number">2.3.</span> <span class="nav-text">编码规范</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#泛型和委托"><span class="nav-number">2.4.</span> <span class="nav-text">泛型和委托</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#自定义事件的实现"><span class="nav-number">2.5.</span> <span class="nav-text">自定义事件的实现</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#小结"><span class="nav-number">3.</span> <span class="nav-text">小结</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">1.7m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">25:01</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>
