@@ -111,10 +111,13 @@
 <meta property="og:site_name" content="车斌的博客">
 <meta property="og:description" content="思考并回答以下问题：">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-08-08T13:55:37.326Z">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/07/游戏主要类--外观模式（Facade）/1.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/07/游戏主要类--外观模式（Facade）/2.png">
+<meta property="og:updated_time" content="2019-08-13T13:13:58.937Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="游戏主要类--外观模式（Facade）">
 <meta name="twitter:description" content="思考并回答以下问题：">
+<meta name="twitter:image" content="http://chebincarl.github.io/2019/08/07/游戏主要类--外观模式（Facade）/1.png">
 
 
 
@@ -440,7 +443,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-08-08 21:55:37" itemprop="dateModified" datetime="2019-08-08T21:55:37+08:00">2019-08-08</time>
+                <time title="修改时间：2019-08-13 21:13:58" itemprop="dateModified" datetime="2019-08-13T21:13:58+08:00">2019-08-13</time>
               
             
           </span>
@@ -486,7 +489,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">8.6k</span>
+                <span title="本文字数">8.7k</span>
               
 
               
@@ -523,7 +526,30 @@
         <p>思考并回答以下问题：</p>
 <a id="more"></a>
 
-<h1 id="游戏子功能的整合"><a href="#游戏子功能的整合" class="headerlink" title="游戏子功能的整合"></a><span style="color:#039BE5;">游戏子功能的整合</span></h1><p>一款游戏要能顺利运行，必须同时由内部数个不同的子系统一起合作完成。在这些子系统中，有些是在早期游戏分析时规划出来的，有些则是实现过程中，将相同功能重构整合之后才完成的。以《P级阵地》为例，它是由下列游戏系统所组成：</p>
+<p>本章涵盖：</p>
+<ul>
+<li>游戏场景<ul>
+<li>场景的转换</li>
+<li>游戏场景可能的实现方式白</li>
+</ul>
+</li>
+<li>状态模式（State）<ul>
+<li>状态模式的定义</li>
+<li>状态模式的说明</li>
+<li>状态模式的实现范例</li>
+</ul>
+</li>
+<li>使用状态模式实现游戏场景的转换<ul>
+<li>SceneState的实现</li>
+<li>实现说明</li>
+<li>使用状态模式的优点</li>
+<li>游戏执行流程及场景转换说明</li>
+</ul>
+</li>
+<li>状态模式面对变化时</li>
+<li>结论</li>
+</ul>
+<h1 id="游戏子功能的整合"><a href="#游戏子功能的整合" class="headerlink" title="游戏子功能的整合"></a><span style="color:#339AFF;">游戏子功能的整合</span></h1><p>一款游戏要能顺利运行，必须同时由内部数个不同的子系统一起合作完成。在这些子系统中，有些是在早期游戏分析时规划出来的，有些则是实现过程中，将相同功能重构整合之后才完成的。以《P级阵地》为例，它是由下列游戏系统所组成：</p>
 <ul>
 <li>游戏事件系统（GameEventSystem）；</li>
 <li>兵营系统（CampSystem）；</li>
@@ -547,13 +573,16 @@
 <li>以“可重用性”来看，这种设计方式会使得BattleState类不容易转换给其他项目使用，因为BattleState类与太多特定的子系统类产生关联，必须将它们删除才能转换给其他项目，因此丧失可重用性。</li>
 </ul>
 <p>综合上述两个原因，将这些子系统从BattleState类中移出，整合在单一类之下，会是比较好的做法。所以，在《P级阵地》中应用了外观模式来整合这些子系统，使它们成为单一界面并提供外界使用。</p>
-<h1 id="外观模式（Facade）"><a href="#外观模式（Facade）" class="headerlink" title="外观模式（Facade）"></a><span style="color:#039BE5;">外观模式（Facade）</span></h1><p>其实，外观模式是在生活中最容易碰到的模式。当我们能够利用简单的行为来操作一个复杂的系统时，当下所使用的接口，就是以外观模式来定义的高级接口。</p>
+<h1 id="外观模式（Facade）"><a href="#外观模式（Facade）" class="headerlink" title="外观模式（Facade）"></a><span style="color:#339AFF;">外观模式（Facade）</span></h1><p>其实，外观模式是在生活中最容易碰到的模式。当我们能够利用简单的行为来操作一个复杂的系统时，当下所使用的接口，就是以外观模式来定义的高级接口。</p>
 <h2 id="外观模式的定义"><a href="#外观模式的定义" class="headerlink" title="外观模式的定义"></a><span style="color:#00ACC1;">外观模式的定义</span></h2><p>外观模式在GoF的解释是：</p>
-<p>“为子系统定义一组统一的接口，这个高级的接口会让子系统更容易被使用”。</p>
-<p>以驾驶汽车为例，当驾驶者能够开着一辆汽车在路上行走，汽车内部还必须由许多的子系统一起配合才能完成汽车行走这项功能，这些子系统包含引擎系统、传动系统、悬吊系统、车身骨架系统、电装系统等，如图4-1所示。但对客户端（驾驶者）而言，并不需要了解这些子系统是如何协调工作的，驾驶者只需要通过高级接口（方向盘、踏板、仪表盘）就可以轻易操控汽车。</p>
-<p>再以生活中常用的微波炉为例，微波炉内部包含了电源供应系统、微波加热系统、冷却系统、外装防护等，如图4-2所示。当我们想要使用微波炉加热食物时，只需要使用微波炉上的面板调整火力和时间，按下启动键后，微波炉的子系统就会立即交互合作将食物加热。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">为子系统定义一组统一的接口，这个高级的接口会让子系统更容易被使用。</span><br></pre></td></tr></table></figure>
+
+<p>以驾驶汽车为例，当驾驶者能够开着一辆汽车在路上行走，汽车内部还必须由许多的子系统一起配合才能完成汽车行走这项功能，这些子系统包含引擎系统、传动系统、悬吊系统、车身骨架系统、电装系统等。但对客户端（驾驶者）而言，并不需要了解这些子系统是如何协调工作的，驾驶者只需要通过高级接口（方向盘、踏板、仪表盘）就可以轻易操控汽车。</p>
+<p>再以生活中常用的微波炉为例，微波炉内部包含了电源供应系统、微波加热系统、冷却系统、外装防护等。当我们想要使用微波炉加热食物时，只需要使用微波炉上的面板调整火力和时间，按下启动键后，微波炉的子系统就会立即交互合作将食物加热。</p>
 <p>所以，外观模式的重点在于，它能将系统内部的互动细节隐藏起来，并提供一个简单方便的接口。之后客户端只需要通过这个接口，就可以操作一个复杂系统并让它们顺利运行。</p>
-<h2 id="外观模式的说明"><a href="#外观模式的说明" class="headerlink" title="外观模式的说明"></a><span style="color:#00ACC1;">外观模式的说明</span></h2><p>整合子系统并提供一个高级的界面让客户端使用，可以由图4-3表示。</p>
+<h2 id="外观模式的说明"><a href="#外观模式的说明" class="headerlink" title="外观模式的说明"></a><span style="color:#00ACC1;">外观模式的说明</span></h2><p>整合子系统并提供一个高级的界面让客户端使用，可以由图1表示。</p>
+<img src="/2019/08/07/游戏主要类--外观模式（Facade）/1.png">
+
 <p>参与者的说明如下:</p>
 <ul>
 <li>client（客户端、用户）<br>从原本需要操作多个子系统的情况，改为只需要面对一个整合后的界面。</li>
@@ -564,13 +593,15 @@
 </ul>
 </li>
 </ul>
-<h2 id="外观模式的实现说明"><a href="#外观模式的实现说明" class="headerlink" title="外观模式的实现说明"></a><span style="color:#00ACC1;">外观模式的实现说明</span></h2><p>从之前提到的一些实例来看，驾驶座位前的方向盘、仪表板，以及微波炉上的面板，都是制造商提供给用户使用的Facade界面，如图4-4和图4-5所示。</p>
+<h2 id="外观模式的实现说明"><a href="#外观模式的实现说明" class="headerlink" title="外观模式的实现说明"></a><span style="color:#00ACC1;">外观模式的实现说明</span></h2><p>从之前提到的一些实例来看，驾驶座位前的方向盘、仪表板，以及微波炉上的面板，都是制造商提供给用户使用的Facade界面。</p>
 <p>外观模式可以让客户端使用简单的界面来操作一个复杂的系统，并且减少客户端要与之互动的系统数量，让客户端能够专心处理与本身有关的事情。所以，驾驶员不需要了解汽车引擎系统是否已完成调校，只需要注意行车速度及仪表板上是否有红灯亮起；用户在使用微波炉时，也不用了解此时的微波功率是多少瓦，只需要知道放入的容器是否正确、食物是否过熟即可。</p>
-<h1 id="使用外观模式实现游戏主程序"><a href="#使用外观模式实现游戏主程序" class="headerlink" title="使用外观模式实现游戏主程序"></a><span style="color:#039BE5;">使用外观模式实现游戏主程序</span></h1><p>游戏开始实现时，就如同本章第一节中的范例一样，先将几个游戏系统写在一个直接使用它们的类中，但随着游戏系统越加越多，会发现这些游戏系统的程序代码占据了整个类。这些游戏系统的初始化设置和流程串接，与使用它们的类完全没有关系，此时就需要将它们移出，并以一个类重新组织。</p>
+<h1 id="使用外观模式实现游戏主程序"><a href="#使用外观模式实现游戏主程序" class="headerlink" title="使用外观模式实现游戏主程序"></a><span style="color:#339AFF;">使用外观模式实现游戏主程序</span></h1><p>游戏开始实现时，就如同本章第一节中的范例一样，先将几个游戏系统写在一个直接使用它们的类中，但随着游戏系统越加越多，会发现这些游戏系统的程序代码占据了整个类。这些游戏系统的初始化设置和流程串接，与使用它们的类完全没有关系，此时就需要将它们移出，并以一个类重新组织。</p>
 <h2 id="游戏主程序架构设计"><a href="#游戏主程序架构设计" class="headerlink" title="游戏主程序架构设计"></a><span style="color:#00ACC1;">游戏主程序架构设计</span></h2><p>在《P级阵地》中， PBaseDefenseGame就是“整合所有子系统，并提供高级界面的外观模式类”。重新规划后的类结构图如图4-6所示。</p>
 <blockquote>
-<p>图4-6 外观模式类的结构图</p>
+<p>图2 外观模式类的结构图</p>
 </blockquote>
+<img src="/2019/08/07/游戏主要类--外观模式（Facade）/2.png">
+
 <p>参与者的说明如下:</p>
 <ul>
 <li>GameEventSystem、CampSystem、…：分别为游戏的子系统，每个系统负责各自应该实现的功能并提供接口.</li>
@@ -618,8 +649,8 @@
 <p>隔离客户端对子系统的接触，除了能减少耦合度之外，安全性也是重点之一。这里所说的安全性，指的是系统执行时“意外宕机或出错”的情况。因为有时候子系统之间的沟通和构建程序上会有一定的步骤，例如：某一个功能一定要先通知子系统A将内部功能设置完成后，才能通知子系统B接手完成后续的设置，顺序的错误会让系统初始化失败或导致宕机，所以像这样的程序构建顺序，应该由Facade接口类来完成，而不应该由客户端去实现。</p>
 <h2 id="实现外观模式时的注意事项"><a href="#实现外观模式时的注意事项" class="headerlink" title="实现外观模式时的注意事项"></a><span style="color:#00ACC1;">实现外观模式时的注意事项</span></h2><p>由于将所有子系统集中在Facade接口类中，最终会导致Facade接口类过于庞大且难以维护。当发生这种情况时，可以重构Facade接口类，将功能相近的子系统进行整合，以减少内部系统的依赖性，或是整合其他设计模式来减少Facade接口类过度膨胀。</p>
 <p>例如在本章的实现上，PBaseDefenseGame类虽然隔离了战斗状态类（BattleState）和各游戏子系统之间的操作，但还需要注意的是，PBaseDefenseGame内部子系统之间要如何减少耦合度的问题，在下一章（第5章）中，将说明如何减少子系统之间的耦合度。</p>
-<h1 id="外观模式面对变化时"><a href="#外观模式面对变化时" class="headerlink" title="外观模式面对变化时"></a><span style="color:#039BE5;">外观模式面对变化时</span></h1><p>随着开发需求的变更，任何游戏子系统的修改及更换，都被限制在PBaseDefenseGame这个Facade接口类内。所以，当有新的系统需要增加时，也只会影响PBaseDefenseGame类的定义及增加对外开放的方法，这样就能使项目的变动范围减到最小。</p>
-<h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a><span style="color:#039BE5;">结论</span></h1><p><span style="color:red">将复杂的子系统沟通交给单一的一个类负责，并提供单一界面给客户端使用，使客户减少对系统的耦合度是外观模式的优点。</span>在本章中，我们利用外观模式实现了PBaseDefenseGame类，所以战斗状态类（BattleState）与各游戏子系统被隔离开了，这样做的好处是显而易见的。除此之外，本章所实现的设计还有哪些应该注意的地方，以及还可以将外观模式应用在游戏设计的哪些地方，分述如下。</p>
+<h1 id="外观模式面对变化时"><a href="#外观模式面对变化时" class="headerlink" title="外观模式面对变化时"></a><span style="color:#339AFF;">外观模式面对变化时</span></h1><p>随着开发需求的变更，任何游戏子系统的修改及更换，都被限制在PBaseDefenseGame这个Facade接口类内。所以，当有新的系统需要增加时，也只会影响PBaseDefenseGame类的定义及增加对外开放的方法，这样就能使项目的变动范围减到最小。</p>
+<h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a><span style="color:#339AFF;">结论</span></h1><p><span style="color:red">将复杂的子系统沟通交给单一的一个类负责，并提供单一界面给客户端使用，使客户减少对系统的耦合度是外观模式的优点。</span>在本章中，我们利用外观模式实现了PBaseDefenseGame类，所以战斗状态类（BattleState）与各游戏子系统被隔离开了，这样做的好处是显而易见的。除此之外，本章所实现的设计还有哪些应该注意的地方，以及还可以将外观模式应用在游戏设计的哪些地方，分述如下。</p>
 <p><strong>与其他模式的合作</strong></p>
 <p>在《P级阵地》中，PBaseDefenseGame类使用单例模式（Singleton）来产生唯一的类对象，内部子系统之间则使用中介者模式（Mediator）作为互相沟通的方式，而游戏事件系统（GameEventSystem)是观察者模式（Observer）的实现，主要目的就是要减少PBaseDefenseGame类接口过于庞大而加入的设计。</p>
 <p><strong>其他应用方式</strong></p>
@@ -746,7 +777,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">326</span>
+                    <span class="site-state-item-count">333</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -872,7 +903,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">38</span>
+                      
+                    
+                    <span class="site-state-item-count">39</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -903,23 +936,23 @@
                 
                 
                   <li>
-                    <a href="/2019/08/08/Transform-API/" title="Transform API" target="_blank">Transform API</a>
+                    <a href="/2019/08/13/游戏内各系统的整合-中介者模式/" title="游戏内各系统的整合--中介者模式" target="_blank">游戏内各系统的整合--中介者模式</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/08/08/GameObject-API/" title="GameObject API" target="_blank">GameObject API</a>
+                    <a href="/2019/08/13/Unity通用场景管理器/" title="Unity通用场景管理器" target="_blank">Unity通用场景管理器</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/08/07/获取游戏服务的唯一对象--单例模式/" title="获取游戏服务的唯一对象--单例模式" target="_blank">获取游戏服务的唯一对象--单例模式</a>
+                    <a href="/2019/08/13/Unity3D的界面设计-组合模式/" title="Unity3D的界面设计--组合模式" target="_blank">Unity3D的界面设计--组合模式</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/08/07/游戏主要类--外观模式（Facade）/" title="游戏主要类--外观模式（Facade）" target="_blank">游戏主要类--外观模式（Facade）</a>
+                    <a href="/2019/08/13/成就系统-观察者模式/" title="成就系统--观察者模式" target="_blank">成就系统--观察者模式</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/08/07/动态配置图片/" title="动态配置图片" target="_blank">动态配置图片</a>
+                    <a href="/2019/08/13/兵营训练单位-命令模式/" title="兵营训练单位--命令模式" target="_blank">兵营训练单位--命令模式</a>
                   </li>
                 
               </ul>
@@ -991,7 +1024,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">25:01</span>
+    <span title="站点阅读时长">25:53</span>
   
 </div>
 
