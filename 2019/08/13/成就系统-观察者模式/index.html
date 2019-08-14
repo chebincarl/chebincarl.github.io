@@ -111,7 +111,7 @@
 <meta property="og:site_name" content="车斌的博客">
 <meta property="og:description" content="思考并回答以下问题：">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-08-13T14:36:39.798Z">
+<meta property="og:updated_time" content="2019-08-14T13:14:01.138Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="成就系统--观察者模式">
 <meta name="twitter:description" content="思考并回答以下问题：">
@@ -423,12 +423,24 @@
                 
               
 
-              <time title="创建时间：2019-08-13 13:17:20 / 修改时间：22:36:39" itemprop="dateCreated datePublished" datetime="2019-08-13T13:17:20+08:00">2019-08-13</time>
+              <time title="创建时间：2019-08-13 13:17:20" itemprop="dateCreated datePublished" datetime="2019-08-13T13:17:20+08:00">2019-08-13</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-08-14 21:14:01" itemprop="dateModified" datetime="2019-08-14T21:14:01+08:00">2019-08-14</time>
               
             
           </span>
@@ -474,7 +486,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">19</span>
+                <span title="本文字数">3.1k</span>
               
 
               
@@ -488,7 +500,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">1 分钟</span>
+                <span title="阅读时长">3 分钟</span>
               
             </div>
           
@@ -512,6 +524,30 @@
 <a id="more"></a>
 
 <p>本章涵盖：</p>
+<h1 id="成就系统"><a href="#成就系统" class="headerlink" title="成就系统"></a>成就系统</h1><p>成就系统(AchievementSystem),是早期单机游戏就出现的一种系统,例如:收集到多少颗星星就能开启特定关卡、全装备收集完成就能额外获得另一组套装等等。这些收集的项目并不会影响游戏主线的进行,也不与游戏主要的玩法相关。但增加这些成就项目,有助于游戏的可玩性,并提升玩家对游戏的挑战和目标的追求</p>
+<p>成就系统(AchievementSystem)中的项目,都会和游戏本身有关,并且在玩家游玩的过程中,就能顺便收集,或是反复进行某项操作就能实现目标。一般可以先将成就项目分门别类,例如属于总数类的可能有累积击杀敌方角色达100次、训练我单位达100个等;也有的是目标完成的项目,如完成训练一个等级3的玩家角色、成功打倒一个Boss等。所以,在实现成就系统之前,需要企划单位先将需要的成就事件列出来,并在项目完成到某个段落之后,才开始加入实现开发中。实现上,会先定义“游戏事件”,如敌方角色阵亡、玩家角色阵亡、玩家角色升级等。当游戏进行过程中,有任何“游戏事件”被触发时,系统就要通知对应的“成就项目”,进行累积或条件判断,如果达到,则完成“成就项目”并通知玩家或直接给予奖励,如图21-1所示。</p>
+<p>图21-1 成就系统与玩家奖励</p>
+<p>一个简单的设计方式是,我们可以把通知成就系统的程序代码加入到“成就事件触发”的方法中。例如,击杀敌方角色,实现时就可以加在敌方角色阵亡的地方:<br>Listing 21-1 Enemy角色接口</p>
+<p>事件触发后,调用成就系统(AchievementSystem)中的NotifyGameEvent方法,并将触发的游戏事件及触发时的敌方角色传入。上述范例中,使用枚举(ENUM)的方式来定义“游戏事件”,并将事件从参数行传入,而不是针对每一个游戏事件定义特定的调用方法,这样做可以避免成就系统定义过多的接口方法。而成就系统的NotifyGameEvent方法,可根据参数传入的“游戏事件”参数,来决定后续的处理流程:</p>
+<p>因为“游戏事件”非常多,所以在NotifyGameEvent方法中先判断emGameEvent的参属性,再分别调用对应的私有成员方法,而每个私有成员方法,再按照企划的需求,累积计属性或判断单次成就是否实现。<br>Listing 21-3成就系统</p>
+<p>如果让成就系统(AchievementSystem)负责每一个游戏事件的方法,并针对每一个单独的游戏事件,去进行“成就项目的累积或判断”,会让成就系统的扩充被限制在每个游戏事件处理方法中。当以后需要针对某一个游戏事件增加成就项目时,就必须通过修改原有“游戏事件处理方法”中的程序代码才能达成。例如,想再增加一个成就项目“杀死装备武器为Rocket以上的敌人数”,那么就只能修改Notify-EnemyKilled方法,在其中追加程序代码来实现修改的目标。</p>
+<p>此外, “游戏事件”发生时可能不是只有成就系统会被影响,其他系统也可能需要追踪相关的游戏事件。因此,如果都是在“游戏事件”的触发点进行每个系统调用的话,那么触发点的程序代码将会变得非常复杂:</p>
+<p>所以要将“游戏事件”与“成就系统”分开,让成就系统仅关注于某些游戏事件的发生;而游戏事件的发生,也不是只提供给成就系统使用。这样的设计才是适当的设计。</p>
+<p>要如何完成这样的设计呢?如果能将“游戏事件的产生与通知”独立成为一个系统,并且让其他系统能通过“订阅”或“关注”的方式,来追踪游戏事件系统发生的事。也就是,当游戏事件系统发生事件时,会负责去通知所有“订阅”了游戏事件的系统,此时被通知的系统,再根据自己的系统逻辑自行决定后续的处理操作。如果能按照上述流程来进行设计,就是一个极为适当的设计。上述的流程,其实就是观察者模式(Observer)所要表达的内容,如图21-2所示。</p>
+<p>图21-2 由事件触发其他相关的系统</p>
+<h1 id="观察者模式-Observer"><a href="#观察者模式-Observer" class="headerlink" title="观察者模式(Observer)"></a>观察者模式(Observer)</h1><p>观察者模式(Observer)与命令模式(Command)是很相似的模式,两者都是希望“事件发生”与“功能执行”之间不要有太多的依赖性,不过,还是可以按照系统的使用需求,分析出应该运用哪个模式。命令模式(Command)已经在第19章中详细说明过了,接下来将说明观察者模式(Observer),另外,在21.3.4节中也将说明,如何根据系统的需要在这两个模式中,选择合适的模式进行实现。</p>
+<h2 id="观察者模式-Observer-的定义"><a href="#观察者模式-Observer-的定义" class="headerlink" title="观察者模式(Observer)的定义"></a>观察者模式(Observer)的定义</h2><p>GoF对观察者模式(Observer)的定义为:</p>
+<p>,在对象之间定义一个一对多的连接方法,当一个对象变换状态时,其他关联的对象都会自动收到通知。”</p>
+<p>土交网站就是最佳的观察者模式(Observer)实现范例。当我们在社交网站上,与另一位用户成为好友、加入一个粉丝团或关注另一位用户的状态,那么当这些好友、粉丝团、用户有任何的新的动态或状态变动时,就会在我们动态页面上“主动”看到这些对象更新的情况,而不必到每一位好友或粉丝团中查看,如图21-3所示。</p>
+<p>图21-3社交网站上的关注对象的更新</p>
+<p>在早期社交网站还没广泛流行之前,说明观察者模式(Observer)常以“报社-订户”来做说明:多位订户向报社“订阅(Subscribe)”了一份报纸,而报社针对昨天的新闻整理编辑之后,在今天一早进行“发布(Publish)”的工作,接着送报生会主动按照订阅的信息,将每份报纸送到订户手上,如图21-4所示。</p>
+<p>图214 向报社订阅后,报纸每日会送达到指定的订户手上</p>
+<p>在上面的案例中,都存在“主题目标”与其他“订阅者/关注者”之间的关系(一对多),当主题有变化时,就会通过之前建立的“关系”,将更动态的信息传送给“订阅者/关注者”。因此,实现上可分为以下儿点:</p>
+<p>主题者、订阅者的角色;<br>如何建立订阅者与主题者的关系;<br>主题者发布信息时,如何通知所有订阅者。<br>21.2.2观察者模式(Observer)的说明<br>GoF定义的观察者模式(Observer)的类结构图如图21-5所示。</p>
+<p>图21-5 GOF定义的观察者模式(Observer)的类结构图<br>GoF参与者的说明如下:<br>Subject (主题接口)&gt;定义主题的接口。让观察者通过接口方法,来订阅、解除订阅主题。这些观察者在主题内部可使用泛型容器加以管理。在主题更新时,通知所有观察者。ConcreteSubject (主题实现)&gt;实现主题接口。&gt;设置主题的内容及更新,当主题变化时,使用父类的通知方法告知所有的观察者。Observer (观察者接口).定义观察者的接口。&gt;提供更新通知方法,让主题可以通知更新。ConcreteObserver (观察者实现)&gt;实现观察者接口。&gt;针对主题的更新,按需求向主题获取更新状态.</p>
+<p>在类定义中,使用了一个C#的List泛型容器(m Observers)来管理所有的Observer(观察者),并实现了3个与Observer (观察者)相关的方法。当某一个Observer (观察者),对Subject (主题)感兴趣时,就利用Attach方法将自己加入主题的管理器中,通过这样的方式, Observer (观察者)就能主动与Subject (主题)建立关系。当Subject (主题)被更改而需要通知Observer (观察者)时,只要遍历m Observers就能通知每一个在容器内的Observer (观察者)现在有Subject (主题)发生了更改。</p>
+<p>以下程序范例实现了一个主题</p>
+<p>Listing 21-5 主题实现(Observer.cs)</p>
 
       
     </div>
@@ -604,8 +640,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <div class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -622,7 +667,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">333</span>
+                    <span class="site-state-item-count">335</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -781,6 +826,14 @@
                 
                 
                   <li>
+                    <a href="/2019/08/14/游戏角色的产生-工厂方法模式/" title="游戏角色的产生--工厂方法模式" target="_blank">游戏角色的产生--工厂方法模式</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/08/14/MySQL的Join/" title="MySQL的Join" target="_blank">MySQL的Join</a>
+                  </li>
+                
+                  <li>
                     <a href="/2019/08/13/游戏内各系统的整合-中介者模式/" title="游戏内各系统的整合--中介者模式" target="_blank">游戏内各系统的整合--中介者模式</a>
                   </li>
                 
@@ -790,14 +843,6 @@
                 
                   <li>
                     <a href="/2019/08/13/Unity3D的界面设计-组合模式/" title="Unity3D的界面设计--组合模式" target="_blank">Unity3D的界面设计--组合模式</a>
-                  </li>
-                
-                  <li>
-                    <a href="/2019/08/13/成就系统-观察者模式/" title="成就系统--观察者模式" target="_blank">成就系统--观察者模式</a>
-                  </li>
-                
-                  <li>
-                    <a href="/2019/08/13/兵营训练单位-命令模式/" title="兵营训练单位--命令模式" target="_blank">兵营训练单位--命令模式</a>
                   </li>
                 
               </ul>
@@ -812,6 +857,23 @@
         </div>
       </div>
 
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#成就系统"><span class="nav-number">1.</span> <span class="nav-text">成就系统</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#观察者模式-Observer"><span class="nav-number">2.</span> <span class="nav-text">观察者模式(Observer)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#观察者模式-Observer-的定义"><span class="nav-number">2.1.</span> <span class="nav-text">观察者模式(Observer)的定义</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
       
 
       
@@ -852,7 +914,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">25:53</span>
+    <span title="站点阅读时长">26:27</span>
   
 </div>
 
