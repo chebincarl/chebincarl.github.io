@@ -1,0 +1,1696 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="思考并回答以下问题：">
+<meta name="keywords" content="设计模式与游戏完美开发">
+<meta property="og:type" content="article">
+<meta property="og:title" content="角色与武器的实现--桥接模式">
+<meta property="og:url" content="http://chebincarl.github.io/2019/08/17/角色与武器的实现-桥接模式/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="思考并回答以下问题：">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/17/角色与武器的实现-桥接模式/a.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/17/角色与武器的实现-桥接模式/b.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/17/角色与武器的实现-桥接模式/c.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/17/角色与武器的实现-桥接模式/d.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/17/角色与武器的实现-桥接模式/1.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/17/角色与武器的实现-桥接模式/2.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/17/角色与武器的实现-桥接模式/3.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/17/角色与武器的实现-桥接模式/4.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/17/角色与武器的实现-桥接模式/5.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/17/角色与武器的实现-桥接模式/6.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/17/角色与武器的实现-桥接模式/7.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/17/角色与武器的实现-桥接模式/8.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/17/角色与武器的实现-桥接模式/9.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/17/角色与武器的实现-桥接模式/10.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/17/角色与武器的实现-桥接模式/11.png">
+<meta property="og:updated_time" content="2019-08-18T03:59:57.439Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="角色与武器的实现--桥接模式">
+<meta name="twitter:description" content="思考并回答以下问题：">
+<meta name="twitter:image" content="http://chebincarl.github.io/2019/08/17/角色与武器的实现-桥接模式/a.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/08/17/角色与武器的实现-桥接模式/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>角色与武器的实现--桥接模式 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">文章看10遍，动手做10遍，自然就会了</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/08/17/角色与武器的实现-桥接模式/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">角色与武器的实现--桥接模式
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-08-17 23:08:09" itemprop="dateCreated datePublished" datetime="2019-08-17T23:08:09+08:00">2019-08-17</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-08-18 11:59:57" itemprop="dateModified" datetime="2019-08-18T11:59:57+08:00">2019-08-18</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Unity/" itemprop="url" rel="index"><span itemprop="name">Unity</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">21k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">19 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>思考并回答以下问题：</p>
+<a id="more"></a>
+
+<h1 id="游戏角色的架构"><a href="#游戏角色的架构" class="headerlink" title="游戏角色的架构"></a><span style="color:#339AFF;">游戏角色的架构</span></h1><p>《P级阵地》的世界中包含两个阵营：“玩家阵营”和“敌方阵营”。玩家阵营的角色必须通过训练的方式从兵营中产生；而敌方阵营的角色，则是不断地从地图上的某个地点自动出现，一次一队往玩家守护的营地前进。</p>
+<p>双方阵营的角色也有一些共享的部分：</p>
+<ul>
+<li>角色属性：每个角色都有“生命力”和“移动速度”两个属性，不同角色单位之间利用不同的属性进行区分。</li>
+<li>装备武器：每个角色能装备一把武器用来攻击对手，每把武器利用“攻击力”和“攻击距离”来区分不同的武器。</li>
+<li>人工智能（AI）：由于玩家只决定玩家阵营要训练哪一个兵种出来防守阵营（玩家不负责如何防守攻击），而敌方阵营的角色则是会自动攻击的作战单位，所以双方角色都通过人工智能（AI）来协助移动和攻击。</li>
+</ul>
+<p>在角色的表现上，《P级阵地》使用3D模型来呈现每一个角色，而每个角色也都有代表的2D图标（Icon）显示于玩家界面上，如图A和图B所示。</p>
+<blockquote>
+<p>图A 使用Unity3D角色</p>
+</blockquote>
+<img src="/2019/08/17/角色与武器的实现-桥接模式/a.png">
+
+<blockquote>
+<p>图B 双方游戏角色</p>
+</blockquote>
+<img src="/2019/08/17/角色与武器的实现-桥接模式/b.png">
+
+<p>两方阵营不同之处在于：</p>
+<ul>
+<li>产生方式：玩家阵营的角色必须经由训练的方式，从兵营中产生；敌方阵营的角色，则是会不断地从场景上产生。</li>
+<li>等级：玩家阵营的单位可以通过“兵营升级”的方式，提高角色的等级来增加防守优势；敌方阵营的角色则没有等级的设置。</li>
+<li>爆击能力：敌方阵营的角色有一定的概率会以“爆击”来增加攻击优势；玩家阵营的单位则没有爆击能力。</li>
+</ul>
+<h1 id="角色类的规划"><a href="#角色类的规划" class="headerlink" title="角色类的规划"></a><span style="color:#339AFF;">角色类的规划</span></h1><p>按上述的需求说明，在Unity3D进行实现时，可以先抽象化双方阵营“角色”的属性和操作，成为一个角色接口（ICharacter）来定义双方阵营角色的共享操作接口，如图C所示。</p>
+<blockquote>
+<p>图C 角色接口ICharacter</p>
+</blockquote>
+<img src="/2019/08/17/角色与武器的实现-桥接模式/c.png">
+
+<blockquote>
+<p>角色接口（ICharacter.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">ICharacter</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">string</span> m_Name = <span class="string">""</span>;               <span class="comment">// 名称</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">protected</span> GameObject m_GameObject = <span class="literal">null</span>;   <span class="comment">// 显示的Uniyt模型</span></span><br><span class="line">    <span class="keyword">protected</span> NavMeshAgent m_NavAgent = <span class="literal">null</span>;   <span class="comment">// 用于控制角色移动</span></span><br><span class="line">    <span class="keyword">protected</span> AudioSource  m_Audio    = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">string</span>    m_IconSpriteName = <span class="string">""</span>;  <span class="comment">// 显示Icon</span></span><br><span class="line">        </span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">bool</span> m_bKilled = <span class="literal">false</span>;           <span class="comment">// 是否阵亡</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">bool</span> m_bCheckKilled = <span class="literal">false</span>;      <span class="comment">// 是否确认过阵亡事件</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">float</span> m_RemoveTimer = <span class="number">1.5f</span>;       <span class="comment">// 阵亡后多久删除</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">bool</span> m_bCanRemove = <span class="literal">false</span>;        <span class="comment">// 是否可以删除</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 建造者</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ICharacter</span>(<span class="params"></span>)</span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置Unity模型</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">SetGameObject</span>(<span class="params"> GameObject theGameObject </span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_GameObject = theGameObject ;</span><br><span class="line">        m_NavAgent = m_GameObject.GetComponent&lt;NavMeshAgent&gt;();</span><br><span class="line">        m_Audio = m_GameObject.GetComponent&lt;AudioSource&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取Unity模型</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> GameObject <span class="title">GetGameObject</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> m_GameObject;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 释放</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Release</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span>( m_GameObject != <span class="literal">null</span>)</span><br><span class="line">            GameObject.Destroy( m_GameObject);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 名称</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">string</span> <span class="title">GetName</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> m_Name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置Icon名称</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">SetIconSpriteName</span> (<span class="params"><span class="keyword">string</span> SpriteName</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_IconSpriteName = SpriteName;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取Icon名称</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">string</span>  <span class="title">GetIconSpriteName</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> m_IconSpriteName ;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>由于游戏玩法中设计了两个阵营角色，并且存在差异，所以在此阶段中，先规划出两个子类来继承ICharacter类。一个为代表玩家阵营的ISoldier类，另一个则是代表敌方阵营的IEnemy类如图D所示。</p>
+<blockquote>
+<p>图D 代表玩家阵营和敌方阵营的两个子类</p>
+</blockquote>
+<img src="/2019/08/17/角色与武器的实现-桥接模式/d.png">
+
+<blockquote>
+<p>Listing 2 Soldier角色接口（ISoldier.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">ISoldier</span> : <span class="title">ICharacter</span></span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ISoldier</span>(<span class="params"></span>)</span>&#123;&#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>Listing 3 Enemy角色接口（IEnemy.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">IEnemy</span> : <span class="title">ICharacter</span></span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">IEnemy</span>(<span class="params"></span>)</span>&#123;&#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在后续的章节中，我们将进行角色接口（ICharacter）中各项属性和功能的说明，并说明运用各种设计模式后所新增的子类。</p>
+<h1 id="角色与武器的关系"><a href="#角色与武器的关系" class="headerlink" title="角色与武器的关系"></a><span style="color:#339AFF;">角色与武器的关系</span></h1><p>在《P级阵地》中设计了3种武器类型：手枪、散弹枪及火箭，并以“攻击力”和“攻击距离”，来区分它们的威力。此外，“武器发射”和“击中目标”时也会有不同的音效和视觉效果。双方阵营都可以装备这3种武器，但敌方角色使用武器攻击时，会有额外的加成效果来增加攻击时的优势，而玩家角色则没有额外的加成效果。</p>
+<p>综上所述，这些游戏设计需求给程序设计人员的第一个印象是：这是两个群组类要一起合作完成的功能，如图1所示。</p>
+<blockquote>
+<p>图1 角色与武器</p>
+</blockquote>
+<img src="/2019/08/17/角色与武器的实现-桥接模式/1.png">
+
+<p>图1中的每一个行列的交叉点都是可能的组合，所以刚开始实现时，最容易想到的方法就是将所有可能组合的程序代码都写出来，例如先将武器声明为一个类，并声明一个枚举类型来定义3种武器：</p>
+<blockquote>
+<p>Listing 1 第一次实现可能采用的方式</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 武器类</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span> ENUM_Weapon</span><br><span class="line">&#123;</span><br><span class="line">    Null    = <span class="number">0</span>,</span><br><span class="line">    Gun     = <span class="number">1</span>,</span><br><span class="line">    Rifle   = <span class="number">2</span>,    </span><br><span class="line">    Rocket  = <span class="number">3</span>,    </span><br><span class="line">    Max ,</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 武器接口</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Weapon</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 属性</span></span><br><span class="line">    <span class="keyword">protected</span> ENUM_Weapon  m_emWeapon = ENUM_Weapon.Null;   <span class="comment">// 类型</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">int</span>          m_AtkValue =<span class="number">0</span>;       <span class="comment">// 攻击力</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">int</span>          m_AtkRange =<span class="number">0</span>;       <span class="comment">// 攻击距离</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">int</span>          m_AtkPlusValue = <span class="number">0</span>;  <span class="comment">// 额外加成值</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Weapon</span>(<span class="params">ENUM_Weapon Type,<span class="keyword">int</span> AtkValue, <span class="keyword">int</span> AtkRange</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_emWeapon = Type;</span><br><span class="line">        m_AtkValue = AtkValue;</span><br><span class="line">        m_AtkRange = AtkRange;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ENUM_Weapon <span class="title">GetWeaponType</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> m_emWeapon;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 攻击目标</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Fire</span>(<span class="params"> ICharacter theTarget </span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置额外攻击力</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">SetAtkPlusValue</span>(<span class="params"><span class="keyword">int</span> AtkPlusValue</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_AtkPlusValue = AtkPlusValue;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 显示子弹特效</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ShowBulletEffect</span>(<span class="params">Vector3 TargetPosition, <span class="keyword">float</span> LineWidth, <span class="keyword">float</span> DisplayTime</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 显示枪口特效</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ShowShootEffect</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 播放音效</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ShowSoundEffect</span>(<span class="params"><span class="keyword">string</span> ClipName</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在Weapon类中，将攻击力、攻击距离和额外加成的值都声明为类属性，并提供相关的操作方法。然后在角色类中增加一个“记录当前使用武器”的类成员：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 角色接口</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">ICharacter</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 拥有一把武器</span></span><br><span class="line">    <span class="keyword">protected</span> Weapon m_Weapon = <span class="literal">null</span>；</span><br><span class="line">    <span class="comment">// 攻击目标</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">Attack</span>(<span class="params">ICharacter therarget</span>)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>声明一个抽象方法Attack()，让持有武器的角色利用这把武器去攻击另一个角色。因为不同武器在发射时，会产生不同的音效和特效，所以将此方法声明为抽象方法，以便让武器子类能够针对不同的需求重新定义这个方法。另一项需求则是：敌方阵营使用武器攻击时有额外的加成效果，所以在实现上，代表玩家阵营的角色ISoldier，以及代表敌方阵营的IEmeny在重新定义Attack()方法时，自然也会有不一样的实现内容：</p>
+<blockquote>
+<p>Listing 2 Enemy使用武器攻击</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Enemy角色接口</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">IEnemy</span> : <span class="title">ICharacter</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">IEnemy</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 攻击目标</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Attack</span>(<span class="params"> ICharacter theTarget</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 发射特效</span></span><br><span class="line">        m_Weapon.ShowShootEffect();</span><br><span class="line">        <span class="keyword">int</span> AtkPlusValue = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 按当前武器決定攻击方式</span></span><br><span class="line">        <span class="keyword">switch</span>(m_Weapon.GetWeaponType())</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">case</span> ENUM_Weapon.Gun:</span><br><span class="line"></span><br><span class="line">                <span class="comment">// 显示武器特效及音效</span></span><br><span class="line">                m_Weapon.ShowBulletEffect(theTarget.GetPosition(),<span class="number">0.03f</span>,<span class="number">0.2f</span>);</span><br><span class="line">                m_Weapon.ShowSoundEffect(<span class="string">"GunShot"</span>);</span><br><span class="line"></span><br><span class="line">                <span class="comment">// 有概率增加额外加成</span></span><br><span class="line">                AtkPlusValue = GetAtkPlusValue(<span class="number">5</span>,<span class="number">20</span>);</span><br><span class="line"></span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> ENUM_Weapon.Rifle:</span><br><span class="line">                <span class="comment">// 显示武器特效及音效</span></span><br><span class="line">                m_Weapon.ShowBulletEffect(theTarget.GetPosition(),<span class="number">0.5f</span>,<span class="number">0.2f</span>);</span><br><span class="line">                m_Weapon.ShowSoundEffect(<span class="string">"RifleShot"</span>);</span><br><span class="line"></span><br><span class="line">                <span class="comment">// 有概率增加额外加成</span></span><br><span class="line">                AtkPlusValue = GetAtkPlusValue(<span class="number">10</span>,<span class="number">25</span>);</span><br><span class="line"></span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> ENUM_Weapon.Rocket:</span><br><span class="line">                <span class="comment">// 显示武器特效及音效</span></span><br><span class="line">                m_Weapon.ShowBulletEffect(theTarget.GetPosition(),<span class="number">0.8f</span>,<span class="number">0.5f</span>);</span><br><span class="line">                m_Weapon.ShowSoundEffect(<span class="string">"RocketShot"</span>);</span><br><span class="line"></span><br><span class="line">                <span class="comment">// 有概率增加额外加成</span></span><br><span class="line">                AtkPlusValue = GetAtkPlusValue(<span class="number">15</span>,<span class="number">30</span>);</span><br><span class="line"></span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 设置额外加成值</span></span><br><span class="line">        m_Weapon.SetAtkPlusValue( AtkPlusValue );</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 攻击</span></span><br><span class="line">        m_Weapon.Fire( theTarget );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取额外的加成值</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">int</span> <span class="title">GetAtkPlusValue</span>(<span class="params"><span class="keyword">int</span> Rate, <span class="keyword">int</span> AtkValue</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">int</span> RandValue = UnityEngine.Random.Range(<span class="number">0</span>,<span class="number">100</span>);</span><br><span class="line">        <span class="keyword">if</span>( Rate &gt; RandValue ) </span><br><span class="line">            <span class="keyword">return</span> AtkValue;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>Listing 3 Soldier用武器攻击</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Soldier角色接口</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ISoldier</span> : <span class="title">ICharacter</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ISoldier</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 攻击目标</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Attack</span>(<span class="params"> ICharacter theTarget</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 发射特效</span></span><br><span class="line">        m_Weapon.ShowShootEffect();</span><br><span class="line">                    </span><br><span class="line">        <span class="comment">// 按当前武器決定攻击方式</span></span><br><span class="line">        <span class="keyword">switch</span>(m_Weapon.GetWeaponType())</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">case</span> ENUM_Weapon.Gun:               </span><br><span class="line">                <span class="comment">// 显示武器特效及音效</span></span><br><span class="line">                m_Weapon.ShowBulletEffect(theTarget.GetPosition(),<span class="number">0.03f</span>,<span class="number">0.2f</span>);</span><br><span class="line">                m_Weapon.ShowSoundEffect(<span class="string">"GunShot"</span>);                                        </span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> ENUM_Weapon.Rifle:</span><br><span class="line">                <span class="comment">// 显示武器特效及音效</span></span><br><span class="line">                m_Weapon.ShowBulletEffect(theTarget.GetPosition(),<span class="number">0.5f</span>,<span class="number">0.2f</span>);</span><br><span class="line">                m_Weapon.ShowSoundEffect(<span class="string">"RifleShot"</span>);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            <span class="keyword">case</span> ENUM_Weapon.Rocket:</span><br><span class="line">                <span class="comment">// 显示武器特效及音效</span></span><br><span class="line">                m_Weapon.ShowBulletEffect(theTarget.GetPosition(),<span class="number">0.8f</span>,<span class="number">0.5f</span>);</span><br><span class="line">                m_Weapon.ShowSoundEffect(<span class="string">"RocketShot"</span>);                         </span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 攻击</span></span><br><span class="line">        m_Weapon.Fire( theTarget );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>两个类在重新定义Attack()方法时，都先获取武器的类型，再按照类型播放不同的音效和特效。另外，IEmeny还实现了“获取额外的加成值”的功能。</p>
+<p>将两种角色与3种武器交叉组合，然后以上述方式实现，会存在以下两个缺点：</p>
+<p>（1）每个继承自ICharacter角色接口的类，在重新定义Attack方式时，都必须针对每一种武器来实现（显示特效和播放音效），或者进行额外的公式计算。所以当要新增角色类时，也要在新的子类中重复编写相同的程序代码，如图2所示。</p>
+<p>（2）当要新增武器类型时，所有角色子类中的Attack方法，都必须修改，针对新的武器类型编写新的对应程序代码。这样会增加维护的难度，使得武器类型不容易增加。</p>
+<p>一般来说，上述的情况可以视为两个类群组交互使用所引发的问题。</p>
+<p>GoF的设计模式中，桥接模式可以用来解决上述实现方式的缺点。</p>
+<blockquote>
+<p>图2 两种角色与3种武器交叉组合编程的示意图</p>
+</blockquote>
+<img src="/2019/08/17/角色与武器的实现-桥接模式/2.png">
+
+<h1 id="桥接模式"><a href="#桥接模式" class="headerlink" title="桥接模式"></a><span style="color:#339AFF;">桥接模式</span></h1><p>笔者认为，在GoF的23种设计模式中，桥接模式是最好应用但也是最难理解的，尤其是它的定义不长，其中关键的“抽象与实现分离（Decouple an abstraction from its implementation）”，常让程序设计师花费许多时间，才能慢慢了解它背后所代表的原则。</p>
+<h2 id="桥接模式的定义"><a href="#桥接模式的定义" class="headerlink" title="桥接模式的定义"></a><span style="color:#00ACC1;">桥接模式的定义</span></h2><p>桥接模式，在GoF中的解释是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">将抽象与实现分离，使二者可以独立地变化。</span><br></pre></td></tr></table></figure>
+
+<p>多数人会以为这是“只依赖接口而不依赖实现”原则的另外一个解释：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">定义一个接口类，然后将实现的部分在子类中完成。</span><br></pre></td></tr></table></figure>
+
+<p>客户端只需要知道“接口类”的存在，不必知道是由哪一个实现类来完成功能的。而实现类则可以有好几个，至于使用哪一个实现类，可能会按照当前系统设置的情况来决定。程序设计师大多都可以按照这个原则进行系统实现，假设我们先按这个原则实现下面的案例，来看看会出现什么问题。</p>
+<p>假设：我们要实现一个“3D绘画工具”，并且要支持当前最常见的OpenGL和DirectX两种3D绘图API。</p>
+<p>首先，定义“球体”这个类和两个绘图引擎，如图3所示。</p>
+<blockquote>
+<p>图3 定义“球体”类和两个绘图引擎</p>
+</blockquote>
+<img src="/2019/08/17/角色与武器的实现-桥接模式/3.png">
+
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// DirectX引擎 </span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">DirectX</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">DXRender</span>(<span class="params"><span class="keyword">string</span> ObjName</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Debug.Log (<span class="string">"DXRender:"</span>+ObjName);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// OpenGL引擎 </span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">OpenGL</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">GLRender</span>(<span class="params"><span class="keyword">string</span> ObjName</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Debug.Log (<span class="string">"OpenGL:"</span>+ObjName);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 球体</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">ISphere</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">Draw</span>(<span class="params"></span>)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>ISphere是一个抽象类（接口），在其中声明了一个Draw()方法，让子类可以重新实现要如何绘制这个球体。因为要支持两种3D绘图API，所以要再定义继承IShaper的两个子类，由这两个子类分别实现，以支持不同的3D绘图API，结构图如图4所示。</p>
+<blockquote>
+<p>图4 定义继承IShaper的两个子类以支持OpenGL和DirectX两种3D绘图API</p>
+</blockquote>
+<img src="/2019/08/17/角色与武器的实现-桥接模式/4.png">
+
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 球体使用Direct绘出</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">SphereDX</span> : <span class="title">ISphere</span></span><br><span class="line">&#123;</span><br><span class="line">    DirectX m_DirectX;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Draw</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_DirectX.DXRender(<span class="string">"Sphere"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 球体使用Direct绘出</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">SphereGL</span> : <span class="title">ISphere</span></span><br><span class="line">&#123;</span><br><span class="line">    OpenGL m_OpenGL;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Draw</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_OpenGL.GLRender(<span class="string">"Sphere"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>SphererDX代表使用DirectX绘制球体；SphereGL代表使用OpenGL绘制球体。因为满足“只依赖接口而不依赖实现”的原则，所以客户端只需要知道ISphere接口，至于由哪一个实现类负责完成所需功能，则交给系统决定。如果系统判断客户端当前在Windows操作系统下，那么就会选择使用DirectX绘制，即会指定SphererDX这个实现类；如果是处于Mac操作系统环境下，则会选择使用OpenGL绘制，即指定SphereGL这个实现类。</p>
+<p>现在再增加一个“立方体”类， 且因为“球体”与“立方体”可以再一般化为一个“形状”父类，类结构图如图5所示。</p>
+<blockquote>
+<p>图5 定义“形状”父类后的类结构图</p>
+</blockquote>
+<img src="/2019/08/17/角色与武器的实现-桥接模式/5.png">
+
+<p>接下来，若系统再继续开发，继续增加“圆柱体”时，会变成如图6所示的设计。</p>
+<blockquote>
+<p>图6 增加“圆柱体”子类后的设计图</p>
+</blockquote>
+<img src="/2019/08/17/角色与武器的实现-桥接模式/6.png">
+
+<p>发现了吗？我们每增加一个“形状”的子类，都必须为新的子类再实现两个孙类，两个孙类中再以DirectX和OpenGL实现Draw()方法。为什么会这样呢？原因是，每一个形状的Draw方法要在不同的引擎上绘制时，都必须先用“继承”的方式产生新的子类后，才能在各自的Draw()方式中调用对应的“绘图工具”来绘制该形状，例如：</p>
+<ul>
+<li>想要在OpenGL上绘制一个球体，就先要“继承”球体类来产生一个子类，之后在子类的Draw()方法中调用“OpenGL引擎”函数来绘制球体；</li>
+<li>想要在Directx上绘制一个球体，就先要“继承”球体类来产生一个子类，之后在子类的Draw()方法中调用“DirectX引擎”函数来绘制球体。</li>
+</ul>
+<p>我们将实现“不同功能”交给“不同的子类”来完成，也就是利用“继承的方式”来完成“不同功能的实现”，这种方式看似直截了当，但在某些应用上并不是那么聪明。就以上述的“3D绘画工具”为例，这样利用“继承实现”的解法，反而增加系统维护的难度：也就是每增加一个“形状”子类，就必须连带增加“两个实现类”。</p>
+<p>最麻烦的是，如果这个“3D绘画工具”想要在移动设备上运行，就必须支持“OpenGL ES”引擎，意思就是得再增加第3个绘图引擎作为实现的方法，所以设计会变成如图7所示。</p>
+<blockquote>
+<p>图7 增加第3个绘图引擎后的设计图</p>
+</blockquote>
+<img src="/2019/08/17/角色与武器的实现-桥接模式/7.png">
+
+<p>更糟糕的是，“OpenGL ES”还会因为移动设备支持的程度，又分为OpenGL ES1、OpenGL ES2、OpenGL ES3…。此时，所有的“形状”子类都要加上GLES：ShaperGLES1、CubeGLES1…。</p>
+<p>这会造成非常难维护的情况，因为系统扩充时会连带修改或新增许多类，而且每个绘图工具类还会不断地增加与其他形状类的耦合度（即依赖度）。</p>
+<p>但在当前的架构下，不同功能的实现，当前仅采用“继承实现”这个方式。“继承”是“功能实现”的方式之一，但如果“功能实现”被限制在只能使用“继承”方式来达成，则是不乐观的。</p>
+<h2 id="桥接模式的说明"><a href="#桥接模式的说明" class="headerlink" title="桥接模式的说明"></a><span style="color:#00ACC1;">桥接模式的说明</span></h2><p>如果要避免被限制在只能以“继承实现”来完成功能实现，可考虑使用桥接模式桥接模式是有别于上述解法的另一种解决方式。从先前的例子中可以看出，基本上这是两个类组群之间，关系呈现“交叉组合汇编”的情况：</p>
+<ul>
+<li>群组一的“抽象类”指的是将对象或功能经“抽象”之后所定义出来的类接口，并通过子类继承的方式产生多个不同的对象或功能。例如上述的“形状”类，其用途是用来描述一个有“形状”的对象应该具备的功能和操作方式。所以，这个群组只负责增加“抽象类”，不负责实现“接口定义的功能”。</li>
+<li>群组二的“实现类”指的是这些类可以用来实现“抽象类”中所定义的功能。例如上述例子中的OpenGL引擎类和DirectX引擎类，它们可以用来实现“形状”类中所定义的“绘出”功能，能将形状绘制到屏幕上。所以，这个群组只负责增加“实现类”。</li>
+</ul>
+<p>“群组一类”中的每一个类，可以使用“群组二类”中的每一个类来实现所定义的功能。</p>
+<p>在重新设计后，我们将绘图工具当作群组二中的“实现类”，所以先要一般化出一个接口类（“抽象类”），再分别继承不同的实现类，如图8所示。</p>
+<blockquote>
+<p>图8 群组二中的“实现类”一般化出一个接口类</p>
+</blockquote>
+<img src="/2019/08/17/角色与武器的实现-桥接模式/8.png">
+
+<p>在“抽象类”中包含一个“实现类”的对象引用m_RenderEngine，如图9所示。</p>
+<blockquote>
+<p>图9 “抽象类”中包含一个“实现类”的对象，引用m_RenderEngine</p>
+</blockquote>
+<img src="/2019/08/17/角色与武器的实现-桥接模式/9.png">
+
+<p>继承“抽象类”的子类需要实现功能时，只要通过“实现类”的对象引用m_RenderEngine来调用实现功能即可。这样一来，就真正让“抽象与实现分离”，也就是“抽象不与实现绑定”，让“球体”或“立方体”这种抽象概念的类，不再通过产生不同子类的方式去完成特定的“实现方式”（OpenGL或DirectX），将“抽象类群组”与“实现类群组”彻底分开。</p>
+<p>运用桥接模式后的“形状”类，不必再考虑要使用OpenGL还是DirectX进行绘制，因为RenderEngenr类接口，已经真正实现与客户端（IShaper）分开了。</p>
+<p>如图10所示为GoF定义的桥接模式的结构图。</p>
+<blockquote>
+<p>图10 GoF定义的桥接模式的结构图</p>
+</blockquote>
+<img src="/2019/08/17/角色与武器的实现-桥接模式/10.png">
+
+<p>参与者的说明如下：</p>
+<ul>
+<li>Abstraction（抽象体接口）<ul>
+<li>拥有指向Implementor的对象引用。</li>
+<li>定义抽象功能的接口，也可作为子类调用实现功能的接口</li>
+</ul>
+</li>
+<li>RefinedAbstraction（抽象体实现、扩充）<ul>
+<li>继承抽象体并调用Implementor完成实现功能。</li>
+<li>扩充抽象体的接口，增加额外的功能。</li>
+</ul>
+</li>
+<li>Implementor（实现体接口）<ul>
+<li>定义实现功能的接口，提供给Abstraction（抽象体）使用。</li>
+<li>接口功能可以只有单一的功能，真正的选择则再由Abstraction（抽象体）的需求加以组合应用。</li>
+</ul>
+</li>
+<li>ConcretelmplementorA/B（实现体）<ul>
+<li>实际完成实现体接口上所定义的方法.</li>
+</ul>
+</li>
+</ul>
+<h2 id="桥接模式的实现范例"><a href="#桥接模式的实现范例" class="headerlink" title="桥接模式的实现范例"></a><span style="color:#00ACC1;">桥接模式的实现范例</span></h2><p>以下为”3D绘图工具”运用桥接模式后的范例。首先定义绘图引擎使用的接口：</p>
+<blockquote>
+<p>Listing 4 绘图引擎使用桥接模式的具体实现（实现体接口和实现体）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 绘图引擎</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">RenderEngine</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">Render</span>(<span class="params"><span class="keyword">string</span> ObjName</span>)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// DirectX引擎 </span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">DirectX</span> : <span class="title">RenderEngine</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Render</span>(<span class="params"><span class="keyword">string</span> ObjName</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        DXRender(ObjName);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">DXRender</span>(<span class="params"><span class="keyword">string</span> ObjName</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Debug.Log (<span class="string">"DXRender:"</span>+ObjName);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// OpenGL引擎 </span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">OpenGL</span> : <span class="title">RenderEngine</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Render</span>(<span class="params"><span class="keyword">string</span> ObjName</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        GLRender(ObjName);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">GLRender</span>(<span class="params"><span class="keyword">string</span> ObjName</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Debug.Log (<span class="string">"OpenGL:"</span>+ObjName);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>将绘图引擎定义为RenderEngine后，再分别继承出两个子类：DirectX和OpenGL。在两个子类中将父类定义的接口功能重新实现，然后在IShaper类中增加一个RenderEngine的类成员，并提供一个SetRanderEngine()方法，让系统能指定当前使用的绘图引擎：</p>
+<blockquote>
+<p>Listing 5 绘图引擎使用桥接模式的具体实现（抽象体接口）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 形状</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">IShape</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">protected</span> RenderEngine m_RenderEngine = <span class="literal">null</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">SetRenderEngine</span>(<span class="params"> RenderEngine theRenderEngine </span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_RenderEngine = theRenderEngine;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">Draw</span>(<span class="params"></span>)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>抽象体接口定义之后，其下所有的子类都可以通过m_RenderEngine对象来调用当前指定的绘图引擎：</p>
+<blockquote>
+<p>Listing 6 绘图引擎使用桥接模式的具体实现（抽象体接口的子类）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 球体</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Sphere</span> : <span class="title">IShape</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Draw</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_RenderEngine.Render(<span class="string">"Sphere"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 立方体</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Cube</span> : <span class="title">IShape</span></span><br><span class="line">&#123;   </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Draw</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_RenderEngine.Render(<span class="string">"Cube"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 圆柱体</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Cylinder</span> : <span class="title">IShape</span></span><br><span class="line">&#123;   </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Draw</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_RenderEngine.Render(<span class="string">"Cylinder"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>由于RenderEngine将绘图引擎的功能与使用接口类分离，让原本依赖实现的程度降到最低。</p>
+<p>新的范例同样是在“只依赖接口而不依赖实现”的原则下实现的。只不过，重构后的3D绘图引擎工具中，同时存在着“抽象接口”与“实现接口”，而“抽象接口”中的实现类现在依赖“实现接口”的接口，不再依赖它的实现类了。</p>
+<h1 id="使用桥接模式实现角色与武器接口"><a href="#使用桥接模式实现角色与武器接口" class="headerlink" title="使用桥接模式实现角色与武器接口"></a><span style="color:#339AFF;">使用桥接模式实现角色与武器接口</span></h1><p>定义哪个群组类是“抽象类”，哪个又是“实现类”并不容易。不过，如果从两个类群组的交叉合作开始分析，那么对于桥接模式的运用就不会那么困难了。</p>
+<h2 id="角色与武器接口设计"><a href="#角色与武器接口设计" class="headerlink" title="角色与武器接口设计"></a><span style="color:#00ACC1;">角色与武器接口设计</span></h2><p>桥接模式除了能够应用在“抽象与实现”的分离之外，还可以应用在：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">当两个群组因为功能上的需求，想要连接合作，但又希望两组类可以各自发展不受彼此影响时</span><br></pre></td></tr></table></figure>
+
+<p>本章开始所描述的角色与武器的游戏功能需求满足上述的情况：“角色类群组”想要使用“武器类群组”的功能（攻击），并且希望避免游戏开发后期，因为新增角色或新增武器而影响到另一个类群组，所以采用了桥接模式来实现，设计后的类结构如图11所示。</p>
+<blockquote>
+<p>图11 采用桥接模式实现“角色类群组”和“武器类群组”的情况</p>
+</blockquote>
+<img src="/2019/08/17/角色与武器的实现-桥接模式/11.png">
+
+<p>参与者的说明如下：</p>
+<ul>
+<li>ICharacter：角色的抽象接口拥有一个IWeapon对象引用，并且在接口中声明了一个武器攻击目标WeaponAttackTarget()方法让子类可以调用，同时要求继承的子类必须在Attack()中重新实现攻击目标的功能。</li>
+<li>ISoldier、IEnemy：双方阵营单位，实现攻击目标Attack()时，只需要调用父类的WeaponAttackTarget()方法，就可以使用当前装备的武器攻击对手。</li>
+<li>IWeapon：武器接口，定义游戏中对于武器的操作和使用方法。</li>
+<li>WeaponGun、WeaponRifle、WeaponRocket：游戏中可以使用的3种武器类型的实现。</li>
+</ul>
+<h2 id="实现说明"><a href="#实现说明" class="headerlink" title="实现说明"></a><span style="color:#00ACC1;">实现说明</span></h2><p>将原先的武器类重新定义为IWeapon武器接口：</p>
+<blockquote>
+<p>Listing 7 桥接模式中的武器接口（IWeapon.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 武器接口</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">IWeapon</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 属性</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">int</span>          m_AtkPlusValue = <span class="number">0</span>;          <span class="comment">// 额外增加的攻击力</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">int</span>        m_Atk = <span class="number">0</span>;                   <span class="comment">// 攻击力</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">float</span>      m_Range= <span class="number">0.0f</span>;               <span class="comment">// 攻击距离</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="keyword">protected</span> GameObject  m_GameObject = <span class="literal">null</span>;          <span class="comment">// 显示的Uniyt模型</span></span><br><span class="line">    <span class="keyword">protected</span> ICharacter  m_WeaponOwner = <span class="literal">null</span>;         <span class="comment">// 武器的拥有者</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 发射特效</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">float</span>          m_EffectDisplayTime = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">protected</span> ParticleSystem m_Particles;                    </span><br><span class="line">    <span class="keyword">protected</span> LineRenderer   m_Line;                           </span><br><span class="line">    <span class="keyword">protected</span> AudioSource    m_Audio;                           </span><br><span class="line">    <span class="keyword">protected</span> Light          m_Light;      </span><br><span class="line">    </span><br><span class="line">    ...                           </span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 显示子弹特效</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">ShowBulletEffect</span>(<span class="params">Vector3 TargetPosition, <span class="keyword">float</span> LineWidth,<span class="keyword">float</span> DisplayTime</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span>( m_Line ==<span class="literal">null</span>)</span><br><span class="line">            <span class="keyword">return</span> ;</span><br><span class="line">        m_Line.enabled = <span class="literal">true</span>;</span><br><span class="line">        m_Line.SetWidth( LineWidth,LineWidth);</span><br><span class="line">        m_Line.SetPosition(<span class="number">0</span>,m_GameObject.transform.position);</span><br><span class="line">        m_Line.SetPosition(<span class="number">1</span>,TargetPosition);</span><br><span class="line">        m_EffectDisplayTime = DisplayTime;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 显示枪口特效 </span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">ShowShootEffect</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span>( m_Particles != <span class="literal">null</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            m_Particles.Stop ();</span><br><span class="line">            m_Particles.Play ();        </span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>( m_Light !=<span class="literal">null</span>)</span><br><span class="line">            m_Line.enabled = <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 播放音效</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">ShowSoundEffect</span>(<span class="params"><span class="keyword">string</span> ClipName</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span>(m_Audio==<span class="literal">null</span>)</span><br><span class="line">            <span class="keyword">return</span> ;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//  获取音效</span></span><br><span class="line">        IAssetFactory Factory = PBDFactory.GetAssetFactory();</span><br><span class="line">        AudioClip theClip = Factory.LoadAudioClip( ClipName);</span><br><span class="line">        <span class="keyword">if</span>(theClip == <span class="literal">null</span>)</span><br><span class="line">            <span class="keyword">return</span> ;</span><br><span class="line">        m_Audio.clip = theClip;</span><br><span class="line">        m_Audio.Play();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 攻击目标</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Fire</span>(<span class="params"> ICharacter theTarget </span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>除了定义武器的相关属性外，也将与特效有关的程序代码实现在父类中，供继承的子类调用。最后则是声明一个“攻击目标Fire()”抽象方法，让每个子类重新实现该武器在攻击对手时所需的功能：</p>
+<blockquote>
+<p>Listing 8 桥接模式中的武器实现</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Gun</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">WeaponGun</span> : <span class="title">IWeapon</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">WeaponGun</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 攻击目标</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Fire</span>(<span class="params"> ICharacter theTarget </span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 显示武器特效和音效</span></span><br><span class="line">        ShowShootEffect();</span><br><span class="line">        ShowBulletEffect( theTarget.GetPosition(),<span class="number">0.03f</span>,<span class="number">0.2f</span> );</span><br><span class="line">        ShowSoundEffect(<span class="string">"GunShot"</span>);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 攻击直接命中</span></span><br><span class="line">        theTarget.UnderAttack( m_WeaponOwner );</span><br><span class="line">    &#125;</span><br><span class="line">&#125; <span class="comment">// WeaponGun.cs</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">WeaponRifle</span> : <span class="title">IWeapon</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">WeaponRifle</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 攻击目标</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Fire</span>(<span class="params"> ICharacter theTarget </span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 显示武器特效和音效</span></span><br><span class="line">        ShowShootEffect();</span><br><span class="line">        ShowBulletEffect( theTarget.GetPosition(),<span class="number">0.5f</span>,<span class="number">0.2f</span> );</span><br><span class="line">        ShowSoundEffect(<span class="string">"RifleShot"</span>);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 攻击直接命中</span></span><br><span class="line">        theTarget.UnderAttack( m_WeaponOwner );</span><br><span class="line">    &#125;</span><br><span class="line">&#125; <span class="comment">// WeaponRifle.cs</span></span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">WeaponRocket</span> : <span class="title">IWeapon</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">WeaponRocket</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 攻击目标</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Fire</span>(<span class="params"> ICharacter theTarget </span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 显示武器特效和音效</span></span><br><span class="line">        ShowShootEffect();</span><br><span class="line">        ShowBulletEffect( theTarget.GetPosition(),<span class="number">0.8f</span>,<span class="number">0.5f</span> );</span><br><span class="line">        ShowSoundEffect(<span class="string">"RocketShot"</span>);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 攻击直接命中</span></span><br><span class="line">        theTarget.UnderAttack( m_WeaponOwner );</span><br><span class="line">    &#125;</span><br><span class="line">&#125; <span class="comment">// WeaponRocket.cs</span></span><br></pre></td></tr></table></figure>
+
+<p>每一种武器都重新实现了“攻击目标Fire()”这个方法。客户端（拥有武器的角色）调用该方法后，武器会对目标发动攻击，过程包含了显示特效和音效，最后则是通知目标受到攻击，并把攻击它的武器以参数方式传递过去。但是，在当前实现的程序代码中，每一种武器的实现内容仍相同，而且重复了3次，这里还有改进的空间，这一部分的改进方式将留在第11章中说明。</p>
+<p>最后，在角色接口ICharacter的定义中增加一个类型为IWeapon的成员属性，用来记录当前装备的武器：</p>
+<blockquote>
+<p>Listing 9 桥接模式中的角色接口（ICharacter.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 角色接口</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">ICharacter</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> IWeapon m_Weapon = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置使用的武器</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">SetWeapon</span>(<span class="params">IWeapon Weapon</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span>( m_Weapon != <span class="literal">null</span>)</span><br><span class="line">            m_Weapon.Release();</span><br><span class="line">        m_Weapon = Weapon;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 设置武器拥有者</span></span><br><span class="line">        m_Weapon.SetOwner(<span class="keyword">this</span>);</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 设置Unity GameObject的层级</span></span><br><span class="line">        UnityTool.AttachToRefPos( m_GameObject, m_Weapon.GetGameObject(),<span class="string">"weapon-point"</span> ,Vector3.zero);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 获取武器</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IWeapon <span class="title">GetWeapon</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> m_Weapon;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 設定額外攻擊力</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">SetWeaponAtkPlusValue</span>(<span class="params"><span class="keyword">int</span> Value</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_Weapon.SetAtkPlusValue( Value );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 武器攻擊目標</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> <span class="keyword">void</span> <span class="title">WeaponAttackTarget</span>(<span class="params"> ICharacter Target</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_Weapon.Fire( Target );</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 計算攻擊力</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">GetAtkValue</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 武器攻擊力 + 角色數值的加乘</span></span><br><span class="line">        <span class="keyword">return</span> m_Weapon.GetAtkValue();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 取得攻擊距離</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">float</span> <span class="title">GetAttackRange</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> m_Weapon.GetAtkRange();</span><br><span class="line">    &#125;    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>除了增加一个IWeapon类成员m_Weapon外，也定义了和武器相关的方法，让客户端可以调用，并且声明了两个抽象方法，让继承的子类重新定义：</p>
+<blockquote>
+<p>Listing 10 桥接模式中的角色实现</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>在玩家阵营ISoldier类重新实现Attack方法时，直接调用父类的WeaponAttackTarget方法，要求以当前装备的武器去攻击对手。但在敌方阵营IEnemy类中，重新实现的Attack方法在调用WeaponAttackTarget之前，会先将角色本身能造成的“额外加成效果”设置给装备的武器，以便后续“攻击效果计算”时，能使用到加成的属性。利用这样的方式，IEnemy类就可以达到游戏需求中提到的“敌方阵营使用武器攻击时，会有额外的加成效果，用来增加攻击时的优势”。</p>
+<h2 id="使用桥接模式的优点"><a href="#使用桥接模式的优点" class="headerlink" title="使用桥接模式的优点"></a><span style="color:#00ACC1;">使用桥接模式的优点</span></h2><p>运用桥接模式后的ICharacter（角色接口）就是群组一“抽象类”，它定义了“攻击目标”功能，但真正实现“攻击目标”功能的类，则是群组二IWeapon（武器接口）“实现类”。对于ICharacter及其继承类都不必理会IWeapon群组的变化，尤其是游戏开发后期可能增加的武器类型。而对于ICharacter来说，它面对的只有IWeapon这个接口类，相对地，IWeapon类群组也不必理会角色类群组内的新增或修改，让两个群组之间的耦合度降到最低。</p>
+<h2 id="实现桥接模式的注意事项"><a href="#实现桥接模式的注意事项" class="headerlink" title="实现桥接模式的注意事项"></a><span style="color:#00ACC1;">实现桥接模式的注意事项</span></h2><p>在实现角色接口ICharacter时，《P级阵地》将武器类IWeapon的变量定义为“私有成员”并提供一组操作函数。这些操作函数除了提供给外界的客户端操作使用外，另一层用意则是不让角色子类直接使用IWeapon成员。这项设计的好处在于，让武器系统的功能调用只限制在ICharacter类中，因此，武器类IWeapon只会和角色接口ICharacter产生耦合。这么做是因为当游戏制作进入后期时，下面几种情况是预期会出现的：</p>
+<p>1、ICharacter类群组会产生变化，可能是增加角色类，也可能是增加角色的功能。<br>2、武器系统可能更复杂，攻击一个目标时可能需要设置更多的参数，而这些参数无法由角色子类提供。<br>3、可能将武器全部更换，换成另一种武器系统（如近战武器），所以需要引入另一组武器群组。</p>
+<p>因为武器系统是《P级阵地》的核心系统之一，一旦产生变化很容易影响到其他系统，所以有必要在实现的初期，就将武器类IWeapon的操作与角色群组的子类加以解耦（解除依赖性）。</p>
+<h1 id="桥接模式面对变化时"><a href="#桥接模式面对变化时" class="headerlink" title="桥接模式面对变化时"></a><span style="color:#339AFF;">桥接模式面对变化时</span></h1><p>应用了桥接模式的角色与武器系统，在后续的游戏系统设计上，增加了不少的弹性和灵活度。当需要新增武器类型时，继承IWeapon类并重新实现抽象方法后，就可让角色系统装   而在角色群组的扩充上，也完全不必受到武器系统的限制。后续章节（第25章）将会说明在《P级阵地》中角色群组顺应游戏需求而做的类扩充。</p>
+<h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a><span style="color:#339AFF;">结论</span></h1><p>桥接模式可以将两个群组有效地分离，让两个群组彼此互相不受影响。这两个群组可以是“抽象定义”与“功能实现”，也可以是两个需要交叉合作后才能完成某项任务的类。</p>
+<p><strong>与其他模式的合作</strong></p>
+<p>在第15章中，《P级阵地》将使用建造者模式（Builder）负责产生游戏中的角色对象，当角色产生时会设置需要装备的武器，而设置武器的操作则是由角色接口中的方法来完成。</p>
+<p><strong>其他应用方式</strong></p>
+<p>两组类群组需要搭配使用的实现方式，常见于游戏设计中，例如：</p>
+<ul>
+<li>游戏角色可以驾驶不同的行动载具，如汽车、飞机、水王摩托车……。</li>
+<li>奇幻类型游戏的角色可以施展法术，除了多样的角色之外，“法术”本身也是另一个复杂的系统，火系法术、冰系法术……，远程法术、近战法术、补血法术…..，想额外加上使用限制的话，就必须使用桥接模式让角色与法术类群组妥善结合。</li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/设计模式与游戏完美开发/" rel="tag"># 设计模式与游戏完美开发</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/08/17/攻击特效与击中反应-模板方法模式/" rel="next" title="攻击特效与击中反应--模板方法模式">
+                <i class="fa fa-chevron-left"></i> 攻击特效与击中反应--模板方法模式
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">342</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">40</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2019/08/17/角色与武器的实现-桥接模式/" title="角色与武器的实现--桥接模式" target="_blank">角色与武器的实现--桥接模式</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/08/17/攻击特效与击中反应-模板方法模式/" title="攻击特效与击中反应--模板方法模式" target="_blank">攻击特效与击中反应--模板方法模式</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/08/17/结合使用设计模式和UML/" title="结合使用设计模式和UML" target="_blank">结合使用设计模式和UML</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/08/16/角色AI-状态模式/" title="角色AI--状态模式" target="_blank">角色AI--状态模式</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/08/16/角色属性的计算-策略模式/" title="角色属性的计算--策略模式" target="_blank">角色属性的计算--策略模式</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#游戏角色的架构"><span class="nav-number">1.</span> <span class="nav-text">游戏角色的架构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#角色类的规划"><span class="nav-number">2.</span> <span class="nav-text">角色类的规划</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#角色与武器的关系"><span class="nav-number">3.</span> <span class="nav-text">角色与武器的关系</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#桥接模式"><span class="nav-number">4.</span> <span class="nav-text">桥接模式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#桥接模式的定义"><span class="nav-number">4.1.</span> <span class="nav-text">桥接模式的定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#桥接模式的说明"><span class="nav-number">4.2.</span> <span class="nav-text">桥接模式的说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#桥接模式的实现范例"><span class="nav-number">4.3.</span> <span class="nav-text">桥接模式的实现范例</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用桥接模式实现角色与武器接口"><span class="nav-number">5.</span> <span class="nav-text">使用桥接模式实现角色与武器接口</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#角色与武器接口设计"><span class="nav-number">5.1.</span> <span class="nav-text">角色与武器接口设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现说明"><span class="nav-number">5.2.</span> <span class="nav-text">实现说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用桥接模式的优点"><span class="nav-number">5.3.</span> <span class="nav-text">使用桥接模式的优点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现桥接模式的注意事项"><span class="nav-number">5.4.</span> <span class="nav-text">实现桥接模式的注意事项</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#桥接模式面对变化时"><span class="nav-number">6.</span> <span class="nav-text">桥接模式面对变化时</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#结论"><span class="nav-number">7.</span> <span class="nav-text">结论</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">1.8m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">27:26</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>
