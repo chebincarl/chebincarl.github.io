@@ -121,7 +121,7 @@
 <meta property="og:image" content="http://chebincarl.github.io/2019/08/11/角色AI-状态模式/8.png">
 <meta property="og:image" content="http://chebincarl.github.io/2019/08/11/角色AI-状态模式/9.png">
 <meta property="og:image" content="http://chebincarl.github.io/2019/08/11/角色AI-状态模式/10.png">
-<meta property="og:updated_time" content="2019-08-18T15:39:44.451Z">
+<meta property="og:updated_time" content="2019-08-19T15:10:01.352Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="角色AI--状态模式">
 <meta name="twitter:description" content="思考并回答以下问题：">
@@ -451,7 +451,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-08-18 23:39:44" itemprop="dateModified" datetime="2019-08-18T23:39:44+08:00">2019-08-18</time>
+                <time title="修改时间：2019-08-19 23:10:01" itemprop="dateModified" datetime="2019-08-19T23:10:01+08:00">2019-08-19</time>
               
             
           </span>
@@ -497,7 +497,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">23k</span>
+                <span title="本文字数">25k</span>
               
 
               
@@ -511,7 +511,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">21 分钟</span>
+                <span title="阅读时长">23 分钟</span>
               
             </div>
           
@@ -533,7 +533,20 @@
       
         <p>思考并回答以下问题：</p>
 <a id="more"></a>
-
+<p>本章涵盖：</p>
+<ul>
+<li>角色的AI</li>
+<li>状态模式</li>
+<li>使用状态模式实现角色AI<ul>
+<li>角色AI的实现</li>
+<li>实现说明</li>
+<li>使用状态模式的优点</li>
+<li>角色AI执行流程</li>
+</ul>
+</li>
+<li>状态模式面对变化时</li>
+<li>结论</li>
+</ul>
 <h1 id="角色的AI"><a href="#角色的AI" class="headerlink" title="角色的AI"></a><span style="color:#339AFF;">角色的AI</span></h1><p>在前面几个章节中，我们将《P级阵地》的角色属性、装备武器、武器攻击流程进行了说明。本章我们将把重点放在如何能让角色在场景上“根据战场情况来移动或攻击”。</p>
 <p>游戏开始时，玩家会先决定由哪一个兵营产生角色，而角色在经过一段时间的训练后，就会出现在战场上，负责守护阵地防止被敌方角色占领。同时，画面的右方会出现敌方角色，并且不断地朝玩家阵地前进，他们的目的是“占领玩家阵地”。当双方角色在地图上遭遇时会相互攻击，这时候，玩家角色要击退敌人，而敌人角色则是努力突破防线。在过程中，玩家无法参与指挥任何一只角色，任由他们自动决定要如何行动。</p>
 <p>在玩家不能参与操作角色的情况下，双方角色要如何自动攻击和防守呢？一般会使用所谓的“人工智能”（AI）来实现这一目标。或许读者会认为“人工智能”是一门很高深的技术，其实不然，它不像字义表面那么复杂，有时候它也可以用很简单的方式来实现。</p>
@@ -617,12 +630,12 @@
 
 <p>两个类都在UpdateAI方法中实现了“条件判断”和“有限状态机”的切换。但因为两个阵营对于没有目标时的需求不同，所以在闲置状态（ENUM_AI_State.Idle）和移动状态（ENUM_AI_State.Move）的处理方式不太一样，其他状态大部分是差不多的。</p>
 <p>在第3章中说明《P级阵地》转换场景的功能时曾提及，“有限状态机”使用switch case来实现时会有一些缺点。所以，在第一次的实现范例中，也同样出现了类似的缺点：</p>
-<p>1、只要增加一个状态，则所有switch(state)的程序代码都需要增加对应的程序代码。</p>
-<p>2、与每一个状态有关的对象和参数都必须被保留在同一个类中，当这些对象与参数被多个状态共享时，可能会产生混淆，不太容易了解是由哪个状态设置的。</p>
-<p>3、两个类的UpdateAI方法都过于冗长，不易了解和调试。或许可以将两个类中重复的程序代码重构为父类的方法来共享，但这样一来，又会造成父类ICharacter也过于庞大。</p>
+<p>1.只要增加一个状态，则所有switch(state)的程序代码都需要增加对应的程序代码。</p>
+<p>2.与每一个状态有关的对象和参数都必须被保留在同一个类中，当这些对象与参数被多个状态共享时，可能会产生混淆，不太容易了解是由哪个状态设置的。</p>
+<p>3.两个类的UpdateAI方法都过于冗长，不易了解和调试。或许可以将两个类中重复的程序代码重构为父类的方法来共享，但这样一来，又会造成父类ICharacter也过于庞大。</p>
 <p>同样地，既然能使用“有限状态机”来实现角色的AI功能，那么就可以使用状态模式来解决上述缺点。</p>
 <h1 id="状态模式"><a href="#状态模式" class="headerlink" title="状态模式"></a><span style="color:#339AFF;">状态模式</span></h1><p>有限状态机最简单的实现方式，就是使用switch case来实现。故而以往很容易看到，一个类方法中被一大串的switch case占据。有重构习惯的程序设计师会想办法让每一个case下的程序代码能够写到类方法中，但对于“状态转换”和“不共享参数的保护”也会是个麻烦的地方。善用状态模式可以让有限状态机变得不那么复杂。</p>
-<p>GoF对状态模式的详细说明，已经在“第3章游戏场景的转换”中完整介绍过了，在此还是将结构图和角色说明列出，如图7所示。</p>
+<p>GoF对状态模式的详细说明，已经在<a href="/2019/08/06/游戏场景的转换--状态模式/" title="游戏场景的转换--状态模式">游戏场景的转换--状态模式</a>中完整介绍过了，在此还是将结构图和角色说明列出，如图7所示。</p>
 <blockquote>
 <p>图7 采用状态模式实现时的类结构图</p>
 </blockquote>
@@ -646,7 +659,7 @@
 </ul>
 </li>
 </ul>
-<p>程序代码的实现部分在第3章中有详细说明，在此不再列出。</p>
+<p>程序代码的实现部分在<a href="/2019/08/06/游戏场景的转换--状态模式/" title="游戏场景的转换--状态模式">游戏场景的转换--状态模式</a>中有详细说明，在此不再列出。</p>
 <h1 id="使用状态模式实现角色AI"><a href="#使用状态模式实现角色AI" class="headerlink" title="使用状态模式实现角色AI"></a><span style="color:#339AFF;">使用状态模式实现角色AI</span></h1><p>就如之前提到的，状态模式是游戏程序设计中被应用最频繁的一个模式，而游戏程序设计师的新手第一次学习“有限状态机”的场合，多半是应用在AI的实现上。游戏程序设计书籍多半是以switch case作为入门的实现方式。当程序设计师了解有限状态机和状态模式的关联之后，想要转换到运用模式来实现，就不会那么困难了。</p>
 <h2 id="角色AI的实现"><a href="#角色AI的实现" class="headerlink" title="角色AI的实现"></a><span style="color:#00ACC1;">角色AI的实现</span></h2><p>在开始运用状态模式时，先将《P级阵地》中的AI功能从角色类中独立出来。所以，先声明一个角色AI抽象类ICharacterAI，而继承它的SoldierAI和EnemyAI则分别代表玩家角色和敌方角色的AI。ICharacterAI类中拥有一个代表当前状态的IAIState类对象，IAIState的子类们分别代表角色当前的状态。类结构图如图8所示。</p>
 <blockquote>
@@ -715,7 +728,7 @@
 <blockquote>
 <p>Listing 12 角色接口（ICharacter.cs）</p>
 </blockquote>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">ICharacterAI</span> </span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">protected</span> ICharacter m_Character = <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">float</span>     m_AttackRange = <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">protected</span> IAIState  m_AIState = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">const</span> <span class="keyword">float</span> ATTACK_COOLD_DOWN = <span class="number">1f</span>; <span class="comment">// 攻擊的CoolDown</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">float</span> m_CoolDown = ATTACK_COOLD_DOWN;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ICharacterAI</span>(<span class="params"> ICharacter Character</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_Character = Character;</span><br><span class="line">        m_AttackRange = Character.GetAttackRange() ;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 更換AI狀態</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">ChangeAIState</span>(<span class="params"> IAIState NewAIState</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_AIState = NewAIState;</span><br><span class="line">        m_AIState.SetCharacterAI( <span class="keyword">this</span> );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 攻擊目標</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">Attack</span>(<span class="params"> ICharacter Target </span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 時間到了才攻擊</span></span><br><span class="line">        m_CoolDown -= Time.deltaTime;</span><br><span class="line">        <span class="keyword">if</span>( m_CoolDown &gt;<span class="number">0</span>)</span><br><span class="line">            <span class="keyword">return</span> ;</span><br><span class="line">        m_CoolDown = ATTACK_COOLD_DOWN;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//Debug.Log ("攻擊目標:"+Target.GetGameObject().gameObject.name);</span></span><br><span class="line">        m_Character.Attack( Target );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 是否在攻擊距離內</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">bool</span> <span class="title">TargetInAttackRange</span>(<span class="params"> ICharacter Target </span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">float</span> dist = Vector3.Distance( m_Character.GetPosition() , </span><br><span class="line">                                       Target.GetPosition() );</span><br><span class="line">        <span class="keyword">return</span> ( dist &lt;= m_AttackRange );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 目前的位置</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Vector3 <span class="title">GetPosition</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> m_Character.GetGameObject().transform.position;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 移動</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">MoveTo</span>(<span class="params"> Vector3 Position </span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_Character.MoveTo( Position );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 停止移動</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">StopMove</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_Character.StopMove();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 設定陣亡</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Killed</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_Character.Killed();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 是否陣亡</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">bool</span> <span class="title">IsKilled</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> m_Character.IsKilled(); </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 目標移除</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">RemoveAITarget</span>(<span class="params"> ICharacter Target </span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_AIState.RemoveTarget( Target);  </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 更新AI</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params">List&lt;ICharacter&gt; Targets</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_AIState.Update( Targets );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 是否可以攻擊Heart</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">bool</span> <span class="title">CanAttackHeart</span>(<span class="params"></span>)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h2 id="使用状态模式的优点"><a href="#使用状态模式的优点" class="headerlink" title="使用状态模式的优点"></a><span style="color:#00ACC1;">使用状态模式的优点</span></h2><p>游戏角色的AI有时并不难，使用有限状态机即可完成。而有限状态机最适合运用状态模式来实现，并具有以下优点：</p>
 <p><strong>减少错误发生及降低维护的难度</strong></p>
@@ -728,13 +741,13 @@
 </blockquote>
 <img src="/2019/08/11/角色AI-状态模式/9.png">
 
-<h1 id="状态模式面对变化时"><a href="#状态模式面对变化时" class="headerlink" title="状态模式面对变化时"></a><span style="color:#339AFF;">状态模式面对变化时</span></h1><p>就在某一天，企划又来找小程了…<br>企划：“小程”<br>小程：“又有什么需求想要更改啊？”<br>企划：“是这样的，我最近测试时突然觉得，玩家角色在阵地里站着等下一波敌人出现时，傻傻地站在原地，有点奇怪。”<br>小程： “嗯…是有那么点呆呆的感觉。”<br>企划： “是吧？你也这样觉得。那我们来改一下好了，原本来玩家阵营角色在‘没有可攻击目标时’加入一个‘守卫状态’，这样你觉得如何，就像这张新的状态图（如图10所示）一样。”</p>
+<h1 id="状态模式面对变化时"><a href="#状态模式面对变化时" class="headerlink" title="状态模式面对变化时"></a><span style="color:#339AFF;">状态模式面对变化时</span></h1><p>就在某一天，企划又来找小程了…<br>企划：“小程”<br>小程：“又有什么需求想要更改啊？”<br>企划：“是这样的，我最近测试时突然觉得，玩家角色在阵地里站着等下一波敌人出现时，傻傻地站在原地，有点奇怪。”<br>小程：“嗯…是有那么点呆呆的感觉。”<br>企划：“是吧？你也这样觉得。那我们来改一下好了，原本来玩家阵营角色在‘没有可攻击目标时’加入一个‘守卫状态’，这样你觉得如何，就像这张新的状态图（如图10所示）一样。”</p>
 <blockquote>
 <p>图10 增加了“守卫状态”的新状态图</p>
 </blockquote>
 <img src="/2019/08/11/角色AI-状态模式/10.png">
 
-<p>小程： 那玩家阵营角色在‘守卫状态’时，要执行什么功能吗？”<br>企划：“我想一下…那就到处走走吧。”</p>
+<p>小程：“那玩家阵营角色在‘守卫状态’时，要执行什么功能吗？”<br>企划：“我想一下…那就到处走走吧。”</p>
 <p>小程想了一下，在当前角色AI以状态模式实现的情况下，增加一个状态并不是太困难的任务。所以，小程新增了一个“守卫状态类”：</p>
 <blockquote>
 <p>Listing 13 守卫状态（GuardAIState.cs）</p>
@@ -883,7 +896,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">351</span>
+                    <span class="site-state-item-count">352</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -1044,6 +1057,10 @@
                 
                 
                   <li>
+                    <a href="/2019/08/19/用MVVM模式建立应用架构：好应用的正反面-0/" title="用MVVM模式建立应用架构：好应用的正反面" target="_blank">用MVVM模式建立应用架构：好应用的正反面</a>
+                  </li>
+                
+                  <li>
                     <a href="/2019/08/19/加载速度的优化-代理模式/" title="加载速度的优化--代理模式" target="_blank">加载速度的优化--代理模式</a>
                   </li>
                 
@@ -1057,10 +1074,6 @@
                 
                   <li>
                     <a href="/2019/08/19/角色信息查询-访问者模式/" title="角色信息查询--访问者模式" target="_blank">角色信息查询--访问者模式</a>
-                  </li>
-                
-                  <li>
-                    <a href="/2019/08/19/存盘功能-备忘录模式/" title="存盘功能--备忘录模式" target="_blank">存盘功能--备忘录模式</a>
                   </li>
                 
               </ul>
@@ -1121,7 +1134,7 @@
     
       <span class="post-meta-item-text">站点总字数：</span>
     
-    <span title="站点总字数">1.8m</span>
+    <span title="站点总字数">1.9m</span>
   
 
   
@@ -1132,7 +1145,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">27:36</span>
+    <span title="站点阅读时长">28:18</span>
   
 </div>
 

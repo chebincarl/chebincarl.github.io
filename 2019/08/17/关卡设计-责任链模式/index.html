@@ -111,7 +111,7 @@
 <meta property="og:site_name" content="车斌的博客">
 <meta property="og:description" content="思考并回答以下问题：">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-08-18T16:09:24.182Z">
+<meta property="og:updated_time" content="2019-08-19T16:01:36.140Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="关卡设计--责任链模式">
 <meta name="twitter:description" content="思考并回答以下问题：">
@@ -440,7 +440,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-08-19 00:09:24" itemprop="dateModified" datetime="2019-08-19T00:09:24+08:00">2019-08-19</time>
+                <time title="修改时间：2019-08-20 00:01:36" itemprop="dateModified" datetime="2019-08-20T00:01:36+08:00">2019-08-20</time>
               
             
           </span>
@@ -486,7 +486,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">19</span>
+                <span title="本文字数">10k</span>
               
 
               
@@ -500,7 +500,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">1 分钟</span>
+                <span title="阅读时长">9 分钟</span>
               
             </div>
           
@@ -524,6 +524,166 @@
 <a id="more"></a>
 
 <p>本章涵盖：</p>
+<h1 id="关卡设计"><a href="#关卡设计" class="headerlink" title="关卡设计"></a><span style="color:#339AFF;">关卡设计</span></h1><p>经过上一章的功能实现后，现在可以通过兵营界面（CampInfoUI）来产生玩家角色，并迎战来袭的敌方角色。在“第14章游戏角色的产生”时曾介绍，敌方角色也是从角色工厂（ICharacterFactory）中产生的，但是，玩家角色是由玩家自行决定产生的时间，而那些要占领玩家阵地的敌方角色，又是由谁负责下达产生的命令呢？在《P级阵地》中，是由关卡系统（StageSystem）负责这些工作。</p>
+<p>《P级阵地》对于关卡功能的需求是这样的：</p>
+<p>（1）每次关卡开始时，会同时出现n个敌方角色，这n个角色会不断地往玩家阵地移动。<br>（2）敌方角色到达阵地中心3次以上时，游戏结束，而玩家的最高闯关记录为当前这一个关卡。<br>（3）在兵营训练的玩家角色会守护阵地，如果将敌方角色全部被击杀，代表通过这一关，游戏进入下一关。<br>（4）每一个关卡都设有通关分数，若未达关卡设置的分数，则重复这一关。<br>（5）重复1-4的流程，直到玩家无法成功守护阵地（即满足2的规则）为止。分析上述功能需求后，《P级阵地》的关卡系统（StageSystem）需要完成下列相关实现：</p>
+<p>（1）指定每一关出现敌方阵营角色的数量和等级。<br>（2）每一关需设置通关条件，条件满足后即开启下一关。<br>（3）每一关也必须知道要开启的下一关。<br>（4）如果阵地中央被占领次数超过3次，游戏结束。</p>
+<p>关卡系统（StageSystem）实现时，将它列为游戏系统（IGameSystem ）之一，因此和其他子系统一样继承IGameSystem界面并实现。另外，也在PBaseDefenseGame类中产生对象，作为类成员之一：</p>
+<blockquote>
+<p>Listing 1 关卡控制系统（StageSystem.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>关卡系统（StageSystem）成员包含了当前玩家阵营被攻击的情况（m NowHeart）、当前击杀敌方阵营的角色数量（mEnemyKilledCount）及当前进行的关卡（mNowStageLv），并且提供相关的方法来操作相关成员。</p>
+<p>如果在关卡系统（StageSystem）的定期更新（Update）方法中，以成员mNowStage作为关卡前进的依据，那么可能会以下面的方式来实现：</p>
+<blockquote>
+<p>Listing 2 关卡控制系统</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>定期更新Update方法中，判断当前是否需要产生新的关卡，如果需要，则先调用产生关卡CreateStage方法。而关卡是否结束，则是直接判断当前敌方阵营的角色数量，如果为0，代表关卡结束可以进入下一个关卡。确认开始下一个关卡CheckNextStage方法中，会先判断当前得分来判断是否可以进入下一个关卡。</p>
+<p>仔细分析两个与关卡产生有关的方法：CreateStage，CheckNextStage，其中都按照当前关卡（m_NowStageLv）的值，来决定接下来要产生哪些敌方角色以及是否切换到下一个关卡。上述的程序代码只产生了3个关卡而已，但《P级阵地》的目标是希望能设置数十个以上的关卡让玩家挑战，所以若以上述的写法来设计的话，程序代码将变得非常冗长，而且弹性不足，无法让企划人员快速设置和调整，所以我们需要使用新的设计来重新编写程序。</p>
+<p>重构的目标是，希望能将关卡数据使用类加以封装。而封装的信息包含：要出场的敌方角色的设置、通关条件、下一关的记录等。也就是让每一关都是一个对象并加以管理。而关卡系统则是在这群对象中寻找“条件符合”的关卡，让玩家进入挑战。等到关卡完成后，再进入到下一个条件符合的关卡。</p>
+<p>试着寻找GoF设计模式中可以使用的模式，责任链模式可以提供重构时的依据。</p>
+<h1 id="责任链模式"><a href="#责任链模式" class="headerlink" title="责任链模式"></a><span style="color:#339AFF;">责任链模式</span></h1><p>当有问题需要解决，而且可以解决问题的人还不止一个时，就有很多方式可以得到想要的答案。例如可以将问题同时交给可以解决问题的人，请他们都回答，但这个方式比较浪费资源，也会造成重复，也有可能回答的人有等级之分，不适合太简单和太复杂的问题。另一个方式就是将可以回答问题的人，按照等级或专业一个个串接起来。责任链模式就是提供了一个可以将这些回答问题的人，一个个链接起来的设计方法。</p>
+<h2 id="责任链模式的定义"><a href="#责任链模式的定义" class="headerlink" title="责任链模式的定义"></a><span style="color:#00ACC1;">责任链模式的定义</span></h2><p>GoF对责任链模式的定义是</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">让一群对象都有机会来处理一项请求，以减少请求发送者与接收者之间的耦合度（即依赖度），将所有的接收者对象串接起来，让请求沿着串接传递，直到有一个对象可以处理为止。</span><br></pre></td></tr></table></figure>
+
+<p>以下，笔者先以现实生活的亲身经历，来说明责任链模式在非软件设计领域中的呈现实例：</p>
+<p>有家非常大的电信公司，拥有非常多的部门，每个部门都负责不同的业务，也是由于每个部门的业务都过于繁多，所以每个部门都有自己的客服部门。有一天，笔者一款上市运营中的游戏，接到玩家的反馈说，游戏出现无法正常连线的问题。经查明之后发现，这些玩家的计算机无法将游戏使用的域名（Domain Name）转换成IP地址（IP Address），恰好，这个问题也发生在笔者家中使用的计算机上。所以我先使用指令，确认游戏域名转换成IP地址时的情况，检查之后发现，转换后的IP地址会不定时地在两个IP之间切换，而我当时计算机的DNS服务器（DNS： Domain NameServer，即域名服务器）是设置为那一家电信公司提供的DNS。但当时服务公司的IT部门人员都己下班，无法获取公司DNS更新的情况，又着急要解决问题，所以当下的反应就是想直接打电话给电信公司询问：“为什么由你们DNS返回的网址，会不定时在两个IP之间切换？那么我该询问哪个部门呢？当下我也不是很清楚，所以就直接拿起电话拨打该电信公司的“通用客服专线”。接通后，我将遇到的问题很清楚地说明了一次。但很不幸，那位客服人员不好意思地说了声抱歉，因为他们负责的是“电信业务”不是“网络业务”，所以“电信业务的客服”就将我的电话转给了“网络业务的容服”。</p>
+<p>“网络业务的客服”人员接通后，我一样将问题重新说明了一次（所以很明显地，他们的客服间为了快速转换服务，不会将客户遇到的问题一起移动，当然也可能是因为问题太复杂），而网络业务的客服人员，似乎是第一次遇到这样的问题，于是让我挂线等了一下。当网络业务的客服人员重新接回时却表示，他们部门也无法解决，所以再将我的电话转换到“网络机房的客服”。</p>
+<p>同样地，在与“网络机房的客服”人员接通后，我再将问题重新说明了一次。而这次的客服人员，总算可以了解我的问题，并且再询问几个问题之后，留下我的联络方式并说明，待他们查明后会通知我。我在隔天早上收到了邮件通知，了解了问题发生的真正原因，进而解决了玩家无法正常连线的问题。</p>
+<p>若运用责任链模式来说明的话，可以这样模拟：“为什由你们的DNS返回的网址，会不定时在两个IP之间切换”是这次事件中的“请求”，客户（也就是我）就是“请求的发送者”，而那家电信公司的电信业务的客服、网络业务的客服、网络机房的客服，都是“接收者对象”，他们之间使用电话分机的方式彼此串联。当客户的“请求”无法在第一个部门（电信业务的容服）被解决时，客户的“请求”就通过他们内部串联（分机）的方式，转到下一个可能可以解决问题的部门，第二个部门无法解决时再转往下一个，直到“网络机房的客服”解决了问题为止，如图1所示。</p>
+<p>对于客户而言，当时对应的只有一个所谓的“客服人员”角色，而这个“客服人员”是属于电信公司的哪一个部门并不重要，客户（也就是我）还是使用与一般“客服人员”的对话方式，而对方也使用标准“客服流程”来应答。而这也是定义中所说的： “减少请求发送者与接收者之间的耦合度”， “客服人员”都使用一般的应答方式（电话沟通），不需要因为不同的部门，而有不同的沟通工具或互动方式。</p>
+<blockquote>
+<p>图1 责任链模式的电信客服示意图</p>
+</blockquote>
+<p>所以，从上述举例中可以了解到，责任链模式描述的就是，将一群能够解决问题的部门（对象），使用电话分机通话后，一同来解决客户（请求发送者）问题的模式。而其中还要让客户（请求发送者）减少接口转换的负担（减少耦合度即依赖度），也就是都是使用电话沟通，不必中途转换去使用计算机或其他沟通工具。</p>
+<p>因此，让我们从现实的个案回到软件的开发上，在运用责任链模式（Chain of Responsibilit）解决问题时，只要将下列的几个重点列出来分别实现，即可满足模式的基本要求：<br>可以解决请求的接收者对象：这些类对象能够了解“请求”信息的内容，并判断本身能否解决.</p>
+<p>接收者对象间的串接：利用一个串接机制，将每一个可能可以解决问题的接收者对象给串，接起来。对于被串接的接收者对象来说，当本身无法解决这个问题时，就利用这个串接机制，让请求能不断地传递下去;或使用其他管理方式，让接收者对象得以链接。</p>
+<p>请求自动转移传递：发出请求后，请求会自动往下转移传递，过程之中，发送者不需特别转换接口。</p>
+<h2 id="责任链模式的说明"><a href="#责任链模式的说明" class="headerlink" title="责任链模式的说明"></a><span style="color:#00ACC1;">责任链模式的说明</span></h2><p>将责任链模式的各项重点结构化后，可用图2来表示。</p>
+<blockquote>
+<p>图2 将责任链模式的各项重点结构化的结构图</p>
+</blockquote>
+<p>GoF参与者的说明如下：<br>Handler （请求接收者接口）</p>
+<blockquote>
+<p>定义可以处理客户端请求事项的接口;<br>可包含“可链接下一个同样能处理请求”的对象引用。ConcreteHandierl， ConcreteHandler2 （实现请求接收者接口）&gt;实现请求处理接口，并判断对象本身是否能处理这次的请求;&gt;不能完成请求的话，交由后继者（下一个）来处理。Client （请求发送者）<br>将请求发送给第一个接收者对象，并等待请求的回复.</p>
+</blockquote>
+<h2 id="责任链模式的实现范例"><a href="#责任链模式的实现范例" class="headerlink" title="责任链模式的实现范例"></a><span style="color:#00ACC1;">责任链模式的实现范例</span></h2><p>从GoF定义的基本架构实现来看，我们首先必须定义Handler （请求接收者接口）：</p>
+<p>类的构建方法说明了，当对象被产生时，就要提供一个可以链接到下一个请求接收者（Handler）的对象引用。而处理请求方法（HandeRequest）被声明为虚拟函数，让是否传递给后继者的任务交由子类重新定义，父类不针对传入的参数作判断，只是直接传给下一个对象。</p>
+<p>接下来，定义3个子类来实现Handler接口，分别用来处理传入参数（Cost）所需要的判断：</p>
+<blockquote>
+<p>Listing 4 实现信息处理类（ChainofResponsibility.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>这个范例所要呈现的是，对于传入参数Cost的“核准权限”确认，而这3个类就是“可以解决请求的接收者对象”，使用父类中的成员mNextHandler将它们串接起来。每一个类负责一定金额的核准权限，如果传入的Cost超过自己能够核准的权限，就将请求传给下一个对象，请下一个对象来核准，直到有某个对象完成核准为止。</p>
+<p>在测试程序中，先将3个子类对象分别产生并串接，所以测试程序担任的就是Client端，最后再将不同的Cost参数带入：</p>
+<blockquote>
+<p>Listing 5 测试责任链模式（ChainofResponsibilityTest.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">UnitTest</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// 缠身Cost验证的链接方式</span></span><br><span class="line">    ConcreteHandler3 theHandle3 = <span class="keyword">new</span> ConcreteHandler3(nul1);</span><br><span class="line">    ConcreteHandler2 theHandle2 = <span class="keyword">new</span> concreteHandler2q(theHandle3);</span><br><span class="line">    ConcreteHandler1 theHandlel = <span class="keyword">new</span> ConcreteHandlerl(theHandle2);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 确认</span></span><br><span class="line">    theHandle1.HandleRequest(<span class="number">10</span>);</span><br><span class="line">    theHandlel.HandleRequest(<span class="number">15</span>);</span><br><span class="line">    theHandlel.HandleRequest(<span class="number">20</span>);</span><br><span class="line">    EheHandlel.HandleRequest(<span class="number">30</span>);</span><br><span class="line">    theHandlel.HandleRequest(<span class="number">100</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>执行结果1显示出每一种金额负责核准的对象信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ConcreteHandlerl.HandleRequest核准</span><br><span class="line">concreteHandler2.HandleRequest核准</span><br><span class="line">ConcreteHandler2.HandleRequest核准</span><br><span class="line">ConcxeteHandler3.HandleRequest核准</span><br><span class="line">ConcreteHandler3.HandleRequest核准</span><br></pre></td></tr></table></figure>
+
+<h1 id="使用责任链模式实现关卡系统"><a href="#使用责任链模式实现关卡系统" class="headerlink" title="使用责任链模式实现关卡系统"></a><span style="color:#339AFF;">使用责任链模式实现关卡系统</span></h1><p>游戏中的关卡都是一关关的串接，完成了这一关之后就进入下一关，所以在实现上使用责任链模式来串接每一个关卡是非常合适的。但是对于每一个关卡的通关判断规则，则要按照各个游戏的需求来设计，可能就不是如同前一节的范例那样，可以使用一个属性来作为开启下一个关卡的条件。</p>
+<h2 id="关卡系统的设计"><a href="#关卡系统的设计" class="headerlink" title="关卡系统的设计"></a><span style="color:#00ACC1;">关卡系统的设计</span></h2><p>对于《P级阵地》关卡系统（StageSystem）的修改需求上，关卡可能需要的信息包含要出场的敌方角色设置、通关条件及连接下一关卡对象的引用，封装成一个“接收者类”，并增加能够判断通关与否的方法，作为是否前进到下一关的判断依据。关卡串接的图解如图3所示。</p>
+<p>每个关卡对象都会判断“当前的游戏状态”是否符合关卡的“通关条件”：.<br>如果符合通关条件，则将关卡通关与否的判断交由下一个关卡对象判断，直到有一个关卡对象负责接下来的“关卡开启”工作。</p>
+<p>如果不符合，则将“当前关卡”维持在这一个关卡对象上，继续让现在的关卡对象负责“关卡开启”工作。</p>
+<blockquote>
+<p>图3 关卡串接的图解</p>
+</blockquote>
+<p>运用责任链模式后的关卡系统结构如图4所示。</p>
+<blockquote>
+<p>图4 运用责任链模式后的关卡系统结构</p>
+</blockquote>
+<p>参与者的说明如下：<br>IStageHandler：定义可以处理“过关判断”和“关卡开启”的接口，也包含指向下一个关，卡对象的引用。<br>NormalStageHandler：实现关卡接口，负责“常规”关卡的开启和过关条件判断。<br>IStageScore：定义判断通关与否的操作接口。<br>StageScoreEnemykilledCount：使用当前的“击杀敌方角色数”，作为通关与否的判断。IStageData：定义关卡内容的操作接口，在《P级阵地》中，关卡内容指的是：</p>
+<blockquote>
+<p>这一关会出现攻击玩家阵营的敌方角色数据之设置;<br>关卡开启;<br>，关卡是否结束的判断<br>NormalStageData：实现“常规”关卡内容，实际将产生的敌方角色放入战场上攻击玩家阵营，以及实现判断关卡是否结束的方法</p>
+</blockquote>
+<p>此外，IStageScore和IStageData这两个类也是应用策略模式（Strategy）的类，让关卡系统在“过关判断”和“产生敌方单位”这两个设计需求上，能更具备灵活性，不限制只有一种玩法。</p>
+<h2 id="实现说明"><a href="#实现说明" class="headerlink" title="实现说明"></a><span style="color:#00ACC1;">实现说明</span></h2><p>关卡接口IStageHandler中定义了关卡操作的方法：</p>
+<blockquote>
+<p>Listing 6 关卡接口（IStageHandler.cs）</p>
+</blockquote>
+<p>其中， CheckStage用来判断当前游戏所处的关卡是哪一个，所以会返回一个IStageHandler 引用给关卡系统（StageSystem），当前《P级阵地》先实现了“常规关卡”的功能：</p>
+<blockquote>
+<p>Listing 7 常规关卡（NormalStageHandler.cs）</p>
+</blockquote>
+<p>在关卡初始化时（NormalStageHandler），会将关卡所使用的“过关条件”和“关卡内容”设置给关卡对象，并且利用SetNextHandler来设置连接的下一个关卡。在确认关卡CheckStage方法中，判断当前游戏状态是否符合关卡过关的条件判断。如果已满足，代表可前往下一个关卡，该方法最后会返回游戏当前可使用的关卡对象给关卡系统。</p>
+<p>当前的关卡判定，是以“击杀敌方角色数”为通关的条件判断：</p>
+<blockquote>
+<p>Listing 8 关卡分数确认（IStageScore.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">IstageScore</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">bool</span> <span class="title">checkscore</span>(<span class="params"></span>)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>Listing 9 关卡分数确认：敌人阵亡数（StageScoreEnemykilledCount）</p>
+</blockquote>
+<p>至于关卡内容（IStageData）类主要负责的则是将关卡的“内容”呈现给玩家：</p>
+<blockquote>
+<p>Listing 10关卡内容接口（IStageData.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">IStageData</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">bool</span> <span class="title">IsFinished</span>(<span class="params"></span>)</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">Reset</span>(<span class="params"></span>)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>“关卡内容”一般指的就是玩家要挑战的项目，这些项目可能是出现3个敌方角色，让玩家击退：也可能是出现3个道具让玩家可以去搜索获取;或是设计特殊任务关卡让玩家去完成。而这些设置内容都会放进IStageData的子类中，并且通过Game Loop更新机制，让关卡内容可以顺利产生给玩家挑战。以下是当前实现的常规关卡内容（NormalStageData）：</p>
+<blockquote>
+<p>Listing 11 常规关卡内容（NormalStageData.cs）</p>
+</blockquote>
+<p>以当前实现的常规关卡内容（NormalStageData）来看，类内定义了数个与派送敌方角色上场有关的设置参数：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">float</span> n CoolDown =<span class="number">0</span>;  <span class="comment">//产生角色的间隔时间</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">float</span> m MaxCoolDown=<span class="number">0</span>;</span><br><span class="line"><span class="keyword">private</span> Vector3 m SpawnPosition  vector3.zero;y</span><br><span class="line"><span class="comment">//出生点</span></span><br><span class="line"><span class="keyword">private</span> vector3m AttackPosition-Vector3.zero; </span><br><span class="line"><span class="comment">//攻击目标</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">bool</span> m Al1EnemyBorn  <span class="literal">false</span>;</span><br><span class="line"><span class="comment">//关卡内要产生的敌人单位</span></span><br><span class="line"><span class="keyword">private</span> List&lt;stageData&gt; m StageData <span class="keyword">new</span> List&lt;stageData&gt;();</span><br></pre></td></tr></table></figure>
+
+<p>而要上场的角色数据，则是利用AddStageData方法来设置。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//增加关卡的故方单位</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">AddstageData</span> (<span class="params">ENUM_Enemy emEnemy,</span></span></span><br><span class="line"><span class="function"><span class="params">    ENUM_Weapon emweapon, <span class="keyword">int</span> count</span>) </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i<span class="number">-0</span>;i&lt;count;++i)</span><br><span class="line">     stageData.Add ( <span class="keyword">new</span> StageData (emEnemy, enWeapon));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>此外，还有一些其他信息会在更新方法（Update）中被使用到：</p>
+<p>当敌方角色可以产生时，就通过调用角色工厂（CharacterFactory）的方法，将对象产出并放入战场中。</p>
+<p>关卡系统（StageSystem）也配合新的关卡类进行修正：</p>
+<blockquote>
+<p>Listing 12关卡控制系统（StageSystem.cs）</p>
+</blockquote>
+<p>修正的关键点在于</p>
+<p>1.定期更新（Update）方法中，将切换关卡的判断交给一群关卡对象串接起来的链表来负责，所以需要切换关卡时，询问关卡对象链表，就可以获取当前可以进行的关卡：</p>
+<p>2.在初始化关卡系统时，将所有关卡的数据一次设置完成，包含关卡要出现的敌方角色等级、数量、武器等级、过关的判断分数及连接的下一关：</p>
+<p>正如同在“第16章游戏属性管理功能”提到的，将属性集中在角色属性工厂（IAttr Factory）中，有助于企划进行设置和调整。不过，更好的方式则是使用“企划设置工具”，让企划人员在使用工具程序设置后，输出成设置文件，再由关卡系统（StageSysten）读入。</p>
+<h2 id="使用责任链模式的优点"><a href="#使用责任链模式的优点" class="headerlink" title="使用责任链模式的优点"></a><span style="color:#00ACC1;">使用责任链模式的优点</span></h2><p>将旧方法中的CreateStage， CheckNextStage两个方法的内容，使用关卡对象来替代，这样一来，原本可能出现的冗长式写法就获得了改善。并且将关卡内容（IStageData）、过关条件（IStagescore）类化，可使得《P级阵地》中关卡的类型有多种形式的组合。而关卡设计的数据将来也可以搭配“企划工具”来设置，增加关卡设计人员的调整灵活度。</p>
+<h2 id="实现责任链模式时的注意事项"><a href="#实现责任链模式时的注意事项" class="headerlink" title="实现责任链模式时的注意事项"></a><span style="color:#00ACC1;">实现责任链模式时的注意事项</span></h2><p>实现责任链模式并非一成不变的，在具体实现中，常常可按照实际的需求来微调实现方式：</p>
+<p>不用从头判断</p>
+<p>在20.2.3节的范例中，针对每一次的Score进行判断时，测试程序代码都要求从接收者链表中，的第一个对象开始判断。但《P级阵地》在每次判断关卡推进时，并没有从第一个关卡开始，而是从当前的关卡对象（mNowStageHandle）开始往下判断。存在这种实现上的差异，其原因在于设计需求上的不同，因为《P级阵地》的设计需求是一关一关往下推进的，并不会发生回头的情况，所以在判断上，可以直接从当前的关卡对象继续往下，不必再从第一关开始判断。但如果游戏的关卡设计存在“退回上一关卡”的需求时，那么就必须改写成“从第1关卡开始判断”的实现方式。</p>
+<p>使用泛型容器来管理关卡对象</p>
+<p>在责任链模式中的Handle类，通常都会定义一个引用指向下一个可以接收的对象。但如果接收对象间的关系如《P级阵地》中的关卡对象，那么还可以有另一种设计方式-也就是将所有关卡对象以泛型容器来管理，例如：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//关卡控制系统</span></span><br><span class="line">public class stageSystem： IGameSystem</span><br><span class="line">&#123;   </span><br><span class="line">    <span class="keyword">private</span> List&lt;istagelandler&gt; m stageHandlers;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> mNowStagelv=<span class="number">1</span>;</span><br><span class="line">    <span class="comment">//当前的关卡...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>因为关卡的顺序是一关接着一关，没有其他树状分支的情况，所以在转换为下一个关卡时，只要获取List-IStageHandler&gt;中的下一个成员即可。</p>
+<h1 id="责任链模式面对变化时"><a href="#责任链模式面对变化时" class="headerlink" title="责任链模式面对变化时"></a><span style="color:#339AFF;">责任链模式面对变化时</span></h1><p>当《P级阵地》运用责任链模式并将关卡相关的“数据”及“操作方法”类化之后，只要通过继承类的方式就可以使关卡类型多样化。例如：某天的项目会议…企划： “测试了这一阵子后，我发现玩家对于相同内容的关卡类型，可能会觉得无聊，不知大家有没有什么好意见？”</p>
+<p>美术：“我认为可以增加Boss关卡， Boss关卡可能与其他关卡不一样，关卡内只会出现一个大Boss，虽然Boss的移动速度较慢，但攻击力强、生命力高，而且只要一攻击成功，玩家就会立即结束游戏。”</p>
+<p>企划：“这个提案不错，小程你那边好调整吗？ ”</p>
+<p>小程这时想了一下，已经运用了责任链模式的关卡系统中各类的实现情况…</p>
+<p>小程：“我可以试着以增加关卡类型及扣除阵营生命力的方式来调整看看，给我一些时间试试。”</p>
+<p>企划：“好的，如果没有问题的话，通知一下我们，然后就列入工作事项，美术那边也会给出Boss角色的需求。”</p>
+<p>小程回到计算机前，开启项目研究了一下，发现需要将先前判定敌方角色占领玩家阵地成功后，原本要扣除的固定生命值1，改由关卡组件来决定要扣除多少生命力，所以关卡接口中要新增一个获取损失生命力的方法：</p>
+<blockquote>
+<p>Listing 13关卡接口</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>Listing 14 常规关卡</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public class NormalstageHandler ： IstageHandler</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 损失的生命值</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">int</span> LoseHearto） </span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在原本的关卡系统（StageSystem）中，扣除阵营生命力的地方，也需要修正为：</p>
+<blockquote>
+<p>Listing 15 关卡控制系统</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class stageSystem： IGamesystem</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//通知损失，</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">LoseHeart</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m NowHeart-m NowStageHandler.LoseHeart();</span><br><span class="line">        m PBDGame. ShowHeart( m NowHeart );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>将这些都修正好后，就可以着手进行Boss关卡的实现。因为Boss关卡与常规关卡的差异在于：在Boss关卡中，只要有敌方角色占领到玩家阵营之后，就会损失所有的阵营生命力，所以只要让Boss关卡在获取“损失的生命值”时，返回最大阵营生命力（MAXHEART）就可以了。那么只要新增一个BossStageHandler类，其他的设置和操作就与常规关卡无异，因此让它继承常规关卡（NormalStageHandler），再重新实现LoseHeart）方法即可：</p>
+<h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a><span style="color:#339AFF;">结论</span></h1><p>责任链模式让一群信息接收者能够一起被串联起来管理，让信息判断上能有一致的操作接口，不必因为不同的接收者而必须执行“类转换操作”，并且让所有的信息接收者都有机会可以判断是否提供服务或将需求移往下一个信息接收者，在后续的系统维护上，也可以轻易地增加接收者类。</p>
+<p><strong>与其他模式的合作</strong></p>
+<p>在通关判断上，可以配合策略模式（Strategy），让通关的规则具有其他的变化形式，而不只是单纯地击退所有进攻的敌方角色。</p>
 
       
     </div>
@@ -616,8 +776,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <div class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -634,7 +803,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">351</span>
+                    <span class="site-state-item-count">352</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -795,6 +964,10 @@
                 
                 
                   <li>
+                    <a href="/2019/08/19/用MVVM模式建立应用架构：好应用的正反面-0/" title="用MVVM模式建立应用架构：好应用的正反面" target="_blank">用MVVM模式建立应用架构：好应用的正反面</a>
+                  </li>
+                
+                  <li>
                     <a href="/2019/08/19/加载速度的优化-代理模式/" title="加载速度的优化--代理模式" target="_blank">加载速度的优化--代理模式</a>
                   </li>
                 
@@ -810,10 +983,6 @@
                     <a href="/2019/08/19/角色信息查询-访问者模式/" title="角色信息查询--访问者模式" target="_blank">角色信息查询--访问者模式</a>
                   </li>
                 
-                  <li>
-                    <a href="/2019/08/19/存盘功能-备忘录模式/" title="存盘功能--备忘录模式" target="_blank">存盘功能--备忘录模式</a>
-                  </li>
-                
               </ul>
             </div>
         
@@ -826,6 +995,23 @@
         </div>
       </div>
 
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#关卡设计"><span class="nav-number">1.</span> <span class="nav-text">关卡设计</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#责任链模式"><span class="nav-number">2.</span> <span class="nav-text">责任链模式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#责任链模式的定义"><span class="nav-number">2.1.</span> <span class="nav-text">责任链模式的定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#责任链模式的说明"><span class="nav-number">2.2.</span> <span class="nav-text">责任链模式的说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#责任链模式的实现范例"><span class="nav-number">2.3.</span> <span class="nav-text">责任链模式的实现范例</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用责任链模式实现关卡系统"><span class="nav-number">3.</span> <span class="nav-text">使用责任链模式实现关卡系统</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#关卡系统的设计"><span class="nav-number">3.1.</span> <span class="nav-text">关卡系统的设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现说明"><span class="nav-number">3.2.</span> <span class="nav-text">实现说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用责任链模式的优点"><span class="nav-number">3.3.</span> <span class="nav-text">使用责任链模式的优点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现责任链模式时的注意事项"><span class="nav-number">3.4.</span> <span class="nav-text">实现责任链模式时的注意事项</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#责任链模式面对变化时"><span class="nav-number">4.</span> <span class="nav-text">责任链模式面对变化时</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#结论"><span class="nav-number">5.</span> <span class="nav-text">结论</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
       
 
       
@@ -855,7 +1041,7 @@
     
       <span class="post-meta-item-text">站点总字数：</span>
     
-    <span title="站点总字数">1.8m</span>
+    <span title="站点总字数">1.9m</span>
   
 
   
@@ -866,7 +1052,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">27:36</span>
+    <span title="站点阅读时长">28:18</span>
   
 </div>
 

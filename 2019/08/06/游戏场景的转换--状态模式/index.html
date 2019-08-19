@@ -116,7 +116,7 @@
 <meta property="og:image" content="http://chebincarl.github.io/2019/08/06/游戏场景的转换--状态模式/3.png">
 <meta property="og:image" content="http://chebincarl.github.io/2019/08/06/游戏场景的转换--状态模式/4.png">
 <meta property="og:image" content="http://chebincarl.github.io/2019/08/06/游戏场景的转换--状态模式/5.png">
-<meta property="og:updated_time" content="2019-08-18T10:57:09.320Z">
+<meta property="og:updated_time" content="2019-08-19T14:36:17.578Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="游戏场景的转换--状态模式">
 <meta name="twitter:description" content="思考并回答以下问题：  状态模式的正式描述是什么？如何用德鲁伊来描述状态模式？Context类就是德鲁伊怎么理解？Context和State接口互相用类成员调用怎么理解？ 德鲁伊怎么玩？首先我要告诉德鲁伊最初的状态是什么，然后操作德鲁伊攻击。而无论人形兽形都可以攻击。 什么场景使用状态模式？ A类作为B类的成员，然后在B类的B1方法里赋值，B1方法的参数是A类对象，怎么理解？ 状态在自身里面进行状">
@@ -446,7 +446,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-08-18 18:57:09" itemprop="dateModified" datetime="2019-08-18T18:57:09+08:00">2019-08-18</time>
+                <time title="修改时间：2019-08-19 22:36:17" itemprop="dateModified" datetime="2019-08-19T22:36:17+08:00">2019-08-19</time>
               
             
           </span>
@@ -714,7 +714,7 @@
 <ul>
 <li>StateBegin方法：场景转换成功后会利用这个方法通知类对象。其中可以实现在该场景执行时需要加载的资源及游戏参数的设置。SceneStateController在此时才传入（不像前一节范例那样在建造者中传入），因为Unity3D在转换场景时会花费一些时间，所以必须先等到场景完全加载成功后才能继续执行。</li>
 <li>StateEnd方法：场景将要被释放时会利用这个方法通知类对象。其中可以释放游戏不再使用的资源，或者重新设置游戏场景状态。</li>
-<li>StateUpdate方法：“游戏定时更新”时会利用这个方法通知类对象。该方法可以让Unity3D的“定时更新功能”被调用，并通过这个方法让其他游戏系统也定期更新。这个方法可以让游戏系统类不必继承Unity3D的MonoBehaviour类，也可以拥有定时更新功能，第7章会对此进行更详细地说明。</li>
+<li>StateUpdate方法：“游戏定时更新”时会利用这个方法通知类对象。该方法可以让Unity3D的“定时更新功能”被调用，并通过这个方法让其他游戏系统也定期更新。这个方法可以让游戏系统类不必继承Unity3D的MonoBehaviour类，也可以拥有定时更新功能，<a href="/2019/08/08/游戏的主循环-Game-Loop/" title="游戏的主循环-Game-Loop">游戏的主循环-Game-Loop</a>会对此进行更详细地说明。</li>
 <li>m_StateName属性：可以在调试（Debug）时使用。</li>
 </ul>
 <p>StateBegin、StateEnd及StateUpdate这3个方法，虽然是定义为IScenesState中的接口方法，但是由于不强迫子类重新实现它，所以并没有被定义为抽象方法。</p>
@@ -731,7 +731,7 @@
 </blockquote>
 <figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">MainMenuState</span> : <span class="title">ISceneState</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MainMenuState</span>(<span class="params">SceneStateController Controller</span>) : <span class="title">base</span>(<span class="params">Controller</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">this</span>.StateName = <span class="string">"MainMenuState"</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 开始</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">StateBegin</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 获取开始按钮</span></span><br><span class="line">        Button tmpBtn = UITool.GetUIComponent&lt;Button&gt;(<span class="string">"StartGameBtn"</span>);</span><br><span class="line">        <span class="keyword">if</span>(tmpBtn != <span class="literal">null</span>)</span><br><span class="line">            tmpBtn.onClick.AddListener( ()=&gt; OnStartGameBtnClick(tmpBtn) );</span><br><span class="line">    &#125;</span><br><span class="line">            </span><br><span class="line">    <span class="comment">// 开始游戏</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">OnStartGameBtnClick</span>(<span class="params">Button theButton</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Debug.Log (<span class="string">"OnStartBtnClick:"</span>+theButton.gameObject.name);</span><br><span class="line">        m_Controller.SetState(<span class="keyword">new</span> BattleState(m_Controller), <span class="string">"BattleScene"</span> );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>《P级阵地》的开始画面上只有一个“开始”按钮，这个按钮是使用Unity3D的UI工具增加的。从原本Unity3D的UI设置界面上，可直接设置当按钮被鼠标单击时，需要由哪一个脚本组件的方法来执行；这个设置动作也可以改由程序代码来指定。至于《P级阵地》与Unity3D的UI设计工具的整合，在第17章中有进一步的说明。</p>
+<p>《P级阵地》的开始画面上只有一个“开始”按钮，这个按钮是使用Unity3D的UI工具增加的。从原本Unity3D的UI设置界面上，可直接设置当按钮被鼠标单击时，需要由哪一个脚本组件的方法来执行；这个设置动作也可以改由程序代码来指定。至于《P级阵地》与Unity3D的UI设计工具的整合，在<a href="/2019/08/14/Unity3D的界面设计-组合模式/" title="Unity3D的界面设计-组合模式">Unity3D的界面设计-组合模式</a>中有进一步的说明。</p>
 <p>因此，在MainMenuState的StateBegin方法中，获取MainMenuScene的“开始”按钮（StartGameBtn）后，将其OnClick事件的监听者设置为OnStartGameBtnClick方法，而该方法也将直接实现在MainMenuState类中。所以，当玩家单击“开始”按钮时， OnStartGameBtnClick会被调用，并将游戏场景状态通过SceneStateController转换到战斗场景（BattleScene）。</p>
 <p>战斗场景为《P级阵地》真正游戏玩法（阵地防守）场景，程序代码如下:</p>
 <blockquote>
@@ -745,7 +745,7 @@
 <p>当《P级阵地》在一场战斗结束或放弃战斗时，玩家可以回到主菜单场景（MainMenuState）。所以，当战斗场景即将结束时，StateEnd方法就会被调用，实现上，会在此调用释放游戏主程序的操作：</p>
 <figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">StateEnd</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    PBaseDefenseGame.Instance.Release();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>BattleState的StateUpdate方法扮演着“游戏循环”的角色（GameLoop将在第7章中说明）。先获取玩家的“输入操作”后，再执行“游戏逻辑”（调用PBaseDefenseGame的Update方法），并且不断地定时重复调用，直到游戏结束转换为主菜单场景（MainMenuState）为止：</p>
+<p>BattleState的StateUpdate方法扮演着“游戏循环”的角色（GameLoop将在<a href="/2019/08/08/游戏的主循环-Game-Loop/" title="游戏的主循环-Game-Loop">游戏的主循环-Game-Loop</a>中说明）。先获取玩家的“输入操作”后，再执行“游戏逻辑”（调用PBaseDefenseGame的Update方法），并且不断地定时重复调用，直到游戏结束转换为主菜单场景（MainMenuState）为止：</p>
 <figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">StateUpdate</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;   </span><br><span class="line">    <span class="comment">// 输入</span></span><br><span class="line">    InputProcess();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 游戏逻辑</span></span><br><span class="line">    PBaseDefenseGame.Instance.Update();</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Render由Unity负责</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 游戏是否结束</span></span><br><span class="line">    <span class="keyword">if</span>( PBaseDefenseGame.Instance.ThisGameIsOver())</span><br><span class="line">        m_Controller.SetState(<span class="keyword">new</span> MainMenuState(m_Controller), <span class="string">"MainMenuScene"</span> );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>3个主要的游戏状态类都定义完成后，接下来就是实现这些场景转换和控制的功能：</p>
@@ -917,7 +917,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">351</span>
+                    <span class="site-state-item-count">352</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -1078,6 +1078,10 @@
                 
                 
                   <li>
+                    <a href="/2019/08/19/用MVVM模式建立应用架构：好应用的正反面-0/" title="用MVVM模式建立应用架构：好应用的正反面" target="_blank">用MVVM模式建立应用架构：好应用的正反面</a>
+                  </li>
+                
+                  <li>
                     <a href="/2019/08/19/加载速度的优化-代理模式/" title="加载速度的优化--代理模式" target="_blank">加载速度的优化--代理模式</a>
                   </li>
                 
@@ -1091,10 +1095,6 @@
                 
                   <li>
                     <a href="/2019/08/19/角色信息查询-访问者模式/" title="角色信息查询--访问者模式" target="_blank">角色信息查询--访问者模式</a>
-                  </li>
-                
-                  <li>
-                    <a href="/2019/08/19/存盘功能-备忘录模式/" title="存盘功能--备忘录模式" target="_blank">存盘功能--备忘录模式</a>
                   </li>
                 
               </ul>
@@ -1155,7 +1155,7 @@
     
       <span class="post-meta-item-text">站点总字数：</span>
     
-    <span title="站点总字数">1.8m</span>
+    <span title="站点总字数">1.9m</span>
   
 
   
@@ -1166,7 +1166,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">27:36</span>
+    <span title="站点阅读时长">28:18</span>
   
 </div>
 
