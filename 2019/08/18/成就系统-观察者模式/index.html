@@ -103,18 +103,25 @@
 
 
 
-  <meta name="description" content="思考并回答以下问题：">
+  <meta name="description" content="思考并回答以下问题：  观察者模式的官方解释是什么？背下来。">
 <meta name="keywords" content="设计模式与游戏完美开发">
 <meta property="og:type" content="article">
 <meta property="og:title" content="成就系统--观察者模式">
 <meta property="og:url" content="http://chebincarl.github.io/2019/08/18/成就系统-观察者模式/index.html">
 <meta property="og:site_name" content="车斌的博客">
-<meta property="og:description" content="思考并回答以下问题：">
+<meta property="og:description" content="思考并回答以下问题：  观察者模式的官方解释是什么？背下来。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-08-18T16:09:19.623Z">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/18/成就系统-观察者模式/1.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/18/成就系统-观察者模式/2.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/18/成就系统-观察者模式/3.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/18/成就系统-观察者模式/4.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/18/成就系统-观察者模式/5.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/18/成就系统-观察者模式/12.png">
+<meta property="og:updated_time" content="2019-08-21T13:43:13.140Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="成就系统--观察者模式">
-<meta name="twitter:description" content="思考并回答以下问题：">
+<meta name="twitter:description" content="思考并回答以下问题：  观察者模式的官方解释是什么？背下来。">
+<meta name="twitter:image" content="http://chebincarl.github.io/2019/08/18/成就系统-观察者模式/1.png">
 
 
 
@@ -440,7 +447,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-08-19 00:09:19" itemprop="dateModified" datetime="2019-08-19T00:09:19+08:00">2019-08-19</time>
+                <time title="修改时间：2019-08-21 21:43:13" itemprop="dateModified" datetime="2019-08-21T21:43:13+08:00">2019-08-21</time>
               
             
           </span>
@@ -486,7 +493,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">3.1k</span>
+                <span title="本文字数">5k</span>
               
 
               
@@ -500,7 +507,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">3 分钟</span>
+                <span title="阅读时长">5 分钟</span>
               
             </div>
           
@@ -521,33 +528,116 @@
 
       
         <p>思考并回答以下问题：</p>
+<ul>
+<li>观察者模式的官方解释是什么？背下来。</li>
+</ul>
 <a id="more"></a>
 
 <p>本章涵盖：</p>
-<h1 id="成就系统"><a href="#成就系统" class="headerlink" title="成就系统"></a>成就系统</h1><p>成就系统(AchievementSystem),是早期单机游戏就出现的一种系统,例如:收集到多少颗星星就能开启特定关卡、全装备收集完成就能额外获得另一组套装等等。这些收集的项目并不会影响游戏主线的进行,也不与游戏主要的玩法相关。但增加这些成就项目,有助于游戏的可玩性,并提升玩家对游戏的挑战和目标的追求</p>
-<p>成就系统(AchievementSystem)中的项目,都会和游戏本身有关,并且在玩家游玩的过程中,就能顺便收集,或是反复进行某项操作就能实现目标。一般可以先将成就项目分门别类,例如属于总数类的可能有累积击杀敌方角色达100次、训练我单位达100个等;也有的是目标完成的项目,如完成训练一个等级3的玩家角色、成功打倒一个Boss等。所以,在实现成就系统之前,需要企划单位先将需要的成就事件列出来,并在项目完成到某个段落之后,才开始加入实现开发中。实现上,会先定义“游戏事件”,如敌方角色阵亡、玩家角色阵亡、玩家角色升级等。当游戏进行过程中,有任何“游戏事件”被触发时,系统就要通知对应的“成就项目”,进行累积或条件判断,如果达到,则完成“成就项目”并通知玩家或直接给予奖励,如图21-1所示。</p>
-<p>图21-1 成就系统与玩家奖励</p>
-<p>一个简单的设计方式是,我们可以把通知成就系统的程序代码加入到“成就事件触发”的方法中。例如,击杀敌方角色,实现时就可以加在敌方角色阵亡的地方:<br>Listing 21-1 Enemy角色接口</p>
-<p>事件触发后,调用成就系统(AchievementSystem)中的NotifyGameEvent方法,并将触发的游戏事件及触发时的敌方角色传入。上述范例中,使用枚举(ENUM)的方式来定义“游戏事件”,并将事件从参数行传入,而不是针对每一个游戏事件定义特定的调用方法,这样做可以避免成就系统定义过多的接口方法。而成就系统的NotifyGameEvent方法,可根据参数传入的“游戏事件”参数,来决定后续的处理流程:</p>
-<p>因为“游戏事件”非常多,所以在NotifyGameEvent方法中先判断emGameEvent的参属性,再分别调用对应的私有成员方法,而每个私有成员方法,再按照企划的需求,累积计属性或判断单次成就是否实现。<br>Listing 21-3成就系统</p>
-<p>如果让成就系统(AchievementSystem)负责每一个游戏事件的方法,并针对每一个单独的游戏事件,去进行“成就项目的累积或判断”,会让成就系统的扩充被限制在每个游戏事件处理方法中。当以后需要针对某一个游戏事件增加成就项目时,就必须通过修改原有“游戏事件处理方法”中的程序代码才能达成。例如,想再增加一个成就项目“杀死装备武器为Rocket以上的敌人数”,那么就只能修改Notify-EnemyKilled方法,在其中追加程序代码来实现修改的目标。</p>
-<p>此外, “游戏事件”发生时可能不是只有成就系统会被影响,其他系统也可能需要追踪相关的游戏事件。因此,如果都是在“游戏事件”的触发点进行每个系统调用的话,那么触发点的程序代码将会变得非常复杂:</p>
-<p>所以要将“游戏事件”与“成就系统”分开,让成就系统仅关注于某些游戏事件的发生;而游戏事件的发生,也不是只提供给成就系统使用。这样的设计才是适当的设计。</p>
-<p>要如何完成这样的设计呢?如果能将“游戏事件的产生与通知”独立成为一个系统,并且让其他系统能通过“订阅”或“关注”的方式,来追踪游戏事件系统发生的事。也就是,当游戏事件系统发生事件时,会负责去通知所有“订阅”了游戏事件的系统,此时被通知的系统,再根据自己的系统逻辑自行决定后续的处理操作。如果能按照上述流程来进行设计,就是一个极为适当的设计。上述的流程,其实就是观察者模式(Observer)所要表达的内容,如图21-2所示。</p>
-<p>图21-2 由事件触发其他相关的系统</p>
-<h1 id="观察者模式-Observer"><a href="#观察者模式-Observer" class="headerlink" title="观察者模式(Observer)"></a>观察者模式(Observer)</h1><p>观察者模式(Observer)与命令模式(Command)是很相似的模式,两者都是希望“事件发生”与“功能执行”之间不要有太多的依赖性,不过,还是可以按照系统的使用需求,分析出应该运用哪个模式。命令模式(Command)已经在第19章中详细说明过了,接下来将说明观察者模式(Observer),另外,在21.3.4节中也将说明,如何根据系统的需要在这两个模式中,选择合适的模式进行实现。</p>
-<h2 id="观察者模式-Observer-的定义"><a href="#观察者模式-Observer-的定义" class="headerlink" title="观察者模式(Observer)的定义"></a>观察者模式(Observer)的定义</h2><p>GoF对观察者模式(Observer)的定义为:</p>
-<p>,在对象之间定义一个一对多的连接方法,当一个对象变换状态时,其他关联的对象都会自动收到通知。”</p>
-<p>土交网站就是最佳的观察者模式(Observer)实现范例。当我们在社交网站上,与另一位用户成为好友、加入一个粉丝团或关注另一位用户的状态,那么当这些好友、粉丝团、用户有任何的新的动态或状态变动时,就会在我们动态页面上“主动”看到这些对象更新的情况,而不必到每一位好友或粉丝团中查看,如图21-3所示。</p>
-<p>图21-3社交网站上的关注对象的更新</p>
-<p>在早期社交网站还没广泛流行之前,说明观察者模式(Observer)常以“报社-订户”来做说明:多位订户向报社“订阅(Subscribe)”了一份报纸,而报社针对昨天的新闻整理编辑之后,在今天一早进行“发布(Publish)”的工作,接着送报生会主动按照订阅的信息,将每份报纸送到订户手上,如图21-4所示。</p>
-<p>图214 向报社订阅后,报纸每日会送达到指定的订户手上</p>
-<p>在上面的案例中,都存在“主题目标”与其他“订阅者/关注者”之间的关系(一对多),当主题有变化时,就会通过之前建立的“关系”,将更动态的信息传送给“订阅者/关注者”。因此,实现上可分为以下儿点:</p>
-<p>主题者、订阅者的角色;<br>如何建立订阅者与主题者的关系;<br>主题者发布信息时,如何通知所有订阅者。<br>21.2.2观察者模式(Observer)的说明<br>GoF定义的观察者模式(Observer)的类结构图如图21-5所示。</p>
-<p>图21-5 GOF定义的观察者模式(Observer)的类结构图<br>GoF参与者的说明如下:<br>Subject (主题接口)&gt;定义主题的接口。让观察者通过接口方法,来订阅、解除订阅主题。这些观察者在主题内部可使用泛型容器加以管理。在主题更新时,通知所有观察者。ConcreteSubject (主题实现)&gt;实现主题接口。&gt;设置主题的内容及更新,当主题变化时,使用父类的通知方法告知所有的观察者。Observer (观察者接口).定义观察者的接口。&gt;提供更新通知方法,让主题可以通知更新。ConcreteObserver (观察者实现)&gt;实现观察者接口。&gt;针对主题的更新,按需求向主题获取更新状态.</p>
-<p>在类定义中,使用了一个C#的List泛型容器(m Observers)来管理所有的Observer(观察者),并实现了3个与Observer (观察者)相关的方法。当某一个Observer (观察者),对Subject (主题)感兴趣时,就利用Attach方法将自己加入主题的管理器中,通过这样的方式, Observer (观察者)就能主动与Subject (主题)建立关系。当Subject (主题)被更改而需要通知Observer (观察者)时,只要遍历m Observers就能通知每一个在容器内的Observer (观察者)现在有Subject (主题)发生了更改。</p>
+<h1 id="成就系统"><a href="#成就系统" class="headerlink" title="成就系统"></a>成就系统</h1><p>成就系统（AchievementSystem），是早期单机游戏就出现的一种系统，例如：收集到多少颗星星就能开启特定关卡、全装备收集完成就能额外获得另一组套装等等。这些收集的项目并不会影响游戏主线的进行，也不与游戏主要的玩法相关。但增加这些成就项目，有助于游戏的可玩性，并提升玩家对游戏的挑战和目标的追求</p>
+<p>成就系统中的项目，都会和游戏本身有关，并且在玩家游玩的过程中，就能顺便收集，或是反复进行某项操作就能实现目标。一般可以先将成就项目分门别类，例如属于总数类的可能有累积击杀敌方角色达100次、训练我单位达100个等；也有的是目标完成的项目，如完成训练一个等级3的玩家角色、成功打倒一个Boss等。所以，在实现成就系统之前，需要企划单位先将需要的成就事件列出来，并在项目完成到某个段落之后，才开始加入实现开发中。实现上，会先定义“游戏事件”，如敌方角色阵亡、玩家角色阵亡、玩家角色升级等。当游戏进行过程中，有任何“游戏事件”被触发时，系统就要通知对应的“成就项目”，进行累积或条件判断，如果达到，则完成“成就项目”并通知玩家或直接给予奖励，如图1所示。</p>
+<blockquote>
+<p>图1 成就系统与玩家奖励</p>
+</blockquote>
+<img src="/2019/08/18/成就系统-观察者模式/1.png">
+
+<p>一个简单的设计方式是，我们可以把通知成就系统的程序代码加入到“成就事件触发”的方法中。例如，击杀敌方角色，实现时就可以加在敌方角色阵亡的地方：</p>
+<blockquote>
+<p>Listing1 Enemy角色接口</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>事件触发后，调用成就系统（AchievementSystem）中的NotifyGameEvent方法，并将触发的游戏事件及触发时的敌方角色传入。上述范例中，使用枚举（ENUM）的方式来定义“游戏事件”，并将事件从参数行传入，而不是针对每一个游戏事件定义特定的调用方法，这样做可以避免成就系统定义过多的接口方法。而成就系统的NotifyGameEvent方法，可根据参数传入的“游戏事件”参数，来决定后续的处理流程：</p>
+<p>因为“游戏事件”非常多，所以在NotifyGameEvent方法中先判断emGameEvent的参属性，再分别调用对应的私有成员方法，而每个私有成员方法，再按照企划的需求，累积计属性或判断单次成就是否实现。</p>
+<blockquote>
+<p>Listing3成就系统</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>如果让成就系统（AchievementSystem）负责每一个游戏事件的方法，并针对每一个单独的游戏事件，去进行“成就项目的累积或判断”，会让成就系统的扩充被限制在每个游戏事件处理方法中。当以后需要针对某一个游戏事件增加成就项目时，就必须通过修改原有“游戏事件处理方法”中的程序代码才能达成。例如，想再增加一个成就项目“杀死装备武器为Rocket以上的敌人数”，那么就只能修改Notify-EnemyKilled方法，在其中追加程序代码来实现修改的目标。</p>
+<p>此外，“游戏事件”发生时可能不是只有成就系统会被影响，其他系统也可能需要追踪相关的游戏事件。因此，如果都是在“游戏事件”的触发点进行每个系统调用的话，那么触发点的程序代码将会变得非常复杂：</p>
+<p>所以要将“游戏事件”与“成就系统”分开，让成就系统仅关注于某些游戏事件的发生；而游戏事件的发生，也不是只提供给成就系统使用。这样的设计才是适当的设计。</p>
+<p>要如何完成这样的设计呢?如果能将“游戏事件的产生与通知”独立成为一个系统，并且让其他系统能通过“订阅”或“关注”的方式，来追踪游戏事件系统发生的事。也就是，当游戏事件系统发生事件时，会负责去通知所有“订阅”了游戏事件的系统，此时被通知的系统，再根据自己的系统逻辑自行决定后续的处理操作。如果能按照上述流程来进行设计，就是一个极为适当的设计。上述的流程，其实就是观察者模式所要表达的内容，如图2所示。</p>
+<blockquote>
+<p>图2 由事件触发其他相关的系统</p>
+</blockquote>
+<img src="/2019/08/18/成就系统-观察者模式/2.png">
+
+<h1 id="观察者模式"><a href="#观察者模式" class="headerlink" title="观察者模式"></a>观察者模式</h1><p>观察者模式与命令模式（Command）是很相似的模式，两者都是希望“事件发生”与“功能执行”之间不要有太多的依赖性，不过，还是可以按照系统的使用需求，分析出应该运用哪个模式。命令模式（Command）已经在第19章中详细说明过了，接下来将说明观察者模式，另外，在21.3.4节中也将说明，如何根据系统的需要在这两个模式中，选择合适的模式进行实现。</p>
+<h2 id="观察者模式的定义"><a href="#观察者模式的定义" class="headerlink" title="观察者模式的定义"></a>观察者模式的定义</h2><p>GoF对观察者模式的定义为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">在对象之间定义一个一对多的连接方法，当一个对象变换状态时，其他关联的对象都会自动收到通知。</span><br></pre></td></tr></table></figure>
+
+<p>土交网站就是最佳的观察者模式实现范例。当我们在社交网站上，与另一位用户成为好友、加入一个粉丝团或关注另一位用户的状态，那么当这些好友、粉丝团、用户有任何的新的动态或状态变动时，就会在我们动态页面上“主动”看到这些对象更新的情况，而不必到每一位好友或粉丝团中查看，如图3所示。</p>
+<blockquote>
+<p>图3 社交网站上的关注对象的更新</p>
+</blockquote>
+<img src="/2019/08/18/成就系统-观察者模式/3.png">
+
+<p>在早期社交网站还没广泛流行之前，说明观察者模式常以“报社-订户”来做说明：多位订户向报社“订阅（Subscribe）”了一份报纸，而报社针对昨天的新闻整理编辑之后，在今天一早进行“发布（Publish）”的工作，接着送报生会主动按照订阅的信息，将每份报纸送到订户手上，如图4所示。</p>
+<blockquote>
+<p>图4 向报社订阅后，报纸每日会送达到指定的订户手上</p>
+</blockquote>
+<img src="/2019/08/18/成就系统-观察者模式/4.png">
+
+<p>在上面的案例中，都存在“主题目标”与其他“订阅者/关注者”之间的关系（一对多），当主题有变化时，就会通过之前建立的“关系”，将更动态的信息传送给“订阅者/关注者”。因此，实现上可分为以下儿点：</p>
+<p>主题者、订阅者的角色；<br>如何建立订阅者与主题者的关系；<br>主题者发布信息时，如何通知所有订阅者。</p>
+<h2 id="观察者模式的说明"><a href="#观察者模式的说明" class="headerlink" title="观察者模式的说明"></a>观察者模式的说明</h2><p>GoF定义的观察者模式的类结构图如图5所示。</p>
+<blockquote>
+<p>图5 GOF定义的观察者模式的类结构图</p>
+</blockquote>
+<img src="/2019/08/18/成就系统-观察者模式/5.png">
+
+<p>GoF参与者的说明如下：</p>
+<ul>
+<li>Subject（主题接口）<ul>
+<li>定义主题的接口。让观察者通过接口方法，来订阅、解除订阅主题。这些观察者在主题内部可使用泛型容器加以管理。在主题更新时，通知所有观察者。</li>
+</ul>
+</li>
+<li>ConcreteSubject（主题实现）<ul>
+<li>实现主题接口。</li>
+<li>设置主题的内容及更新，当主题变化时，使用父类的通知方法告知所有的观察者。</li>
+</ul>
+</li>
+<li>Observer（观察者接口）<ul>
+<li>定义观察者的接口。</li>
+<li>提供更新通知方法，让主题可以通知更新。</li>
+</ul>
+</li>
+<li>ConcreteObserver（观察者实现）<ul>
+<li>实现观察者接口。</li>
+<li>针对主题的更新，按需求向主题获取更新状态.</li>
+</ul>
+</li>
+</ul>
+<p>在类定义中，使用了一个C#的List泛型容器（m_Observers）来管理所有的Observer（观察者），并实现了3个与Observer （观察者）相关的方法。当某一个Observer，对Subject （主题）感兴趣时，就利用Attach方法将自己加入主题的管理器中，通过这样的方式，Observer就能主动与Subject建立关系。当Subject被更改而需要通知Observer时，只要遍历m_Observers就能通知每一个在容器内的Observer现在有Subject发生了更改。</p>
 <p>以下程序范例实现了一个主题</p>
-<p>Listing 21-5 主题实现(Observer.cs)</p>
+<blockquote>
+<p>Listing5 主题实现（Observer.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>图12 成就系统及其相关系统的流程图</p>
+</blockquote>
+<img src="/2019/08/18/成就系统-观察者模式/12.png">
+
+<h2 id="使用观察者模式的优点"><a href="#使用观察者模式的优点" class="headerlink" title="使用观察者模式的优点"></a>使用观察者模式的优点</h2><p>成就系统（AchievementSystem）以“游戏事件”为基础，记录每个游戏事件发生的次数及时间点，作为成就项目的判断依据。但是当同一个游戏事件被触发后，可能不只是只有一个成就系统会被触发，系统中也可能存在着其他系统需要使用同一个游戏事件。因此，加入了以观察者模式为基础的游戏事件系统（GameEventSystem），就可以有效地解除“游戏事件的发生”与有关的“系统功能调用”之间的绑定。这样在游戏事件发生时，不必理会后续的处理工作，而是交给游戏事件主题（Subject）负责调用观察者/订阅者。此外，也能同时调用多个系统同时处理这个事件引发的后续操作。</p>
+<h2 id="实现观察者模式时的注意事项"><a href="#实现观察者模式时的注意事项" class="headerlink" title="实现观察者模式时的注意事项"></a>实现观察者模式时的注意事项</h2><p><strong>双向与单向信息通知</strong></p>
+<p>社交网页上的“粉丝团”比较像是观察者模式：当粉丝团上发布了一则新的动态后，所有订阅的用户都可以看到新增的动态，而用户与用户之间则是同时扮演“主题（Subject）”与“观察者”的角色，除了同时收到其他好友的动态信息，当自己有任何的动态消息时，也会同时广播给好友们（观察者）。</p>
+<p><strong>类过多的问题</strong></p>
+<p>“游戏事件”“游戏事件主题（IGameEventSubject）”会随着项目的开发不断地增加，与此同时，这些主题的观察者的数量也会随之上升。从当前的《P级阵地》内容来看，已经产生了7个游戏事件观察者类（IGameEventObserver），所以不难想象，在大型项目可能会产生非常多的观察者类，当然，在某些情况下类过多，反而是个缺点。因此，如果想要减少类的产生，可以考虑向游戏的主题注册时，不要使用“类对象”而是使用“回调函数”，之后再将功能相似的“回调函数”以同一个类来管理，就能减少过多类的问题。这一部分的解决方式与“第19章兵营训练单位”解决大量请求命令时的想法是一样的，读者可以回顾相关的内容。</p>
+<p><strong>比较命令模式（Command）与观察者模式</strong></p>
+<p>这两个模式都是着重在于将“发生”与“执行”这两个操作消除耦合（或减少依赖性）的模式。当观察者模式中的主题只存在一个观察者时，就非常像是命令模式的基本架构，但还是有一些差异可以分辨出两个模式应用的时机：</p>
+<p>命令模式：该模式的另一个重点是“命令的管理”，应用的系统对于发出的命令有新增、删除、记录、排序、撤销等等的需求。</p>
+<p>观察者模式：对于“观察者/订阅者”可进行管理，意思是观察者可以在系统运行时间决定订阅或退订等操作，让“执行者（观察者/订阅者）”可以被管理。</p>
+<p>所以，两者在应用上还是有明确的目标。当然，如果有需要将两个模式整合应用并非不可能，像是让命令模式的执行者可以动态新增、删除；或是让观察者模式的“每一次发布”都可以被管理等等。而这也是本书所要呈现的重点-模式之间的交互合作，会产生出更大的效果。</p>
+<h1 id="观察者模式面对变化时"><a href="#观察者模式面对变化时" class="headerlink" title="观察者模式面对变化时"></a>观察者模式面对变化时</h1><p>企划：“小程，我们想要在游戏过程中，增加兵营升级的诱因，让玩家认为高级单位有高生命值的好处，所以……<br>小程：“所以想要加什么系统吗?<br>企划：“可以记录当前连续成功击退敌人的数量吗?就是Combo.”<br>小程：“可以再定义清楚一些吗? “<br>企划：“就是玩家角色在没有阵亡的情况下，连续击退敌方角色的数量，但如果有我方单位阵亡的话，那么就从头开始计数。”<br>小程：“嗯 复杂了点，我试试看。”</p>
+<p>小程分析，这一项记录连续击退（Combo Count）的功能，需要同时接收“玩家角色阵亡事件”以及“敌方角色阵亡事件”，若是新增一个游戏事件观察者（IGameEvent Observer），而这个观察者可以同时订阅两个游戏事件主题，内部再加上主题判断的话，应该是可行的：</p>
+<p>这一次对于功能的增加，是利用现有游戏事件主题来实现的，所以只增加了一个comboobserver类来完成功能。并且只修改了PBaseDefenseGame.cs来增加必要的订阅主题功能，对于系统的修改程度来说，并不算大。由此可以证明运用观察者模式有助于系统的开发和维护。</p>
+<h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h1><p>观察者模式的设计原理是，先设置一个主题（Subject），让这个主题发布时可同时通知关心这个主题的观察者/订阅者，并且主题不必理会观察者/订阅者接下来会执行那些操作。观察者模式的主要功能和优点，就是将“主题发生”与“功能执行”这两个操作解除绑定-即消除依赖性，而且对于“执行者（观察者/订阅者）”来说，还是可以动态决定是否要执行后续的功能。</p>
+<p>观察者模式的缺点是可能造成过多的观察者类。不过利用注册“回调函数”来取代“注册类对象”可有效减少类的产生。</p>
+<p><strong>其他应用方式</strong></p>
+<p>在游戏场景中，设计者通常会摆放一些所谓的“事件触发点”，这些事件触发点会在玩家角色进入时，触发对应的游戏功能，例如突然会出现一群怪物NPC来攻击玩家角色；或是进入剧情模式演出一段游戏故事剧情等等。而且游戏通常不会限制一个事件触发点只能执行一个操作，因此实现时可以将每一个事件触发点当成一个“主题”，而每一个要执行的功能，都成为“观察者”，当事件被触动发布时，所有的观察者都能立即反应。</p>
 
       
     </div>
@@ -870,7 +960,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#成就系统"><span class="nav-number">1.</span> <span class="nav-text">成就系统</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#观察者模式-Observer"><span class="nav-number">2.</span> <span class="nav-text">观察者模式(Observer)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#观察者模式-Observer-的定义"><span class="nav-number">2.1.</span> <span class="nav-text">观察者模式(Observer)的定义</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#成就系统"><span class="nav-number">1.</span> <span class="nav-text">成就系统</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#观察者模式"><span class="nav-number">2.</span> <span class="nav-text">观察者模式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#观察者模式的定义"><span class="nav-number">2.1.</span> <span class="nav-text">观察者模式的定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#观察者模式的说明"><span class="nav-number">2.2.</span> <span class="nav-text">观察者模式的说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用观察者模式的优点"><span class="nav-number">2.3.</span> <span class="nav-text">使用观察者模式的优点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现观察者模式时的注意事项"><span class="nav-number">2.4.</span> <span class="nav-text">实现观察者模式时的注意事项</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#观察者模式面对变化时"><span class="nav-number">3.</span> <span class="nav-text">观察者模式面对变化时</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#结论"><span class="nav-number">4.</span> <span class="nav-text">结论</span></a></li></ol></div>
             
 
           </div>
@@ -905,7 +995,7 @@
     
       <span class="post-meta-item-text">站点总字数：</span>
     
-    <span title="站点总字数">1.9m</span>
+    <span title="站点总字数">2m</span>
   
 
   
@@ -916,7 +1006,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">29:08</span>
+    <span title="站点阅读时长">29:57</span>
   
 </div>
 

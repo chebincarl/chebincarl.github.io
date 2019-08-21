@@ -121,7 +121,10 @@
 <meta property="og:image" content="http://chebincarl.github.io/2019/08/11/角色AI-状态模式/8.png">
 <meta property="og:image" content="http://chebincarl.github.io/2019/08/11/角色AI-状态模式/9.png">
 <meta property="og:image" content="http://chebincarl.github.io/2019/08/11/角色AI-状态模式/10.png">
-<meta property="og:updated_time" content="2019-08-19T15:10:01.352Z">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/11/角色AI-状态模式/11.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/11/角色AI-状态模式/12.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/11/角色AI-状态模式/13.png">
+<meta property="og:updated_time" content="2019-08-21T13:43:13.162Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="角色AI--状态模式">
 <meta name="twitter:description" content="思考并回答以下问题：">
@@ -451,7 +454,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-08-19 23:10:01" itemprop="dateModified" datetime="2019-08-19T23:10:01+08:00">2019-08-19</time>
+                <time title="修改时间：2019-08-21 21:43:13" itemprop="dateModified" datetime="2019-08-21T21:43:13+08:00">2019-08-21</time>
               
             
           </span>
@@ -497,7 +500,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">25k</span>
+                <span title="本文字数">30k</span>
               
 
               
@@ -511,7 +514,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">23 分钟</span>
+                <span title="阅读时长">27 分钟</span>
               
             </div>
           
@@ -777,6 +780,55 @@
 <li>变身：角色变成另一种形体，会在场上乱走动。</li>
 </ul>
 <p>这些特殊状态，都可以使用状态模式来实现，但限制是，只能同时存在一个状态。</p>
+<h1 id="角色类"><a href="#角色类" class="headerlink" title="角色类"></a>角色类</h1><p>经过前面几章的介绍后，《P级阵地》角色类ICharacter的功能就大致完成了，角色架构如图1所示。</p>
+<blockquote>
+<p>图11 角色架构1</p>
+</blockquote>
+<img src="/2019/08/11/角色AI-状态模式/11.png">
+
+<p>在图1中，包含了与角色功能相关的类：</p>
+<ul>
+<li>角色属性类ICharacterAttr：记录角色当前的最高生命值、攻击力，并负责计算攻击流程中所需要的属性。</li>
+<li>武器类IWeapon：角色可以装备的武器。</li>
+<li>角色AI类ICharacterAI：负责角色在游戏中攻击和防守等自动行为。</li>
+</ul>
+<p>另外图1中还包含一些与Unity3D引擎有关的几个组件：</p>
+<ul>
+<li>UnityEngine.GameObject：负责角色在游戏中的3D模型数据，通过该对象引用可以设置Unity3D相关的功能，而有关实际创建出角色3D模型数据，将在下一个阶段进行说明。</li>
+<li>UnityEngine.AudioSource：负责播放角色在游戏进行中发出的音效。</li>
+<li>UnityEngine.NavMeshAgent：负责角色在场景中的自动寻路功能。以往，游戏中如果实现自动寻路功能，多半要自行开发寻路（Path Finding）算法（A*，Dijkstra……）。不过Unity3D引擎已经内置了不错的寻路系统，可节省许多开发时间。</li>
+</ul>
+<p>角色类ICharacter算是《P级阵地》的重要类之一，但要让其实际运行起来，还需要一些系统进行协助，如图2所示。</p>
+<blockquote>
+<p>图12 角色与其他系统</p>
+</blockquote>
+<img src="/2019/08/11/角色AI-状态模式/12.png">
+
+<ul>
+<li>游戏角色管理系统CharacterSystem：管理游戏中双方阵营所产生的角色；并通过它的定期更新功能，让角色AI系统可以运行并产生自动化行为（攻击、防守）。</li>
+<li>游戏角色生产和组装功能：一个游戏角色包含了3个游戏系统组件和Unity3D引擎相关的对象。所以在角色组装系统CharacterBuilderSystem中，会经过一定的步骤和流程，将这些组件产生并设置给一个角色。此外，将Unity3D引擎中的模型从资源目录下加载，并放入场景中也有一定的步骤。关于角色的组装，将在之后几章进行详细说明。</li>
+<li>兵营系统与关卡系统：玩家通过兵营系统CampSystem产生玩家阵营的角色来防守阵地。而关卡系统StageSystem则是按照设置，不断地产生敌方角色来进攻玩家的阵地。</li>
+</ul>
+<h1 id="游戏角色管理系统"><a href="#游戏角色管理系统" class="headerlink" title="游戏角色管理系统"></a>游戏角色管理系统</h1><p>游戏角色管理系统CharacterSystem，在《P级阵地》中负责管理角色类ICharacter的对象。它是<a href="/2019/08/07/游戏主要类--外观模式/" title="游戏主要类--外观模式">游戏主要类--外观模式</a>中提到的一个“游戏系统IGameSystem”，它的类对象会在PBaseDefenseGame类中被定义和初始化，并在PBaseDefenseGame类的定期更新方法Update中被更新。</p>
+<p>所谓的游戏角色“管理”指的是，角色管理系统CharacterSystem类会将当前游戏产生的角色类对象“记录”下来，并提供接口让客户端可以新增、删除、获取这些被记录的角色对象。而此处所称的“记录”则是使用C#的容器类List来完成。通过记录管理这些对象，让游戏系统可以有效地进行角色更新、数据查询、资源释放等操作。最重要的是，游戏中的角色之所以能够自动攻击和防守，就是由游戏角色管理系统CharacterSystem来执行的。</p>
+<p>游戏角色管理系统CharacterSystem的类定义中，先定义的两个List容器类，分别来记录玩家角色和敌方角色：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 管理创建出来的角色</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">CharacterSystem</span> : <span class="title">IGameSystem</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> List&lt;ICharacter&gt; m_Soldiers = <span class="keyword">new</span> List&lt;ICharacter&gt;();</span><br><span class="line">    <span class="keyword">private</span> List&lt;ICharacter&gt; m_Enemys = <span class="keyword">new</span> List&lt;ICharacter&gt;();</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>并且提供与这两个容器相关的“管理”功能，包含新增、删除等方法：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 管理容器的相关方法</span></span><br><span class="line"><span class="comment">// 增加Soldier</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">AddSoldier</span>(<span class="params"> ISoldier theSoldier</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    m_Soldiers.Add( theSoldier );</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 删除Soldier</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">RemoveSoldier</span>(<span class="params"> ISoldier theSoldier</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    m_Soldiers.Remove( theSoldier );</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 增加Enemy</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">AddEnemy</span>(<span class="params"> IEnemy theEnemy</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    m_Enemys.Add( theEnemy );</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 删除Enemy</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">RemoveEnemy</span>(<span class="params"> IEnemy theEnemy</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    m_Enemys.Remove( theEnemy );</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">// 删除角色</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">RemoveCharacter</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// 删除掉可以删除的角色</span></span><br><span class="line">    RemoveCharacter( m_Soldiers, m_Enemys, ENUM_GameEvent.SoldierKilled );</span><br><span class="line">    RemoveCharacter( m_Enemys, m_Soldiers, ENUM_GameEvent.EnemyKilled);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 删除角色</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">RemoveCharacter</span>(<span class="params">List&lt;ICharacter&gt; Characters, List&lt;ICharacter&gt; Opponents, ENUM_GameEvent emEvent</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// 分別获取可以删除和存活的角色</span></span><br><span class="line">    List&lt;ICharacter&gt; CanRemoves = <span class="keyword">new</span> List&lt;ICharacter&gt;();</span><br><span class="line">    <span class="keyword">foreach</span>( ICharacter Character <span class="keyword">in</span> Characters)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 是否阵亡</span></span><br><span class="line">        <span class="keyword">if</span>( Character.IsKilled() == <span class="literal">false</span>)</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//  是否确认过阵亡事件</span></span><br><span class="line">        <span class="keyword">if</span>( Character.CheckKilledEvent()==<span class="literal">false</span>)            </span><br><span class="line">            m_PBDGame.NotifyGameEvent( emEvent,Character );</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 是否可以删除</span></span><br><span class="line">        <span class="keyword">if</span>( Character.CanRemove())</span><br><span class="line">            CanRemoves.Add (Character);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 删除</span></span><br><span class="line">    <span class="keyword">foreach</span>( ICharacter CanRemove <span class="keyword">in</span> CanRemoves)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 通知对手删除</span></span><br><span class="line">        <span class="keyword">foreach</span>(ICharacter Opponent <span class="keyword">in</span> Opponents)</span><br><span class="line">            Opponent.RemoveAITarget( CanRemove );</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 释放资源并删除</span></span><br><span class="line">        CanRemove.Release();</span><br><span class="line">        Characters.Remove( CanRemove );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Enemy数量</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">GetEnemyCount</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> m_Enemys.Count;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>游戏角色管理系统的定期更新中，会先让所有角色进行更新，再进行角色AI的功能更新：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 系统定期更新</span></span><br><span class="line"><span class="comment">// 更新</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)   </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    UpdateCharacter();</span><br><span class="line">    UpdateAI(); <span class="comment">// 更新AI</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 更新角色</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">UpdateCharacter</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">foreach</span>( ICharacter Character <span class="keyword">in</span> m_Soldiers)</span><br><span class="line">        Character.Update();</span><br><span class="line">    <span class="keyword">foreach</span>( ICharacter Character <span class="keyword">in</span> m_Enemys)</span><br><span class="line">        Character.Update();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 更新AI</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">UpdateAI</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// 分別更新两个群组的AI</span></span><br><span class="line">    UpdateAI(m_Soldiers, m_Enemys );</span><br><span class="line">    UpdateAI(m_Enemys, m_Soldiers );</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 删除角色</span></span><br><span class="line">    RemoveCharacter();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 更新AI</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">UpdateAI</span>(<span class="params"> List&lt;ICharacter&gt; Characters, List&lt;ICharacter&gt; Targets </span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">foreach</span>( ICharacter Character <span class="keyword">in</span> Characters)</span><br><span class="line">        Character.UpdateAI( Targets );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这里的“更新”并不是指Unity3D引擎MonoBehaviour中的Update方法，而是进行我们为开发需求所设计的“游戏系统”更新。就像在<a href="/2019/08/08/游戏的主循环-Game-Loop/" title="游戏的主循环-Game-Loop">游戏的主循环-Game-Loop</a>中提到的“单一的游戏系统”，对于《P级阵地》来说，游戏角色管理系统CharacterSystem和角色AI就是“单一的游戏系统”，所以必须通过之前设计的Game Loop机制来定期更新，并使它们运行：</p>
+<p>“通过Game Loop，开发者可以为游戏系统定期更新功能，因为这个游戏系统类，不想通过继承MonoBehaviour且挂入某一个Unity游戏对象（GameObject）的方式，来拥有定期更新的功能。”</p>
+<p>以角色AI功能为例，在UpdateAI的方法中，会分别更新两个阵营群组的AI方法。在更新每一个单位角色AI时（UpdateAI），都会将敌对阵营的全部角色以参数的方式传入。这样一来，每个角色在AI状态更新时，就会有全部的敌对角色可以引用，之后就可以从这些敌对角色中找出可攻击或追击的目标，接着完成AI状态的转换或维持现状。通过下面的流程图（如图13所示）就能了解整体系统的运行方式。</p>
+<blockquote>
+<p>图13 系统流程图</p>
+</blockquote>
+<img src="/2019/08/11/角色AI-状态模式/13.png">
+
+<p>在后续的阶段中，我们将继续介绍“游戏角色的生产和组装功能”以及“兵营系统与关卡系统”，也将介绍在一般实现时会遇到的问题，并提出使用设计模式的解决方法。</p>
 
       
     </div>
@@ -1099,7 +1151,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#角色的AI"><span class="nav-number">1.</span> <span class="nav-text">角色的AI</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#状态模式"><span class="nav-number">2.</span> <span class="nav-text">状态模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用状态模式实现角色AI"><span class="nav-number">3.</span> <span class="nav-text">使用状态模式实现角色AI</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#角色AI的实现"><span class="nav-number">3.1.</span> <span class="nav-text">角色AI的实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现说明"><span class="nav-number">3.2.</span> <span class="nav-text">实现说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用状态模式的优点"><span class="nav-number">3.3.</span> <span class="nav-text">使用状态模式的优点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#角色AI执行流程"><span class="nav-number">3.4.</span> <span class="nav-text">角色AI执行流程</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#状态模式面对变化时"><span class="nav-number">4.</span> <span class="nav-text">状态模式面对变化时</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#结论"><span class="nav-number">5.</span> <span class="nav-text">结论</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#角色的AI"><span class="nav-number">1.</span> <span class="nav-text">角色的AI</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#状态模式"><span class="nav-number">2.</span> <span class="nav-text">状态模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用状态模式实现角色AI"><span class="nav-number">3.</span> <span class="nav-text">使用状态模式实现角色AI</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#角色AI的实现"><span class="nav-number">3.1.</span> <span class="nav-text">角色AI的实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现说明"><span class="nav-number">3.2.</span> <span class="nav-text">实现说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用状态模式的优点"><span class="nav-number">3.3.</span> <span class="nav-text">使用状态模式的优点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#角色AI执行流程"><span class="nav-number">3.4.</span> <span class="nav-text">角色AI执行流程</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#状态模式面对变化时"><span class="nav-number">4.</span> <span class="nav-text">状态模式面对变化时</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#结论"><span class="nav-number">5.</span> <span class="nav-text">结论</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#角色类"><span class="nav-number">6.</span> <span class="nav-text">角色类</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#游戏角色管理系统"><span class="nav-number">7.</span> <span class="nav-text">游戏角色管理系统</span></a></li></ol></div>
             
 
           </div>
@@ -1134,7 +1186,7 @@
     
       <span class="post-meta-item-text">站点总字数：</span>
     
-    <span title="站点总字数">1.9m</span>
+    <span title="站点总字数">2m</span>
   
 
   
@@ -1145,7 +1197,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">29:08</span>
+    <span title="站点阅读时长">29:57</span>
   
 </div>
 
