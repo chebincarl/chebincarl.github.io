@@ -103,18 +103,22 @@
 
 
 
-  <meta name="description" content="思考并回答以下问题：">
+  <meta name="description" content="思考并回答以下问题：  备忘录模式的官方解释是什么？背下来。">
 <meta name="keywords" content="设计模式与游戏完美开发">
 <meta property="og:type" content="article">
 <meta property="og:title" content="存盘功能--备忘录模式">
 <meta property="og:url" content="http://chebincarl.github.io/2019/08/19/存盘功能-备忘录模式/index.html">
 <meta property="og:site_name" content="车斌的博客">
-<meta property="og:description" content="思考并回答以下问题：">
+<meta property="og:description" content="思考并回答以下问题：  备忘录模式的官方解释是什么？背下来。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-08-19T16:02:52.314Z">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/19/存盘功能-备忘录模式/1.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/19/存盘功能-备忘录模式/2.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/19/存盘功能-备忘录模式/3.png">
+<meta property="og:updated_time" content="2019-08-22T13:17:59.481Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="存盘功能--备忘录模式">
-<meta name="twitter:description" content="思考并回答以下问题：">
+<meta name="twitter:description" content="思考并回答以下问题：  备忘录模式的官方解释是什么？背下来。">
+<meta name="twitter:image" content="http://chebincarl.github.io/2019/08/19/存盘功能-备忘录模式/1.png">
 
 
 
@@ -440,7 +444,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-08-20 00:02:52" itemprop="dateModified" datetime="2019-08-20T00:02:52+08:00">2019-08-20</time>
+                <time title="修改时间：2019-08-22 21:17:59" itemprop="dateModified" datetime="2019-08-22T21:17:59+08:00">2019-08-22</time>
               
             
           </span>
@@ -486,7 +490,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">7.9k</span>
+                <span title="本文字数">8.5k</span>
               
 
               
@@ -500,7 +504,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">7 分钟</span>
+                <span title="阅读时长">8 分钟</span>
               
             </div>
           
@@ -521,15 +525,41 @@
 
       
         <p>思考并回答以下问题：</p>
+<ul>
+<li>备忘录模式的官方解释是什么？背下来。</li>
+</ul>
 <a id="more"></a>
 
 <p>本章涵盖：</p>
-<h1 id="存储成就记录"><a href="#存储成就记录" class="headerlink" title="存储成就记录"></a><span style="color:#339AFF;">存储成就记录</span></h1><p>在上一章中，《P级阵地》增加了成就系统来强化玩家对游戏成绩的追求，但以当前项目成就的实现方式，除非不关掉游戏，否则这些成就分数就会在玩家关掉游戏的同时也一并消失。因此，现在需要的是一个“存储成就记录”的功能，让这些记录能够被保存下来，不会因为关闭游戏而消失，如图1所示。</p>
+<ul>
+<li>存储成就记录</li>
+<li>备忘录模式<ul>
+<li>备忘录模式的定义</li>
+<li>备忘录模式的说明</li>
+<li>备忘录模式的实现范例</li>
+</ul>
+</li>
+<li>使用备志录模式实现成就记录的保存<ul>
+<li>成就记录保存的功能设计</li>
+<li>实现说明</li>
+<li>使用备忘录模式的优点</li>
+<li>实现备忘录模式的注意事项</li>
+</ul>
+</li>
+<li>备忘录模式面对变化时</li>
+<li>结论</li>
+</ul>
+<h1 id="存储成就记录"><a href="#存储成就记录" class="headerlink" title="存储成就记录"></a><span style="color:#339AFF;">存储成就记录</span></h1><p>在<a href="/2019/08/18/成就系统-观察者模式/" title="成就系统-观察者模式">成就系统-观察者模式</a>中，《P级阵地》增加了成就系统来强化玩家对游戏成绩的追求，但以当前项目成就的实现方式，除非不关掉游戏，否则这些成就分数就会在玩家关掉游戏的同时也一并消失。因此，现在需要的是一个“存储成就记录”的功能，让这些记录能够被保存下来，不会因为关闭游戏而消失，如图1所示。</p>
+<blockquote>
+<p>图1 将玩家游戏数据存盘的示意图</p>
+</blockquote>
+<img src="/2019/08/19/存盘功能-备忘录模式/1.png">
+
 <p>数据保存的方式有很多种，以单机游戏而言，大多是以文件的方式存储在玩家的计算机中。若是网络游戏，则玩家的数据大多是存储在游戏服务器（Game Server）的数据库系统（Database）中，不过有时也会将少数的设置信息利用文件系统存储在玩家的计算机上。</p>
 <p>在Unity3D开发工具中，提供了多种的信息存储方式：</p>
 <ul>
-<li>PlayerPrefs类： Unity3D引擎提供的类，使用Key-Value的形式将信息存放在文件系统中，不需自行指定文件路径及名称，适合存储简单的数据。</li>
-<li>自行存储文件：使用C#中的System.IO.Frile类， 自行打开文件以及存储数据到文件中，需自行定义存储数据的格式以及文件路径和名称，适合存储复杂的数据。</li>
+<li>PlayerPrefs类：Unity3D引擎提供的类，使用Key-Value的形式将信息存放在文件系统中，不需自行指定文件路径及名称，适合存储简单的数据。</li>
+<li>自行存储文件：使用C#中的System.IO.File类，自行打开文件以及存储数据到文件中，需自行定义存储数据的格式以及文件路径和名称，适合存储复杂的数据。</li>
 <li>使用XML格式存盘：使用C#中的System.Xml下的类，以XML格式存盘，原理同上一种方式，只是存档的内容会以XML格式来表现，适合存储复杂的数据。</li>
 </ul>
 <p>《P级阵地》中的成就项目并不复杂，全都可以使用Key-Value方式存储，所以《P级阵地》将使用PlayerPrefs类实现保存记录的功能。</p>
@@ -539,25 +569,25 @@
 <li>SetInt：存储为整数。</li>
 <li>SetString：存储为字符串。</li>
 <li>GetFloat：读取浮点数。</li>
-<li>GetInt： 读取整数。</li>
-<li>GetString： 读取字符串。</li>
+<li>GetInt：读取整数。</li>
+<li>GetString：读取字符串。</li>
 </ul>
 <p>上列方法都为静态方法，而调用时只需要提供“Key”和Value值即可，存储方式如下：</p>
 <figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PlayerPrefs.SetInt(<span class="string">"Key1"</span>, IntValue);</span><br></pre></td></tr></table></figure>
 
-<p>读出方式如下</p>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> ivalue = PlayerPrefs.GetInt(<span class="string">"Keyl"</span>, <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+<p>读出方式如下：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> iValue = PlayerPrefs.GetInt(<span class="string">"Key1"</span>, <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
 
-<p>GetInt的第2个参数为默认值，当无法读取“以Key值存储的数据”时，会以默认值返回给周用者。</p>
-<p>因为当前的成就项目全部都记录在成就系统（AchievementSystem）中，所以采取简单实现的方式，就是直接在成就系统（AchievementSystem）内实现成就记录的存储和读取：</p>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//成就系统</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">AchievementSystem</span> : <span class="title">IGameSystem</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//记录的成就项目</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> m_EnenykilledCount=<span class="number">0</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> m_Soldierkilledcount =<span class="number">0</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> m_Stagelv=<span class="number">0</span>;</span><br><span class="line">    <span class="comment">//存储记录</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">SaveData</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        PlayerPrefs.SetInt (<span class="string">"Enemykilledcount"</span>, m_Enemykilledcount);</span><br><span class="line">        PlayerPrefs.SetInt (<span class="string">"SoldierkilledCount"</span>, m_soldierkilledCount);</span><br><span class="line">        PlayerPrefs.SetInt (<span class="string">"Stagelv"</span>, m_stageLv);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//读取记录</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">LoadData</span> (<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_Enemykilledcount = PlayerPrefs.GetInt(<span class="string">"EnemykilledCount"</span>, <span class="number">0</span>);</span><br><span class="line">        m_soldierkilledcount = PlayerPrefs.GetInt(<span class="string">"SoldierkilledCount"</span>, <span class="number">0</span>);</span><br><span class="line">        m_stagelv = PlayerPrefs.GetInt (<span class="string">"StageLv"</span>, <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>GetInt的第2个参数为默认值，当无法读取“以Key值存储的数据”时，会以默认值返回给调用者。</p>
+<p>因为当前的成就项目全部都记录在成就系统（AchievementSystem）中，所以采取简单实现的方式，就是直接在成就系统内实现成就记录的存储和读取：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 成就系统</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">AchievementSystem</span> : <span class="title">IGameSystem</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 记录的成就项目</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> m_EnemyKilledCount = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> m_SoldierKilledCount = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> m_StageLv = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    ...</span><br><span class="line">    <span class="comment">// 存储记录</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">SaveData</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        PlayerPrefs.SetInt (<span class="string">"EnemyKilledCount"</span>, m_EnemyKilledCount);</span><br><span class="line">        PlayerPrefs.SetInt (<span class="string">"SoldierKilledCount"</span>, m_SoldierKilledCount);</span><br><span class="line">        PlayerPrefs.SetInt (<span class="string">"StageLv"</span>, m_StageLv);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 读取记录</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">LoadData</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_EnemyKilledCount = PlayerPrefs.GetInt(<span class="string">"EnemyKilledCount"</span>, <span class="number">0</span>);</span><br><span class="line">        m_SoldierKilledCount = PlayerPrefs.GetInt(<span class="string">"SoldierKilledCount"</span>, <span class="number">0</span>);</span><br><span class="line">        m_StageLv = PlayerPrefs.GetInt (<span class="string">"StageLv"</span>, <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>直接将数据存盘功能实现于游戏功能类中，一般来说是不太理想的方式，因为违反了单一职责原则（SRP），也就是说，各个游戏功能类应该专心处理与游戏相关的功能，至于“记录保存”的功能，应该由其他的专职类来实现才是。因为每个平台上数据保存的方式迥异，也会因项目的需求而采取不同的方式，所以这一部分不该由游戏功能类自己去实现。</p>
 <p>如果每个游戏功能类都有记录保存的需求，但又没有专职的记录保存类，那么，可想而知的是，每个游戏功能类都实现自己的记录保存功能，这样就会造成功能重复实现、记录单元格式不统一或是存盘名称重复的问题。</p>
 <p>因此应该要有一个专职的类来“负责记录保存”，这个类会去获取各个系统想要存储的记录后，再一并执行数据保存的操作。虽然《P级阵地》中只有成就系统（AchievementSystem）有记录保存的需求，但我们还是要实现另一个类来专门负责记录的保存：</p>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//成就系统</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">AchievementSyster</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//记录的成就项目</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> m_EnemykilledCount= <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> m_SoldierkilledCount=<span class="number">0</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> m_stagelv = <span class="number">0</span>;</span><br><span class="line">    <span class="comment">//记录的成就项目</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">GetEnemykilledcount</span> (<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> m_Enemykilledcount;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">Getsoldierkilledcount</span> (<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> m_SoldierKilledCount;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">GetstageLv</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> m_stagelv;</span><br><span class="line">    &#125;   </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 成就系统</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">AchievementSystem</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 记录的成就项目</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> m_EnemyKilledCount = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> m_SoldierKilledCount = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> m_StageLv = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 记录的成就项目</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">GetEnemyKilledCount</span> (<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> m_EnemyKilledCount;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">GetSoldierKilledCount</span> (<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> m_SoldierKilledCount;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">GetStageLv</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> m_StageLv;</span><br><span class="line">    &#125;   </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">SetEnemyKilledCount</span> (<span class="params"><span class="keyword">int</span> iValue</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_EnemyKilledCount = iValue;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">SetSoldierKilledCount</span> (<span class="params"><span class="keyword">int</span> iValue</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_SoldierKilledCount = iValue;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">SetStageLv</span>(<span class="params"><span class="keyword">int</span> iValue</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_StageLv = iValue;</span><br><span class="line">    &#125;  </span><br><span class="line"></span><br><span class="line">    <span class="comment">// 存储记录</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 读取记录</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 成就记录存盘</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>新的做法实现了一个AchievementSaveData类，它是专门负责成就的记录保存。由于AchievementSaveData类存盘时还是必须获取和设置成就系统（Achievement System）的相关信息，所以成就系统就必须声明对应的信息获取方法。当然如果使用C#实现的话，可以利用getter和setter的语句，这样可以少写一些程序代码，但无论是采用哪种方式，这种实现方式最主要的缺点是：成就系统（AchievementSystem）必须将“内部成员数据”全部对外公开。</p>
+<p>新的做法实现了一个AchievementSaveData类，它是专门负责成就的记录保存。由于AchievementSaveData类存盘时还是必须获取和设置成就系统（AchievementSystem）的相关信息，所以成就系统就必须声明对应的信息获取方法。当然如果使用C#实现的话，可以利用getter和setter的语句，这样可以少写一些程序代码，但无论是采用哪种方式，这种实现方式最主要的缺点是：成就系统（AchievementSystem）必须将“内部成员数据”全部对外公开。</p>
 <p>对外公开成员数据是有风险的，如果从接口隔离原则（ISP）的角度来看，除非必要，否则类应该尽量减少对外显示内部的数据结构，以减少客户端有机会破坏内部成员的记录，而对外公布过多的操作方法，也容易增加与其他系统的耦合度（即依赖度）。</p>
 <p>所以，对于这个版本的存盘功能而言，修改目标除了“将记录保存交由项目类去负责”之外，也必须同时“减少不必要的成员访问方法”。在GoF的设计模式中的备忘录模式为我们提供了修改时的引用模板。</p>
 <h1 id="备忘录模式"><a href="#备忘录模式" class="headerlink" title="备忘录模式"></a><span style="color:#339AFF;">备忘录模式</span></h1><p>本章将使用备忘录模式来保存游戏数据，因为要保存游戏的数据，所以需要重新设计游戏系统中的某些功能。备忘录模式是用来记录对象状态的设计模式，如果将系统内某一时间内的对象状态全都保留下来，那么就等于实现了“系统快照”（Snapshot，即系统保存）的功能，为用户提供了可以返回某一个“快照”时点的系统状态。</p>
@@ -568,6 +598,8 @@
 <blockquote>
 <p>图2 游戏存盘示意图</p>
 </blockquote>
+<img src="/2019/08/19/存盘功能-备忘录模式/2.png">
+
 <p>那么，怎么让现有的游戏系统“不违反封装的原则”，还能提供内部的详细信息呢?其实如果从另一个方向来思考，那么就是由游戏系统本身“主动提供内部信息”存盘功能，而且也“主动”向存盘功能提供与自己（系统）有关的信息。</p>
 <p>这与原本由游戏本身提供一大堆“存取内部成员”的方法，有什么不同?最大的不同在于：游戏系统提供存取内部成员方法，是让游戏系统处于“被动”状态。游戏系统本身不能判断提供这些访问方法后，会不会有什么后遗症，而备忘录模式则是将游戏系统由“被动”改为“主动提供”，意思是，由游戏系统自己决定要提供什么信息和记录存盘功能，也由游戏系统决定要从存盘功能中，读取什么样的数据及记录还原给内部成员。而这些信息记录的设置和获取的实现地点都在“游戏系统类内”，不会发生在游戏系统类以外的地方，如此就可确保类的“封装的原则”不被破坏。</p>
 <h2 id="备忘录模式的说明"><a href="#备忘录模式的说明" class="headerlink" title="备忘录模式的说明"></a><span style="color:#00ACC1;">备忘录模式的说明</span></h2><p>备忘录模式的概念，是让有记录保存需求的类，自行产生要保存的数据，外界完全不用了解这些记录产生的过程及米源。另外，也让类自己从之前的保存数据中找回信息，自行重设类的状态。</p>
@@ -575,6 +607,8 @@
 <blockquote>
 <p>图3 游戏存盘示意图</p>
 </blockquote>
+<img src="/2019/08/19/存盘功能-备忘录模式/3.png">
+
 <p>GoF参与者的说明如下：</p>
 <ul>
 <li>Originator（记录拥有者）<ul>
@@ -784,7 +818,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">353</span>
+                    <span class="site-state-item-count">362</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -945,23 +979,23 @@
                 
                 
                   <li>
-                    <a href="/2019/08/20/WPF/" title="WPF" target="_blank">WPF</a>
+                    <a href="/2019/08/23/通用类负责连接，代理模式保证安全/" title target="_blank"></a>
                   </li>
                 
                   <li>
-                    <a href="/2019/08/19/用MVVM模式建立应用架构：好应用的正反面-0/" title="用MVVM模式建立应用架构：好应用的正反面" target="_blank">用MVVM模式建立应用架构：好应用的正反面</a>
+                    <a href="/2019/08/23/职责链模式/" title="职责链模式" target="_blank">职责链模式</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/08/19/加载速度的优化-代理模式/" title="加载速度的优化--代理模式" target="_blank">加载速度的优化--代理模式</a>
+                    <a href="/2019/08/23/策略模式的灵活性/" title="策略模式的灵活性" target="_blank">策略模式的灵活性</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/08/19/俘兵-适配器模式/" title="俘兵--适配器模式" target="_blank">俘兵--适配器模式</a>
+                    <a href="/2019/08/23/模板方法模式/" title="模板方法模式" target="_blank">模板方法模式</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/08/19/前缀字尾-装饰模式/" title="前缀字尾--装饰模式" target="_blank">前缀字尾--装饰模式</a>
+                    <a href="/2019/08/23/装饰器模式/" title="装饰器模式" target="_blank">装饰器模式</a>
                   </li>
                 
               </ul>
@@ -1022,7 +1056,7 @@
     
       <span class="post-meta-item-text">站点总字数：</span>
     
-    <span title="站点总字数">2m</span>
+    <span title="站点总字数">2.1m</span>
   
 
   
@@ -1033,7 +1067,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">29:57</span>
+    <span title="站点阅读时长">31:20</span>
   
 </div>
 

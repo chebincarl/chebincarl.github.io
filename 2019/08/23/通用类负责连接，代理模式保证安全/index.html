@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="layout： titletitle： 通用类负责连接，代理模式保证安全date： 2019-08-23 22：37：20categories： 设计模式 tags： Learning PHP设计模式思考并回答以下问题：">
+<meta name="keywords" content="Unity">
+<meta property="og:type" content="article">
+<meta property="og:title" content="车斌的博客">
+<meta property="og:url" content="http://chebincarl.github.io/2019/08/23/通用类负责连接，代理模式保证安全/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="layout： titletitle： 通用类负责连接，代理模式保证安全date： 2019-08-23 22：37：20categories： 设计模式 tags： Learning PHP设计模式思考并回答以下问题：">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/23/通用类负责连接，代理模式保证安全/1.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/23/通用类负责连接，代理模式保证安全/2.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/23/通用类负责连接，代理模式保证安全/1.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/23/通用类负责连接，代理模式保证安全/1.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/23/通用类负责连接，代理模式保证安全/1.png">
+<meta property="og:updated_time" content="2019-08-23T15:26:02.726Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="车斌的博客">
+<meta name="twitter:description" content="layout： titletitle： 通用类负责连接，代理模式保证安全date： 2019-08-23 22：37：20categories： 设计模式 tags： Learning PHP设计模式思考并回答以下问题：">
+<meta name="twitter:image" content="http://chebincarl.github.io/2019/08/23/通用类负责连接，代理模式保证安全/1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/08/23/通用类负责连接，代理模式保证安全/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title> | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">专注，重复10遍</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/08/23/通用类负责连接，代理模式保证安全/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-08-23 22:37:20 / 修改时间：23:26:02" itemprop="dateCreated datePublished" datetime="2019-08-23T22:37:20+08:00">2019-08-23</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">6.9k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">6 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <hr>
+<p>layout： title<br>title： 通用类负责连接，代理模式保证安全<br>date： 2019-08-23 22：37：20<br>categories： 设计模式</p>
+<h2 id="tags：-Learning-PHP设计模式"><a href="#tags：-Learning-PHP设计模式" class="headerlink" title="tags： Learning PHP设计模式"></a>tags： Learning PHP设计模式</h2><p>思考并回答以下问题：</p>
+<a id="more"></a>
+
+<p>本章涵盖：</p>
+<h1 id="MySQL在PHP设计模式中的角色"><a href="#MySQL在PHP设计模式中的角色" class="headerlink" title="MySQL在PHP设计模式中的角色"></a>MySQL在PHP设计模式中的角色</h1><p>一些高级的MySQL程序员会结合关系数据库使用设计模式，第5部分中的这4章就将结合MySQL使用PHP设计模式。所以在接下来的4章中，你不需要放弃原来使用的数据库代码，也就是说，原先结合MySQL和PHP时使用的JOIN语句或其他关系数据库代码还能继续使用。</p>
+<p>不过，结合PHP使用MySQL的情况相当普遍，如果没有一部分专门介绍如何结合MySQL使用OOP结构和设计模式，这绝对是一个严重的疏漏。另外，作为最后一部分，这里提供了一种增加更多PHP设计模式的方法。这些模式包括：</p>
+<ul>
+<li>代理（Proxy）</li>
+<li>策略（Strategy）</li>
+<li>职责链（Chain of Responsibility）</li>
+<li>观察者（Observer）</li>
+</ul>
+<p>这些模式并非只能在结合PHP和MySQL的应用中使用，它们完全可以单独用于PHP。另外，通过后面给出的一个职责链例子，还可以看到一个应用中可以结合使用多个设计模式。</p>
+<p>你还会看到使用mysqli处理连接的一个组合接口和类。这个“二人组”将在第5部分中一直使用，只要替换为你自己的连接信息（主机、用户名、密码和数据库），就可以利用这个组合接口和类建立你想要的任何MySQL连接。</p>
+<p>尽管第5部分并没有真正的MySQL设计模式，不过你会发现一些可重用的结构，可以在其他结合了MySQL的PHP项目中使用。有经验的程序员都知道，即使只对PHP或MysQL代码做很小的改变，对于同时包含PHP和MySQL的程序来说，这也会带来可怕的影响。不过，你会发现良构的设计模式会妥善地处理各种变化，即使是在MySQL环境中也能从容应对。</p>
+<h1 id="一个简单的MySQL接口和类"><a href="#一个简单的MySQL接口和类" class="headerlink" title="一个简单的MySQL接口和类"></a>一个简单的MySQL接口和类</h1><p>PHP允许接口存储常量，在第2章中你已经看到一个这样的例子，实现接口的类都可以使用接口中存储的这些常量。连接到一个MySQL数据库时需要提供一组常量，这些常量就可以存储在接口中。使用PHP mysqli扩展包的例程提供了一些变形来建立连接，不过所有这些变形都需要主机、用户名、口令和数据库信息。一旦在类中建立了这个例程，只要程序需要一个MySQL连接，就可以重用这个例程。图1所示为这种设计的类图。</p>
+<p>连接信息独立于客户，因为具体信息存储在接口的常量中。UniversalConnect类使用作用域解析操作符来访问存储在接口常量中的数据。</p>
+<blockquote>
+<p>图1：MySQL通用连接类图</p>
+</blockquote>
+<img src="/2019/08/23/通用类负责连接，代理模式保证安全/1.png">
+
+<h2 id="重要的接口"><a href="#重要的接口" class="headerlink" title="重要的接口"></a>重要的接口</h2><p>在设计模式中，接口通常允许开发人员创建松绑定的对象和类，不过这里有些不同，接口将用来存储数据——MySQL连接数据。所以，这个接口并不是一个用来组织操作的抽象结构，它包含一些具体的数据，实现这个接口的类都可以使用这些数据。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="comment">// 文件名：IConnectInfo.php</span></span><br><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">IConnectInfo</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">	<span class="keyword">const</span> HOST = <span class="string">"localhost"</span>;</span><br><span class="line">	<span class="keyword">const</span> UNAME = <span class="string">"phplorker"</span>;</span><br><span class="line">	<span class="keyword">const</span> PW = <span class="string">"easyway"</span>;</span><br><span class="line">	<span class="keyword">const</span> DBNAME = <span class="string">"dpPatt"</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">doConnect</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样很容易隔离出这个接口进行修改，来指定你希望连接的任何主机。通过使用mysqli，可以为它提供这4个元素，建立与指定数据库的连接。通过替换接口，指定为类中定义的一组值，这样能减少开发所需的时间，因为通过这个接口可以隔离出程序中一个简单但必要的部分，任何程序都可以实现这个接口。</p>
+<h2 id="通用MySQL连接类和静态变量"><a href="#通用MySQL连接类和静态变量" class="headerlink" title="通用MySQL连接类和静态变量"></a>通用MySQL连接类和静态变量</h2><p>所有IConnectInfo接口实现都使用作用域解析操作符来访问连接值。为了从接口向一个实现类传递值并使用这个值，可以为变量赋一个私有静态状态，这有两个好处，一方面可以体会静态变量处理迅速的速度优势，另外还可以得到私有可见性提供的封装性：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>除了为连接变量指定静态状态值，UniversalConnect类中的mysqli变量（$hookup）也是静态的。这样一来， Client类做出请求时，就可以在一个更大的静态上下文中使用这个变量。</p>
+<blockquote>
+<p>全局变量一定不好吗?<br>我总会尽量避免使用全局变量。全局变量很可能会破坏封装-——它们总是横冲直撞，在程序中带来各种各样的麻烦。要在较大的程序中一路追查各种小问题，这会尤其麻烦。在某些方面，静态变量与全局变量有一些共同的特性，因此除非有很充分的理由，否则我不会使用全局变量。不过由于不断变化的编程环境的速度问题最近我有了很多很好的理由来使用全局变量，但具体使用时我还是很谨慎。另外如果需要反复实例化一个类，静态变量将有助于减少类的实例化。<br><br>有些人可能已经注意到，这本书并没有提供单例（Singleton）设计模式的例子，对此一个重要的原因是：如果正确地实现单例设计模式，它就相当于全局变量。<br>如今已经开发了很多实现有问题的单例设计模式，它们往往是无害的，不过还有一些实现正确的单例模式，这些则可能导致全局变量类型问题。有一位开发人员Misko Hevery把单例称为“病态的说谎者” （见http：//bit.ycl6mll）。，甚至《设计模式》一书的首席作者Erich Gamma也不赞成把单例作为一种设计模式（见http：//bit.ly/3Lg5IN） 。之所以避免使用单例，主要原因就在于它们相当于全局变量。<br><br>所以尽管我不认为这个例子中使用静态变量会导致问题，不过如果你很关心全局变量可能带来的影响，可以从所有代码中删除static关键字，另外有private可见性的变量都使用$this-&gt;格式。</p>
+</blockquote>
+<p>使用静态变量最大的好处可能是可以轻松地使用这些静态变量的值，而不必每次程序中某个部分需要创建一个新连接时都实例化UniversalConnect类。例如，每次通过一个在线HTML表单为一个数据库表输入新数据时，都需要一个新连接。这说明，每个数据输入都会带来一个新的实例化，而使用静态变量就可以避免不断重新实例化连接类。</p>
+<h2 id="简单客户"><a href="#简单客户" class="headerlink" title="简单客户"></a>简单客户</h2><p>在这里，客户是需要一个MySQL连接的程序。在一个典型应用中，客户可以是任何需要MySQL连接的具体类。除了一个include_once()操作来访问UniversalConnect类外，连接例程只有一行代码：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>通过一个类和接口来建立一个简单的连接操作，这样可以大大减少开发时间。修改很容易，因为所有信息都存储在常量中。要改变主机、用户、口令或数据库名，只需要修改接口中相应的常量值。UniversalConnect类或使用UniversalConnect类的程序则不用做任何修改。</p>
+<h1 id="保护代理完成登录"><a href="#保护代理完成登录" class="headerlink" title="保护代理完成登录"></a>保护代理完成登录</h1><p>代理（Proxy）模式是一种结构型设计模式。“四人帮”提出了4种代理模式：</p>
+<p>远程代理（Remote proxy）<br>    * 代理对象在一个地址空间，而实际对象在另一个地址空间中，此时代理就是远程的。除了使用远程代理作为防火墙，远程代理还可以用于在线游戏，在这种情况下，不同地方可能同时需要相同的代理对象。</p>
+<p>虚拟代理（Virtual proxy）<br>    * 虚拟代理可以缓存一个真实主题的有关信息，从而能延迟对这个真实主题的访问。有时在真实对象处理登录数据之前，高安全性登录会使用一个虚拟代理来完成登录。</p>
+<p>保护代理（Protection proxy）<br>    * 保护代理只有在验证过请求之后，才会把请求发送到真实主题。这个真实主题就是请求的目标，如访问数据库信息。根据用户的登录信息，很多保护代理会提供不同级别的访问;并不是建立一个真实主题，真实主题可能是多个，而且是受限的。</p>
+<p>智能引用（A smart reference）<br>    * 程序可以使用GOF所称的“裸指针” ，不过，如果“裸指针”不能满足程序的需要，代理就相当于一个智能引用（或智能指针） ，可以在引用对象时完成额外的动作。例如，可能首先由作为智能引用的代理参与者加载一个数据库的数据。</p>
+<p>代理模式有两个主要的参与者：一个代理主题（proxy subject）和一个真实主题（realsubject）。客户通过Subjec接口向Proxy提交请求，不过只有当请求首先通过Proxy之后才有可能访问RealSubject。图2显示了代理设计模式的类图。</p>
+<blockquote>
+<p>图2：代理模式类图</p>
+</blockquote>
+<img src="/2019/08/23/通用类负责连接，代理模式保证安全/2.png">
+
+<p>Proxy和RealSubject参与者都实现了Subject接口，不过Proxy的角色是一个“守门人”或封装模块。如果请求经由Proxy确认，Proxy再调用RealSubject为用户提供请求的内容。</p>
+<h1 id="建立登录注册"><a href="#建立登录注册" class="headerlink" title="建立登录注册"></a>建立登录注册</h1><p>在这个程序中，要创建一个代理来完成需要注册的登录，首先建立一个表，其中只包含用户名和口令字段，除此以外没有其他信息。这是一个很简单的例子，可以进一步扩展，不过现在的重点是代理设计模式。下面的PHP脚本会创建存储用户信息的数据库表：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>这是一个很标准的类，用来创建存储用户名和口令的表。由口令的字符数NVARCHAR（120）可以看出，掩码口令最多为120个字符。要输入数据，下面的PHP会接收从一个HTML表单发送的数据：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>MD5函数将掩码作为一个32字符的十六进制数返回。md5()函数是一个比较原始但也比较简单的散列函数，这里使用这个散列函数只是为了说明一点：建立将在代理登录中使用的注册口令时可能会完成加密。</p>
+<p>可以用下面的HTML5脚本完成注册——增加一个用户名和口令：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>最后给出有些文件会用到的CSS文件，这个CSS文件也很简单：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>图3显示了用户在注册过程中看到的界面。（HTML文件都是分开的，这是为了更清楚地理解使用代理设计模式登录网站时不同元素在建立和执行登录时的作用。也可以把登录注册和登录本身都放在一个HTML5页面中，其中包含多个表单，一个表单用于注册，另一个用于登录）</p>
+<blockquote>
+<p>图3：注册屏幕</p>
+</blockquote>
+<img src="/2019/08/23/通用类负责连接，代理模式保证安全/1.png">
+
+<p>一旦用户注册，会有一个“确认”消息显示一个注册完成，如图4所示。</p>
+<blockquote>
+<p>图4：注册确认</p>
+</blockquote>
+<img src="/2019/08/23/通用类负责连接，代理模式保证安全/1.png">
+
+<p>这个确认消息很简短，也可以嵌入到HTML代码中，并提供一个选项，提示用户现在就完成登录，不过，正如前面提到的，代码中所有部分都是模块化的，从而保证逻辑更为清晰。</p>
+<p>两个PHP文件都使用UniversalConnect类来链接MySQL数据库，在这两个文件中，只使用一行代码就可以完成数据库的连接，而无需编写大堆的代码。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">$this</span>-&gt;hookup = UniversalConnect::doConnect();</span><br></pre></td></tr></table></figure>
+
+<p>为了测试这个代理模式实现，下面用不同口令“注册”多个用户。下一节将构建一个代理登录应用，其中会使用proxyLog表查看用户名和口令是否可用而且正确。所以在学习后面的内容之前，先用Registration.html和InsertData类在数据库表中增加一些用户名和口令。</p>
+<h2 id="实现登录代理"><a href="#实现登录代理" class="headerlink" title="实现登录代理"></a>实现登录代理</h2><p>通过查看代理模式文件图中的参与者（见图5），可以看到类名（及其文件名）与设计模式中的参与者名完全一致。</p>
+<blockquote>
+<p>图5：登录代理文件图</p>
+</blockquote>
+<img src="/2019/08/23/通用类负责连接，代理模式保证安全/1.png">
+
+<p>Proxy类调用MySQL数据库来确保用户名和口令匹配，如果确实匹配，请求将传递到RealSubject类。所以尽管IconnectInfo接口和UniversalConnect类不属于这个设计模式，它们对于“守门人”角色却是很重要的组件。</p>
+<p><strong><font size="3">登录表单和客户</font></strong></p>
+<p>用户在HTML文件的表单中放入登录信息。一旦用户输入数据，并点击提交按钮，信息会发送到Client：</p>
+<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>最初的开发设计是由HTML表单将数据直接发送到Proxy类，不过经过重新考虑，完全可以利用Client来封装口令和用户名。Client还可以对HTML表单的数据进行修剪和过滤。Client使用一个私有方法（包含类型提示），将HTML表单的数据传递到Proxy类中的登录方法：</p>
+<p>由于用户名和口令解装到一个私有变量中，并由一个私有方法（getIface）发送到Proxy类，所以可以得到有效的封装，然后才会在Proxy类中完成比较以保证用户名和口令合法。</p>
+<p><strong><font size="3">代理的工作</font></strong></p>
+<p>通过Client将HTML表单发送的数据传递到Proxy类时，必须将这个数据与MysQL表中存储的数据进行比较。由于Proxy和RealSubject类有一个共同的接口，它们必须分别实现ISubject接口：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">ISubject</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">	<span class="function"><span class="keyword">function</span> <span class="title">request</span><span class="params">()</span></span>;	</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>可以采用很多不同的方式来实现方法request。对于Proxy，如果用户名和口令得到验证，可以通过它将原始请求发送到Realsubject类。换句话说， Proxy要确定是否调用RealSubject的方法request。</p>
+<p>设计代理时，可以通知用户口令和用户名是非法的，除此以外不做其他处理。不过也可以让用户返回登录页面或注册页面：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>大多数工作都是由login方法完成的。它接收口令和用户名，用md5（）函数对口令计算散列，打开数据库，并查询数据表。如果发现一个匹配的用户名和口令对，则设置$logGood变量为true。如果$logGood为true，则调用request方法;否则只给出一个消息。</p>
+<p>Proxy的request方法会调用RealSubject的request方法。在代理模式中，真实主题（请求的目标）的代理是Proxy类，所以它的任务是掩护真实主题，而不是重复真实主题的request方法。</p>
+<p><strong><font size="3">真实主题</font></strong></p>
+<p>代理设计模式的关键是代理参与者。不过，用户想要的实际上是真实主题里的内容，所以对用户来说，只有真实主题是最重要的。可以告诉你一个好消息，真实主题几乎可以是任何东西。在这个例子中，真实主题是一个页面，其中包含一些OOP和设计模式技巧：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>其中只有一个方法，这是实现ISubject接口时必须实现的一个方法——request。这个request方法只生成一些HTML，会显示一个有序列表。它也可以是任何内容，在这个模式中它有特定的位置，相当于火车最后一节的守车，没有反向影响。</p>
+<p>从用户的角度来看，所有类和代码都是透明的。图6显示了用户在HTML5页面上登录时看到的屏幕。</p>
+<p>登录模块把请求发送到Client类，Client类从HTML5表单获得登录数据，并进一步通过Proxy login方法将请求转发给Proxy。当然，用户不会看到这些。用户看到的只是RealSubject输出，如图7所示。</p>
+<blockquote>
+<p>图7：RealSubject的输出</p>
+</blockquote>
+<p>当然， Realsubject类的内容就是用户原本想看到的内容，用户根本不知道初始请求必须成功地通过Client和Proxy类。</p>
+<p>如果输入了不正确的用户名和/或口令，或者用户根本没有注册，而导致请求无法完成，必须发送一些替代消息。在这里，可能会有一个类似图8的简单消息。通知用户无法找到他输入的数据。</p>
+<p>一般地，为用户提供消息时，会建议他注册，或者在登录时更仔细地输入信息，也可能会链接到另外一个页面，允许用户在这个页面中选择注册或者再次登录。不过，为清楚起见，这个例子力求最简。一旦熟悉了如何使用代理设计模式实现一个保护代理，完全可以稍做修改来建立无缝的注册和登录体验。毕竟，网站就是为了让用户更容易访问，代理的作用只是确保有合法权限的用户才能使用网站。</p>
+<h1 id="代理和真实世界安全"><a href="#代理和真实世界安全" class="headerlink" title="代理和真实世界安全"></a>代理和真实世界安全</h1><p>就其本身而言（特别是如本章例子所示），对于真实世界的网站，代理模式肯定是不够安全的。如果涉及金融交易，代理模式更无法保证其安全性。不过，如果一个代理模块把请求转发到一个高安全性模块，这仍保持了代理设计模式。实际上，可以把这个模式中的代理参与者看作是一个场所，在用户访问到真实主题之前可以在这里做一些真正保证高安全性的操作。在这个例子中， mds()函数显示了可以在这里生成一个口令散列码，不过MD5并不是一个高安全性的加密方法。可以为你的网站增加更多安全性。例如，在完成信用卡金融业务处理时，代理会把请求发送到一个信用卡处理公司的模块，负责完成金融业务，如果处理返回的结果指示交易成功，则会继续将请求传给真实主题，由真实主题本身为用户提供可用的产品或服务。</p>
+<p>不过，绝对不要认为代理设计模式（不论是使用PHP还是任何其他编程语言）是一个高安全性的设计。实际上，它只是一个提供安全性的通用模型，安全性的细节要由代理中或代理之外的另一个模块处理。图9描述了真实世界高安全性环境中代理的角色。对用户来说，所有请求都直接发送给真实主题。代理模块可以是一个简单的口令检查，也可以调用一个高安全性模块来处理敏感信息。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/08/23/职责链模式/" rel="next" title="职责链模式">
+                <i class="fa fa-chevron-left"></i> 职责链模式
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">362</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">40</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2019/08/23/通用类负责连接，代理模式保证安全/" title target="_blank"></a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/08/23/职责链模式/" title="职责链模式" target="_blank">职责链模式</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/08/23/策略模式的灵活性/" title="策略模式的灵活性" target="_blank">策略模式的灵活性</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/08/23/模板方法模式/" title="模板方法模式" target="_blank">模板方法模式</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/08/23/装饰器模式/" title="装饰器模式" target="_blank">装饰器模式</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#tags：-Learning-PHP设计模式"><span class="nav-number">1.</span> <span class="nav-text">tags： Learning PHP设计模式</span></a></li></ol><li class="nav-item nav-level-1"><a class="nav-link" href="#MySQL在PHP设计模式中的角色"><span class="nav-number"></span> <span class="nav-text">MySQL在PHP设计模式中的角色</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#一个简单的MySQL接口和类"><span class="nav-number"></span> <span class="nav-text">一个简单的MySQL接口和类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#重要的接口"><span class="nav-number">1.</span> <span class="nav-text">重要的接口</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#通用MySQL连接类和静态变量"><span class="nav-number">2.</span> <span class="nav-text">通用MySQL连接类和静态变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#简单客户"><span class="nav-number">3.</span> <span class="nav-text">简单客户</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#保护代理完成登录"><span class="nav-number"></span> <span class="nav-text">保护代理完成登录</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#建立登录注册"><span class="nav-number"></span> <span class="nav-text">建立登录注册</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#实现登录代理"><span class="nav-number">1.</span> <span class="nav-text">实现登录代理</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#代理和真实世界安全"><span class="nav-number"></span> <span class="nav-text">代理和真实世界安全</span></a></li></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">2.1m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">31:20</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>
