@@ -103,19 +103,19 @@
 
 
 
-  <meta name="description" content="思考并回答以下问题：">
+  <meta name="description" content="思考并回答以下问题：  特性的作用是什么？ 自定义特性要用起来就必须能被识别，如何做到？ 如何用反射在运行时实现动态绑定？如何在编译时利用一个成员的名称来调用该成员？ 在执行时调用目标未知的情况下，也要用到反射。怎么理解？">
 <meta name="keywords" content="C#本质论">
 <meta property="og:type" content="article">
 <meta property="og:title" content="第17章-反射和特性">
 <meta property="og:url" content="http://chebincarl.github.io/2019/07/29/第17章-反射和特性/index.html">
 <meta property="og:site_name" content="车斌的博客">
-<meta property="og:description" content="思考并回答以下问题：">
+<meta property="og:description" content="思考并回答以下问题：  特性的作用是什么？ 自定义特性要用起来就必须能被识别，如何做到？ 如何用反射在运行时实现动态绑定？如何在编译时利用一个成员的名称来调用该成员？ 在执行时调用目标未知的情况下，也要用到反射。怎么理解？">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://chebincarl.github.io/2019/07/29/第17章-反射和特性/1.png">
-<meta property="og:updated_time" content="2019-07-30T14:41:28.640Z">
+<meta property="og:updated_time" content="2019-08-28T13:25:28.666Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="第17章-反射和特性">
-<meta name="twitter:description" content="思考并回答以下问题：">
+<meta name="twitter:description" content="思考并回答以下问题：  特性的作用是什么？ 自定义特性要用起来就必须能被识别，如何做到？ 如何用反射在运行时实现动态绑定？如何在编译时利用一个成员的名称来调用该成员？ 在执行时调用目标未知的情况下，也要用到反射。怎么理解？">
 <meta name="twitter:image" content="http://chebincarl.github.io/2019/07/29/第17章-反射和特性/1.png">
 
 
@@ -442,7 +442,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-07-30 22:41:28" itemprop="dateModified" datetime="2019-07-30T22:41:28+08:00">2019-07-30</time>
+                <time title="修改时间：2019-08-28 21:25:28" itemprop="dateModified" datetime="2019-08-28T21:25:28+08:00">2019-08-28</time>
               
             
           </span>
@@ -488,7 +488,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">3.7k</span>
+                <span title="本文字数">9.8k</span>
               
 
               
@@ -502,7 +502,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">3 分钟</span>
+                <span title="阅读时长">9 分钟</span>
               
             </div>
           
@@ -523,29 +523,51 @@
 
       
         <p>思考并回答以下问题：</p>
+<ul>
+<li>特性的作用是什么？</li>
+<li>自定义特性要用起来就必须能被识别，如何做到？</li>
+<li>如何用反射在运行时实现动态绑定？如何在编译时利用一个成员的名称来调用该成员？</li>
+<li>在执行时调用目标未知的情况下，也要用到反射。怎么理解？</li>
+</ul>
 <a id="more"></a>
 
 <p>本章涵盖：</p>
-<p>特性（attribute）的作用是在程序集中插入额外的元数据，并将元数据同编程构造（比如类、方法或者属性）关联起来。本章探讨了特性的细节，并描述了如何创建自定义特性。自定义特性要用起来就必须能被识别。这是通过反射（reflection）来实现的。本章首先讨论了反射，其中包括如何用它在运行时实现动态绑定，以及如何在编译时利用一个成员的名称来调用该成员。在像代码生成器这样的工具中，会频繁地执行这个操作。除此之外，在执行时调用目标未知的情况下，也要用到反射。</p>
+<ul>
+<li>反射<ul>
+<li>使用System.Type访问元数据</li>
+<li>成员调用</li>
+<li>泛型类型上的反射</li>
+</ul>
+</li>
+<li>特性<ul>
+<li>自定义特性</li>
+<li>查找特性</li>
+<li>使用构造器来初始化特性</li>
+<li>System.AttributeUsageAttribute</li>
+<li>命名参数</li>
+</ul>
+</li>
+</ul>
+<p><span style="color:red">特性（attribute）的作用是在程序集中插入额外的元数据，并将元数据同编程构造（比如类、方法或者属性）关联起来。</span>本章探讨了特性的细节，并描述了如何创建自定义特性。自定义特性要用起来就必须能被识别。这是通过反射（reflection）来实现的。本章首先讨论了反射，其中包括如何用它在运行时实现动态绑定，以及如何在编译时利用一个成员的名称来调用该成员。在像代码生成器这样的工具中，会频繁地执行这个操作。除此之外，在执行时调用目标未知的情况下，也要用到反射。</p>
 <img src="/2019/07/29/第17章-反射和特性/1.png">
 
-<h1 id="反射"><a href="#反射" class="headerlink" title="反射"></a>反射</h1><p>可以利用反射做下面这些事情。</p>
+<h1 id="反射"><a href="#反射" class="headerlink" title="反射"></a><span style="color:#339AFF;">反射</span></h1><p>可以利用反射做下面这些事情。</p>
 <ul>
 <li>访问程序集中类型的元数据。其中包括像完整类型名和成员名这样的构造，以及对一个构造进行修饰的任何特性。</li>
 <li>使用元数据，在运行时动态调用一个类型的成员，而不是执行编译时绑定。</li>
 </ul>
-<p>反射是指对程序集中的元数据进行检查的过程。在以前，当代码编译成一种机器语言时，关于代码的所有元数据（比如类型和方法名）都会被丢弃。相反，当C#编译成CIL时，它会维持关于代码的大部分元数据。除此之外，可以利用反射枚举程序集中的所有类型，找出满足特定条件的那些。我们通过System. Type的实例来访问类型的元数据，该对象包含了对类型实例的成员进行枚举的方法。除此之外，可在被检查类型的特定对象上调用那些成员。</p>
+<p>反射是指对程序集中的元数据进行检查的过程。在以前，当代码编译成一种机器语言时，关于代码的所有元数据（比如类型和方法名）都会被丢弃。相反，当C#编译成CIL时，它会维持关于代码的大部分元数据。除此之外，可以利用反射枚举程序集中的所有类型，找出满足特定条件的那些。我们通过System.Type的实例来访问类型的元数据，该对象包含了对类型实例的成员进行枚举的方法。除此之外，可在被检查类型的特定对象上调用那些成员。</p>
 <p>基于反射，人们发展出了一系列前所未有的编程模式。例如，反射允许枚举程序集中的所有类型及其成员。在这个过程中，可以创建对程序集API进行编档所需的存根（stub）。然后，可将通过反射获取的元数据与通过XML注释（使用/doc开关）创建的XML文档合并，从而创建API文档。类似地，程序员可以利用反射元数据来生成代码，从而将业务对象（business object）持久化（序列化）到数据库中。可以在显示对象集合的列表控件中使用反射。基于这个集合，列表控件可以利用反射来遍历集合中的一个对象的所有属性，并在列表中为每个属性都定义一个列。除此之外，通过调用每个对象的每个属性，列表控件可以使用对象中包含的数据来填充每一行和每一列——即使对象的数据类型在编译时是未知的。</p>
 <p>.NET Framework所提供的XmlSerializer、ValueType和DataBinder类均在其实现中利用了反射技术。</p>
-<h2 id="使用System-Type访问元数据"><a href="#使用System-Type访问元数据" class="headerlink" title="使用System.Type访问元数据"></a>使用System.Type访问元数据</h2><p>读取类型的元数据，关键在于获得System.Type的一个实例，它代表了目标类型实例。System.Type提供了获取类型信息的所有方法。可以用它回答以下问题。</p>
+<h2 id="使用System-Type访问元数据"><a href="#使用System-Type访问元数据" class="headerlink" title="使用System.Type访问元数据"></a><span style="color:#00ACC1;">使用System.Type访问元数据</span></h2><p>读取类型的元数据，关键在于获得System.Type的一个实例，它代表了目标类型实例。System.Type提供了获取类型信息的所有方法。可以用它回答以下问题。</p>
 <ul>
 <li>类型的名称是什么（Type.Name）？</li>
 <li>类型是public的吗（Type.IsPublic）？</li>
 <li>类型的基类型是什么（Type.BaseType）？</li>
-<li>类型支持任何接口吗（Type.GetInterfaces ()）？</li>
+<li>类型支持任何接口吗（Type.GetInterfaces()）？</li>
 <li>类型是在哪个程序集中定义的（Type.Assembly）？</li>
 <li>类型的属性、方法、字段是什么（Type.GetProperties()、Type.GetMethods()、Тype.GetFields()）？</li>
-<li>都有什么特性在修饰一个类型（Type.GetcustomAttributes()）？</li>
+<li>都有什么特性在修饰一个类型（Type.GetCustomAttributes()）？</li>
 </ul>
 <p>还有其他成员未能一列出，但总而言之，它们都提供了与特定类型有关的信息。很明显，现在的关键是获得对类型的Type对象的引用。我们主要通过object.GetType()和typeof()来达到这个目的。</p>
 <blockquote>
@@ -556,12 +578,12 @@
 <blockquote>
 <p>代码清单1 使用Type.GetProperties()获取对象的public属性</p>
 </blockquote>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">DateTime dateTime = <span class="keyword">new</span> DateTime();</span><br><span class="line">Type type = dateTime.GetType();</span><br><span class="line"><span class="keyword">foreach</span>(System.Reflection.PropertyInfo property <span class="keyword">in</span> type.GetProperties())</span><br><span class="line">&#123;</span><br><span class="line">	Console.WriteLine(property.Name);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">DateTime dateTime = <span class="keyword">new</span> DateTime();</span><br><span class="line"></span><br><span class="line">Type type = dateTime.GetType();</span><br><span class="line"></span><br><span class="line"><span class="keyword">foreach</span>(System.Reflection.PropertyInfo property <span class="keyword">in</span> type.GetProperties())</span><br><span class="line">&#123;</span><br><span class="line">    Console.WriteLine(property.Name);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <blockquote>
-<p>输出17-1</p>
+<p>输出1</p>
 </blockquote>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">Date</span><br><span class="line">Day</span><br><span class="line">DayOfWeek</span><br><span class="line">DayOfYear</span><br><span class="line">Hour</span><br><span class="line">Kind</span><br><span class="line">Millisecond</span><br><span class="line">Minute</span><br><span class="line">Month</span><br><span class="line">Now</span><br><span class="line">UtcNow</span><br><span class="line">Second</span><br><span class="line">Ticks</span><br><span class="line">TimeOfDay</span><br><span class="line">Today</span><br><span class="line">Year</span><br></pre></td></tr></table></figure>
 
 <p>在调用了GetType()之后，程序遍历从Type.GetProperties()返回的每个System.Reflection.PropertyInfo实例，并显示属性名。成功调用GetType()的关键在于获得一个对象实例。但在某些时候，这样的实例是无法获得的。例如，静态类是无法实例化的，所以没办法调用GetType()。</p>
 <p><strong>2.typeof()</strong></p>
@@ -569,24 +591,24 @@
 <blockquote>
 <p>代码清单2使用typeof()创建System.Type实例</p>
 </blockquote>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System.Diagnostics;</span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line">	ThreadPriorityLevel priority;</span><br><span class="line">	priority = (ThreadPriorityLevel)Enum. Parse(<span class="keyword">typeof</span>(ThreadPriorityLevel), <span class="string">"Idle"</span>);</span><br><span class="line"><span class="comment">// ...</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System.Diagnostics;</span><br><span class="line"><span class="comment">// ...</span></span><br><span class="line">    ThreadPriorityLevel priority;</span><br><span class="line">    priority = (ThreadPriorityLevel)Enum. Parse(<span class="keyword">typeof</span>(ThreadPriorityLevel), <span class="string">"Idle"</span>);</span><br><span class="line"><span class="comment">// ...</span></span><br></pre></td></tr></table></figure>
 
-<p>Enum.Parse()获取标识了一个枚举的Type对象，然后将一个字符串转换成特定的枚举值。在本例中，它将”Idle”转换成System.Diagnostics.ThreadPriorityLevel.Idle.</p>
-<h2 id="成员调用"><a href="#成员调用" class="headerlink" title="成员调用"></a>成员调用</h2><p>反射并非仅可以用来获取元数据。下一步是获取元数据，并动态调用它引用的成员。假定现在定义一个类，代表一个应用程序的命令行，并把它命名为CommandLineinfo。对于这个类来说，最困难的地方在于如何在类中填充启动应用程序时的实际命令行数据。然而，利用反射，可以将命令行选项映射到属性名，并在运行时动态设置属性。代码清单3对此进行了演示。</p>
+<p>Enum.Parse()获取标识了一个枚举的Type对象，然后将一个字符串转换成特定的枚举值。在本例中，它将“Idle”转换成System.Diagnostics.ThreadPriorityLevel.Idle。</p>
+<h2 id="成员调用"><a href="#成员调用" class="headerlink" title="成员调用"></a>成员调用</h2><p>反射并非仅可以用来获取元数据。下一步是获取元数据，并动态调用它引用的成员。假定现在定义一个类，代表一个应用程序的命令行，并把它命名为CommandLineInfo。对于这个类来说，最困难的地方在于如何在类中填充启动应用程序时的实际命令行数据。然而，利用反射，可以将命令行选项映射到属性名，并在运行时动态设置属性。代码清单3对此进行了演示。</p>
 <blockquote>
 <p>代码清单3 动态调用成员</p>
 </blockquote>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> <span class="title">AddisonWesley.Michaelis.EssentialCSharp.Chapter17.Listing17_03</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">using</span> System;</span><br><span class="line">    <span class="keyword">using</span> System.Diagnostics;</span><br><span class="line">    <span class="keyword">using</span> System.Reflection;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">partial</span> <span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="keyword">string</span>[] args</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">string</span> errorMessage;</span><br><span class="line">            CommandLineInfo commandLine = <span class="keyword">new</span> CommandLineInfo();</span><br><span class="line">            <span class="keyword">if</span> (!CommandLineHandler.TryParse(</span><br><span class="line">                args, commandLine, <span class="keyword">out</span> errorMessage))</span><br><span class="line">            &#123;</span><br><span class="line">                Console.WriteLine(errorMessage);</span><br><span class="line">                DisplayHelp();</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (commandLine.Help)</span><br><span class="line">            &#123;</span><br><span class="line">                DisplayHelp();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span> (commandLine.Priority !=</span><br><span class="line">                    ProcessPriorityClass.Normal)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="comment">// Change thread priority</span></span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// ...</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">DisplayHelp</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="comment">// Display the command-line help.</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">partial</span> <span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">class</span> <span class="title">CommandLineInfo</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">public</span> <span class="keyword">bool</span> Help &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">public</span> <span class="keyword">string</span> Out &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">public</span> ProcessPriorityClass Priority</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">get</span> &#123; <span class="keyword">return</span> _Priority; &#125;</span><br><span class="line">                <span class="keyword">set</span> &#123; _Priority = <span class="keyword">value</span>; &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">private</span> ProcessPriorityClass _Priority =</span><br><span class="line">                ProcessPriorityClass.Normal;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">CommandLineHandler</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Parse</span>(<span class="params"><span class="keyword">string</span>[] args, <span class="keyword">object</span> commandLine</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">string</span> errorMessage;</span><br><span class="line">            <span class="keyword">if</span> (!TryParse(args, commandLine, <span class="keyword">out</span> errorMessage))</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> ApplicationException(errorMessage);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">bool</span> <span class="title">TryParse</span>(<span class="params"><span class="keyword">string</span>[] args, <span class="keyword">object</span> commandLine,</span></span></span><br><span class="line"><span class="function"><span class="params">            <span class="keyword">out</span> <span class="keyword">string</span> errorMessage</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">bool</span> success = <span class="literal">false</span>;</span><br><span class="line">            errorMessage = <span class="literal">null</span>;</span><br><span class="line">            <span class="keyword">foreach</span> (<span class="keyword">string</span> arg <span class="keyword">in</span> args)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">string</span> option;</span><br><span class="line">                <span class="keyword">if</span> (arg[<span class="number">0</span>] == <span class="string">'/'</span> || arg[<span class="number">0</span>] == <span class="string">'-'</span>)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">string</span>[] optionParts = arg.Split(</span><br><span class="line">                        <span class="keyword">new</span> <span class="keyword">char</span>[] &#123; <span class="string">':'</span> &#125;, <span class="number">2</span>);</span><br><span class="line"></span><br><span class="line">                    <span class="comment">// Remove the slash|dash</span></span><br><span class="line">                    option = optionParts[<span class="number">0</span>].Remove(<span class="number">0</span>, <span class="number">1</span>);</span><br><span class="line">                    PropertyInfo property =</span><br><span class="line">                        commandLine.GetType().GetProperty(option,</span><br><span class="line">                            BindingFlags.IgnoreCase |</span><br><span class="line">                            BindingFlags.Instance |</span><br><span class="line">                            BindingFlags.Public);</span><br><span class="line">                    <span class="keyword">if</span> (property != <span class="literal">null</span>)</span><br><span class="line">                    &#123;</span><br><span class="line">                        <span class="keyword">if</span> (property.PropertyType == <span class="keyword">typeof</span>(<span class="keyword">bool</span>))</span><br><span class="line">                        &#123;</span><br><span class="line">                            <span class="comment">// Last parameters for handling indexers</span></span><br><span class="line">                            property.SetValue(</span><br><span class="line">                                commandLine, <span class="literal">true</span>, <span class="literal">null</span>);</span><br><span class="line">                            success = <span class="literal">true</span>;</span><br><span class="line">                        &#125;</span><br><span class="line">                        <span class="keyword">else</span> <span class="keyword">if</span> (</span><br><span class="line">                            property.PropertyType == <span class="keyword">typeof</span>(<span class="keyword">string</span>))</span><br><span class="line">                        &#123;</span><br><span class="line">                            property.SetValue(</span><br><span class="line">                                commandLine, optionParts[<span class="number">1</span>], <span class="literal">null</span>);</span><br><span class="line">                            success = <span class="literal">true</span>;</span><br><span class="line">                        &#125;</span><br><span class="line">                        <span class="keyword">else</span> <span class="keyword">if</span> (property.PropertyType.IsEnum)</span><br><span class="line">                        &#123;</span><br><span class="line">                            <span class="keyword">try</span></span><br><span class="line">                            &#123;</span><br><span class="line">                                property.SetValue(commandLine,</span><br><span class="line">                                    Enum.Parse(</span><br><span class="line">                                        <span class="keyword">typeof</span>(ProcessPriorityClass),</span><br><span class="line">                                        optionParts[<span class="number">1</span>], <span class="literal">true</span>),</span><br><span class="line">                                    <span class="literal">null</span>);</span><br><span class="line">                                success = <span class="literal">true</span>;</span><br><span class="line">                            &#125;</span><br><span class="line">                            <span class="keyword">catch</span> (ArgumentException)</span><br><span class="line">                            &#123;</span><br><span class="line">                                success = <span class="literal">false</span>;</span><br><span class="line">                                errorMessage =</span><br><span class="line">                                    <span class="keyword">string</span>.Format(</span><br><span class="line">                                        <span class="string">"The option '&#123;0&#125;' is "</span> +</span><br><span class="line">                                        <span class="string">"invalid for '&#123;1&#125;'"</span>,</span><br><span class="line">                                    optionParts[<span class="number">1</span>], option);</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                        <span class="keyword">else</span></span><br><span class="line">                        &#123;</span><br><span class="line">                            success = <span class="literal">false</span>;</span><br><span class="line">                            errorMessage = <span class="keyword">string</span>.Format(</span><br><span class="line">                                <span class="string">"Data type '&#123;0&#125;' on &#123;1&#125; is not"</span></span><br><span class="line">                                + <span class="string">" supported."</span>,</span><br><span class="line">                                property.PropertyType.ToString(),</span><br><span class="line">                                commandLine.GetType().ToString());</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">else</span></span><br><span class="line">                    &#123;</span><br><span class="line">                        success = <span class="literal">false</span>;</span><br><span class="line">                        errorMessage = <span class="keyword">string</span>.Format(</span><br><span class="line">                            <span class="string">"Option '&#123;0&#125;' is not supported."</span>,</span><br><span class="line">                            option);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> success;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>虽然这是一个较长的程序，但代码结构是相当简单的。Main()首先实例化一个CommandLineInfo类。这个类型专门用来包含当前这个程序的命令行数据。每个属性都对应于程序的一个命令行选项，具体的命令行如输出2所示。</p>
 <blockquote>
-<p>输出17-2</p>
+<p>输出2</p>
 </blockquote>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Compress.exe /Out: &lt;file name&gt; /Help</span><br><span class="line">    /Priority:RealTime|High|AboveNormal|Normal|BelowNormal|Idle</span><br></pre></td></tr></table></figure>
 
-<p>CommandLineInfo对象被传给CommandLineHandler的TryParse()方法。该方法首先枚举每个选项，并分离出选项名（比如Help或out）。在确定了名称之后，代码在CommandLineInfo对象上执行反射，查找同名的一个实例属性。如果找到这样的属性，就通过一个SetValue ()调用，并指定与属性类型对应的数据，从而完成对属性的赋值。SetValue()的参数包括要设置值的对象、新值以及一个额外的index参数（除非属性是一个索引器，否则该参数就为null）。上述代码能处理3种属性类型：bool、string和枚举。在枚举的情况下，我们要解析选项值，并将文本的枚举等价值赋给属性。如果TryParse()调用成功，方法会退出，而CommandLineInfo对象会使用来自命令行的数据进行初始化。</p>
-<p>有趣的是，虽然commandLineinfo是嵌套在Program中的一个private类，但CommandLineHandler在它上面执行反射没有任何问题，甚至可以调用它的成员。换言之，只要设置了恰当的代码访问安全性（code access security, CAS）权限，反射就可以绕过可访问性规则。例如，假定out是private的，TryParse()方法仍然可以向其赋值。由于这一点，所以可以将CommandLineHandler转移到一个单独的程序集中，并在多个程序之间共享它，而且每个程序都有它们自己的command Linennfo类。</p>
-<p>在这个特定的例子中，是用PropertyInfo.SetValue()来调用CommandLineInfo的一个成员。此外，PropertyInfo还包含一个Getvalue()方法，可以用它从属性中获取数据。然而，对于方法，有一个MethodInfo类可供利用，该类提供了一个Invoke()成员。MethodInfo和PropertyInfo都是从MemberInfo继承的(虽然并非直接)，如图1所示。</p>
+<p>CommandLineInfo对象被传给CommandLineHandler的TryParse()方法。该方法首先枚举每个选项，并分离出选项名（比如Help或Out）。在确定了名称之后，代码在CommandLineInfo对象上执行反射，查找同名的一个实例属性。如果找到这样的属性，就通过一个SetValue()调用，并指定与属性类型对应的数据，从而完成对属性的赋值。SetValue()的参数包括要设置值的对象、新值以及一个额外的index参数（除非属性是一个索引器，否则该参数就为null）。上述代码能处理3种属性类型：bool、string和枚举。在枚举的情况下，我们要解析选项值，并将文本的枚举等价值赋给属性。如果TryParse()调用成功，方法会退出，而CommandLineInfo对象会使用来自命令行的数据进行初始化。</p>
+<p>有趣的是，虽然commandLineinfo是嵌套在Program中的一个private类，但CommandLineHandler在它上面执行反射没有任何问题，甚至可以调用它的成员。换言之，只要设置了恰当的代码访问安全性（code access security, CAS）权限，反射就可以绕过可访问性规则。例如，假定Out是private的，TryParse()方法仍然可以向其赋值。由于这一点，所以可以将CommandLineHandler转移到一个单独的程序集中，并在多个程序之间共享它，而且每个程序都有它们自己的CommandLineInfo类。</p>
+<p>在这个特定的例子中，是用PropertyInfo.SetValue()来调用CommandLineInfo的一个成员。此外，PropertyInfo还包含一个GetValue()方法，可以用它从属性中获取数据。然而，对于方法，有一个MethodInfo类可供利用，该类提供了一个Invoke()成员。MethodInfo和PropertyInfo都是从MemberInfo继承的(虽然并非直接)，如图1所示。</p>
 <p>在这个例子中，之所以设置CAS权限来允许私有成员调用，是因为程序是从本地电脑中运行的。默认情况下，本地安装的程序是受信任区域的一部分，已被授予了恰当的权限。然而，从一个远程位置运行的程序需要被显式授予这样的权限。</p>
 
       
@@ -707,7 +729,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">371</span>
+                    <span class="site-state-item-count">373</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -870,23 +892,23 @@
                 
                 
                   <li>
+                    <a href="/2019/08/28/单例的模板与最佳实践/" title="单例的模板与最佳实践" target="_blank">单例的模板与最佳实践</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/08/28/Unity中C-单例模式使用总结/" title="Unity中C#单例模式使用总结" target="_blank">Unity中C#单例模式使用总结</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/08/28/使用泛型实现单例模式提供者/" title="使用泛型实现单例模式提供者" target="_blank">使用泛型实现单例模式提供者</a>
+                  </li>
+                
+                  <li>
                     <a href="/2019/08/27/UIFrameWork/" title="UIFrameWork" target="_blank">UIFrameWork</a>
                   </li>
                 
                   <li>
                     <a href="/2019/08/27/Rebase/" title="Rebase" target="_blank">Rebase</a>
-                  </li>
-                
-                  <li>
-                    <a href="/2019/08/26/抽象工厂模式/" title="抽象工厂模式" target="_blank">抽象工厂模式</a>
-                  </li>
-                
-                  <li>
-                    <a href="/2019/08/26/迭代器模式、原型模式和解释器模式/" title="迭代器模式、原型模式和解释器模式" target="_blank">迭代器模式、原型模式和解释器模式</a>
-                  </li>
-                
-                  <li>
-                    <a href="/2019/08/25/观察者（Observer）模式：让你的对象知悉现况/" title="观察者（Observer）模式：让你的对象知悉现况" target="_blank">观察者（Observer）模式：让你的对象知悉现况</a>
                   </li>
                 
               </ul>
@@ -958,7 +980,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">33:25</span>
+    <span title="站点阅读时长">33:55</span>
   
 </div>
 
