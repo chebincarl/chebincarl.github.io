@@ -103,19 +103,19 @@
 
 
 
-  <meta name="description" content="思考并回答以下问题：">
+  <meta name="description" content="思考并回答以下问题：  哪些模式是结构型模式？结构型模式是为了解决什么问题？ 谁来选择客户程序需要的满足抽象类型的具体类型呢？">
 <meta name="keywords" content="设计模式：基于C#的工程化实现与扩展">
 <meta property="og:type" content="article">
 <meta property="og:title" content="实现依赖注入">
 <meta property="og:url" content="http://chebincarl.github.io/2019/08/10/实现依赖注入/index.html">
 <meta property="og:site_name" content="车斌的博客">
-<meta property="og:description" content="思考并回答以下问题：">
+<meta property="og:description" content="思考并回答以下问题：  哪些模式是结构型模式？结构型模式是为了解决什么问题？ 谁来选择客户程序需要的满足抽象类型的具体类型呢？">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://chebincarl.github.io/2019/08/10/实现依赖注入/1.png">
-<meta property="og:updated_time" content="2019-08-27T13:11:24.740Z">
+<meta property="og:updated_time" content="2019-08-29T11:33:43.340Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="实现依赖注入">
-<meta name="twitter:description" content="思考并回答以下问题：">
+<meta name="twitter:description" content="思考并回答以下问题：  哪些模式是结构型模式？结构型模式是为了解决什么问题？ 谁来选择客户程序需要的满足抽象类型的具体类型呢？">
 <meta name="twitter:image" content="http://chebincarl.github.io/2019/08/10/实现依赖注入/1.png">
 
 
@@ -442,7 +442,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-08-27 21:11:24" itemprop="dateModified" datetime="2019-08-27T21:11:24+08:00">2019-08-27</time>
+                <time title="修改时间：2019-08-29 19:33:43" itemprop="dateModified" datetime="2019-08-29T19:33:43+08:00">2019-08-29</time>
               
             
           </span>
@@ -523,6 +523,10 @@
 
       
         <p>思考并回答以下问题：</p>
+<ul>
+<li>哪些模式是结构型模式？结构型模式是为了解决什么问题？</li>
+<li>谁来选择客户程序需要的满足抽象类型的具体类型呢？</li>
+</ul>
 <a id="more"></a>
 
 <p>本章涵盖：</p>
@@ -535,19 +539,22 @@
 <li>基于Attribute实现注入--Attributer</li>
 <li>小结</li>
 </ul>
-<h1 id="背景介绍"><a href="#背景介绍" class="headerlink" title="背景介绍"></a><span style="color:#339AFF;">背景介绍</span></h1><p>设计模式中，尤其是<span style="color:red">结构型模式很多时候解决的就是对象间的依赖关系，变依赖具体为依赖抽象</span>。平时开发中如果发现客户程序依赖某个（或某类）对象，我们常常会对它们进行一次抽象，形成抽象的抽象类、接口，这样客户程序就可以摆脱所依赖的具体类型。</p>
+<h1 id="背景介绍"><a href="#背景介绍" class="headerlink" title="背景介绍"></a><span style="color:#339AFF;">背景介绍</span></h1><p>设计模式中，尤其是<span style="color:red">结构型模式很多时候解决的就是对象间的依赖关系，变依赖具体为依赖抽象</span>。平时开发中如果发现客户程序依赖某个（或某类）对象，我们常常会对它们进行一次抽象，形成抽象的抽象类、接口，这样客户程序就可以摆脱所依赖的具体类型。（这是开发的一种方式，一旦发现依赖，就引入设计模式。）</p>
 <p>这个过程中有个环节被忽略了——谁来选择客户程序需要的满足抽象类型的具体类型呢？通过后面的介绍你会发现很多时候创建型模式可以比较优雅地解决这个问题。但另一问题出现了，如果您设计的不是具体业务逻辑，而是公共库或框架程序，这时候您是一个“服务方”，不是您调用那些构造类型，而是它们把抽象类型传给你，怎么松散地把加工好的抽象类型传递给客户程序就是另一回事了。</p>
 <blockquote>
-<p>这个情形也就是常说的“控制反转”，IOC：Inverse of Control；框架程序与抽象类型的调用关系就像常说的好莱坞规则：Don’t call me, I’ll call you.</p>
+<p>这个情形也就是常说的“控制反转”，IOC：Inverse of Control；框架程序与抽象类型的调用关系就像常说的好莱坞规则：Don’t call me, I’ll call you。</p>
 </blockquote>
 <p>我们可以采用“依赖注入”的方式将加工好的抽象类型实例“注入”到客户程序中，本书的示例也将大量采用这种方式将各种依赖项“注入”到模式实现的外部——客户程序。下面我们结合一个具体的示例看看为什么需要依赖注入，以及Martin Fowler文中提到的三种经典方式，然后依据C#语言的特质，再扩展出一个基于Attributer方式注入（参考原有的Setter命名，这里将基于Attribute的方法称为Attributer）。</p>
 <h1 id="示例情景"><a href="#示例情景" class="headerlink" title="示例情景"></a><span style="color:#339AFF;">示例情景</span></h1><p>客户程序需要一个提供System.DateTime类型当前系统时间的对象，然后根据需要仅仅把其中的年份部分提取出来，因此最初的实现代码如下:</p>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Diagnostics;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">MarvellousWorks.PracticalPattern.Concept.DependencyInjection.Example1</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title">TimeProvider</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">public</span> DateTime CurrentDate &#123; </span><br><span class="line">            <span class="keyword">get</span> &#123; <span class="keyword">return</span> DateTime.Now; &#125; </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Client</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">GetYear</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            TimeProvider timeProvider = <span class="keyword">new</span> TimeProvider();</span><br><span class="line">            <span class="keyword">return</span> timeProvider.CurrentDate.Year;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Diagnostics;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">MarvellousWorks.PracticalPattern.Concept.DependencyInjection.Example1</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title">TimeProvider</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">public</span> DateTime CurrentDate </span><br><span class="line">        &#123; </span><br><span class="line">            <span class="keyword">get</span> </span><br><span class="line">            &#123; </span><br><span class="line">                <span class="keyword">return</span> DateTime.Now; </span><br><span class="line">            &#125; </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Client</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">GetYear</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            TimeProvider timeProvider = <span class="keyword">new</span> TimeProvider();</span><br><span class="line">            <span class="keyword">return</span> timeProvider.CurrentDate.Year;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
+<blockquote>
+<p>客户端进行调用</p>
+</blockquote>
 <figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Program.cs</span></span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> MarvellousWorks.PracticalPattern.Concept.DependencyInjection.Example1;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">ConsoleApplication</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="keyword">string</span>[] args</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            Client cl = <span class="keyword">new</span> Client();</span><br><span class="line">            <span class="keyword">int</span> year = cl.GetYear();</span><br><span class="line">            Console.WriteLine(year); <span class="comment">// 2019</span></span><br><span class="line"></span><br><span class="line">            Console.ReadKey();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>后来因为某种原因，发现使用.NET Framework自带的日期类型精度不够，需要提供其他来源的TimeProvider，确保在不同精度要求的功能模块中使用不同的TimeProvider。这样问题集中在TimeProvider的变化会影响客户程序，但其实客户程序仅需要抽象地使用其获取当前时间的方法。为此，增加一个抽象接口，确保客户程序仅依赖这个接口ITimeProvider，由于这部分客户程序仅需要精确到年，因此它可以使用一个名为SystemTimeProvider(:TimeProvider)的类型。新的实现代码如下：</p>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Diagnostics;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">MarvellousWorks.PracticalPattern.Concept.DependencyInjection.Example1</span></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">interface</span> <span class="title">ITimeProvider</span> </span><br><span class="line">    &#123;</span><br><span class="line">        DateTime CurrentDate &#123; <span class="keyword">get</span>; &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">class</span> <span class="title">TimeProvider</span> : <span class="title">ITimeProvider</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">public</span> DateTime CurrentDate &#123; <span class="keyword">get</span> &#123; <span class="keyword">return</span> DateTime.Now; &#125; &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Client</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">GetYear</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            TimeProvider timeProvider = <span class="keyword">new</span> TimeProvider();</span><br><span class="line">            <span class="keyword">return</span> timeProvider.CurrentDate.Year;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Diagnostics;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">MarvellousWorks.PracticalPattern.Concept.DependencyInjection.Example1</span></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">interface</span> <span class="title">ITimeProvider</span> </span><br><span class="line">    &#123;</span><br><span class="line">        DateTime CurrentDate &#123; <span class="keyword">get</span>; &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">class</span> <span class="title">TimeProvider</span> : <span class="title">ITimeProvider</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">public</span> DateTime CurrentDate </span><br><span class="line">        &#123; </span><br><span class="line">            <span class="keyword">get</span> </span><br><span class="line">            &#123; </span><br><span class="line">                <span class="keyword">return</span> DateTime.Now; </span><br><span class="line">            &#125; </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Client</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">GetYear</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            TimeProvider timeProvider = <span class="keyword">new</span> TimeProvider();</span><br><span class="line">            <span class="keyword">return</span> timeProvider.CurrentDate.Year;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>这样看上去客户程序后续处理权都依赖于抽象的ITimeProvider，问题似乎解决了？没有，它还要知道具体的SystemTimeProvider。因此，需要增加一个对象，由它选择某种方式把ITimeProvider实例传递给客户程序，这个对象被称为Assembler。新的结构如图1所示。 </p>
 <blockquote>
@@ -721,7 +728,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">373</span>
+                    <span class="site-state-item-count">385</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -853,7 +860,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">41</span>
+                      
+                    
+                    <span class="site-state-item-count">42</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -884,23 +893,23 @@
                 
                 
                   <li>
-                    <a href="/2019/08/28/单例的模板与最佳实践/" title="单例的模板与最佳实践" target="_blank">单例的模板与最佳实践</a>
+                    <a href="/2019/08/29/DOTween/" title="DOTween" target="_blank">DOTween</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/08/28/Unity中C-单例模式使用总结/" title="Unity中C#单例模式使用总结" target="_blank">Unity中C#单例模式使用总结</a>
+                    <a href="/2019/08/29/Unity日志工具类的两种封装/" title="Unity日志工具类的两种封装" target="_blank">Unity日志工具类的两种封装</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/08/28/使用泛型实现单例模式提供者/" title="使用泛型实现单例模式提供者" target="_blank">使用泛型实现单例模式提供者</a>
+                    <a href="/2019/08/29/简易引用计数器/" title="简易引用计数器" target="_blank">简易引用计数器</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/08/27/UIFrameWork/" title="UIFrameWork" target="_blank">UIFrameWork</a>
+                    <a href="/2019/08/29/UI管理神器UIKit/" title="UI管理神器UIKit" target="_blank">UI管理神器UIKit</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/08/27/Rebase/" title="Rebase" target="_blank">Rebase</a>
+                    <a href="/2019/08/29/资源管理神器ResKit/" title="资源管理神器ResKit" target="_blank">资源管理神器ResKit</a>
                   </li>
                 
               </ul>
@@ -961,7 +970,7 @@
     
       <span class="post-meta-item-text">站点总字数：</span>
     
-    <span title="站点总字数">2.2m</span>
+    <span title="站点总字数">2.3m</span>
   
 
   
@@ -972,7 +981,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">33:55</span>
+    <span title="站点阅读时长">34:56</span>
   
 </div>
 
