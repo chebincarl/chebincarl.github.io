@@ -111,7 +111,7 @@
 <meta property="og:site_name" content="车斌的博客">
 <meta property="og:description" content="思考并回答以下问题：  为什么管理类都使用单例模式？">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-08-29T11:33:43.349Z">
+<meta property="og:updated_time" content="2019-08-30T12:24:21.610Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="简易引用计数器">
 <meta name="twitter:description" content="思考并回答以下问题：  为什么管理类都使用单例模式？">
@@ -423,12 +423,24 @@
                 
               
 
-              <time title="创建时间：2019-08-29 14:40:01 / 修改时间：19:33:43" itemprop="dateCreated datePublished" datetime="2019-08-29T14:40:01+08:00">2019-08-29</time>
+              <time title="创建时间：2019-08-29 14:40:01" itemprop="dateCreated datePublished" datetime="2019-08-29T14:40:01+08:00">2019-08-29</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-08-30 20:24:21" itemprop="dateModified" datetime="2019-08-30T20:24:21+08:00">2019-08-30</time>
               
             
           </span>
@@ -514,7 +526,7 @@
 </ul>
 <a id="more"></a>
 
-<h1 id="引用计数使用场景"><a href="#引用计数使用场景" class="headerlink" title="引用计数使用场景"></a>引用计数使用场景</h1><p>有一间黑色的屋子，里边有一盏灯。当第一个人进屋的时候灯会打开，之后的人进来则不用再次打开了，因为已经开过了。当屋子里的所有人离开的时候，灯则会关闭。</p>
+<h1 id="引用计数使用场景"><a href="#引用计数使用场景" class="headerlink" title="引用计数使用场景"></a><span style="color:#339AFF;">引用计数使用场景</span></h1><p>有一间黑色的屋子，里边有一盏灯。当第一个人进屋的时候灯会打开，之后的人进来则不用再次打开了，因为已经开过了。当屋子里的所有人离开的时候，灯则会关闭。</p>
 <p>我们先定义灯的对象模型:</p>
 <figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">Light</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Open</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Log.I(<span class="string">"灯打开了"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Close</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Log.I(<span class="string">"灯关闭了"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -531,7 +543,7 @@
 
 <p>OK。以上就是引用计数这项计数的使用场景的所有代码。测试的代码比较整齐，很容易算出来当前有多少个人在屋子里，所以看不出来引用计数的作用。但是在日常开发中，我们可能会把EnterPeople和LeavePeople散落在工程的各个位置。这样就很难统计，这时候引用计数的作用就很明显了，它可以自动帮助你判断什么时候进行开灯关灯操作，而你不用写开关灯的一行代码。</p>
 <p>这个例子比较接近生活，假如笔者再换个例子，我们把Light对象换成资源对象，其开灯对应加载资源，关灯对应卸载资源。而屋子则是对应资源管理器，EnterPeople对应申请资源对象，LeavePeople对应归还资源对象。这样你只管在各个界面中申请各个资源，只要在界面关闭的时候归还各个资源对象就可以不用关心资源的加载和卸载了，可以减轻大脑的负荷。</p>
-<h1 id="简易计数器实现"><a href="#简易计数器实现" class="headerlink" title="简易计数器实现"></a>简易计数器实现</h1><p>计数器的接口很简单，代码如下:</p>
+<h1 id="简易计数器实现"><a href="#简易计数器实现" class="headerlink" title="简易计数器实现"></a><span style="color:#339AFF;">简易计数器实现</span></h1><p>计数器的接口很简单，代码如下:</p>
 <figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title">IRefCounter</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">int</span> RefCount &#123; <span class="keyword">get</span>; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Retain</span>(<span class="params"><span class="keyword">object</span> refOwner = <span class="literal">null</span></span>)</span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Release</span>(<span class="params"><span class="keyword">object</span> refOwner = <span class="literal">null</span></span>)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>Retain是增加引用计数（RefCount+1），Release是减去一个引用计数（RefCount-1）。在接下来的具体实现中，当RefCount降为0时我们需要捕获一个事件，这个事件叫OnZeroRef。</p>
@@ -662,7 +674,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">385</span>
+                    <span class="site-state-item-count">386</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -827,6 +839,10 @@
                 
                 
                   <li>
+                    <a href="/2019/08/30/EasyTouch/" title="EasyTouch" target="_blank">EasyTouch</a>
+                  </li>
+                
+                  <li>
                     <a href="/2019/08/29/DOTween/" title="DOTween" target="_blank">DOTween</a>
                   </li>
                 
@@ -840,10 +856,6 @@
                 
                   <li>
                     <a href="/2019/08/29/UI管理神器UIKit/" title="UI管理神器UIKit" target="_blank">UI管理神器UIKit</a>
-                  </li>
-                
-                  <li>
-                    <a href="/2019/08/29/资源管理神器ResKit/" title="资源管理神器ResKit" target="_blank">资源管理神器ResKit</a>
                   </li>
                 
               </ul>
@@ -915,7 +927,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">34:56</span>
+    <span title="站点阅读时长">34:58</span>
   
 </div>
 
