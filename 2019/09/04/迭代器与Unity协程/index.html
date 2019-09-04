@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="思考并回答以下问题：">
+<meta name="keywords" content="C#">
+<meta property="og:type" content="article">
+<meta property="og:title" content="迭代器与Unity协程">
+<meta property="og:url" content="http://chebincarl.github.io/2019/09/04/迭代器与Unity协程/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="思考并回答以下问题：">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-09-04T13:09:54.032Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="迭代器与Unity协程">
+<meta name="twitter:description" content="思考并回答以下问题：">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/09/04/迭代器与Unity协程/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>迭代器与Unity协程 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">专注，重复10遍</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/09/04/迭代器与Unity协程/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">迭代器与Unity协程
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-09-04 11:22:02 / 修改时间：21:09:54" itemprop="dateCreated datePublished" datetime="2019-09-04T11:22:02+08:00">2019-09-04</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">11k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">10 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>思考并回答以下问题：</p>
+<a id="more"></a>
+
+<p>1.迭代器<br>  首先我们要谈的就是迭代器，很多情况下我们都使用了迭代器，并不仅仅是因为协程，当我们使用foreach循环遍历一个list时其实也是在使用迭代器。</p>
+<p>  要实现迭代器最主要的是实现IEnumerable和IEnumerator这两个接口，当然实际上它们还有泛型形式IEnumerable<t>和IEnumerator<t>,而且这两个泛型形式的接口也是继承自IEnumerable和IEnumerator这两个接口。我们暂时先不管他们的泛型形式。</t></t></p>
+<p>  我们先来看看这两个接口的样子。</p>
+<p>  IEnumerable接口：</p>
+<p>[ComVisible(true)]<br>[Guid(“496B0ABE-CDEE-11d3-88E8-00902754C43A”)]<br>public interface IEnumerable<br>{<br>    [DispId(-4)]<br>    IEnumerator GetEnumerator();<br>}<br>  IEnumerator接口：</p>
+<p>[ComVisible(true)]<br>[Guid(“496B0ABF-CDEE-11d3-88E8-00902754C43A”)]<br>public interface IEnumerator<br>{<br>    object Current { get; }<br>    bool MoveNext();<br>    void Reset();<br>}<br>  先说IEnumerable接口，我们能看到它需要实现一个GetEnumerator方法，而这个方法的返回值正好是 IEnumerator 类型。在IEnumerator接口中，我们能看到有一个属性，两个方法要实现，而且从名字上来看也能一目了然他们的作用。Current表示当前项的内容，因为这里IEnumerator 不是泛型的所以，Current的类型为object。接下来是MoveNext方法，他返回一个bool类型的值，这个方法是个关键，因为这个方法是来判断迭代或者说循环遍历是否要往下执行的，同时一般会在这个方法中进行数组下标值的增加。而在Current中我们一般是不处理下标值的增减，而是通过下标值和数组返回当前对应的值。最后是Reset方法，一般是在这里重置下标，不过一般这个方法使用的比较少，而且后面还会提到这个方法在有些情况下是不能调用的。</p>
+<p>  这里我们注意到一点，我们可以看到这里有两个接口，这里可能就会有个疑问，为什么需要使用两个接口，而不是在IEnumerable中就把需要在IEnumerator中实现的接口就实现了呢。当然首先都塞到一个接口中是可以的，但需要注意的是你如果希望对同一个序列进行多次相互独立的迭代，那么你需要注意每次要进行一次新的迭代时最好都创建一个新的实例，不管是嵌套循环还是非嵌套的。这样不好的地方在于数据和操作没有分离，一般来说在IEnumerable中我们只放入数组保存数据，然后通过GetEnumerator方法返回IEnumerator 的实例，然后把所有迭代操作交给IEnumerator的实现类，像诸如下标的记录等内容我们也会放在IEnumerator的实现类中，这样即使对同一个序列进行多次迭代，我们只需要一个IEnumerable对象就行，通过GetEnumerator方法生成多个IEnumerator的实例就行，他们之间将互不干扰，同时我们又可以只在IEnumerable第一次初始化的时候告诉他序列是什么，之后就可以不用在关心这个序列的内容了，除非你需要一个新的序列。当然上面所谓的好处一方面是我所认为的，一方面也是一些书中这么提到的，不过事实上，C#的设计既然鼓励我们这么做，我们照做就可以，当然你可以用自己的方式进行实现，不过像foreach这样语法糖性质的功能你可能就无法直接使用了。</p>
+<p>  下面举一个例子：</p>
+<p>class Program<br>{<br>    static void Main(string[] args)<br>    {<br>        object[] values = { “a”, “b”, “c”, “d”, “e”};<br>        IterationSample collection = new IterationSample(values, 3);<br>        foreach (object item in collection)<br>        {<br>            Console.WriteLine(item);<br>        }<br>    }<br>}<br>public class IterationSample : IEnumerable<br>{<br>    object[] values;<br>    int startingPoint;<br>    public object[] Values<br>    {<br>        get {<br>            if (values == null)<br>                throw new NullReferenceException();<br>            return values;<br>        }<br>    }<br>    public int StartingPoint<br>    {<br>        get {<br>            return startingPoint;<br>        }<br>    }<br>    public IterationSample(object[] values, int startPoint)<br>    {<br>        this.values = values;<br>        this.startingPoint = startPoint;<br>    }<br>    public System.Collections.IEnumerator GetEnumerator()<br>    {<br>        return new IterationSampleIterator(this);<br>    }<br>}<br>public class IterationSampleIterator : IEnumerator<br>{<br>    IterationSample parent;<br>    int position;<br>    public IterationSampleIterator(IterationSample parent)<br>    {<br>        this.parent = parent;<br>        position = -1;<br>    }</p>
+<pre><code>public bool MoveNext()
+{
+    if (position != parent.Values.Length)
+    {
+        position++;
+    }
+    return position &lt; parent.Values.Length;
+}
+public void Reset()
+{
+    position = -1;
+}
+public object Current
+{
+    get {
+        if (position == -1 || position == parent.Values.Length)
+        {
+            throw new InvalidOperationException();
+        }
+        int index = position + parent.StartingPoint;
+        index = index % parent.Values.Length;
+        return parent.Values[index];
+    }
+}</code></pre><p>}<br>这里我们实现了一个迭代器，可能比较繁琐，不过基本是遵照了迭代器设计的思路。从C#2开始，这个迭代器就不需要这么复杂的写法了，下面来看看C#2后关于迭代器我们能做什么。</p>
+<p>  从C#2开始我们可以使用yield return来简化迭代器的实现，同时又可以让迭代器做更多的事情。我们在协程中经常会写这个东西，不过协程我们放到后面再说，先说这个怎么用。</p>
+<p>  我们对上面的例子做一些修改，我们现在使用yield return的形式来实现上述功能。将上面的 GetEnumerator()方法中的内容替换掉，替换为下面的代码：</p>
+<p>public System.Collections.IEnumerator GetEnumerator()<br>{<br>    for (int index = 0; index &lt; values.Length; index++)<br>    {<br>        yield return values[(index + startingPoint) % values.Length];<br>    }<br>}<br>从结果上来说，两种代码是等价的。下面我们来分析一下 yield return。</p>
+<p>  yield return这句代码是告诉C#编译器，这个方法不是一个普通的方法，而是一个实现迭代器块的方法。这个方法被声明为返回一个IEnumerator接口，所以就只能使用迭代器块来实现返回类型IEnumerable、IEnumrator或泛型等价物的方法（这里个人的理解是可以直接声明一个返回IEnumerable或IEnumerable<t>的方法，在里面使用yield return，或者在IEnumerable的实现类里面的GetEnumerator()方法中使用yield return这个方法的返回值为IEnumrator，至于泛型等价物我也不太理解可能是这两个接口的泛型类型）。另外匿名方法中不能使用迭代器代码块，这个在编译器中会报错。同时要注意的是如果你已经使用了 yield return来标识该方法是迭代器方法，那么该方法中就不能再使用return字样。</t></p>
+<p>  我尝试使用.NET Reflector对上面代码进行反编译，来观察他们是怎么运作的（其中我选择不对代码进行优化，该反编译软件可以选择不同.NET版本进行代码优化，但有时候代码优化反而会使一些东西看不到了）。我们先看一下反编译后结构：</p>
+<p>image.png</p>
+<p>先忽视掉IterationSampleIterator这个类，主要看IterationSample和Program这两个类。在IterationSample这个类中我们可以看到一个<getenumerator>d__7这样命名的奇怪东西，实际上他是编译器帮我们生成的一个匿名类，他继承了IEnumerator接口，并帮我们自动实现了相关方法。这也是为什么使用yield return这种写法会让我们能省掉很多麻烦的原因，因为编译器已经帮我们做了很多工作了。</getenumerator></p>
+<p>  我们暂时先不看<getenumerator>d__7里的相关实现，我们先来看一下反编译后的main方法都做了什么。下面是反编译后的代码：</getenumerator></p>
+<p>private static void Main(string[] args)<br>{<br>    object[] objArray1;<br>    object[] objArray;<br>    IterationSample sample;<br>    IEnumerator enumerator;<br>    object obj2;<br>    IDisposable disposable;<br>    objArray1 = new object[] { “a”, “b”, “c”, “d”, “e” };<br>    objArray = objArray1;<br>    sample = new IterationSample(objArray, 3);<br>    enumerator = sample.GetEnumerator();<br>Label_0040:<br>    try<br>    {<br>        goto Label_0052;<br>    Label_0042:<br>        obj2 = enumerator.Current;<br>        Console.WriteLine(obj2);<br>    Label_0052:<br>        if (enumerator.MoveNext() != null)<br>        {<br>            goto Label_0042;<br>        }<br>        goto Label_0071;<br>    }<br>    finally<br>    {<br>    Label_005C:<br>        disposable = enumerator as IDisposable;<br>        if (disposable == null)<br>        {<br>            goto Label_0070;<br>        }<br>        disposable.Dispose();<br>    Label_0070:;<br>    }<br>Label_0071:<br>    return;<br>}<br>我们能看到有很多Label标签,这里的标签根据我的理解是为了goto而设置的，如果代码中有goto则跳到对应Label，否则顺序执行。这里从Label_0040开始就是源代码中foreach的部分。它首先先去判断MoveNext是否为true（请先忽略这里bool与空值比较的写法，其原理我也没找到合理的解释），如果MoveNext为true就打印Current，然后继续判断MoveNext是否为true，当MoveNext为false时会进行return操作，然后执行finally的代码，对迭代器进行释放操作。这一点很重要，而且如果你在一个foreach循环中return，他也是会走finally代码的，这个问题下面还会提到。现在我们大体上能明白foreach的原理了，其实就是MoveNext的判断与goto的配合。</p>
+<p>  接下来我们再来看看另一个重要的内容，MoveNext里面究竟是怎么实现的。</p>
+<p>private bool MoveNext()<br>{<br>    int num;<br>    int num2;<br>    bool flag;<br>    num = this.&lt;&gt;1__state;<br>    if (num == null)<br>    {<br>        goto Label_0018;<br>    }<br>Label_000C:<br>    if (num == 1)<br>    {<br>        goto Label_0065;<br>    }<br>    goto Label_0016;<br>    goto Label_0018;<br>    goto Label_0065;<br>Label_0016:<br>    return 0;<br>Label_0018:<br>    this.&lt;&gt;1__state = -1;<br>    this.<index>5__1 = 0;<br>    goto Label_007D;<br>Label_0029:<br>    this.&lt;&gt;2__current = this.&lt;&gt;4__this.values[(this.<index>5__1 + this.&lt;&gt;4__this.startingPoint) % ((int) this.&lt;&gt;4__this.values.Length)];<br>    this.&lt;&gt;1__state = 1;<br>    return 1;<br>Label_0065:<br>    this.&lt;&gt;1__state = -1;<br>    num2 = this.<index>5__1;<br>    this.<index>5__1 = num2 + 1;<br>Label_007D:<br>    if ((this.<index>5__1 &lt; ((int) this.&lt;&gt;4__this.values.Length)) != null)<br>    {<br>        goto Label_0029;<br>    }<br>    return 0;<br>}<br>这段看起来挺长，但实际内容并不复杂，我们先看一下<getenumerator>d__7展开的结构，如下图：</getenumerator></index></index></index></index></index></p>
+<p>image.png<br>在MoveNext中我们需要关注的是三个类的字段&lt;&gt;1__state，<index>5__1，&lt;&gt;2__current，第一个代表一种状态，第二个代表数组下标，第三个是当前值。&lt;&gt;1__state在代码中能看到三种情况，一种是一开始的0，一种是-1，一种是1，我的理解是这三种分别表示初始，失败和成功（其实不光有1也可能有2，3等等）。一开始&lt;&gt;1__state为0所以num也为0，这里为0会判空（猜测），然后会跳转到Label_0018去赋初始值。在赋初始值的时候我们能看到&lt;&gt;1__state会被赋为-1，我的理解是先假定后面判断下标与数组长度时会失败。之后会去判断下标是否超过数组长度，超过则返回0（通过0为null在外面再进行判断），成功则跳到Label_0029为2__current赋值，同时 1__state 状态置为1，并返回1来表示MoveNext为true。到此一次判断结束，之后再进行判断与此相同。</index></p>
+<p>  到这里我们就能明白一个foreach循环是怎么运作的了，下面我们从另一个角度来观察迭代器的工作流程。</p>
+<p>  先来看一个例子：</p>
+<p>//main中的<br>IEnumerable<int> iterable = CreateEnumerable();<br>IEnumerator<int> iterator = iterable.GetEnumerator();<br>Console.WriteLine(“Starting to iterate”);<br>while (true)<br>{<br>    Console.WriteLine(“Calling MoveNext()…”);<br>    bool result = iterator.MoveNext();<br>    Console.WriteLine(“…MoveNext result={0}”, result);<br>    if (!result)<br>    {<br>        break;<br>    }<br>    Console.WriteLine(“Fetching Current…”);<br>    Console.WriteLine(“…Current result={0}”, iterator.Current);<br>}<br>//main外面的<br>static readonly string Padding = new string (‘ ‘, 30 );<br>static IEnumerable<int> CreateEnumerable()<br>{<br>    Console.WriteLine(“{0}Start of CreateEnumerable()”, Padding);<br>    for (int i = 0; i &lt; 3; i++)<br>    {<br>        Console.WriteLine(“{0}About to yield {1}”, Padding, i);<br>        yield return i;<br>        Console.WriteLine(“{0}After yield”, Padding);<br>    }<br>    Console.WriteLine(“{0}Yielding final value”, Padding);<br>    yield return -1;<br>    Console.WriteLine(“{0}End of CreateEnumerable()”, Padding);<br>}<br>下图是运行结果。</int></int></int></p>
+<p>image.png<br>  根据这个结果，有几个重要的事情需要牢记：</p>
+<p>在第一次调用MoveNext之前，CreateEnumerble中的代码不会被调用；<br>所有工作都在调用MoveNext的时候就完成了，获取Current的值不会执行任何代码；<br>在yield return的位置，代码就停止执行，在下一次调用MoveNext的时候又继续执行；<br>在一个方法中的不同地方可以书写多个yield return语句；<br>代码不会在最后的yield return处结束——相反，而是通过返回false的MoveNext调用来结束方法的执行；<br>如果IEnumerable和IEnumerator为非泛型形式，yield return后面的内容都会被认为时object，而他们实际上也是将要出现的每个Current。<br>  此外还有一点static IEnumerable<int> CreateEnumerable(ref int a)这种情况是不允许的，迭代器代码块不能实现具有ref或out参数的方法。</int></p>
+<p>  我们从上面已经得知，yield return语句只是临时退出了方法，直到再次调用MoveNext后又继续执行，那在迭代器中我们怎么中途退出呢，这时候就需要使用yield break了；比如我们把上面的例子中yield return i；换成yield break;结果就会变成下图：</p>
+<p>image.png</p>
+<p>  我们看到yield break前面的内容还是走了，但是到了那里迭代器会结束，而且MoveNext会返回false。</p>
+<p>  看完了yield break，我们还要再看看finally。我们在yield return的时候并不像一般方法return时那样如果有finally就会走finally里面的内容。不过如果yield break被执行了的话，finally还是会被执行的。另外其实MoveNext返回false时finally也会被执行。还有几种情况，比如在上面的例子中，在while循环内使用return，那么finally就不会被执行，但是如果是foreach在调用某个迭代器，那么在foreach中return，那么finally会正常工作。那原因是什么呢，因为foreach会在自己的finally代码块中调用IEnumerator所提供的Dispose方法，而这也是迭代器自身的finally会被调用的关键。</p>
+<p>  如果Reset方法是编译器帮我们实现的，而不是我们自己实现的，那么请勿显式调用，那样会报错。</p>
+<p>2.Unity协程<br>  上面我们讲了很多与C#迭代器相关的内容了，下面我们就来看看Unity协程。</p>
+<p>  我们可能会在Unity中写如下代码：</p>
+<p>IEnumerator TestCoroutine()<br>{<br>    Debug.LogError(“StartTestCoroutine”);<br>    yield return new WaitForEndOfFrame();<br>    Debug.LogError(“EndTestCoroutine”);<br>}<br>然后StartCoroutine(TestCoroutine());这样调用它。这里我们可以看到TestCoroutine方法就是一个迭代器的写法，通过反编译我们能看到如下的信息：</p>
+<p>[DebuggerHidden]<br>private IEnumerator TestCoroutine()<br>{<br>    <testcoroutine>c__Iterator0 iterator;<br>    IEnumerator enumerator;<br>    iterator = new <testcoroutine>c__Iterator0();<br>    enumerator = iterator;<br>Label_000D:<br>    return enumerator;<br>}<br>这里我们能看到编译器帮我们生成了一个<testcoroutine>c__Iterator0这与我们在前面讲述迭代器时的套路是一样的。那<testcoroutine>c__Iterator0内部是什么样的呢？</testcoroutine></testcoroutine></testcoroutine></testcoroutine></p>
+<p>private sealed class <testcoroutine>c__Iterator0 : IEnumerator, IDisposable, IEnumerator<object><br>{<br>    // Fields<br>    internal object $current;<br>    internal bool $disposing;<br>    internal int $PC;</object></testcoroutine></p>
+<pre><code>// Methods
+[DebuggerHidden]
+public &lt;TestCoroutine&gt;c__Iterator0();
+[DebuggerHidden]
+public void Dispose();
+public bool MoveNext();
+[DebuggerHidden]
+public void Reset();
+
+// Properties
+object IEnumerator&lt;object&gt;.Current { [DebuggerHidden] get; }
+object IEnumerator.Current { [DebuggerHidden] get; }</code></pre><p>}<br>其实还是在对 IEnumerator接口进行实现，也就是说实质上协程是一个迭代器，只是我们现在无法得知MoveNext是在什么时机被调用的，不过至少我们能看到MoveNext里面长什么样子：</p>
+<p>public bool MoveNext()<br>{<br>    uint num;<br>    num = this.$PC;<br>    this.$PC = -1;<br>    switch (num)<br>    {<br>        case 0:<br>            goto Label_0021;</p>
+<pre><code>    case 1:
+        goto Label_004B;
+}
+goto Label_005C;</code></pre><p>Label_0021:<br>    Debug.LogError(“StartTestCoroutine5”);<br>    this.$current = new WaitForEndOfFrame();<br>    if (this.$disposing != null)<br>    {<br>        goto Label_005E;<br>    }<br>    this.$PC = 1;<br>    goto Label_005E;<br>Label_004B:<br>    Debug.LogError(“EndTestCoroutine5”);<br>    this.$PC = -1;<br>Label_005C:<br>    return 0;<br>Label_005E:<br>    return 1;<br>}<br>与上面介绍过的MoveNext基本上也没啥差别。其关键实际是调用MoveNext的时机，这一块内容被Unity封装了，我们无从看到，不过从Unity声明周期中我们也能看到一些端倪</p>
+<p>image.png</p>
+<p>image.png</p>
+<p>从上图中我们能看到许多yield XXX的内容，而且他们出现在不同阶段，这里他们所在的位置实际上是指结束本次yield return准备调下一个MoveNext的时机，在前面的内容也提到了yield return会暂时中止代码向下进行直到下一个MoveNext出现才会继续下面的代码。而且这个图也能说明MoveNext调用的时机是有选择性的，同时也告诉我们在使用yield XXX时要注意时序，尤其是跟生命周期函数有关联时一定要注意。</p>
+<p>最后<a href="http://www.cnblogs.com/yougoo/p/9565704.html这里有个用C#模拟协程的实现，可以参考一下。" target="_blank" rel="noopener">http://www.cnblogs.com/yougoo/p/9565704.html这里有个用C#模拟协程的实现，可以参考一下。</a></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag"># C#</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/09/04/枚举器和迭代器/" rel="next" title="枚举器和迭代器">
+                <i class="fa fa-chevron-left"></i> 枚举器和迭代器
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">398</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">43</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2019/09/04/迭代器与Unity协程/" title="迭代器与Unity协程" target="_blank">迭代器与Unity协程</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/09/04/枚举器和迭代器/" title="枚举器和迭代器" target="_blank">枚举器和迭代器</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/09/03/访问者模式/" title="访问者模式" target="_blank">访问者模式</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/09/03/中介者模式/" title="中介者模式" target="_blank">中介者模式</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/09/03/一步一步造个IoC轮子（三）：构造基本的IoC容器/" title="一步一步造个IoC轮子（三）：构造基本的IoC容器" target="_blank">一步一步造个IoC轮子（三）：构造基本的IoC容器</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">2.4m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">36:45</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>
