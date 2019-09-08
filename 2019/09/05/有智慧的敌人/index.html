@@ -111,7 +111,7 @@
 <meta property="og:site_name" content="车斌的博客">
 <meta property="og:description" content="思考并回答以下问题：">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-09-05T14:33:29.635Z">
+<meta property="og:updated_time" content="2019-09-07T02:29:05.935Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="有智慧的敌人">
 <meta name="twitter:description" content="思考并回答以下问题：">
@@ -423,12 +423,24 @@
                 
               
 
-              <time title="创建时间：2019-09-05 21:34:51 / 修改时间：22:33:29" itemprop="dateCreated datePublished" datetime="2019-09-05T21:34:51+08:00">2019-09-05</time>
+              <time title="创建时间：2019-09-05 21:34:51" itemprop="dateCreated datePublished" datetime="2019-09-05T21:34:51+08:00">2019-09-05</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-07 10:29:05" itemprop="dateModified" datetime="2019-09-07T10:29:05+08:00">2019-09-07</time>
               
             
           </span>
@@ -474,7 +486,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">3.7k</span>
+                <span title="本文字数">14k</span>
               
 
               
@@ -488,7 +500,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">3 分钟</span>
+                <span title="阅读时长">12 分钟</span>
               
             </div>
           
@@ -511,7 +523,8 @@
         <p>思考并回答以下问题：</p>
 <a id="more"></a>
 
-<p>本章专注于创造一个有智慧敌人的相关理论和编码技术。这些敌人将会表现出3种主要行为：巡逻、追击和进攻。本章将深入讨论以下主题：</p>
+<p>本章将创建一个具有地形的世界、第一人称视角角色以及一些敌人。这些敌人都拥有人工智能，它们在场景中进行巡逻并搜索玩家，如果发现玩家就会发起攻击。</p>
+<p>专注于创造一个有智慧敌人的相关理论和编码技术。这些敌人将会表现出3种主要行为：巡逻、追击和进攻。本章将深入讨论以下主题：</p>
 <ul>
 <li>如何对敌人的人工智能系统进行设计和编码 </li>
 <li>如何编码有限状态机</li>
@@ -527,12 +540,67 @@
 <p>下面对代码进行几点总结。</p>
 <ul>
 <li>LineSight类应该附加到所有的敌人角色对象上，目的是为了计算在玩家和敌人之间是否存在一个可用的直视视线。</li>
-<li>变量CanSeeTarget是一个Boolean类型（true/false），这个值会在每一帧更新一次，描述敌人现在是否可以看到玩家（当前帧）。“true”表示玩家在敌人的视野中，吗“false”表示玩家不在敌人的视野中。</li>
+<li>变量CanSeeTarget是一个Boolean类型（true/false），这个值会在每一帧更新一次，描述敌人现在是否可以看到玩家（当前帧）。“true”表示玩家在敌人的视野中，“false”表示玩家不在敌人的视野中。</li>
 <li>变量FieldOfView是一个浮点数值，它表示敌人眼睛所能看到的两侧之间的角度，在这个范围内的对象（如玩家）是可以看到的。这个值设定得越大，敌人发现玩家的概率就越大。</li>
-<li>InFOV函数将会返回true或者false，这个值表示玩家是否处于敌人的视野范围内。但是这个值忽略了玩家是否被墙或者其他实体（如支柱）挡住的情况，它只是简单地考虑了敌人眼睛的位置，确定一个到玩家的向量，并测量前向向量和玩家之间的角度。然后将这个值与变量FieldOfView，就返回true。简而言之，如果有一个明确的视线，这个函数可以告诉你敌人是否可以看到玩家。</li>
+<li>InFOV函数将会返回true或者false，这个值表示玩家是否处于敌人的视野范围内。但是这个值忽略了玩家是否被墙或者其他实体（如支柱）挡住的情况，它只是简单地考虑了敌人眼睛的位置，确定一个到玩家的向量，并测量前向向量和玩家之间的角度。然后将这个值与变量FieldOfView进行比较，如果玩家与敌人之间的角度小于变量FieldOfView，就返回true。简而言之，如果有一个明确的视线，这个函数可以告诉你敌人是否可以看到玩家。</li>
 <li>函数ClearLineofSight返回值也是true或者false，这个值表示在敌人的眼睛和玩家之间是否存在任何物理的障碍（碰撞体），例如墙或者道具。这个函数并不考虑玩家是否在敌人的视野范围内。将这个函数与InFOV函数结合使用，就可以判断玩家是否处在敌人的无遮挡的视野范围内，因此可以认为玩家是可见的。</li>
 <li>函数OnTriggerStay和OnTriggerExit这两个函数分别表示玩家进入到了敌人的触发区域和玩家离开了敌人的触发区域。正如我们所看到的，一个球状的碰撞器可以附加到敌人角色身上代表它的视野。这意味着在一定距离或者半径内，敌人可以看见里面的玩家，只要视野清晰且没有遮挡即可。</li>
 </ul>
+<h1 id="有限状态机概述"><a href="#有限状态机概述" class="headerlink" title="有限状态机概述"></a>有限状态机概述</h1><p>如果为NPC对象创建一个AI，刚刚创建的视线功能还不够，还需要使用有限状态机（Finite State Machines, FSMs）。有限状态机并不是Unity中的内容，也不是C#语言的组成部分。有限状态机是一个概念、框架或者说是想法，将有限状态机应用在编码中可以实现特定的人工智能行为。它来自于智能角色的一种具体思维方式。总结一下NPC在任意时刻可能处于的全部3种状态，分别是巡逻模式、追逐模式以及攻击模式。这些模式是一种具有独特行为而且唯一的状态，敌人在任何时间都必须且只能处于这3种状态之一。例如，敌人不能同时巡逻和追逐，也不能同时巡逻和攻击，因为这不符合游戏中设计的逻辑。</p>
+<p>除了这些状态以外，还有一个状态连接的规则集，其决定了一个状态在何时转换成另一个状态。例如，NPC可以看到玩家但是并不具备攻击条件的时候，它只能从巡逻状态切换到追逐状态。同样，如果敌人在攻击状态时失去玩家的踪影，它们应该从进攻切换到巡逻状态。因此，这些状态和它们的连接规则的组合形成了一个有限状态机，任何实现了这个功能的代码其实就是一个有限状态机。编码实现有限状态机的方法本身并没有什么正确或者错误之分，这里有很多简单方法，对于特定的目的来说，其中有一些是合适的，另一些是不合适的。这一节将使用Coroutines来实现有限状态机的编码。从创建一个主要结构开始，代码示例2给出的AI_Enemy.cs脚本中的代码就是这样的一个主要结构：</p>
+<blockquote>
+<p>代码示例2 AI_Enemy.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">AI_Enemy</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">enum</span> ENEMY_STATE </span><br><span class="line">    &#123;</span><br><span class="line">        PATROL,</span><br><span class="line">        CHASE,</span><br><span class="line">        ATTACK</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    [<span class="meta">SerializeField</span>]</span><br><span class="line">    <span class="keyword">private</span> ENEMY_STATE currentstate = ENEMY_STATE.PATROL;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> LineSight ThisLineSight = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> NavMeshAgent ThisAgent = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> Transform PlayerTransform = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> ENEMY_STATE CurrentState</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">get</span> </span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">return</span> currentstate;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">set</span> </span><br><span class="line">        &#123;</span><br><span class="line">            currentstate = <span class="keyword">value</span>;</span><br><span class="line"></span><br><span class="line">            StopAllCoroutines();</span><br><span class="line"></span><br><span class="line">            <span class="keyword">switch</span>(currentstate)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">case</span> ENEMY_STATE.PATROL:</span><br><span class="line">                    StartCoroutine(AIPatrol());</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">case</span> ENEMY_STATE.CHASE:</span><br><span class="line">                    StartCoroutine(AIChase());</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">case</span> ENEMY_STATE.ATTACK:</span><br><span class="line">                    StartCoroutine(AIAttack());</span><br><span class="line">                    <span class="keyword">break</span>;    </span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Awake</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        ThisLineSight = GetComponent&lt;LineSight&gt;();</span><br><span class="line">        ThisAgent = GetComponent&lt;NavMeshAgent&gt;();</span><br><span class="line"></span><br><span class="line">        PlayerTransform = GameObject.FindGameObjectWithTag(<span class="string">"Player"</span>).GetComponent&lt;Transform&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        CurrentState = ENEMY_STATE.PATROL;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IEnumerator <span class="title">AIPatrol</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">yield</span> <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IEnumerator <span class="title">AIChase</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">yield</span> <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IEnumerator <span class="title">AIAttack</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">yield</span> <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>AI_Enemy类创建到现在并没有完全地实现一个完整的有限状态机，而只是实现了一个开始的框架。它说明了整体的结构，其中每一个状态对应一个单独的coroutine。</li>
+<li>CurrentState变量定义了当前选中的激活状态，终止所有当前的coroutine并启动相关的coroutine。</li>
+<li>每个状态coroutine将会运行在一个框架安全（Frame Safe）的无限循环中，只要有限状态机是活动的，这个循环就不停止。这将允许敌人对象更新它的行为，下面很快会看到。</li>
+</ul>
+<p>在下一步开始之前，要确保将AI_Enemy脚本附加到了NPC对象上，如下图所示。</p>
+<h1 id="巡逻状态"><a href="#巡逻状态" class="headerlink" title="巡逻状态"></a>巡逻状态</h1><p>NPC人工智能3个状态中的第一个状态是巡逻状态。在前面的章节中，已经配置了动画的巡逻对象，NPC处在巡逻状态时，会一直跟随着这些巡逻对象移动。巡逻对象会根据预先定义好的动画资源从一个位置移动到另一个位置，不断地在场景中巡逻。不过，在此之前，NPC只是简单地跟随这个对象没有尽头，而巡逻状态需要NPC都能看见玩家是否在它的路线上。如果看见，状态就需要改变。为了支持这个功能，需要对巡逻状态和AI_Enemy的Start函数进行编码，下面的代码示例3给出了具体的代码内容。</p>
+<blockquote>
+<p>代码示例3</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    GameObject[] Destinations = GameObject.FindGameObjectWithTag(<span class="string">"Dest"</span>);</span><br><span class="line">    PatrolDestination  = Destinations[Random.Range(<span class="number">0</span>, Destinations.Length)].GetComponent&lt;Transform&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置起始状态</span></span><br><span class="line">    CurrentState = ENEMY_STATE.PATROL;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> IEnumerator <span class="title">AIPatrol</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// 在巡逻的时候一直循环</span></span><br><span class="line">    <span class="keyword">while</span>(currentstate == ENEMY_STATE.PATROL)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 设置搜索为STRICT</span></span><br><span class="line">        ThisLineSight.Sensitity = LineSight.SightSensitivity.STRICT;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 追逐到巡逻位置</span></span><br><span class="line">        ThisAgent.Resume(); <span class="comment">// Resume 重新开始</span></span><br><span class="line">        ThisAgent.SetDestination(PatrolDestination.position);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 等待直到路径完成计算</span></span><br><span class="line">        <span class="keyword">while</span>(ThisAgent.pathPending)</span><br><span class="line">            <span class="keyword">yield</span> <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 当可以看到目标的时候就启动追逐模式</span></span><br><span class="line">        <span class="keyword">if</span>(ThisLineSight.CanSeeTarget)</span><br><span class="line">        &#123;</span><br><span class="line">            ThisAgent.Stop();</span><br><span class="line">            CurrentState = ENEMY_STATE.CHASE;</span><br><span class="line">            <span class="keyword">yield</span> <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Wait until next frame</span></span><br><span class="line">        <span class="keyword">yield</span> <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>Start函数将敌人的初始状态设置为巡逻模式，CoroutineAIPatrol操作这个模式。</li>
+<li>AIPatrol Coroutine在巡逻状态激活时会一直循环。记住，在一个Coroutine与一个yield组合下，无限循环不一定是坏事，这可以实现对长期行为进行简单整齐的编码。</li>
+<li>SetDestination函数用来调用将NavMeshAgent发送到指定目的地。后面跟随一个pathPending控制，它是NavMeshAgent中的一个变量。这个控制会一直持续到pathPending的值变为false的时候，此时意味着已经计算完了从源地址到目的地的整个路径。对于简单的或者短的旅程，路径几乎可以立刻计算出来，但是对于复杂的路径，可能需要很长的时间。</li>
+<li>在巡逻状态时，需要不断地对LineSight组件进行检查，以便知道敌人是否具有到玩家的一个直视视线，如果具有，那么敌人立刻由巡逻状态转为追逐状态。</li>
+<li>记住，yield返回的空语句将会暂停一个Coroutine直到下一帧。</li>
+</ul>
+<p>现在，将AIEnemy脚本拖曳到场景中的NPC角色上。巡逻模式下NPC将跟随一个移动的物体而运动，也就是说敌人会一直跟随一个移动的目的地。在上一章中已经使用Animation窗口在场景中创建了一个随着时间移动的对象，这个对象会从一个地方跳到另一个地方，如图7所示。</p>
+<p>为了获得可移动的对象，可以在场景中创建一个或者更多的目的地对象，将它们的“Tag”属性设置为“Dest”。AIEnemy对象的Start函数会搜索所有场景Tag属性为“Dest”的对象，这些对象将会被当做目的地点，如图8所示。</p>
+<h1 id="追逐状态"><a href="#追逐状态" class="headerlink" title="追逐状态"></a>追逐状态</h1><p>追逐状态时敌人有限状态机3种状态中的第二种，这个状态直接关联到巡逻和攻击状态，它可以转换到两种状态之一。如果一个正在巡逻的NPC建立了一个到玩家的直接视线，那么NPC就会由巡逻模式转为追逐模式。相反，如果一个正在攻击的NPC落在了玩家的范围之外（也许因为玩家逃跑了），NPC会再次转入追逐模式。从追逐状态本身，它可以转换成巡逻状态或者攻击状态，相反，就会进入追逐状态。如果NPC与玩家的距离接近到了可以攻击的距离内，就会切换到攻击模式，下面的代码示例4进行了修改，实现了追逐行为。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> IEnumerator <span class="title">AIChase</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// 循环追逐状态</span></span><br><span class="line">    <span class="keyword">while</span>(currentstate == ENEMY_STATE.CHASE)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 将查找模式设置为“loose”</span></span><br><span class="line">        ThisLineSight.Sensitity = LineSight.SightSensitivity.LOOSE;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 追踪的最后一个位置</span></span><br><span class="line">        ThisAgent.Resume();</span><br><span class="line">        ThisAgent.SetDestination(ThisLineSight.LastKnowSighting);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 等待直到路径计算完成</span></span><br><span class="line">        <span class="keyword">while</span>(ThisAgent.pathPending)</span><br><span class="line">            <span class="keyword">yield</span> <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 我们是否到达目的地</span></span><br><span class="line">        <span class="keyword">if</span>(ThisAgent.remainingDistance &lt;= ThisAgent.stoppingDistance)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// 停止代理</span></span><br><span class="line">            ThisAgent.Stop();</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 到达目的地但是无法看到玩家</span></span><br><span class="line">            <span class="keyword">if</span>(!ThisLineSight.CanSeeTarget)</span><br><span class="line">                CurrentState = ENEMY_STATE.PATROL;</span><br><span class="line">            <span class="keyword">else</span> <span class="comment">// Reached destination and can see player. Reached attacking distance</span></span><br><span class="line">                CurrentState = ENEMY_STATE.ATTACK;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">yield</span> <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 等待到下一帧</span></span><br><span class="line">        <span class="keyword">yield</span> <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>当进入到追逐状态以后，就会启动AIChasecoroutine，跟巡逻状态一样，只要它处于激活状态，Coroutine就会无限循环。</li>
+<li>NavMeshAgent的成员变量remainingDistance用来检测NPC是否进入了攻击玩家的范围。</li>
+<li>LineSight类中的CanSeeTarget布尔型变量表示玩家是否可见，并会影响到NPC是否返回到巡逻模式。</li>
+</ul>
+<p>现在来运行一下这段代码，此时已经拥有了一个可以巡逻和追逐的敌人角色。</p>
+<h1 id="攻击状态"><a href="#攻击状态" class="headerlink" title="攻击状态"></a>攻击状态</h1><p>第三个也是最后一个NPC的状态是攻击状态，在此期间NPC会不断地攻击玩家。只能从追逐状态转换到攻击状态。在追逐过程中，NPC必须检测是否进入了攻击距离，如果进入了，就必须将追逐状态切换到攻击状态。在攻击状态中，如果玩家远离NPC并超出了攻击距离，NPC就必须从攻击状态转换为追逐模式，下面的代码示例5包含了EnemyAI类及全部的代码。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">AI_Enemy</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">enum</span> ENEMY_STATE </span><br><span class="line">    &#123;</span><br><span class="line">        PATROL,</span><br><span class="line">        CHASE,</span><br><span class="line">        ATTACK</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    [<span class="meta">SerializeField</span>]</span><br><span class="line">    <span class="keyword">private</span> ENEMY_STATE currentstate = ENEMY_STATE.PATROL;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// </span></span><br><span class="line">    <span class="keyword">private</span> LineSight ThisLineSight = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// </span></span><br><span class="line">    <span class="keyword">private</span> NavMeshAgent ThisAgent = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// </span></span><br><span class="line">    <span class="keyword">private</span> Transform PlayerTransform = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// </span></span><br><span class="line">    <span class="keyword">public</span> ENEMY_STATE CurrentState</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">get</span> </span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">return</span> currentstate;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">set</span> </span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// </span></span><br><span class="line">            currentstate = <span class="keyword">value</span>;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// </span></span><br><span class="line">            StopAllCoroutines();</span><br><span class="line"></span><br><span class="line">            <span class="keyword">switch</span>(currentstate)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">case</span> ENEMY_STATE.PATROL:</span><br><span class="line">                    StartCoroutine(AIPatrol());</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">case</span> ENEMY_STATE.CHASE:</span><br><span class="line">                    StartCoroutine(AIChase());</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">case</span> ENEMY_STATE.ATTACK:</span><br><span class="line">                    StartCoroutine(AIAttack());</span><br><span class="line">                    <span class="keyword">break</span>;    </span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Awake</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        ThisLineSight = GetComponent&lt;LineSight&gt;();</span><br><span class="line">        ThisAgent = GetComponent&lt;NavMeshAgent&gt;();</span><br><span class="line"></span><br><span class="line">        PlayerTransform = GameObject.FindGameObjectWithTag(<span class="string">"Player"</span>).GetComponent&lt;Transform&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        CurrentState = ENEMY_STATE.PATROL;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IEnumerator <span class="title">AIPatrol</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">yield</span> <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IEnumerator <span class="title">AIChase</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">yield</span> <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IEnumerator <span class="title">AIAttack</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">while</span>(currentstate == ENEMY_STATE.ATTACK)</span><br><span class="line">        &#123;</span><br><span class="line">            ThisAgent.Resume();</span><br><span class="line">            ThisAgent.SetDestination(PlayerTransform.position);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">while</span>(ThisAgent.pathPending)</span><br><span class="line">                <span class="keyword">yield</span> <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span>(ThisAgent.remainingDistance &gt; ThisAgent.stoppingDistance)</span><br><span class="line">            &#123;</span><br><span class="line">                CurrentState = ENEMY_STATE.CHASE;</span><br><span class="line">                <span class="keyword">yield</span> <span class="keyword">break</span>;</span><br><span class="line">            &#125; </span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">            &#123;</span><br><span class="line">                PlayerHealth.HealthPoints -= MaxDamage * Time.deltaTime;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">yield</span> <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">yield</span> <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">yield</span> <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>当攻击状态（敌人处于这个状态之后会进行攻击）被激活以后，AIAttack coroutine就会无限制地执行。</li>
+<li>变量MaxDamage用来指明敌人每秒会对玩家造成的伤害。</li>
+<li>AIAttack coroutine依靠Health来造成对生命值的伤害。这是一个自定义的生命值编码组件。玩家和敌人都应该拥有一个表示他们健康情况的生命值组件。</li>
+</ul>
+<p>脚本Health（Health.cs）由AIEnemy类所引用，对玩家造成伤害。基于这个原因，玩家需要附加一个生命值组件，这个组件的代码如下所示。</p>
+<blockquote>
+<p>Health.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Health</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> HealthPoints</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">get</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">return</span> healthPoints;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">set</span></span><br><span class="line">        &#123;</span><br><span class="line">            healthPoints = <span class="keyword">value</span>;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 如果生命值小于0，就会死亡</span></span><br><span class="line">            <span class="keyword">if</span>(healthPoints &lt;= <span class="number">0</span>)</span><br><span class="line">                Destroy(gameObject);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    [<span class="meta">SerializeField</span>]</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">float</span> healthPoints = <span class="number">100f</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Health脚本十分简单，它负责维护一个数值形式的生命值，当这个生命值下降到0或者0以下时，就会摧毁这个脚本附加的对象。这个脚本必须附加到玩家角色上，允许NPC靠近玩家时对其造成伤害。同样，这个脚本也可以附加到NPC对象上，允许玩家对NPC进行攻击，如下图所示。</p>
+<p>现在已经做好了对这个项目的测试准备。首先，把敌人对象做成一个预设体，具体的方法就是将NPC游戏对象从场景视图或者Hierarchy视图拖动到项目面板上，然后就可以在场景中创建任意数量的敌人了，如图10所示。</p>
+<p>现在已经开发好了一个完整的环境，拥有智能的敌人可以寻找、追逐并攻击玩家。在某些情况下，可能需要对敌人FOV进行调整和改进，以便更好地匹配游戏环境和角色类型，如图11所示。</p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>我们创建了一个完整的地形、一个NPC预设体以及一系列协同工作实现了人工智能的脚本。</p>
 
       
     </div>
@@ -569,8 +637,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/09/04/迭代器与Unity协程/" rel="next" title="迭代器与Unity协程">
-                <i class="fa fa-chevron-left"></i> 迭代器与Unity协程
+              <a href="/2019/09/05/基于消息机制的Unity框架/" rel="next" title="基于消息机制的Unity框架">
+                <i class="fa fa-chevron-left"></i> 基于消息机制的Unity框架
               </a>
             
           </div>
@@ -578,6 +646,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/09/06/状态模式/" rel="prev" title="状态模式">
+                状态模式 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -648,7 +720,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">399</span>
+                    <span class="site-state-item-count">407</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -786,7 +858,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">44</span>
+                      
+                    
+                    <span class="site-state-item-count">45</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -817,23 +891,23 @@
                 
                 
                   <li>
-                    <a href="/2019/09/05/有智慧的敌人/" title="有智慧的敌人" target="_blank">有智慧的敌人</a>
+                    <a href="/2019/09/08/构建2D游戏：地精寻宝/" title="构建2D游戏：地精寻宝" target="_blank">构建2D游戏：地精寻宝</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/04/迭代器与Unity协程/" title="迭代器与Unity协程" target="_blank">迭代器与Unity协程</a>
+                    <a href="/2019/09/08/构建一个太空射击游戏/" title="构建一个太空射击游戏" target="_blank">构建一个太空射击游戏</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/04/枚举器和迭代器/" title="枚举器和迭代器" target="_blank">枚举器和迭代器</a>
+                    <a href="/2019/09/08/塔防游戏/" title="塔防游戏" target="_blank">塔防游戏</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/03/访问者模式/" title="访问者模式" target="_blank">访问者模式</a>
+                    <a href="/2019/09/07/2D冒险游戏/" title="2D冒险游戏" target="_blank">2D冒险游戏</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/03/中介者模式/" title="中介者模式" target="_blank">中介者模式</a>
+                    <a href="/2019/09/07/太空射击游戏/" title="太空射击游戏" target="_blank">太空射击游戏</a>
                   </li>
                 
               </ul>
@@ -859,7 +933,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#敌人的人工智能——视野范围"><span class="nav-number">1.</span> <span class="nav-text">敌人的人工智能——视野范围</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#敌人的人工智能——视野范围"><span class="nav-number">1.</span> <span class="nav-text">敌人的人工智能——视野范围</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#有限状态机概述"><span class="nav-number">2.</span> <span class="nav-text">有限状态机概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#巡逻状态"><span class="nav-number">3.</span> <span class="nav-text">巡逻状态</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#追逐状态"><span class="nav-number">4.</span> <span class="nav-text">追逐状态</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#攻击状态"><span class="nav-number">5.</span> <span class="nav-text">攻击状态</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#小结"><span class="nav-number">6.</span> <span class="nav-text">小结</span></a></li></ol></div>
             
 
           </div>
@@ -894,7 +968,7 @@
     
       <span class="post-meta-item-text">站点总字数：</span>
     
-    <span title="站点总字数">2.4m</span>
+    <span title="站点总字数">2.6m</span>
   
 
   
@@ -905,7 +979,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">36:49</span>
+    <span title="站点阅读时长">39:04</span>
   
 </div>
 
