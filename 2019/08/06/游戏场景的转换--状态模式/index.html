@@ -116,7 +116,7 @@
 <meta property="og:image" content="http://chebincarl.github.io/2019/08/06/游戏场景的转换--状态模式/3.png">
 <meta property="og:image" content="http://chebincarl.github.io/2019/08/06/游戏场景的转换--状态模式/4.png">
 <meta property="og:image" content="http://chebincarl.github.io/2019/08/06/游戏场景的转换--状态模式/5.png">
-<meta property="og:updated_time" content="2019-09-02T14:16:20.052Z">
+<meta property="og:updated_time" content="2019-09-10T11:04:31.598Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="游戏场景的转换--状态模式">
 <meta name="twitter:description" content="思考并回答以下问题：  状态模式的官方定义是什么？背下来。如何用德鲁伊来描述状态模式？Context类就是德鲁伊怎么理解？Context和State接口互相用类成员调用怎么理解？ 动手画一下状态模式的类图。 德鲁伊怎么玩？首先我要告诉德鲁伊最初的状态是什么，然后操作德鲁伊攻击。而无论人形兽形都可以攻击。 什么场景使用状态模式？ A类作为B类的成员，然后在B类的B1方法里赋值，B1方法的参数是A类对">
@@ -446,7 +446,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-09-02 22:16:20" itemprop="dateModified" datetime="2019-09-02T22:16:20+08:00">2019-09-02</time>
+                <time title="修改时间：2019-09-10 19:04:31" itemprop="dateModified" datetime="2019-09-10T19:04:31+08:00">2019-09-10</time>
               
             
           </span>
@@ -538,6 +538,8 @@
 <li>Context这个词表示上下文和执行环境的意思。这里可以根据Unity里Log方法的定义Log(object message, Object context)可把Context理解为发送者，触发者。怎么理解？</li>
 <li>理解状态模式最关键的两点在Context类：1.调用Context类的对象的一个方法（一个对象的行为）时要<span style="color:red">设置一个初始状态</span>；2.给这个方法传传会触发转换的参数。怎么理解？</li>
 <li>代码转成使用状态模式时要新建接口和子类。怎么理解？</li>
+<li>几个状态之间无法通过引用进行调用，虽然都是状态基类的子类，但只能通过context互相通信。这就是为什么状态类要引用Context的原因。怎么理解？</li>
+<li>context什么实际的事都不干，就是设置当前状态，和封装状态类的方法（对象行为），然后只调用那个方法。用户只知道context类，不知道其他的类。怎么理解？</li>
 </ul>
 <a id="more"></a>
 
@@ -628,7 +630,7 @@
 <p>如果将GoF对状态模式的定义改以游戏的方式来解释，就会像下面这样:</p>
 <p>“当德鲁伊（对象）由人形变化为兽形状态（内部状态改变）时，他所施展的技能（对象的行为）也会有所变化，玩家此时就像是在操作另一个不同的角色（像是换了类）”。</p>
 <p>“德鲁伊”是一种经常出现在角色扮演游戏（RPG）中的角色名称。变化外形是他们常使用的能力，通过外形的变化，使德鲁伊具备了转换为其他形体的能力，而变化为“兽形”是比较常见的游戏设计。当玩家决定施展外形转换能力时，德鲁伊会进入“兽形状态”，这时候的德鲁伊会以“兽形”来表现其行为，包含移动和攻击施展的方式；当玩家决定转换回人形时，德鲁伊会复原为一般形态，继续与游戏世界互动。</p>
-<p>所以，变化外形的能力可以看成是德鲁伊的一种“内部状态的转换”。通过变化外形的结果，角色表现出另外一种行为模式，而这一切的转化过程都可以由德鲁伊的内部控制功能来完成，玩家不必理解这个转化过程。但无论怎么变化，玩家操作的角色都是德鲁伊，并不会因为他内部状态的转变而有所差异。</p>
+<p>所以，变化外形的能力可以看成是德鲁伊的一种“内部状态的转换”。通过变化外形的结果，角色表现出另外一种行为模式，而<span style="color:red">这一切的转化过程都可以由德鲁伊的内部控制功能来完成，玩家不必理解这个转化过程</span>。但无论怎么变化，玩家操作的角色都是德鲁伊，并不会因为他内部状态的转变而有所差异。</p>
 <p>当某个对象状态改变时，虽然它“表现的行为”会有所变化，但是对于客户端来说，并不会因为这样的变化，而改变对它的“操作方法”或“信息沟通”的方式。也就是说，这个对象与外界的对应方式不会有任何改变。但是，对象的内部确实是会通过“更换状态类对象”的方式来进行状态的转换。当状态对象更换到另一个类时，对象就会通过新的状态类，表现出它在这个状态下该有的行为。但这一切只会发生在对象内部，对客户端来说，完全不需要了解这些状态转换的过程及对应的方式。</p>
 <h2 id="状态模式的说明"><a href="#状态模式的说明" class="headerlink" title="状态模式的说明"></a><span style="color:#00ACC1;">状态模式的说明</span></h2><p>状态模式的结构如图3所示。</p>
 <blockquote>
@@ -921,7 +923,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">407</span>
+                    <span class="site-state-item-count">413</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -1061,7 +1063,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">45</span>
+                      
+                    
+                    <span class="site-state-item-count">46</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -1092,23 +1096,23 @@
                 
                 
                   <li>
-                    <a href="/2019/09/08/构建2D游戏：地精寻宝/" title="构建2D游戏：地精寻宝" target="_blank">构建2D游戏：地精寻宝</a>
+                    <a href="/2019/09/10/简易对象池/" title="简易对象池" target="_blank">简易对象池</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/08/构建一个太空射击游戏/" title="构建一个太空射击游戏" target="_blank">构建一个太空射击游戏</a>
+                    <a href="/2019/09/10/对象池模式/" title="对象池模式" target="_blank">对象池模式</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/08/塔防游戏/" title="塔防游戏" target="_blank">塔防游戏</a>
+                    <a href="/2019/09/10/C-反射/" title="C#反射" target="_blank">C#反射</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/07/2D冒险游戏/" title="2D冒险游戏" target="_blank">2D冒险游戏</a>
+                    <a href="/2019/09/10/Unity3D面试题摘选/" title="Unity3D面试题摘选" target="_blank">Unity3D面试题摘选</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/07/太空射击游戏/" title="太空射击游戏" target="_blank">太空射击游戏</a>
+                    <a href="/2019/09/10/Unity全面的面试题/" title="Unity全面的面试题" target="_blank">Unity全面的面试题</a>
                   </li>
                 
               </ul>
@@ -1180,7 +1184,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">39:04</span>
+    <span title="站点阅读时长">40:09</span>
   
 </div>
 
