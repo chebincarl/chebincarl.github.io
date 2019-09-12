@@ -111,7 +111,7 @@
 <meta property="og:site_name" content="车斌的博客">
 <meta property="og:description" content="思考并回答以下问题：">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-09-11T13:17:09.004Z">
+<meta property="og:updated_time" content="2019-09-12T10:33:31.718Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Unity 游戏的 string interning 优化">
 <meta name="twitter:description" content="思考并回答以下问题：">
@@ -405,6 +405,9 @@
         
 
         <div class="post-meta">
+
+          
+
           <span class="post-time">
 
             
@@ -423,12 +426,24 @@
                 
               
 
-              <time title="创建时间：2019-09-11 16:24:33 / 修改时间：21:17:09" itemprop="dateCreated datePublished" datetime="2019-09-11T16:24:33+08:00">2019-09-11</time>
+              <time title="创建时间：2019-09-11 16:24:33" itemprop="dateCreated datePublished" datetime="2019-09-11T16:24:33+08:00">2019-09-11</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-12 18:33:31" itemprop="dateModified" datetime="2019-09-12T18:33:31+08:00">2019-09-12</time>
               
             
           </span>
@@ -456,7 +471,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">3.8k</span>
+                <span title="本文字数">3.9k</span>
               
 
               
@@ -470,7 +485,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">3 分钟</span>
+                <span title="阅读时长">4 分钟</span>
               
             </div>
           
@@ -494,18 +509,34 @@
 <a id="more"></a>
 
 <p><a href="http://gulu-dev.com/" target="_blank" rel="noopener">http://gulu-dev.com/</a></p>
-<p>问题描述<br>在开始之前，先说一下这个问题为什么很容易被忽视吧。<br>通常情况下，我们难以注意到运行着的 Unity 程序内 string 的实例化情况。这些字符串的创建，销毁的时机是否合理，是否存在有重复 (相同内容的字符串)，冗余 (存有已不再有意义的垃圾字符)，低效 (capacity 远大于 length)，以及泄漏 (没有在期望的时机及时销毁) 的情况就更容易被忽视了。由于 string 没法随时像普通的 Unity 对象那样通过调用 Object.GetInstanceID() 来查看实例id，我们不太容易感知字符串对象的实际内存开销。其实要不是偶然在工具里发现了大量的此类情况，俺也没想到看起来颇单纯的 immutable string 里居然隐藏着这么多秘密。<br>一次只说一件事，这次我们只讨论重复字符串的问题。<br>使用自制工具 ResourceTracker，可以发现 Unity 游戏运行时 mono(il2cpp) 内有大量重复的字符串，如下所示：<br>before_intern<br>手动 Intern()<br>对 .Net 特性有了解的同学，应该知道 C# 同 Java 一样，提供了一套内建的 string interning 机制，能够在后台维护一个字符串池，从而保证让同样内容的字符串始终复用同一个对象。这么做有两个好处，一个是节省了内存 (重复字符串越多，内存节省量越大)，另一个好处是降低了字符串比较的开销 (如果两个字符串引用一致，就不用逐字符比较内容了)<br>但是为什么上面的 Unity 程序内仍然有大量的重复字符串呢？<br>查看他们的地址，发现彼此各不相同，说明的确没有引用到同一块内存区域。由于 C# 语言实现以静态的特性为主，俺推测，也许只有编译期可以捕捉到的字符串 (也就是通常用字面字符串 literal string 来构建时) 才会 interning。<br>做个实验吧：<br>string foobar = “foobar”;<br>string foobar2 = new StringBuilder().Append(“foo”).Append(“bar”).ToString();</p>
-<p>Debug.Log(foobar == foobar2);<br>Debug.Log(System.Object.ReferenceEquals(foobar, foobar2));<br>运行上面的代码，输出结果分别是 True 和 False。嗯，也就是说，即使运行时内容一样 (== 返回 True)，手动在运行时拼出来的字符串也不会自动复用已有的对象。查看游戏代码，发现很多重复字符串是通过解析 binary stream 或 text stream 构造出来的，这样就解释得通了。(String literals get interned automatically)<br>手动 Intern 一下试试吧。<br>string foobar0 = “foobar”;<br>string foobar1 = new StringBuilder().Append(“foo”).Append(“bar”).ToString();<br>string foobar2 = string.Intern(foobar1);<br>string foobar3 = new StringBuilder().Append(“f”).Append(“oo”).Append(“b”).Append(“ar”).ToString();<br>string foobar4 = string.Intern(foobar3);</p>
-<p>Debug.Log(foobar0 == foobar1);   // True<br>Debug.Log(foobar0 == foobar2);   // True<br>Debug.Log(foobar0 == foobar3);   // True<br>Debug.Log(foobar0 == foobar4);   // True<br>Debug.Log(System.Object.ReferenceEquals(foobar0, foobar1)); // False<br>Debug.Log(System.Object.ReferenceEquals(foobar0, foobar2)); // True<br>Debug.Log(System.Object.ReferenceEquals(foobar0, foobar3)); // False<br>Debug.Log(System.Object.ReferenceEquals(foobar0, foobar4)); // True<br>注意，C# 并没有提供“清除已经 Intern 的字符串”的接口。也就是说，如果不由分说地把产生的字符串都扔进去，会造成大量短生命期字符串 (如某个地图上特有的特效名) 在全局池内的堆积。<br>解决这个问题并不难，手写一个可清除的版本就可以了。<br>可清除的 Interning - UniqueString<br>下面的 UniqueString 类除了提供两个与 string.Intern() 和 string.IsInterned() 一致的接口外，还提供了 Clear() 接口用于周期性地释放整个字符串池，可在地图切换等时机调用。这个类通过判断参数来确认，是将字符串放入全局的系统池，还是支持周期性清理的用户池。<br>public class UniqueString<br>{<br>    // ‘removable = false’ means the string would be added to the global string pool<br>    //   which would stay in memory in the rest of the whole execution period.<br>    public static string Intern(string str, bool removable = true)  </p>
-<pre><code>// Why return a ref rather than a bool? 
-//   return-val is the ref to the unique interned one, which should be tested against `null`
-public static string IsInterned(string str)     
+<h1 id="问题描述"><a href="#问题描述" class="headerlink" title="问题描述"></a>问题描述</h1><p>在开始之前，先说一下这个问题为什么很容易被忽视吧。</p>
+<p>通常情况下，我们难以注意到运行着的Unity程序内string的实例化情况。这些字符串的创建，销毁的时机是否合理，是否存在有重复（相同内容的字符串），冗余（存有已不再有意义的垃圾字符），低效（capacity远大于length），以及泄漏（没有在期望的时机及时销毁）的情况就更容易被忽视了。由于string没法随时像普通的Unity对象那样通过调用 Object.GetInstanceID() 来查看实例id，我们不太容易感知字符串对象的实际内存开销。其实要不是偶然在工具里发现了大量的此类情况，俺也没想到看起来颇单纯的immutable string里居然隐藏着这么多秘密。</p>
+<p>一次只说一件事，这次我们只讨论重复字符串的问题。</p>
+<p>使用自制工具ResourceTracker，可以发现Unity游戏运行时mono(il2cpp) 内有大量重复的字符串，如下所示：</p>
+<p>before_intern</p>
+<p>手动Intern()</p>
+<p>对.Net特性有了解的同学，应该知道C#同Java一样，提供了一套内建的string interning 机制，能够在后台维护一个字符串池，从而保证让同样内容的字符串始终复用同一个对象。这么做有两个好处，一个是节省了内存（重复字符串越多，内存节省量越大），另一个好处是降低了字符串比较的开销（如果两个字符串引用一致，就不用逐字符比较内容了）但是为什么上面的Unity程序内仍然有大量的重复字符串呢？</p>
+<p>查看他们的地址，发现彼此各不相同，说明的确没有引用到同一块内存区域。由于C#语言实现以静态的特性为主，俺推测，也许只有编译期可以捕捉到的字符串（也就是通常用字面字符串literal string来构建时）才会interning。</p>
+<p>做个实验吧：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">string</span> foobar = <span class="string">"foobar"</span>;</span><br><span class="line"><span class="keyword">string</span> foobar2 = <span class="keyword">new</span> StringBuilder().Append(<span class="string">"foo"</span>).Append(<span class="string">"bar"</span>).ToString();</span><br><span class="line"></span><br><span class="line">Debug.Log(foobar == foobar2); </span><br><span class="line">Debug.Log(System.Object.ReferenceEquals(foobar, foobar2));</span><br></pre></td></tr></table></figure>
 
-// should be called on a regular basis
-public static void Clear();</code></pre><p>}<br>通过参数 removable 我们可以指定使用默认 intern 还是 removable-intern。显式地指定后者的字符串将可被随后的 UniqueString.Clear() 清理。<br>UniqueString 的实现 (及更新) 在这里。<br>效果<br>使用上面的机制在关键点加了几行代码简单地优化后，内存中的字符串从 88000 条降低到 34000 条左右 (仍有很多重复存在)。<br>after_intern<br>小结<br>直接写在代码里的常量字符串 (即所谓的 literal string) 会在启动时被系统自动 Intern 到系统字符串池；而通过拼接，解析，转换等方式在运行时动态产生的字符串则不会。<br>避免在 C# 代码里写多行的巨型 literal string，避免无谓的内存浪费。常见的情况是很大的 Lua 代码块，很密集的生成路径，大块 xml/json 等等，见下面的例子。<br>已经被自动或手动 Intern 的字符串在之后的整个生命期中常驻内存无法移除，但可以使用上面提供的 UniqueString 类实现周期性的清理。<br>下面是一些不合理的常见的代码内的常量字符串的情况 (都是常驻内存无法释放的)<br>string query = @”SELECT foo, bar<br>    FROM table<br>    WHERE id = 42”;</p>
-<p>string lua_code_block = @”<br>    local ns = foo.bar(self.nID)<br>        for i,v in ipairs(self.imgs) do<br>        if (i - 1) &lt; ns then<br>            Obj.SetActive(self.imgs[i], true)<br>        else<br>            Obj.SetActive(self.imgs[i], false)<br>        end<br>    end<br>“;</p>
-<p>string[] resFiles = new string[] {<br>    “Assets/Scenes/scene_01.unity”,<br>    “Assets/Scenes/scene_02.unity”,<br>    “Assets/Scenes/scene_03.unity”,<br>    “Assets/Scenes/scene_04.unity”,<br>    “Assets/Scenes/scene_05.unity”<br>};</p>
+<p>运行上面的代码，输出结果分别是True和False。嗯，也就是说，即使运行时内容一样（== 返回 True），手动在运行时拼出来的字符串也不会自动复用已有的对象。查看游戏代码，发现很多重复字符串是通过解析 binary stream 或 text stream 构造出来的，这样就解释得通了。（String literals get interned automatically）</p>
+<p>手动Intern一下试试吧。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">string</span> foobar0 = <span class="string">"foobar"</span>;</span><br><span class="line"><span class="keyword">string</span> foobar1 = <span class="keyword">new</span> StringBuilder().Append(<span class="string">"foo"</span>).Append(<span class="string">"bar"</span>).ToString();</span><br><span class="line"><span class="keyword">string</span> foobar2 = <span class="keyword">string</span>.Intern(foobar1);</span><br><span class="line"><span class="keyword">string</span> foobar3 = <span class="keyword">new</span> StringBuilder().Append(<span class="string">"f"</span>).Append(<span class="string">"oo"</span>).Append(<span class="string">"b"</span>).Append(<span class="string">"ar"</span>).ToString();</span><br><span class="line"><span class="keyword">string</span> foobar4 = <span class="keyword">string</span>.Intern(foobar3);</span><br><span class="line"></span><br><span class="line">Debug.Log(foobar0 == foobar1);   <span class="comment">// True</span></span><br><span class="line">Debug.Log(foobar0 == foobar2);   <span class="comment">// True</span></span><br><span class="line">Debug.Log(foobar0 == foobar3);   <span class="comment">// True</span></span><br><span class="line">Debug.Log(foobar0 == foobar4);   <span class="comment">// True</span></span><br><span class="line">Debug.Log(System.Object.ReferenceEquals(foobar0, foobar1)); <span class="comment">// False</span></span><br><span class="line">Debug.Log(System.Object.ReferenceEquals(foobar0, foobar2)); <span class="comment">// True</span></span><br><span class="line">Debug.Log(System.Object.ReferenceEquals(foobar0, foobar3)); <span class="comment">// False</span></span><br><span class="line">Debug.Log(System.Object.ReferenceEquals(foobar0, foobar4)); <span class="comment">// True</span></span><br></pre></td></tr></table></figure>
 
+<p>注意，C#并没有提供“清除已经Intern的字符串”的接口。也就是说，如果不由分说地把产生的字符串都扔进去，会造成大量短生命期字符串 (如某个地图上特有的特效名) 在全局池内的堆积。</p>
+<p>解决这个问题并不难，手写一个可清除的版本就可以了。</p>
+<h1 id="可清除的-Interning-UniqueString"><a href="#可清除的-Interning-UniqueString" class="headerlink" title="可清除的 Interning - UniqueString"></a>可清除的 Interning - UniqueString</h1><p>下面的UniqueString类除了提供两个与string.Intern()和string.IsInterned()一致的接口外，还提供了Clear()接口用于周期性地释放整个字符串池，可在地图切换等时机调用。这个类通过判断参数来确认，是将字符串放入全局的系统池，还是支持周期性清理的用户池。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">UniqueString</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 'removable = false' means the string would be added to the global string pool</span></span><br><span class="line">    <span class="comment">//   which would stay in memory in the rest of the whole execution period.</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">string</span> <span class="title">Intern</span>(<span class="params"><span class="keyword">string</span> str, <span class="keyword">bool</span> removable = <span class="literal">true</span></span>)  </span></span><br><span class="line"><span class="function">                                                                    </span></span><br><span class="line"><span class="function">    <span class="comment">// Why return a ref rather than a bool? </span></span></span><br><span class="line"><span class="function">    <span class="comment">//   return-val is the ref to the unique interned one, which should be tested against `null`</span></span></span><br><span class="line"><span class="function">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">string</span> <span class="title">IsInterned</span>(<span class="params"><span class="keyword">string</span> str</span>)     </span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function">    <span class="comment">// should be called on a regular basis</span></span></span><br><span class="line"><span class="function">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Clear</span>(<span class="params"></span>)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过参数removable我们可以指定使用默认intern还是removable-intern。显式地指定后者的字符串将可被随后的UniqueString.Clear()清理。UniqueString 的实现 (及更新) 在这里。</p>
+<h1 id="效果"><a href="#效果" class="headerlink" title="效果"></a>效果</h1><p>使用上面的机制在关键点加了几行代码简单地优化后，内存中的字符串从88000条降低到 4000条左右（仍有很多重复存在）。</p>
+<p>after_intern</p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>直接写在代码里的常量字符串（即所谓的 literal string）会在启动时被系统自动Intern到系统字符串池；而通过拼接，解析，转换等方式在运行时动态产生的字符串则不会。</p>
+<p>避免在C#代码里写多行的巨型 iteral string，避免无谓的内存浪费。常见的情况是很大的Lua代码块，很密集的生成路径，大块xml/json等等，见下面的例子。</p>
+<p>已经被自动或手动Intern的字符串在之后的整个生命期中常驻内存无法移除，但可以使用上面提供的UniqueString类实现周期性的清理。</p>
+<p>下面是一些不合理的常见的代码内的常量字符串的情况（都是常驻内存无法释放的）</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">string</span> query = <span class="string">@"SELECT foo, bar</span></span><br><span class="line"><span class="string">    FROM table</span></span><br><span class="line"><span class="string">    WHERE id = 42"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">string</span> lua_code_block = <span class="string">@"</span></span><br><span class="line"><span class="string">    local ns = foo.bar(self.nID)</span></span><br><span class="line"><span class="string">        for i,v in ipairs(self.imgs) do</span></span><br><span class="line"><span class="string">        if (i - 1) &lt; ns then</span></span><br><span class="line"><span class="string">            Obj.SetActive(self.imgs[i], true)</span></span><br><span class="line"><span class="string">        else</span></span><br><span class="line"><span class="string">            Obj.SetActive(self.imgs[i], false)</span></span><br><span class="line"><span class="string">        end</span></span><br><span class="line"><span class="string">    end</span></span><br><span class="line"><span class="string">"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">string</span>[] resFiles = <span class="keyword">new</span> <span class="keyword">string</span>[] </span><br><span class="line">&#123; </span><br><span class="line">    <span class="string">"Assets/Scenes/scene_01.unity"</span>, </span><br><span class="line">    <span class="string">"Assets/Scenes/scene_02.unity"</span>, </span><br><span class="line">    <span class="string">"Assets/Scenes/scene_03.unity"</span>, </span><br><span class="line">    <span class="string">"Assets/Scenes/scene_04.unity"</span>, </span><br><span class="line">    <span class="string">"Assets/Scenes/scene_05.unity"</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
       
     </div>
 
@@ -535,8 +566,8 @@ public static void Clear();</code></pre><p>}<br>通过参数 removable 我们可
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/09/11/CIOC和AOP的一些基本概念/" rel="next" title="CIOC和AOP的一些基本概念">
-                <i class="fa fa-chevron-left"></i> CIOC和AOP的一些基本概念
+              <a href="/2019/09/11/IOC和AOP的一些基本概念/" rel="next" title="IOC和AOP的一些基本概念">
+                <i class="fa fa-chevron-left"></i> IOC和AOP的一些基本概念
               </a>
             
           </div>
@@ -591,8 +622,17 @@ public static void Clear();</code></pre><p>}<br>通过参数 removable 我们可
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <div class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -609,7 +649,7 @@ public static void Clear();</code></pre><p>}<br>通过参数 removable 我们可
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">430</span>
+                    <span class="site-state-item-count">436</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -782,23 +822,23 @@ public static void Clear();</code></pre><p>}<br>通过参数 removable 我们可
                 
                 
                   <li>
-                    <a href="/2019/09/11/命令模式（详解版）/" title="命令模式（详解版）" target="_blank">命令模式（详解版）</a>
+                    <a href="/2019/09/12/学习感想/" title="学习感想" target="_blank">学习感想</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/11/备忘录模式（详解版）/" title="备忘录模式（详解版）" target="_blank">备忘录模式（详解版）</a>
+                    <a href="/2019/09/12/C-设计模式-建造者模式/" title="C#设计模式--建造者模式" target="_blank">C#设计模式--建造者模式</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/11/讲解C-设计模式编程中享元模式的运用/" title="讲解C#设计模式编程中享元模式的运用" target="_blank">讲解C#设计模式编程中享元模式的运用</a>
+                    <a href="/2019/09/12/C-设计模式-组合模式/" title="C#设计模式--组合模式" target="_blank">C#设计模式--组合模式</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/11/CC-设计模式（14）——模板方法模式/" title="CC#设计模式（14）——模板方法模式" target="_blank">CC#设计模式（14）——模板方法模式</a>
+                    <a href="/2019/09/12/C-设计模式-装饰者模式/" title="C#设计模式--装饰者模式" target="_blank">C#设计模式--装饰者模式</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/11/C-设计模式--享元模式/" title="C#设计模式--享元模式" target="_blank">C#设计模式--享元模式</a>
+                    <a href="/2019/09/12/解析C-设计模式编程中的装饰者模式/" title="解析C#设计模式编程中的装饰者模式" target="_blank">解析C#设计模式编程中的装饰者模式</a>
                   </li>
                 
               </ul>
@@ -813,6 +853,23 @@ public static void Clear();</code></pre><p>}<br>通过参数 removable 我们可
         </div>
       </div>
 
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#问题描述"><span class="nav-number">1.</span> <span class="nav-text">问题描述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#可清除的-Interning-UniqueString"><span class="nav-number">2.</span> <span class="nav-text">可清除的 Interning - UniqueString</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#效果"><span class="nav-number">3.</span> <span class="nav-text">效果</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#小结"><span class="nav-number">4.</span> <span class="nav-text">小结</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
       
 
       
@@ -853,7 +910,7 @@ public static void Clear();</code></pre><p>}<br>通过参数 removable 我们可
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">42:07</span>
+    <span title="站点阅读时长">42:25</span>
   
 </div>
 

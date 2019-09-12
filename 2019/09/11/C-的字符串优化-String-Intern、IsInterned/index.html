@@ -111,7 +111,7 @@
 <meta property="og:site_name" content="车斌的博客">
 <meta property="og:description" content="思考并回答以下问题：">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-09-11T13:17:09.004Z">
+<meta property="og:updated_time" content="2019-09-12T10:33:31.632Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="C#的字符串优化-String.Intern、IsInterned">
 <meta name="twitter:description" content="思考并回答以下问题：">
@@ -405,6 +405,9 @@
         
 
         <div class="post-meta">
+
+          
+
           <span class="post-time">
 
             
@@ -423,12 +426,24 @@
                 
               
 
-              <time title="创建时间：2019-09-11 16:19:25 / 修改时间：21:17:09" itemprop="dateCreated datePublished" datetime="2019-09-11T16:19:25+08:00">2019-09-11</time>
+              <time title="创建时间：2019-09-11 16:19:25" itemprop="dateCreated datePublished" datetime="2019-09-11T16:19:25+08:00">2019-09-11</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-12 18:33:31" itemprop="dateModified" datetime="2019-09-12T18:33:31+08:00">2019-09-12</time>
               
             
           </span>
@@ -456,7 +471,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">4.6k</span>
+                <span title="本文字数">5k</span>
               
 
               
@@ -470,7 +485,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">4 分钟</span>
+                <span title="阅读时长">5 分钟</span>
               
             </div>
           
@@ -492,32 +507,70 @@
       
         <p>思考并回答以下问题：</p>
 <a id="more"></a>
+
 <p>首先看一段程序：</p>
-<p>using System;</p>
-<p>class Program<br>{<br> static void Main(string[] args)<br> {<br>  string a = “hello world”;<br>  string b = a;<br>  a = “hello”;<br>  Console.WriteLine(“{0}, {1}”, a, b);<br>  Console.WriteLine(a == b);<br>  Console.WriteLine(object.ReferenceEquals(a, b));<br> }<br>}<br>这个没有什么特殊的地方，相信大家都知道运行结果：</p>
-<p>hello, hello world<br>False<br>False<br>第二个WriteLine使用==比较两个字符串，返回False是因为他们不一致。而最后一个WriteLine返回False，因为a、b的引用不一致。<br>接下来，我们在代码的最后添加代码：</p>
-<p>Console.WriteLine((a + “ world”) == b);<br>Console.WriteLine(object.ReferenceEquals((a + “ world”), b));<br>这个的输出，相信也不会出乎大家的意料。前者返回True，因为==两边的内容相等；后者为False，因为+运算符执行完毕后，会创建一个新的string实例，这个实例与b的引用不一致。<br>上面这些就是对象的通常工作方式，两个独立的对象可以拥有同样的内容，但他们却是不同的个体。</p>
-<p>接下来，我们就来说一下string不寻常的地方<br>看一下下面这段代码：</p>
-<p>using System;</p>
-<p>class Program<br>{<br> static void Main(string[] args)<br> {<br>  string hello = “hello”;<br>  string helloWorld = “hello world”;<br>  string helloWorld2 = hello + “ world”;</p>
-<p>  Console.WriteLine(“{0}, {1}: {2}, {3}”, helloWorld, helloWorld2,<br>  helloWorld == helloWorld2,<br>  object.ReferenceEquals(helloWorld, helloWorld2));<br>  }<br>}<br>运行一下，结果为：</p>
-<p>hello world, hello world: True, False<br>再一次，没什么意外，==返回true因为他们内容相同，ReferenceEquals返回False因为他们是不同的引用。<br>现在在后面添加这样的代码：</p>
-<p>helloWorld2 = “hello world”;<br>Console.WriteLine(“{0}, {1}: {2}, {3}”, helloWorld, helloWorld2,<br>    helloWorld == helloWorld2,<br>    object.ReferenceEquals(helloWorld, helloWorld2));<br>运行，结果为：</p>
-<p>hello world, hello world: True, True<br>等一下，这里的hellowWorld与helloWorld2引用一致？这个结果，相信很多人都有些接受不了。这里的helloWorld2与上面的hello + “ world”应该是一样的，但为什么ReferenceEquals返回的是True？</p>
-<p>String.Intern<br>有经验的程序员们，应该知道，一个大型项目中，字符串的数量是巨大的。有些时候会出现几百、几千、甚至几万的重复字符串存在。这些字符串的内容相同，但却会重复分配内存，占用巨额的存储空间，这个肯定是要优化处理的。而C#在处理这个问题的时候，采用的就是普遍的做法，建立内部的池，池中每一个不同的字符串存在唯一一个个体在池中（这个方案在各种大型项目中都能见得到）。而C#毕竟是一种语言，而不是一个面向某个具体领域的技术，所以，它不能将这种内部的池技术，做成全部自动化的。因为我们不知道，将来C#会被使用到何种规模的项目中。如果完全自动化维护这个内部池，可能会在大型项目中，造成内存的巨大浪费，毕竟不是所有的字符串都有必要加到这个常驻的池中的。于是，C#提供了String.Intern和String.IsInterned接口，交给程序员自己维护内部的池。<br>String.Intern的工作方式很好理解，你将一个字符串作为参数使用这个接口，如果这个字符串已经存在池中，就返回这个存在的引用；如果不存在就将它加入到池中，并返回引用，例如：</p>
-<p>Console.WriteLine(object.ReferenceEquals(String.Intern(helloWorld), String.Intern(helloWorld2)));<br>这段代码将返回True，尽管helloWorld与helloWorld2的引用不同，但他们的内容相同。<br>这里我们花几分钟，测试一下String.Intern，因为在某些情况下，它产生的结果，有点违反直觉。这里是一个例子：</p>
-<p>string a = new string(new char[] {‘a’, ‘b’, ‘c’});<br>object o = String.Copy(a);<br>Console.WriteLine(object.ReferenceEquals(o, a));<br>String.Intern(o.ToString());<br>Console.WriteLine(object.ReferenceEquals(o, String.Intern(a)));<br>第一个WriteLine返回False很好理解，因为String.Copy创建了一个a的新的实例，所以，o与a的引用不用。<br>但为什么第二个WriteLine返回的是True？思考一下吧，下面再看一个例子：</p>
-<p>object o2 = String.Copy(a);<br>String.Intern(o2.ToString());<br>Console.WriteLine(object.ReferenceEquals(o2, String.Intern(a)));<br>这个看起来，与上面的做了同样的事，但为什么WriteLine返回的是False？</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="keyword">string</span>[] args</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">string</span> a = <span class="string">"hello world"</span>;</span><br><span class="line">        <span class="keyword">string</span> b = a;</span><br><span class="line">        a = <span class="string">"hello"</span>;</span><br><span class="line">        Console.WriteLine(<span class="string">"&#123;0&#125;, &#123;1&#125;"</span>, a, b);</span><br><span class="line">        Console.WriteLine(a == b);</span><br><span class="line">        Console.WriteLine(<span class="keyword">object</span>.ReferenceEquals(a, b));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个没有什么特殊的地方，相信大家都知道运行结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hello, hello world</span><br><span class="line">False</span><br><span class="line">False</span><br></pre></td></tr></table></figure>
+
+<p>第二个WriteLine使用==比较两个字符串，返回False是因为他们不一致。而最后一个WriteLine返回False，因为a、b的引用不一致。</p>
+<p>接下来，我们在代码的最后添加代码：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Console.WriteLine((a + <span class="string">" world"</span>) == b);</span><br><span class="line">Console.WriteLine(<span class="keyword">object</span>.ReferenceEquals((a + <span class="string">" world"</span>), b));</span><br></pre></td></tr></table></figure>
+
+<p>这个的输出，相信也不会出乎大家的意料。前者返回True，因为==两边的内容相等；后者为False，因为+运算符执行完毕后，会创建一个新的string实例，这个实例与b的引用不一致。</p>
+<p>上面这些就是对象的通常工作方式，两个独立的对象可以拥有同样的内容，但他们却是不同的个体。</p>
+<p>接下来，我们就来说一下string不寻常的地方。</p>
+<p>看一下下面这段代码：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="keyword">string</span>[] args</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">string</span> hello = <span class="string">"hello"</span>;</span><br><span class="line">        <span class="keyword">string</span> helloWorld = <span class="string">"hello world"</span>;</span><br><span class="line">        <span class="keyword">string</span> helloWorld2 = hello + <span class="string">" world"</span>;</span><br><span class="line"></span><br><span class="line">        Console.WriteLine(<span class="string">"&#123;0&#125;, &#123;1&#125;: &#123;2&#125;, &#123;3&#125;"</span>, helloWorld, helloWorld2,</span><br><span class="line">        helloWorld == helloWorld2,</span><br><span class="line">        <span class="keyword">object</span>.ReferenceEquals(helloWorld, helloWorld2));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行一下，结果为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hello world, hello world: True, False</span><br></pre></td></tr></table></figure>
+
+<p>再一次，没什么意外，==返回true因为他们内容相同，ReferenceEquals返回False因为他们是不同的引用。</p>
+<p>现在在后面添加这样的代码：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">helloWorld2 = <span class="string">"hello world"</span>;</span><br><span class="line">Console.WriteLine(<span class="string">"&#123;0&#125;, &#123;1&#125;: &#123;2&#125;, &#123;3&#125;"</span>, </span><br><span class="line">    helloWorld, </span><br><span class="line">    helloWorld2,</span><br><span class="line">    helloWorld == helloWorld2, </span><br><span class="line">    <span class="keyword">object</span>.ReferenceEquals(helloWorld, helloWorld2)</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>运行，结果为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hello world, hello world: True, True</span><br></pre></td></tr></table></figure>
+
+<p>等一下，这里的hellowWorld与helloWorld2引用一致？这个结果，相信很多人都有些接受不了。这里的helloWorld2与上面的hello + “ world”应该是一样的，但为什么ReferenceEquals返回的是True？</p>
+<h1 id="String-Intern"><a href="#String-Intern" class="headerlink" title="String.Intern"></a>String.Intern</h1><p>有经验的程序员们应该知道，一个大型项目中，字符串的数量是巨大的。有些时候会出现几百、几千、甚至几万的重复字符串存在。这些字符串的内容相同，但却会重复分配内存，占用巨额的存储空间，这个肯定是要优化处理的。而C#在处理这个问题的时候，采用的就是普遍的做法，建立内部的池，池中每一个不同的字符串存在唯一一个个体在池中（这个方案在各种大型项目中都能见得到）。而C#毕竟是一种语言，而不是一个面向某个具体领域的技术，所以，它不能将这种内部的池技术，做成全部自动化的。因为我们不知道，将来C#会被使用到何种规模的项目中。如果完全自动化维护这个内部池，可能会在大型项目中，造成内存的巨大浪费，毕竟不是所有的字符串都有必要加到这个常驻的池中的。于是，C#提供了String.Intern和String.IsInterned接口，交给程序员自己维护内部的池。</p>
+<p>String.Intern的工作方式很好理解，你将一个字符串作为参数使用这个接口，如果这个字符串已经存在池中，就返回这个存在的引用；如果不存在就将它加入到池中，并返回引用，例如：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Console.WriteLine(<span class="keyword">object</span>.ReferenceEquals(String.Intern(helloWorld), String.Intern(helloWorld2)));</span><br></pre></td></tr></table></figure>
+
+<p>这段代码将返回True，尽管helloWorld与helloWorld2的引用不同，但他们的内容相同。</p>
+<p>这里我们花几分钟，测试一下String.Intern，因为在某些情况下，它产生的结果，有点违反直觉。这里是一个例子：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">string</span> a = <span class="keyword">new</span> <span class="keyword">string</span>(<span class="keyword">new</span> <span class="keyword">char</span>[] &#123;<span class="string">'a'</span>, <span class="string">'b'</span>, <span class="string">'c'</span>&#125;);</span><br><span class="line"><span class="keyword">object</span> o = String.Copy(a);</span><br><span class="line">Console.WriteLine(<span class="keyword">object</span>.ReferenceEquals(o, a));</span><br><span class="line">String.Intern(o.ToString());</span><br><span class="line">Console.WriteLine(<span class="keyword">object</span>.ReferenceEquals(o, String.Intern(a)));</span><br></pre></td></tr></table></figure>
+
+<p>第一个WriteLine返回False很好理解，因为String.Copy创建了一个a的新的实例，所以，o与a的引用不用。</p>
+<p>但为什么第二个WriteLine返回的是True？思考一下吧，下面再看一个例子：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">object</span> o2 = String.Copy(a);</span><br><span class="line">String.Intern(o2.ToString());</span><br><span class="line">Console.WriteLine(<span class="keyword">object</span>.ReferenceEquals(o2, String.Intern(a)));</span><br></pre></td></tr></table></figure>
+
+<p>这个看起来，与上面的做了同样的事，但为什么WriteLine返回的是False？</p>
 <p>首先，需要说明一下ToString的工作方式，它总是返回它自身的引用。o是一个指向“abc”的变量，调用ToString返回的就是这个引用。所以，对于上面的内容，可以这样解释：</p>
-<p>开始，变量a指向字符串对象“abc”（#1），变量o指向另一个字符串对象（#2），也包含“abc”。<br>调用String.Intern(o.ToString())将对象#2的引用添加到内部池中。<br>现在#2对象已经存在池中了，任何时候，使用“abc”调用String.Intern都将返回#2的引用（o指向了这个对象）。<br>所以，当你使用ReferenceEquals比较o和String.Intern(a)时，返回True。因为String.Intern(a)返回的是#2的引用。<br>现在我们创建一个新的变量o2，使用String.Copy(a)创建一个新的对象#3，它也包含“abc”。<br>调用String.Intern(o2.ToString())没有向内部池中添加任何内容，因为“abc”已经存在（#2）。<br>所以，此时调用Intern返回的是对象#2的引用。注意，这里并没有使用类似o2 = String.Intern(o2.ToString())这样的代码。<br>这就是为什么最后一行WriteLine打印的False的原因，因为我们在尝试比较#3与#2的引用。如果如7中所说，添加o2 = String.Intern(o2.ToString())这样的代码，WriteLine返回的就是True。<br>String.IsInterned<br>IsInterned，正如它的名字，判断一个字符串是不是已经在内部池中。如果传入的字符串已经在池中，则返回这个字符串对象的引用，如果不再池中，返回null。<br>下面是一个IsInterned例子：</p>
-<p>string s = new string(new char[] {‘x’, ‘y’, ‘z’});<br>Console.WriteLine(String.IsInterned(s) ?? “not interned”);<br>String.Intern(s);<br>Console.WriteLine(String.IsInterned(s) ?? “not interned”);<br>Console.WriteLine(object.ReferenceEquals(<br>String.IsInterned(new string(new char[] { ‘x’, ‘y’, ‘z’ })), s));<br>第一个WriteLine打印的是“not interned”，因为“xyz”还没有存在于内部池中；第二个WriteLine打印了“xyz”因为现在内部池中有了“xyz”；第三个WriteLine打印True，因为对象引用的就是内部池中的“xyz”。</p>
-<p>常量字符串自动被加入内部池<br>改变最后一行代码为：</p>
-<p>Console.WriteLine(object.ReferenceEquals(“xyz”, s));<br>你会发现，奇怪的事情发生了，这些代码不再输出“not interned”了，并且最后的两个WriteLine输出的是False！发生了什么？<br>原因就是这个最后添加的那行代码中的常量“xyz”，CLR会将程序中使用的字符常量自动添加到内部池中。所以，当最后一行被添加之后，“xyz”在程序“运行之前”（避免严谨，这里用引号）就已经存在于内部池中。所以，当调用String.IsInterned的时候，返回的不再是null，而是指向“xyz”的引用。这也解释了，为什么后面的ReferenceEquals返回False，因为s从来没有被加到内部池中，其指向也不是内部池的”xyz”。</p>
-<p>编译器比你想象的要聪明<br>改变最后一行代码为：</p>
-<p>Console.WriteLine(object.ReferenceEquals(“x” + “y” + “z”, s));<br>运行一下，你会发现运行结果和直接使用“xyz”一样。但这里使用了+运算符啊？编译器不应该知道”x“+”y”+”z”最终的结果吧？<br>实际上，如果你将”x“+”y”+”z”替换为String.Format(“{0}{1}{2}”,’x’,’y’,’z’)，结果确实就不一样了。某种原因，CLR会将使用+运算符链接的字符串视为常量，而String.Format却需要在运行时才能知道结果。为什么？看一下下面的代码：</p>
-<p>using System;</p>
-<p>class Program {<br> public static void Main() {<br>  Console.WriteLine(“x” + “y” + “z”);<br>  }<br>}<br>这段代码编译之后，使用Ildasm.exe查看，会看到：</p>
-<p>Screenshot - ILDasm intern-xyz Main method.png<br>看到了吧，编译器足够聪明，将”x“+”y”+”z”替换为”xyz“。</p>
+<p>开始，变量a指向字符串对象“abc”（#1），变量o指向另一个字符串对象（#2），也包含“abc”。<br>调用String.Intern(o.ToString())将对象#2的引用添加到内部池中。<br>现在#2对象已经存在池中了，任何时候，使用“abc”调用String.Intern都将返回#2的引用（o指向了这个对象）。<br>所以，当你使用ReferenceEquals比较o和String.Intern(a)时，返回True。因为String.Intern(a)返回的是#2的引用。<br>现在我们创建一个新的变量o2，使用String.Copy(a)创建一个新的对象#3，它也包含“abc”。<br>调用String.Intern(o2.ToString())没有向内部池中添加任何内容，因为“abc”已经存在（#2）。</p>
+<p>所以，此时调用Intern返回的是对象#2的引用。注意，这里并没有使用类似o2 = String.Intern(o2.ToString())这样的代码。</p>
+<p>这就是为什么最后一行WriteLine打印的False的原因，因为我们在尝试比较#3与#2的引用。如果如7中所说，添加o2 = String.Intern(o2.ToString())这样的代码，WriteLine返回的就是True。</p>
+<h1 id="String-IsInterned"><a href="#String-IsInterned" class="headerlink" title="String.IsInterned"></a>String.IsInterned</h1><p>IsInterned，正如它的名字，判断一个字符串是不是已经在内部池中。如果传入的字符串已经在池中，则返回这个字符串对象的引用，如果不再池中，返回null。</p>
+<p>下面是一个IsInterned例子：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">string</span> s = <span class="keyword">new</span> <span class="keyword">string</span>(<span class="keyword">new</span> <span class="keyword">char</span>[] &#123;<span class="string">'x'</span>, <span class="string">'y'</span>, <span class="string">'z'</span>&#125;);</span><br><span class="line">Console.WriteLine(String.IsInterned(s) ?? <span class="string">"not interned"</span>);</span><br><span class="line">String.Intern(s);</span><br><span class="line">Console.WriteLine(String.IsInterned(s) ?? <span class="string">"not interned"</span>);</span><br><span class="line">Console.WriteLine(<span class="keyword">object</span>.ReferenceEquals(</span><br><span class="line">String.IsInterned(<span class="keyword">new</span> <span class="keyword">string</span>(<span class="keyword">new</span> <span class="keyword">char</span>[] &#123; <span class="string">'x'</span>, <span class="string">'y'</span>, <span class="string">'z'</span> &#125;)), s));</span><br></pre></td></tr></table></figure>
+
+<p>第一个WriteLine打印的是“not interned”，因为“xyz”还没有存在于内部池中；第二个WriteLine打印了“xyz”因为现在内部池中有了“xyz”；第三个WriteLine打印True，因为对象引用的就是内部池中的“xyz”。</p>
+<h1 id="常量字符串自动被加入内部池"><a href="#常量字符串自动被加入内部池" class="headerlink" title="常量字符串自动被加入内部池"></a>常量字符串自动被加入内部池</h1><p>改变最后一行代码为：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Console.WriteLine(<span class="keyword">object</span>.ReferenceEquals(<span class="string">"xyz"</span>, s));</span><br></pre></td></tr></table></figure>
+
+<p>你会发现，奇怪的事情发生了，这些代码不再输出“not interned”了，并且最后的两个WriteLine输出的是False！发生了什么？</p>
+<p>原因就是这个最后添加的那行代码中的常量“xyz”，CLR会将程序中使用的字符常量自动添加到内部池中。所以，当最后一行被添加之后，“xyz”在程序“运行之前”（避免严谨，这里用引号）就已经存在于内部池中。所以，当调用String.IsInterned的时候，返回的不再是null，而是指向“xyz”的引用。这也解释了，为什么后面的ReferenceEquals返回False，因为s从来没有被加到内部池中，其指向也不是内部池的”xyz”。</p>
+<h1 id="编译器比你想象的要聪明"><a href="#编译器比你想象的要聪明" class="headerlink" title="编译器比你想象的要聪明"></a>编译器比你想象的要聪明</h1><p>改变最后一行代码为：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Console.WriteLine(<span class="keyword">object</span>.ReferenceEquals(<span class="string">"x"</span> + <span class="string">"y"</span> + <span class="string">"z"</span>, s));</span><br></pre></td></tr></table></figure>
+
+<p>运行一下，你会发现运行结果和直接使用“xyz”一样。但这里使用了+运算符啊？编译器不应该知道”x“+”y”+”z”最终的结果吧？</p>
+<p>实际上，如果你将”x“+”y”+”z”替换为String.Format(“{0}{1}{2}”,’x’,’y’,’z’)，结果确实就不一样了。某种原因，CLR会将使用+运算符链接的字符串视为常量，而String.Format却需要在运行时才能知道结果。为什么？看一下下面的代码：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line">  </span><br><span class="line"><span class="keyword">class</span> <span class="title">Program</span> </span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Console.WriteLine(<span class="string">"x"</span> + <span class="string">"y"</span> + <span class="string">"z"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这段代码编译之后，使用Ildasm.exe查看，会看到：</p>
+<p>看到了吧，编译器足够聪明，将”x“+”y”+”z”替换为”xyz“。</p>
 
       
     </div>
@@ -558,8 +611,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2019/09/11/CIOC和AOP的一些基本概念/" rel="prev" title="CIOC和AOP的一些基本概念">
-                CIOC和AOP的一些基本概念 <i class="fa fa-chevron-right"></i>
+              <a href="/2019/09/11/IOC和AOP的一些基本概念/" rel="prev" title="IOC和AOP的一些基本概念">
+                IOC和AOP的一些基本概念 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -604,8 +657,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <div class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -622,7 +684,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">430</span>
+                    <span class="site-state-item-count">436</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -795,23 +857,23 @@
                 
                 
                   <li>
-                    <a href="/2019/09/11/命令模式（详解版）/" title="命令模式（详解版）" target="_blank">命令模式（详解版）</a>
+                    <a href="/2019/09/12/学习感想/" title="学习感想" target="_blank">学习感想</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/11/备忘录模式（详解版）/" title="备忘录模式（详解版）" target="_blank">备忘录模式（详解版）</a>
+                    <a href="/2019/09/12/C-设计模式-建造者模式/" title="C#设计模式--建造者模式" target="_blank">C#设计模式--建造者模式</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/11/讲解C-设计模式编程中享元模式的运用/" title="讲解C#设计模式编程中享元模式的运用" target="_blank">讲解C#设计模式编程中享元模式的运用</a>
+                    <a href="/2019/09/12/C-设计模式-组合模式/" title="C#设计模式--组合模式" target="_blank">C#设计模式--组合模式</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/11/CC-设计模式（14）——模板方法模式/" title="CC#设计模式（14）——模板方法模式" target="_blank">CC#设计模式（14）——模板方法模式</a>
+                    <a href="/2019/09/12/C-设计模式-装饰者模式/" title="C#设计模式--装饰者模式" target="_blank">C#设计模式--装饰者模式</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/11/C-设计模式--享元模式/" title="C#设计模式--享元模式" target="_blank">C#设计模式--享元模式</a>
+                    <a href="/2019/09/12/解析C-设计模式编程中的装饰者模式/" title="解析C#设计模式编程中的装饰者模式" target="_blank">解析C#设计模式编程中的装饰者模式</a>
                   </li>
                 
               </ul>
@@ -826,6 +888,23 @@
         </div>
       </div>
 
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#String-Intern"><span class="nav-number">1.</span> <span class="nav-text">String.Intern</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#String-IsInterned"><span class="nav-number">2.</span> <span class="nav-text">String.IsInterned</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#常量字符串自动被加入内部池"><span class="nav-number">3.</span> <span class="nav-text">常量字符串自动被加入内部池</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#编译器比你想象的要聪明"><span class="nav-number">4.</span> <span class="nav-text">编译器比你想象的要聪明</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
       
 
       
@@ -866,7 +945,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">42:07</span>
+    <span title="站点阅读时长">42:25</span>
   
 </div>
 

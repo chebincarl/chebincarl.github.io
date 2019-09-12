@@ -111,7 +111,7 @@
 <meta property="og:site_name" content="车斌的博客">
 <meta property="og:description" content="思考并回答以下问题：">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-09-11T13:17:08.988Z">
+<meta property="og:updated_time" content="2019-09-12T10:33:31.630Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="C#字符串与享元（Flyweight）模式">
 <meta name="twitter:description" content="思考并回答以下问题：">
@@ -405,6 +405,9 @@
         
 
         <div class="post-meta">
+
+          
+
           <span class="post-time">
 
             
@@ -423,12 +426,24 @@
                 
               
 
-              <time title="创建时间：2019-09-11 16:12:56 / 修改时间：21:17:08" itemprop="dateCreated datePublished" datetime="2019-09-11T16:12:56+08:00">2019-09-11</time>
+              <time title="创建时间：2019-09-11 16:12:56" itemprop="dateCreated datePublished" datetime="2019-09-11T16:12:56+08:00">2019-09-11</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-12 18:33:31" itemprop="dateModified" datetime="2019-09-12T18:33:31+08:00">2019-09-12</time>
               
             
           </span>
@@ -456,7 +471,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">4.8k</span>
+                <span title="本文字数">2.9k</span>
               
 
               
@@ -470,7 +485,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">4 分钟</span>
+                <span title="阅读时长">3 分钟</span>
               
             </div>
           
@@ -494,95 +509,47 @@
 <a id="more"></a>
 
 <p>写这个文章，主要是因为网上对C#字符串和享元模式的误解比较多。</p>
-<p>Flyweight模式<br>先说这名字，fly呢，就是苍蝇，没错这里面不是飞的意思，是苍蝇的意思，weight大家都知道，就是重量，苍蝇的重量，就是非常非常轻的意思。所以Flyweight模式就是处理非常非常轻量级对象的一个东西。</p>
+<h1 id="Flyweight模式"><a href="#Flyweight模式" class="headerlink" title="Flyweight模式"></a><span style="color:#339AFF;">Flyweight模式</span></h1><p>先说这名字，fly呢，就是苍蝇，没错这里面不是飞的意思，是苍蝇的意思，weight大家都知道，就是重量，苍蝇的重量，就是非常非常轻的意思。所以Flyweight模式就是处理非常非常轻量级对象的一个东西。</p>
 <p>Flyweight的目标是解决大量细粒度对象的内存消耗问题，当然，巧妇难为无米之炊，任何模式和手法都不能凭空造出内存来，所以享元模式针对的情况是这些细粒度对象的中数据有重复的情况。</p>
-<p>Flyweight的做法是，把对象的状态（通常用属性表示），分成两个部分，一部分是内部状态，另一部分是外部状态。内部状态外部状态是不易重复的（或者说必要的），外部状态 内部状态是易重复的。所以，Flyweight把外部状态提取出来共享，这样就一定程度解决了内存占用问题。</p>
-<p>C#中的字符串不是Flyweight模式<br>在网上常常可以看到一个说法，说C#中的字符串使用了Flyweight模式，开门见山地说，这个说法是错误的。</p>
-<p>错在哪里呢？按照上文的介绍，错就错在字符串它没有所谓的“内部状态外部状态”。</p>
+<p>Flyweight的做法是，把对象的状态（通常用属性表示），分成两个部分，一部分是内部状态，另一部分是外部状态。外部状态是不易重复的，内部状态是易重复的。所以，Flyweight把内部状态提取出来共享，这样就一定程度解决了内存占用问题。</p>
+<h1 id="C-中的字符串不是Flyweight模式"><a href="#C-中的字符串不是Flyweight模式" class="headerlink" title="C#中的字符串不是Flyweight模式"></a><span style="color:#339AFF;">C#中的字符串不是Flyweight模式</span></h1><p>在网上常常可以看到一个说法，说C#中的字符串使用了Flyweight模式，开门见山地说，这个说法是错误的。</p>
+<p>错在哪里呢？按照上文的介绍，错就错在字符串它没有所谓的“外部状态”。</p>
 <p>通常讲字符串是享元的原因就是以下代码：</p>
-<p>string a = “Hello World”;<br>Console.WriteLine(Object.ReferenceEquals(a, “Hello World”)); //True</p>
-<p>当使用字符串直接量的时候，不论你写了多少个”Hello World”，最终内存里面只有一个字符串对象。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">string</span> a = <span class="string">"Hello World"</span>; </span><br><span class="line">Console.WriteLine(Object.ReferenceEquals(a, <span class="string">"Hello World"</span>)); <span class="comment">//True</span></span><br></pre></td></tr></table></figure>
+
+<p>当使用字符串直接量的时候，不论你写了多少个“Hello World”，最终内存里面只有一个字符串对象。</p>
 <p>运行时创建的字符串并不在此列，可以使些手段，强制在内存里面产生新的字符串。</p>
-<p>string a = “Hello World”;<br>Console.WriteLine(Object.ReferenceEquals(a, new String(“Hello World”.ToCharArray())));  //False</p>
-<p>因为我们强行调用了new，所以这个字符串跟内存中的直接量”Hello World”对应的对象不是同一个。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">string</span> a = <span class="string">"Hello World"</span>; </span><br><span class="line">Console.WriteLine(Object.ReferenceEquals(a, <span class="keyword">new</span> String(<span class="string">"Hello World"</span>.ToCharArray())));  <span class="comment">//False</span></span><br></pre></td></tr></table></figure>
+
+<p>因为我们强行调用了new，所以这个字符串跟内存中的直接量<br>“Hello World”对应的对象不是同一个。</p>
 <p>有趣的是，C#还允许强制把一个字符串加入到（如果已经有了，就只是找出来）字符串池里面。</p>
-<p>string a = “Hello World”;<br>string b = String.Intern(new String(“Hello World”.ToCharArray()));<br>Console.WriteLine(Object.ReferenceEquals(a,b) );   </p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">string</span> a = <span class="string">"Hello World"</span>; </span><br><span class="line"><span class="keyword">string</span> b = String.Intern(<span class="keyword">new</span> String(<span class="string">"Hello World"</span>.ToCharArray())); </span><br><span class="line">Console.WriteLine(Object.ReferenceEquals(a,b) );</span><br></pre></td></tr></table></figure>
+
 <p>或者</p>
-<p>string a = String.Intern(new String(“Hello World”.ToCharArray()));<br>string b = String.Intern(new String(“Hello World”.ToCharArray()));<br>Console.WriteLine(Object.ReferenceEquals(a,b) );</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">string</span> a = String.Intern(<span class="keyword">new</span> String(<span class="string">"Hello World"</span>.ToCharArray())); </span><br><span class="line"><span class="keyword">string</span> b = String.Intern(<span class="keyword">new</span> String(<span class="string">"Hello World"</span>.ToCharArray())); </span><br><span class="line">Console.WriteLine(Object.ReferenceEquals(a,b) );</span><br></pre></td></tr></table></figure>
+
 <p>前面提到了，这个行为跟Flyweight使用的内部状态和外部状态不同，是两个对象实实在在就是同一个对象。</p>
-<p>C#中的字符串与Flyweight模式<br>好吧，前面说了不少，C#中的字符串不是Flyweight模式，但是是不是就意味着C#里面字符串跟Flyweight没有关系呢？</p>
+<h1 id="C-中的字符串与Flyweight模式"><a href="#C-中的字符串与Flyweight模式" class="headerlink" title="C#中的字符串与Flyweight模式"></a><span style="color:#339AFF;">C#中的字符串与Flyweight模式</span></h1><p>好吧，前面说了不少，C#中的字符串不是Flyweight模式，但是是不是就意味着C#里面字符串跟Flyweight没有关系呢？</p>
 <p>当然不是，否则我写这么一篇文章岂不是太蛋疼了……</p>
 <p>字符串池和Intern方法简直是实现Flyweight的神器啊！</p>
 <p>考虑我们有某一类对象，可能会创建几百万个，对象里面恰巧有这么一个属性叫做颜色，它在对象构造的时候随机产生，颜色用的是rgb色，用rgb24来表示，于是颜色字符串类似#ccc这样子。</p>
 <p>代码写起来就像下面的样子：</p>
-<pre><code>class Element
-{
-static Random rnd = new Random();
-static char[] table;
-static Element() 
-{
-    table = &quot;0123456789abcdef&quot;.ToCharArray();
-}
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">Element</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">static</span> Random rnd = <span class="keyword">new</span> Random();</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">char</span>[] table;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="title">Element</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        table = <span class="string">"0123456789abcdef"</span>.ToCharArray();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span> color;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Element</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        color = <span class="string">""</span> + table[rnd.Next() % <span class="number">16</span>] + table[rnd.Next() % <span class="number">16</span>] + table[rnd.Next() % <span class="number">16</span>];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-public string color;
-public Element()
-{
-    color = &quot;&quot; + table[rnd.Next() % 16] + table[rnd.Next() % 16] + table[rnd.Next() % 16];
-}
-}</code></pre><p>接下来我们创建3千万个对象看看如何</p>
-<pre><code>Element[] eles = new Element[30000000];
-for (var i = 0; i &lt; 30000000; i++)
-{
-eles[i] = new Element();
-}</code></pre><p>从任务管理器看到一大块内存被吃掉了</p>
-<p>QFOMR9}(NR%(T3`V3Q35MSY</p>
+<p>接下来我们创建3千万个对象看看如何</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Element[] eles = <span class="keyword">new</span> Element[<span class="number">30000000</span>];</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> (<span class="keyword">var</span> i = <span class="number">0</span>; i &lt; <span class="number">30000000</span>; i++)</span><br><span class="line">&#123;</span><br><span class="line">    eles[i] = <span class="keyword">new</span> Element();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>从任务管理器看到一大块内存被吃掉了</p>
 <p>接下来我们使用String.Intern来实现Flyweight：</p>
-<pre><code>class Element
-{
-static Random rnd = new Random();
-static char[] table;
-static Element() 
-{
-    table = &quot;0123456789abcdef&quot;.ToCharArray();
-}
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">Element</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">static</span> Random rnd = <span class="keyword">new</span> Random();</span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">char</span>[] table;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="title">Element</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        table = <span class="string">"0123456789abcdef"</span>.ToCharArray();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span> color;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Element</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        color = String.Intern(<span class="string">""</span> + table[rnd.Next() % <span class="number">16</span>] + table[rnd.Next() % <span class="number">16</span>] + table[rnd.Next() % <span class="number">16</span>]);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-public string color;
-public Element()
-{
-    color = String.Intern(&quot;&quot; + table[rnd.Next() % 16] + table[rnd.Next() % 16] + table[rnd.Next() % 16]);
-}
-}</code></pre><p>同样来看看运行结果：</p>
-<p>@XMI6L75IKU}S%NGI6L31@K</p>
+<p>同样来看看运行结果：</p>
 <p>可以看到内存占用量的明显变化。</p>
 <p>因为字符串对象的不可更改性质，使用了String.Intern之后，我们完全看不出前后color的区别，也就是说，修改前后的Element类是完全等效的，但是Flyweight为我们节约了大量的内存。</p>
-<p>更多思考<br>这个典型的使用flyweight场景为我们揭示了享元外部状态内部状态的特征：像字符串一样不可更改的对象。GoF原书的例子中的字型对象Glyph也是如此。</p>
+<h1 id="更多思考"><a href="#更多思考" class="headerlink" title="更多思考"></a><span style="color:#339AFF;">更多思考</span></h1><p>这个典型的使用flyweight场景为我们揭示了享元外部状态内部状态的特征：像字符串一样不可更改的对象。GoF原书的例子中的字型对象Glyph也是如此。</p>
 <p>String.Intern这种对象池的方式实现flyweight也值得借鉴，我们可以考虑自己设计flyweight的外部状态对象时使用类似的方式。</p>
-<p>感觉文章中把内部和外部两种状态的含义说反了。</p>
-<p>享元模式中“内部状态”又称“内蕴状态”（Internal State），“外部状态”又称“外蕴状态”（External State）。这两个概念经常容易搞混。</p>
-<p>1)    内蕴状态：存储在享元对象内部，不随着环境改变，要以被诸多对象共享。<br>2)    外蕴状态：一般由客户端指定，并传入享元对象内部，它随着环境进行变化。因此，不可以共享的状态。享元对象的外蕴状态必须由外部保存。</p>
-<p>不知理解得是否正确，探讨一下。</p>
-<p>string a = “Hello World”;<br>Console.WriteLine(Object.ReferenceEquals(a, “Hello World”)); //True</p>
-<p>string a1 = “Hello World”;<br>Console.WriteLine(Object.ReferenceEquals(a1, new String(“Hello World”.ToCharArray()))); //False</p>
-<p>Console.WriteLine(a.GetHashCode());<br>Console.WriteLine(new String(“Hello World”.ToCharArray()).GetHashCode());</p>
-<p>那为什么这下面的两个哈希值是一样的 ？<br>支持(0) 反对(0)</p>
-<p>   #4楼 2012-03-13 18:18 NeilChen<br>例子很好，赞。<br>支持(0) 反对(0)</p>
-<p>   #5楼 [楼主] 2012-03-13 23:33 winter-cn<br>@ Skolley<br>我不是很熟悉 似乎C#对于值类型的hash就是如此？<br>支持(0) 反对(0)</p>
-<p>   #6楼 2012-03-27 18:32 Jeffrey Zhao<br>@ winter-cn<br>她爹要打屁股，string哪是值类型，只不过String的GetHashCode方法被重载了而已，相同内容的字符串就是一样的。<br>支持(0) 反对(1)</p>
-<p>   #7楼 [楼主] 2012-03-28 11:29 winter-cn<br>引用<br>Jeffrey Zhao：@winter-cn<br>她爹要打屁股，string哪是值类型，只不过String的GetHashCode方法被重载了而已，相同内容的字符串就是一样的。</p>
-<p>我错鸟 不过string真心应该设计成值类型啊……<br>支持(0) 反对(0)</p>
-<p>   #8楼 2012-03-28 11:59 Jeffrey Zhao<br>@ winter-cn<br>值类型复制的时候要复制全部内容哎，难道为string做特例咩……<br>支持(0) 反对(0)</p>
-<p>   #9楼 [楼主] 2012-03-28 14:25 winter-cn<br>@ Jeffrey Zhao<br>看起来像是复制全部内容就行了啊<br>支持(0) 反对(0)</p>
-<p>   #10楼 2012-03-28 14:51 Jeffrey Zhao<br>@ winter-cn<br>那不就是做特例了嘛，我觉得现在挺好的，没有特殊规则。<br>支持(0) 反对(0)</p>
-<p>   #11楼 [楼主] 2012-03-28 14:56 winter-cn<br>@ Jeffrey Zhao<br>我是觉得大个的valuetype都该这么干<br>支持(0) 反对(0)</p>
-<p>   #12楼 2012-10-09 09:33 berry zhou<br>@ Jeffrey Zhao<br>String 是特殊引用的值类型，说白了还是当值类型用。<br>支持(0) 反对(0)</p>
-<p>   #13楼 2012-10-09 13:13 Jeffrey Zhao<br>@ berry zhou<br>什么乱七八糟的……<br>支持(0) 反对(0)</p>
-<p>   #14楼 2012-10-09 13:33 berry zhou<br>@ Jeffrey Zhao<br>不懂当然会说乱七八糟了，这个是人家刚毕业的人回答的问题。<br>支持(0) 反对(0)</p>
-<p>   #15楼 2012-10-09 13:59 Jeffrey Zhao<br>@ berry zhou<br>是你回答地乱七八糟，特殊引用的值类型都出来了。就是你说这种什么“当值类型用”结果简单的问题都不清楚。<br>支持(0) 反对(0)</p>
-<p>   #16楼 2012-10-09 14:48 berry zhou<br>@ Jeffrey Zhao<br>没文化真可怕。<br>支持(0) 反对(0)</p>
-<p>   #17楼 2012-10-09 14:51 Jeffrey Zhao<br>@ berry zhou<br>没文化还以为自己有文化最可怕。<br>来来，有本事赶快秀点有文化的东西出来。<br>支持(0) 反对(0)</p>
-<p>   #18楼 2012-10-09 16:13 berry zhou<br>@ Jeffrey Zhao<br>看看你写东西就知道，漏洞百出，连基本的概念都没有搞清楚。<br>支持(0) 反对(0)</p>
-<p>   #19楼 2012-10-09 16:18 Jeffrey Zhao<br>@ berry zhou<br>来来，列举几个漏洞，也好让我学习学习。<br>还有，快秀点有文化的东西出来啊，别只会嘴硬，来点干货。<br>支持(0) 反对(0)</p>
-<p>   #20楼 2012-11-21 14:42 AngelGong<br>貌似string对于有个pool的，如果pool里面已经有，就会使用已经存在的。所以GetHashCode就指向同一个了，我也是猜的</p>
+<p>享元模式中“内部状态”又称“内蕴状态”（Internal State），“外部状态”又称“外蕴状态”（External State）。</p>
+<p>1)内蕴状态：存储在享元对象内部，不随着环境改变，要以被诸多对象共享。<br>2)外蕴状态：一般由客户端指定，并传入享元对象内部，它随着环境进行变化。因此，不可以共享的状态。享元对象的外蕴状态必须由外部保存。</p>
 
       
     </div>
@@ -669,8 +636,17 @@ public Element()
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <div class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -687,7 +663,7 @@ public Element()
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">430</span>
+                    <span class="site-state-item-count">436</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -860,23 +836,23 @@ public Element()
                 
                 
                   <li>
-                    <a href="/2019/09/11/命令模式（详解版）/" title="命令模式（详解版）" target="_blank">命令模式（详解版）</a>
+                    <a href="/2019/09/12/学习感想/" title="学习感想" target="_blank">学习感想</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/11/备忘录模式（详解版）/" title="备忘录模式（详解版）" target="_blank">备忘录模式（详解版）</a>
+                    <a href="/2019/09/12/C-设计模式-建造者模式/" title="C#设计模式--建造者模式" target="_blank">C#设计模式--建造者模式</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/11/讲解C-设计模式编程中享元模式的运用/" title="讲解C#设计模式编程中享元模式的运用" target="_blank">讲解C#设计模式编程中享元模式的运用</a>
+                    <a href="/2019/09/12/C-设计模式-组合模式/" title="C#设计模式--组合模式" target="_blank">C#设计模式--组合模式</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/11/CC-设计模式（14）——模板方法模式/" title="CC#设计模式（14）——模板方法模式" target="_blank">CC#设计模式（14）——模板方法模式</a>
+                    <a href="/2019/09/12/C-设计模式-装饰者模式/" title="C#设计模式--装饰者模式" target="_blank">C#设计模式--装饰者模式</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/11/C-设计模式--享元模式/" title="C#设计模式--享元模式" target="_blank">C#设计模式--享元模式</a>
+                    <a href="/2019/09/12/解析C-设计模式编程中的装饰者模式/" title="解析C#设计模式编程中的装饰者模式" target="_blank">解析C#设计模式编程中的装饰者模式</a>
                   </li>
                 
               </ul>
@@ -891,6 +867,23 @@ public Element()
         </div>
       </div>
 
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Flyweight模式"><span class="nav-number">1.</span> <span class="nav-text">Flyweight模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#C-中的字符串不是Flyweight模式"><span class="nav-number">2.</span> <span class="nav-text">C#中的字符串不是Flyweight模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#C-中的字符串与Flyweight模式"><span class="nav-number">3.</span> <span class="nav-text">C#中的字符串与Flyweight模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#更多思考"><span class="nav-number">4.</span> <span class="nav-text">更多思考</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
       
 
       
@@ -931,7 +924,7 @@ public Element()
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">42:07</span>
+    <span title="站点阅读时长">42:25</span>
   
 </div>
 

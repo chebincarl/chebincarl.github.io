@@ -116,7 +116,7 @@
 <meta property="og:image" content="http://chebincarl.github.io/2019/08/12/角色的组装-建造者模式/3.png">
 <meta property="og:image" content="http://chebincarl.github.io/2019/08/12/角色的组装-建造者模式/4.png">
 <meta property="og:image" content="http://chebincarl.github.io/2019/08/12/角色的组装-建造者模式/5.png">
-<meta property="og:updated_time" content="2019-09-04T13:09:54.032Z">
+<meta property="og:updated_time" content="2019-09-12T10:33:31.727Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="角色的组装--建造者模式">
 <meta name="twitter:description" content="思考并回答以下问题：  建造者模式的官方定义是什么？背下来。 建造者模式是创建型模式，是为了获取到Product的实例。但是这个实例的方法有不同的表现。怎么理解？ 建造者模式在其他应用上可能很少用到，但是在游戏开发中，创建角色就会用到。像观察者模式在游戏程序开发中非常重要，但是在PHP中很少使用。所以开发游戏来学习设计模式是非常好的，因为游戏可以模拟现实中的一切，而PHP网站开发遇到的情况没有那么">
@@ -411,6 +411,9 @@
         
 
         <div class="post-meta">
+
+          
+
           <span class="post-time">
 
             
@@ -446,7 +449,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-09-04 21:09:54" itemprop="dateModified" datetime="2019-09-04T21:09:54+08:00">2019-09-04</time>
+                <time title="修改时间：2019-09-12 18:33:31" itemprop="dateModified" datetime="2019-09-12T18:33:31+08:00">2019-09-12</time>
               
             
           </span>
@@ -531,6 +534,7 @@
 <li>建造者模式的官方定义是什么？背下来。</li>
 <li>建造者模式是创建型模式，是为了获取到Product的实例。但是这个实例的方法有不同的表现。怎么理解？</li>
 <li>建造者模式在其他应用上可能很少用到，但是在游戏开发中，创建角色就会用到。像观察者模式在游戏程序开发中非常重要，但是在PHP中很少使用。所以开发游戏来学习设计模式是非常好的，因为游戏可以模拟现实中的一切，而PHP网站开发遇到的情况没有那么广泛。是这样吗？</li>
+<li>回答这个关键问题，没有使用建造者模式之前代码存在什么问题？必须用工厂模式和单例模式的原因都知道，建造者模式必须用吗？如果是理由是什么？</li>
 </ul>
 <a id="more"></a>
 
@@ -578,7 +582,6 @@
 <p>所以，接下来的修正方向应该是：将重复的算法放到一个类中；将两个新的工厂类从工厂继承体系中搬移出去，让组装角色功能的流程独立出来。</p>
 <p>上述说明的修改方向就是运用建造者模式的适用条件，将复杂的构建流程以一个类封装，并让不同功能的组装和设置在各自不同的类中实现。</p>
 <h1 id="建造者模式"><a href="#建造者模式" class="headerlink" title="建造者模式"></a><span style="color:#339AFF;">建造者模式</span></h1><p><span style="color:red">工厂类是将生产对象的地点全部集中到一个地点来管理</span>，但是如何在生产对象的过程中，能够更有效率并且更具弹性，则需要搭配其他的设计模式。建造者模式就是常用来搭配使用的模式之一。</p>
-<p>注：工厂模式并没有控制创建对象前后可以做的事情，就是只是方便改名字而已，放到一处只改一次类名就OK。但是创建对象时完全可能做一些前期和后期处理。</p>
 <h2 id="建造者模式的定义"><a href="#建造者模式的定义" class="headerlink" title="建造者模式的定义"></a><span style="color:#00ACC1;">建造者模式的定义</span></h2><p>在GoF中对建造者模式（Builder）的定义是：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">将一个复杂对象的构建流程与它的对象表现分离出来，让相同的构建流程可以产生不同的对象行为表现。</span><br></pre></td></tr></table></figure>
 
@@ -657,7 +660,7 @@
 <blockquote>
 <p>Listing6 测试建造者模式（BuilderTest.cs）</p>
 </blockquote>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">UnitTest</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// 想得到Product类的一个实例对象</span></span><br><span class="line">    <span class="comment">// 肯定不是直接new，因为创造型模式就是转移new 对象这个代码。</span></span><br><span class="line">    <span class="comment">// 不使用任何模式时都是这样写的。</span></span><br><span class="line">    <span class="comment">// Product theProduct = new Product();</span></span><br><span class="line">    <span class="comment">// theProduct.ShowProduct();</span></span><br><span class="line">    <span class="comment">// 本来两步的事，现在多了好几步。</span></span><br><span class="line">    <span class="comment">// 只能从Director的一个方法得到实例。</span></span><br><span class="line">    <span class="comment">// 在这之前，Director还进行了</span></span><br><span class="line">    <span class="comment">// 对比工厂模式，得到实例只比最初版本多了一步，即Factory.GetInstance(switch_type);或ConcreteFactory.GetInstance();</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建</span></span><br><span class="line">    Product theProduct = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    Director theDirectoir = <span class="keyword">new</span> Director();</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 使用BuilderA构建</span></span><br><span class="line">    theDirectoir.Construct( <span class="keyword">new</span> ConcreteBuilderA());</span><br><span class="line">    theProduct = theDirectoir.GetResult();</span><br><span class="line"></span><br><span class="line">    theProduct.ShowProduct();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用BuilderB构建</span></span><br><span class="line">    theDirectoir.Construct( <span class="keyword">new</span> ConcreteBuilderB());</span><br><span class="line">    theProduct = theDirectoir.GetResult();</span><br><span class="line">    theProduct.ShowProduct();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">UnitTest</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// 想得到Product类的一个实例对象</span></span><br><span class="line">    <span class="comment">// 肯定不是直接new，因为创造型模式就是转移new 对象这个代码。</span></span><br><span class="line">    <span class="comment">// 不使用任何模式时都是这样写的。</span></span><br><span class="line">    <span class="comment">// Product theProduct = new Product();</span></span><br><span class="line">    <span class="comment">// theProduct.ShowProduct();</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 创建</span></span><br><span class="line">    Product theProduct = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    Director theDirectoir = <span class="keyword">new</span> Director();</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 使用BuilderA构建</span></span><br><span class="line">    theDirectoir.Construct( <span class="keyword">new</span> ConcreteBuilderA());</span><br><span class="line">    theProduct = theDirectoir.GetResult();</span><br><span class="line"></span><br><span class="line">    theProduct.ShowProduct();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用BuilderB构建</span></span><br><span class="line">    theDirectoir.Construct( <span class="keyword">new</span> ConcreteBuilderB());</span><br><span class="line">    theProduct = theDirectoir.GetResult();</span><br><span class="line">    theProduct.ShowProduct();</span><br><span class="line">    <span class="comment">// 得到实例的最终目的就是实例.方法调用对象的方法，不然new一个对象什么事都不干毫无意义。</span></span><br><span class="line">    <span class="comment">// 建造者再怎么复杂最终还是要有theProduct.ShowProduct();这一行代码。那么比最简单版本的new之后再调用有什么区别呢？寻找一个这个区别。</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>在Director的指挥下，将不同属性的功能指定给Product对象，最后获取Product，并显示该Product当前获得的功能和状态。通过信息的输出，可以看到Product对象在使用不同的Builder时，会有不同的功能表现：</p>
 <blockquote>
@@ -860,7 +863,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">430</span>
+                    <span class="site-state-item-count">436</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -1033,23 +1036,23 @@
                 
                 
                   <li>
-                    <a href="/2019/09/11/命令模式（详解版）/" title="命令模式（详解版）" target="_blank">命令模式（详解版）</a>
+                    <a href="/2019/09/12/学习感想/" title="学习感想" target="_blank">学习感想</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/11/备忘录模式（详解版）/" title="备忘录模式（详解版）" target="_blank">备忘录模式（详解版）</a>
+                    <a href="/2019/09/12/C-设计模式-建造者模式/" title="C#设计模式--建造者模式" target="_blank">C#设计模式--建造者模式</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/11/讲解C-设计模式编程中享元模式的运用/" title="讲解C#设计模式编程中享元模式的运用" target="_blank">讲解C#设计模式编程中享元模式的运用</a>
+                    <a href="/2019/09/12/C-设计模式-组合模式/" title="C#设计模式--组合模式" target="_blank">C#设计模式--组合模式</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/11/CC-设计模式（14）——模板方法模式/" title="CC#设计模式（14）——模板方法模式" target="_blank">CC#设计模式（14）——模板方法模式</a>
+                    <a href="/2019/09/12/C-设计模式-装饰者模式/" title="C#设计模式--装饰者模式" target="_blank">C#设计模式--装饰者模式</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/11/C-设计模式--享元模式/" title="C#设计模式--享元模式" target="_blank">C#设计模式--享元模式</a>
+                    <a href="/2019/09/12/解析C-设计模式编程中的装饰者模式/" title="解析C#设计模式编程中的装饰者模式" target="_blank">解析C#设计模式编程中的装饰者模式</a>
                   </li>
                 
               </ul>
@@ -1121,7 +1124,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">42:07</span>
+    <span title="站点阅读时长">42:25</span>
   
 </div>
 
