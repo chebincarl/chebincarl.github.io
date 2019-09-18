@@ -103,25 +103,25 @@
 
 
 
-  <meta name="description" content="思考并回答以下问题：">
-<meta name="keywords" content="QFramework">
+  <meta name="description" content="思考并回答以下问题：  这个类干嘛用的？ 如何监测UI图片Image的单击事件？ Unity开发有一个重要的原则是不要手动拖代码，一切拖动的都需要优化成自动加载，怎么理解？">
+<meta name="keywords" content="Unity">
 <meta property="og:type" content="article">
-<meta property="og:title" content="ResSystem">
-<meta property="og:url" content="http://chebincarl.github.io/2019/09/10/ResSystem/index.html">
+<meta property="og:title" content="UguiEventListener">
+<meta property="og:url" content="http://chebincarl.github.io/2019/09/18/UguiEventListener/index.html">
 <meta property="og:site_name" content="车斌的博客">
-<meta property="og:description" content="思考并回答以下问题：">
+<meta property="og:description" content="思考并回答以下问题：  这个类干嘛用的？ 如何监测UI图片Image的单击事件？ Unity开发有一个重要的原则是不要手动拖代码，一切拖动的都需要优化成自动加载，怎么理解？">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-09-10T11:04:31.584Z">
+<meta property="og:updated_time" content="2019-09-18T13:21:33.021Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="ResSystem">
-<meta name="twitter:description" content="思考并回答以下问题：">
+<meta name="twitter:title" content="UguiEventListener">
+<meta name="twitter:description" content="思考并回答以下问题：  这个类干嘛用的？ 如何监测UI图片Image的单击事件？ Unity开发有一个重要的原则是不要手动拖代码，一切拖动的都需要优化成自动加载，怎么理解？">
 
 
 
 
 
 
-  <link rel="canonical" href="http://chebincarl.github.io/2019/09/10/ResSystem/">
+  <link rel="canonical" href="http://chebincarl.github.io/2019/09/18/UguiEventListener/">
 
 
 
@@ -131,7 +131,7 @@
   };
 </script>
 
-  <title>ResSystem | 车斌的博客</title>
+  <title>UguiEventListener | 车斌的博客</title>
   
 
 
@@ -380,7 +380,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/09/10/ResSystem/">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/09/18/UguiEventListener/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Chebin">
@@ -397,7 +397,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">ResSystem
+          <h1 class="post-title" itemprop="name headline">UguiEventListener
 
               
             
@@ -426,7 +426,7 @@
                 
               
 
-              <time title="创建时间：2019-09-10 09:23:05 / 修改时间：19:04:31" itemprop="dateCreated datePublished" datetime="2019-09-10T09:23:05+08:00">2019-09-10</time>
+              <time title="创建时间：2019-09-18 09:17:55 / 修改时间：21:21:33" itemprop="dateCreated datePublished" datetime="2019-09-18T09:17:55+08:00">2019-09-18</time>
             
 
             
@@ -436,24 +436,6 @@
             
           </span>
 
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Unity/" itemprop="url" rel="index"><span itemprop="name">Unity</span></a></span>
-
-                
-                
-              
-            </span>
           
 
           
@@ -477,7 +459,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">1.8k</span>
+                <span title="本文字数">2.4k</span>
               
 
               
@@ -512,27 +494,25 @@
 
       
         <p>思考并回答以下问题：</p>
+<ul>
+<li>这个类干嘛用的？</li>
+<li>如何监测UI图片Image的单击事件？</li>
+<li><span style="color:red">Unity开发有一个重要的原则是不要手动拖代码，一切拖动的都需要优化成自动加载</span>，怎么理解？</li>
+</ul>
 <a id="more"></a>
 
-<blockquote>
-<p>IObjectFactory.cs</p>
-</blockquote>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> <span class="title">QF</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 接口声明可以有任何的访问修饰符public、protected、internal或private。</span></span><br><span class="line">    public interface IObjectFactory&lt;T&gt;</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 接口的成员是隐式public的，不允许有任何访问修饰符，包括public。</span></span><br><span class="line">        <span class="comment">// 函数成员的声明不能包含任何实现代码，而在每一个成员声明的主体后必须使用分号。</span></span><br><span class="line">        <span class="function">T <span class="title">Create</span>(<span class="params"></span>)</span>; </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>UI的Image不像Button，没有一开始自带了单击事件。如果需要给Image添加单击事件，需要这样做：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
-<blockquote>
-<p>DefaultObjectFactory.cs</p>
-</blockquote>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> <span class="title">QF</span></span><br><span class="line">&#123;</span><br><span class="line">    public class DefaultObjectFactory&lt;T&gt; : IObjectFactory&lt;T&gt; where T : new()</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> T <span class="title">Create</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> T();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>修改后，无需手动给Image添加脚本，直接寻找到Image，因为脚本不是挂载到Image上，所以新增了委托机制，用于在另外的脚本处（没有挂载到Image上）定义单击后要处理的事情。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"><span class="keyword">using</span> UnityEngine.EventSystems;</span><br><span class="line"></span><br><span class="line">public class UguiEventListener : UnityEngine.EventSystems.EventTrigger</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// EventTrigger是Unity里面自带的类，主要用来监测UI的单击、拖拽等行为</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">delegate</span> <span class="keyword">void</span> <span class="title">VoidDelegate</span>(<span class="params">GameObject go</span>)</span>;</span><br><span class="line">    <span class="keyword">public</span> VoidDelegate onClick;</span><br><span class="line">    <span class="keyword">public</span> VoidDelegate onDown;</span><br><span class="line">    <span class="keyword">public</span> VoidDelegate onEnter;</span><br><span class="line">    <span class="keyword">public</span> VoidDelegate onExit;</span><br><span class="line">    <span class="keyword">public</span> VoidDelegate onUp;</span><br><span class="line">    <span class="keyword">public</span> VoidDelegate onSelect;</span><br><span class="line">    <span class="keyword">public</span> VoidDelegate onUpdateSelect;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> UguiEventListener <span class="title">Get</span>(<span class="params">GameObject go</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        UguiEventListener listener = go.GetComponent&lt;UguiEventListener&gt;();</span><br><span class="line">        <span class="keyword">if</span> (listener == <span class="literal">null</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            listener = go.AddComponent&lt;UguiEventListener&gt;();</span><br><span class="line">        &#125; </span><br><span class="line">        <span class="keyword">return</span> listener;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">OnPointerClick</span>(<span class="params">PointerEventData eventData</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span> (onClick != <span class="literal">null</span>) onClick(<span class="keyword">this</span>.gameObject);</span><br><span class="line">    &#125;</span><br><span class="line">   </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">OnPointerDown</span>(<span class="params">PointerEventData eventData</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span> (onDown != <span class="literal">null</span>) onDown(gameObject);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">OnPointerEnter</span>(<span class="params">PointerEventData eventData</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span> (onEnter != <span class="literal">null</span>) onEnter(gameObject);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">OnPointerExit</span>(<span class="params">PointerEventData eventData</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span> (onExit != <span class="literal">null</span>) onExit(gameObject);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">OnPointerUp</span>(<span class="params">PointerEventData eventData</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span> (onUp != <span class="literal">null</span>) onUp(gameObject);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">OnSelect</span>(<span class="params">BaseEventData eventData</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span> (onSelect != <span class="literal">null</span>) onSelect(gameObject);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">OnUpdateSelected</span>(<span class="params">BaseEventData eventData</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span> (onUpdateSelect != <span class="literal">null</span>) onUpdateSelect(gameObject);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<blockquote>
-<p>CustomObjectFactory.cs</p>
-</blockquote>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> <span class="title">QF</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">using</span> System;</span><br><span class="line"></span><br><span class="line">    public class CustomObjectFactory&lt;T&gt; : IObjectFactory&lt;T&gt;</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 带返回类型的委托</span></span><br><span class="line">        <span class="comment">// 无参数时：Func&lt;TResult&gt;  Func&lt;返回值&gt;</span></span><br><span class="line">        <span class="comment">// 有参数时：Func&lt;TParam, TResult&gt; Func&lt;参数类型, 返回值&gt;</span></span><br><span class="line">        <span class="keyword">protected</span> Func&lt;T&gt; mFactoryMethod;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">CustomObjectFactory</span>(<span class="params">Func&lt;T&gt; factoryMethod</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            mFactoryMethod = factoryMethod;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> T <span class="title">Create</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="comment">// 执行委托</span></span><br><span class="line">            <span class="keyword">return</span> mFactoryMethod();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用</p>
+<p>无需再给Image手动添加脚本，</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">MainUI</span> : <span class="title">BaseUI</span></span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">private</span> Transform image;</span><br><span class="line"></span><br><span class="line">	UguiEventListener.Get(image.gameObject).onClick = Show;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">Show</span>(<span class="params">GameObject go</span>)</span></span><br><span class="line"><span class="function"></span>	&#123;</span><br><span class="line">		Debug.Log(<span class="string">"***"</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<blockquote>
-<p>NonPublicObjectFactory.cs</p>
-</blockquote>
-<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> <span class="title">QF</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">using</span> System;</span><br><span class="line">    <span class="keyword">using</span> System.Reflection;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// class约束：任何引用类型，包括类（静态类和非静态类）、数组、委托和接口都可以用作类型实参</span></span><br><span class="line">    public class NonPublicObjectFactory&lt;T&gt; : IObjectFactory&lt;T&gt; where T : class</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> T <span class="title">Create</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="comment">// 得到所有构造函数</span></span><br><span class="line">            <span class="keyword">var</span> ctors = <span class="keyword">typeof</span>(T).GetConstructors(BindingFlags.Instance | BindingFlags.NonPublic);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 寻找到无参私有构造函数</span></span><br><span class="line">            <span class="keyword">var</span> ctor = Array.Find(ctors, c =&gt; c.GetParameters().Length == <span class="number">0</span>);</span><br><span class="line">            <span class="keyword">return</span> ctor.Invoke(<span class="literal">null</span>) <span class="keyword">as</span> T;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>调用的onClick是个委托，真正的单击监听是OnPointerClick，因为UguiEventListener脚本自动挂载到了Image上。</p>
+
       
     </div>
 
@@ -555,7 +535,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/QFramework/" rel="tag"># QFramework</a>
+            <a href="/tags/Unity/" rel="tag"># Unity</a>
           
         </div>
       
@@ -568,8 +548,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/09/08/构建2D游戏：地精寻宝/" rel="next" title="构建2D游戏：地精寻宝">
-                <i class="fa fa-chevron-left"></i> 构建2D游戏：地精寻宝
+              <a href="/2019/09/17/组合模式-1/" rel="next" title="组合模式">
+                <i class="fa fa-chevron-left"></i> 组合模式
               </a>
             
           </div>
@@ -578,8 +558,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2019/09/10/Unity全面的面试题/" rel="prev" title="Unity全面的面试题">
-                Unity全面的面试题 <i class="fa fa-chevron-right"></i>
+              <a href="/2019/09/18/Editor/" rel="prev" title="Editor">
+                Editor <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -642,7 +622,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">436</span>
+                    <span class="site-state-item-count">457</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -784,7 +764,13 @@
                     
                       
                     
-                    <span class="site-state-item-count">46</span>
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">49</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -815,23 +801,23 @@
                 
                 
                   <li>
-                    <a href="/2019/09/12/学习感想/" title="学习感想" target="_blank">学习感想</a>
+                    <a href="/2019/09/18/命令模式-1/" title="命令模式" target="_blank">命令模式</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/12/C-设计模式-建造者模式/" title="C#设计模式--建造者模式" target="_blank">C#设计模式--建造者模式</a>
+                    <a href="/2019/09/18/在Unity中实现游戏命令模式/" title="在Unity中实现游戏命令模式" target="_blank">在Unity中实现游戏命令模式</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/12/C-设计模式-组合模式/" title="C#设计模式--组合模式" target="_blank">C#设计模式--组合模式</a>
+                    <a href="/2019/09/18/职责链模式-1/" title="职责链模式" target="_blank">职责链模式</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/12/C-设计模式-装饰者模式/" title="C#设计模式--装饰者模式" target="_blank">C#设计模式--装饰者模式</a>
+                    <a href="/2019/09/18/Editor/" title="Editor" target="_blank">Editor</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/12/解析C-设计模式编程中的装饰者模式/" title="解析C#设计模式编程中的装饰者模式" target="_blank">解析C#设计模式编程中的装饰者模式</a>
+                    <a href="/2019/09/18/UguiEventListener/" title="UguiEventListener" target="_blank">UguiEventListener</a>
                   </li>
                 
               </ul>
@@ -875,7 +861,7 @@
     
       <span class="post-meta-item-text">站点总字数：</span>
     
-    <span title="站点总字数">2.8m</span>
+    <span title="站点总字数">3m</span>
   
 
   
@@ -886,7 +872,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">42:25</span>
+    <span title="站点阅读时长">45:04</span>
   
 </div>
 

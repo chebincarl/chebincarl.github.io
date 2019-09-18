@@ -103,20 +103,20 @@
 
 
 
-  <meta name="description" content="思考并回答以下问题：  享元模式不包括client共有四个类，没有再多的类了，说出是哪四个类和每个类的作用。 即使森林里有100颗树实体，代码里也没有更多的类了。怎么理解？ 享元模式有一个工厂类，通过这个工厂维护的一个Dictionary进行相似实体类对象的增删查。怎么理解？ 通过公共接口的参数来传入外部状态怎么理解？ 我们new实例化对象A到Z的目的是什么？是为了调用他们的方法和字段。享元模式并">
-<meta name="keywords" content="Unity">
+  <meta name="description" content="思考并回答以下问题：">
+<meta name="keywords" content="设计模式">
 <meta property="og:type" content="article">
 <meta property="og:title" content="C#设计模式--享元模式">
 <meta property="og:url" content="http://chebincarl.github.io/2019/09/11/C-设计模式--享元模式/index.html">
 <meta property="og:site_name" content="车斌的博客">
-<meta property="og:description" content="思考并回答以下问题：  享元模式不包括client共有四个类，没有再多的类了，说出是哪四个类和每个类的作用。 即使森林里有100颗树实体，代码里也没有更多的类了。怎么理解？ 享元模式有一个工厂类，通过这个工厂维护的一个Dictionary进行相似实体类对象的增删查。怎么理解？ 通过公共接口的参数来传入外部状态怎么理解？ 我们new实例化对象A到Z的目的是什么？是为了调用他们的方法和字段。享元模式并">
+<meta property="og:description" content="思考并回答以下问题：">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://chebincarl.github.io/2019/09/11/C-设计模式--享元模式/1.png">
 <meta property="og:image" content="http://chebincarl.github.io/2019/09/11/C-设计模式--享元模式/2.png">
-<meta property="og:updated_time" content="2019-09-12T10:33:31.633Z">
+<meta property="og:updated_time" content="2019-09-16T12:50:09.727Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="C#设计模式--享元模式">
-<meta name="twitter:description" content="思考并回答以下问题：  享元模式不包括client共有四个类，没有再多的类了，说出是哪四个类和每个类的作用。 即使森林里有100颗树实体，代码里也没有更多的类了。怎么理解？ 享元模式有一个工厂类，通过这个工厂维护的一个Dictionary进行相似实体类对象的增删查。怎么理解？ 通过公共接口的参数来传入外部状态怎么理解？ 我们new实例化对象A到Z的目的是什么？是为了调用他们的方法和字段。享元模式并">
+<meta name="twitter:description" content="思考并回答以下问题：">
 <meta name="twitter:image" content="http://chebincarl.github.io/2019/09/11/C-设计模式--享元模式/1.png">
 
 
@@ -446,11 +446,29 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-09-12 18:33:31" itemprop="dateModified" datetime="2019-09-12T18:33:31+08:00">2019-09-12</time>
+                <time title="修改时间：2019-09-16 20:50:09" itemprop="dateModified" datetime="2019-09-16T20:50:09+08:00">2019-09-16</time>
               
             
           </span>
 
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C#</span></a></span>
+
+                
+                
+              
+            </span>
           
 
           
@@ -509,6 +527,9 @@
 
       
         <p>思考并回答以下问题：</p>
+<a id="more"></a> 
+
+<p>思考并回答以下问题：</p>
 <ul>
 <li>享元模式不包括client共有四个类，没有再多的类了，说出是哪四个类和每个类的作用。</li>
 <li>即使森林里有100颗树实体，代码里也没有更多的类了。怎么理解？</li>
@@ -518,7 +539,7 @@
 <li>享元模式属于结构型模式。为什么？</li>
 <li>客户端使用工厂类的工厂方法来创建这些大量相似的对象，不相似的地方就传参。怎么理解？</li>
 </ul>
-<a id="more"></a>
+<!--more-->
 
 <h1 id="享元模式介绍"><a href="#享元模式介绍" class="headerlink" title="享元模式介绍"></a><span style="color:#339AFF;">享元模式介绍</span></h1><p>在软件开发中我们经常遇到多次使用相似或者相同对象的情况，如果每次使用这个对象都去new一个新的实例会很浪费资源。这时候很多人会想到前边介绍过的一个设计模式：原型模式，原型模式通过拷贝现有对象来生成一个新的实例，使用拷贝来替代new。原型模式可以很好的解决创建多个相同/相似实例的问题，为什么还要用享元模式呢？这是因为这两种模式的使用场景是不同的，原型模式侧重于“创建”，我们通过拷贝确确实实的创建了新的实例，它属于创建型设计模式；而享元模式侧重于“重用”，即如果有现有的实例就不去创建了，直接拿来用就行了。</p>
 <p>下面以大头儿子家开车为例介绍享元模式的用法。我们都知道大头儿子家里有三个人，这里就不用介绍了，家里现有一辆红色车和一辆蓝色车，小头爸爸，扁头妈妈和大头儿子开车时都是用家里现有的车，而不是每次开车都要新买一辆，只有想开的车家里没有时才会去买一辆，如大头儿子想开白色的车，但家里没有白色的车，这时候才去买一辆回来。我们直接在代码中理解享元模式的用法：</p>
@@ -563,6 +584,12 @@
     
 
     <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/设计模式/" rel="tag"># 设计模式</a>
+          
+        </div>
       
 
       
@@ -656,7 +683,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">436</span>
+                    <span class="site-state-item-count">457</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -798,7 +825,13 @@
                     
                       
                     
-                    <span class="site-state-item-count">46</span>
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">49</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -829,23 +862,23 @@
                 
                 
                   <li>
-                    <a href="/2019/09/12/学习感想/" title="学习感想" target="_blank">学习感想</a>
+                    <a href="/2019/09/18/命令模式-1/" title="命令模式" target="_blank">命令模式</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/12/C-设计模式-建造者模式/" title="C#设计模式--建造者模式" target="_blank">C#设计模式--建造者模式</a>
+                    <a href="/2019/09/18/在Unity中实现游戏命令模式/" title="在Unity中实现游戏命令模式" target="_blank">在Unity中实现游戏命令模式</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/12/C-设计模式-组合模式/" title="C#设计模式--组合模式" target="_blank">C#设计模式--组合模式</a>
+                    <a href="/2019/09/18/职责链模式-1/" title="职责链模式" target="_blank">职责链模式</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/12/C-设计模式-装饰者模式/" title="C#设计模式--装饰者模式" target="_blank">C#设计模式--装饰者模式</a>
+                    <a href="/2019/09/18/Editor/" title="Editor" target="_blank">Editor</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/12/解析C-设计模式编程中的装饰者模式/" title="解析C#设计模式编程中的装饰者模式" target="_blank">解析C#设计模式编程中的装饰者模式</a>
+                    <a href="/2019/09/18/UguiEventListener/" title="UguiEventListener" target="_blank">UguiEventListener</a>
                   </li>
                 
               </ul>
@@ -906,7 +939,7 @@
     
       <span class="post-meta-item-text">站点总字数：</span>
     
-    <span title="站点总字数">2.8m</span>
+    <span title="站点总字数">3m</span>
   
 
   
@@ -917,7 +950,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">42:25</span>
+    <span title="站点阅读时长">45:04</span>
   
 </div>
 
