@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="思考并回答以下问题：  序列化便是将对象转换为字节流的过程，反序列化指的是将字节流转换回对象的过程。怎么理解？">
+<meta name="keywords" content="Unity3D脚本编程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从序列化和反序列化看Unity3D的存储机制">
+<meta property="og:url" content="http://chebincarl.github.io/2019/09/19/从序列化和反序列化看Unity3D的存储机制/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="思考并回答以下问题：  序列化便是将对象转换为字节流的过程，反序列化指的是将字节流转换回对象的过程。怎么理解？">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-09-20T14:00:22.147Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="从序列化和反序列化看Unity3D的存储机制">
+<meta name="twitter:description" content="思考并回答以下问题：  序列化便是将对象转换为字节流的过程，反序列化指的是将字节流转换回对象的过程。怎么理解？">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/09/19/从序列化和反序列化看Unity3D的存储机制/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>从序列化和反序列化看Unity3D的存储机制 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">专注，重复10遍</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/09/19/从序列化和反序列化看Unity3D的存储机制/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">从序列化和反序列化看Unity3D的存储机制
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-09-19 09:35:23" itemprop="dateCreated datePublished" datetime="2019-09-19T09:35:23+08:00">2019-09-19</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-20 22:00:22" itemprop="dateModified" datetime="2019-09-20T22:00:22+08:00">2019-09-20</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Unity/" itemprop="url" rel="index"><span itemprop="name">Unity</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">42k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">38 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>思考并回答以下问题：</p>
+<ul>
+<li>序列化便是将对象转换为字节流的过程，反序列化指的是将字节流转换回对象的过程。怎么理解？</li>
+</ul>
+<a id="more"></a>
+
+<p>之前的内容已经涉及到一些序列化和反序列化的内容，但是并没有深入讲解，本章的主要内容将会为各位读者详细讲解C#语言的序列化和反序列化的知识，并且结合Unity3D的存储机制来加深各位读者的理解。</p>
+<h1 id="初识序列化和反序列化"><a href="#初识序列化和反序列化" class="headerlink" title="初识序列化和反序列化"></a>初识序列化和反序列化</h1><p>所谓的<span style="color:red">序列化便是将对象转换为字节流的过程</span>，与此相反的是反序列化。<span style="color:red">反序列化指的是将字节流转换回对象的过程</span>。因此可以说，序列化和反序列化是在对象和字节流之间转换发挥了很大作用的机制。</p>
+<p>下面通过一个例子看看序列化和反序列化是如何使用的，代码如下。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> System.IO;</span><br><span class="line"><span class="keyword">using</span> System.Runtime.Serialization.Formatters.Binary;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">SerializationTest</span> : <span class="title">MonoBehaviour</span> </span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//  Use this for initialization</span></span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">Start</span> (<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>  &#123;</span><br><span class="line">    <span class="comment">// 创建一个英雄Hero类的实例</span></span><br><span class="line">    <span class="comment">// 并为其基本属性赋初始值</span></span><br><span class="line">    Hero heroInstance = <span class="keyword">new</span> Hero();</span><br><span class="line">    heroInstance.id = <span class="number">10000</span>;</span><br><span class="line">    heroInstance.attack = <span class="number">10000f</span>;</span><br><span class="line">    heroInstance.defence = <span class="number">90000f</span>;</span><br><span class="line">    heroInstance.name = <span class="string">"DefaultHeroName"</span>;</span><br><span class="line">    <span class="comment">// 进行序列化</span></span><br><span class="line">    Stream stream = InstanceDataToMemory(heroInstance);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 为了演示下面的反序列化之后的结果</span></span><br><span class="line">    <span class="comment">// 此处将刚刚创建的英雄Hero类实例的</span></span><br><span class="line">    <span class="comment">// 数据进行重置</span></span><br><span class="line">    stream.Position = <span class="number">0</span>;</span><br><span class="line">    heroInstance = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 反序列化生成英雄Hero类的实例</span></span><br><span class="line">    <span class="comment">// 并且打印其属性值，可以发现是</span></span><br><span class="line">    <span class="comment">// 我们初始赋值给它的值</span></span><br><span class="line">    heroInstance = (Hero) <span class="keyword">this</span>.MemoryToInstanceData(stream);</span><br><span class="line"></span><br><span class="line">    Debug.Log(heroInstance.id.ToString());</span><br><span class="line">    Debug.Log(heroInstance.attack.ToString());</span><br><span class="line">    Debug.Log(heroInstance.defence.ToString());</span><br><span class="line">    Debug.Log(heroInstance.name);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// InstanceDataToMemory方法用来实现将对象序列化</span></span><br><span class="line">  <span class="comment">// 到流中的逻辑</span></span><br><span class="line">  <span class="function"><span class="keyword">private</span> MemoryStream <span class="title">InstanceDataToMemory</span>(<span class="params"><span class="keyword">object</span> instance</span>)</span></span><br><span class="line"><span class="function"></span>  &#123;</span><br><span class="line">    <span class="comment">// 创建一个新的流来容纳经过序列化的对象</span></span><br><span class="line">    MemoryStream memoStream = <span class="keyword">new</span> MemoryStream();</span><br><span class="line">    <span class="comment">// 创建一个序列化格式化器来执行具体的序列化</span></span><br><span class="line">    <span class="comment">// 操作</span></span><br><span class="line">    BinaryFormatter binaryFormatter = <span class="keyword">new</span> BinaryFormatter();</span><br><span class="line">    <span class="comment">// 将传入的对象instance序列化到流memoStream</span></span><br><span class="line">    <span class="comment">// 中</span></span><br><span class="line">    binaryFormatter.Serialize(memoStream, instance);</span><br><span class="line">    <span class="comment">// 返回序列化好的流</span></span><br><span class="line">    <span class="keyword">return</span> memoStream;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// MemoryToInstanceData方法用来实现将流</span></span><br><span class="line">  <span class="comment">// 反序列化为对象的逻辑</span></span><br><span class="line">  <span class="function"><span class="keyword">private</span> <span class="keyword">object</span> <span class="title">MemoryToInstanceData</span>(<span class="params">Stream memoryStream</span>)</span></span><br><span class="line"><span class="function"></span>  &#123;</span><br><span class="line">    <span class="comment">// 创建一个序列化格式化器来执行具体的</span></span><br><span class="line">    <span class="comment">// 反序列化操作</span></span><br><span class="line">    BinaryFormatter binaryFormatter = <span class="keyword">new</span> BinaryFormatter();</span><br><span class="line">    <span class="comment">// 返回从流memoryStream中反序列化</span></span><br><span class="line">    <span class="comment">// 得到的对象</span></span><br><span class="line">    <span class="keyword">return</span> binaryFormatter.Deserialize(memoryStream);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//  Update is called once per frame</span></span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">Update</span> (<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>  &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个例子中，我们通过将一个英雄Hero类的对象序列化和反序列化来进行数据的保存和读取的操作。看上去似乎十分简单，InstanceDataToMemory方法通过构造一个System.IO.MemoryStream对象，提供了一个用来容纳经过序列化之后的字节块的容器。紧接着又创建了一个System.Runtime.Serialization.Formatters.Binary.BinaryFormatter对象，格式化器的主要作用是用来进行序列化和反序列化，因为它实现了System.Runtime.Serialization.IFormatters接口，因此知道如何对对象进行序列化和反序列化。在此处需要注意的是，C#语言中并非只有BinaryFormatter这一种格式化器，在C#的基础类库中有两个格式化器是可以使用的。除了在例子中使用的BinaryFormatter之外，还有一个格式化器——SoapFormatter，这个格式化器定义在命名空间System.Runtime.Serialization.Formatters.Soap之中。当然，对对象进行序列化和反序列化并非必须使用格式化器，例如要使用XML序列化和反序列化时还会用到XmlSerializer和DataContractSerializer类，关于这部分内容在后面的章节中会具体介绍。</p>
+<p>在上面例子的那段代码中，可以看到序列化对象只需要调用格式化器BinaryFormatter的Serialize方法。首先看看Serialize方法的签名，代码如下。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Serialize</span>(<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">  Stream serializationStream,</span></span></span><br><span class="line"><span class="function"><span class="params">  Object graph</span></span></span><br><span class="line"><span class="function"><span class="params"></span>)</span></span><br></pre></td></tr></table></figure>
+
+<p>可以看到Serialize方法只需要两个参数：一个是System.IO.Stream类型（也可以是派生自System.IO.Stream类的派生类，例如MemoryStream、FileStream以及NetworkStream等）的参数，表示对流对象的引用；另一个是System.Object类型的参数，表示对需要被序列化的对象的引用。如上文所说，流对象的主要作用是为序列化之后的字节提供存放的容器。而第二个参数的作用则是对需要被序列化的对象的引用，由于它是System.Object类型的，因此它可以是任何类型的实例（无论是引用类型还是值类型）。例如它可以是值类型int、float，也可以是引用类型string、List&lt;string&gt;、Dictionary&lt;string, string&gt;、Hero等。在这里有一点需要注意的是，由于graph可以是一个集合或者字典，所以当集合或字典中已经引用了一组对象时，一旦调用格式化器的Serialize方法，则graph中所有的对象都会被序列化到第一个参数所指定的流中。</p>
+<p>那么Serialize方法到底是如何进行序列化的呢？首先，格式化器会参考目标对象的类型的元数据，进而了解要序列化的对象的信息。具体来说，Serialize方法会利用反射机制来查看每个对象的类型中都有哪些实例字段，而正如前面刚刚说过的一样，凡是在这些字段中引用的对象，也会被格式化器的Serialize方法进行序列化。其次，Serialize方法在进行序列化时同样要保证要有分辨对象是否已经被序列化的能力，因为一旦无法确定该对象是否已经被序列化，就有可能导致同一个对象被多次序列化，如果发生这样的情况，往往会造成死循环。不过值得庆幸的一点是，C#语言中的格式化器的算法已经具备了保证每个对象只被序列化一次的能力。一个常见的情景是两个对象互相引用时，格式化器能够探测到这种情况，并且保证对每个对象只进行一次序列化操作。最后，一旦Serialize方法执行完毕并且返回之后，便获得了一个容纳了目标对象被序列化之后字节块的Stream对象。本例中是一个MemoryStream对象，此时我们就可以按照自己的方式来处理它了，例如比较常见的一种处理方式是可以将它保存到文件中，当然也可以将序列化之后的对象作为二进制数据，通过网络进行和服务器的通信等。下面来看一个例子，这次我们将刚刚的英雄Hero类的实例序列化成为二进制文件后保存在硬盘上，并且在另一个方法中将被保存到硬盘上的二进制文件反序列化为英雄Hero类的那个特定的实例，代码如下。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> System.IO;</span><br><span class="line"><span class="keyword">using</span> System.Runtime.Serialization.Formatters.Binary;</span><br><span class="line"><span class="keyword">using</span> System.Runtime.Serialization;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">SerializationTest</span> : <span class="title">MonoBehaviour</span> </span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">private</span> Hero heroInstance;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//  Use this for initialization</span></span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">Start</span> (<span class="params"></span>)</span> &#123;</span><br><span class="line">    <span class="comment">// 创建一个英雄Hero类的实例</span></span><br><span class="line">    <span class="comment">// 并为其基本属性赋初始值</span></span><br><span class="line">    heroInstance = <span class="keyword">new</span> Hero();</span><br><span class="line">    heroInstance.id = <span class="number">10000</span>;</span><br><span class="line">    heroInstance.attack = <span class="number">10000f</span>;</span><br><span class="line">    heroInstance.defence = <span class="number">90000f</span>;</span><br><span class="line">    heroInstance.name = <span class="string">"DefaultHeroName"</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">OnGUI</span> (<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>  &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(GUILayout.Button(<span class="string">"save(Serialize)"</span>,GUILayout.Width(<span class="number">200</span>)))</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="comment">// 将对象序列化之后生成的</span></span><br><span class="line">      <span class="comment">// 二进制文件保存在硬盘上</span></span><br><span class="line">      FileStream fs = <span class="keyword">new</span> FileStream(<span class="string">"HeroData.dat"</span>, FileMode.Create);</span><br><span class="line"></span><br><span class="line">      BinaryFormatter formatter = <span class="keyword">new</span> BinaryFormatter();</span><br><span class="line">      <span class="keyword">try</span></span><br><span class="line">      &#123;</span><br><span class="line">        formatter.Serialize(fs, <span class="keyword">this</span>.heroInstance);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">catch</span> (SerializationException e)</span><br><span class="line">      &#123;</span><br><span class="line">        Console.WriteLine(<span class="string">"Failed to serialize．Reason: "</span> + e.Message);</span><br><span class="line">        <span class="keyword">throw</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">finally</span></span><br><span class="line">      &#123;</span><br><span class="line">        fs.Close();</span><br><span class="line">        <span class="comment">// 为了演示下面的反序列化之后的结果，</span></span><br><span class="line">        <span class="comment">// 此处将刚刚创建的英雄Hero类实例的</span></span><br><span class="line">        <span class="comment">// 数据进行重置</span></span><br><span class="line">        <span class="keyword">this</span>.heroInstance = <span class="literal">null</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(GUILayout.Button(<span class="string">"load(Deserialize)"</span>,GUILayout.Width(<span class="number">200</span>)))</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="comment">// 从硬盘上读取流的内容</span></span><br><span class="line">      FileStream fs = <span class="keyword">new</span> FileStream(<span class="string">"HeroData.dat"</span>, FileMode.Open);</span><br><span class="line">          <span class="keyword">try</span></span><br><span class="line">          &#123;</span><br><span class="line">              BinaryFormatter formatter = <span class="keyword">new</span> BinaryFormatter();</span><br><span class="line"></span><br><span class="line">              <span class="keyword">this</span>.heroInstance = (Hero) formatter.Deserialize(fs);</span><br><span class="line">          &#125;</span><br><span class="line">          <span class="keyword">catch</span> (SerializationException e)</span><br><span class="line">          &#123;</span><br><span class="line">              Console.WriteLine(<span class="string">"Failed to deserialize．Reason: "</span> + e.Message);</span><br><span class="line">              <span class="keyword">throw</span>;</span><br><span class="line">          &#125;</span><br><span class="line">          <span class="keyword">finally</span></span><br><span class="line">          &#123;</span><br><span class="line">              fs.Close();</span><br><span class="line">        Debug.Log(<span class="keyword">this</span>.heroInstance.id.ToString());</span><br><span class="line">        Debug.Log(<span class="keyword">this</span>.heroInstance.attack.ToString());</span><br><span class="line">        Debug.Log(<span class="keyword">this</span>.heroInstance.defence.ToString());</span><br><span class="line">        Debug.Log(<span class="keyword">this</span>.heroInstance.name);</span><br><span class="line">          &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个例子与之前的例子最大的一个区别便是我们使用了另一种流的类型FileStream，而不是刚才的MemoryStream。将Hero对象序列化之后生成的二进制文件命名为HeroData.dat，并将其保存在硬盘上，如图10-1所示。</p>
+<p>图10-1　经过序列化后保存在硬盘上的二进制文件</p>
+<p>了解了格式化器的Serialize方法是如何对对象进行序列化操作后，再让我们把目光的焦点放在格式化器的Deserialize方法是如何进行反序列化操作的。同样先看一下Deserialize方法的签名，代码如下。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">Deserialize</span>(<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">  Stream serializationStream</span></span></span><br><span class="line"><span class="function"><span class="params"></span>)</span></span><br></pre></td></tr></table></figure>
+
+<p>看上去Deserialize方法要比Serialize方法简单，它仅仅只需要一个Stream类型的参数，而返回的则是经过反序列化后得到的对象的引用。那么Deserialize方法的反序列化操作究竟是怎么执行的呢？首先，它会检查流中的内容获取流中对象的信息，并且构造流中所有对象的实例。然后一旦对象的实例构造完成，便按照当初进行序列化时的对象中的字段的值为刚刚创建的实例的字段进行初始化的赋值操作，使得经过反序列化创建的实例和当初序列化的实例中的字段的值一致。最后，Deserialize方法会返回一个Object类型的对象引用，我们常常需要将返回的对象引用转换为我们期望的类型。在上面的例子中可以看到Deserialize是如何被用来对二进制文件进行反序列化操作的。</p>
+<p>通过以上内容的介绍，各位读者应该已经初步掌握了格式化器是如何进行序列化和反序列化操作的。不过在这里还是提醒各位读者一些需要注意的地方。</p>
+<p>第一个需要注意的地方是，在C#的基础类库中有两个格式化器是可以使用的，除了在例子中使用的BinaryFormatter之外，还有一个格式化器——SoapFormatter。因此我们在使用格式化器来实现序列化和反序列化时，必须保证在代码中进行序列化操作和反序列化操作的是相同的格式化器。如果使用BinaryFormatter来对一个对象进行序列化，但是却使用SoapFormatter来进行反序列化，很有可能会由于无法正确解释流中的内容而抛出System.Runtime.Serialization.SerializationException异常。</p>
+<p>第二个需要注意的地方是，前面已经说过流的主要作用是为序列化之后的字节块提供容纳的容器，那么各位读者是否有过这样的疑问，那就是同一个流是否可以容纳多个对象序列化之后的字节块呢？答案是肯定的，在Unity 3D的游戏脚本语言C#中，可以将多个对象序列化到同一个流中。在前面的例子中，我们对英雄Hero类的对象进行了序列化操作，现在假设我们又定义了另一个表示游戏单位的类型——士兵Soldier类。并且在代码中对存在的这两个对象，分别是Hero类型和Soldier类型的对象，进行序列化操作，并且都放在同一个流中。然后再从同一个流中反序列化得到这两个对象，代码如下。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> System.IO;</span><br><span class="line"><span class="keyword">using</span> System.Runtime.Serialization.Formatters.Binary;</span><br><span class="line"><span class="keyword">using</span> System.Runtime.Serialization;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">SerializationTest</span> : <span class="title">MonoBehaviour</span> </span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">private</span> Hero heroInstance;</span><br><span class="line">  <span class="keyword">private</span> Soldier soldierInstance;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//  Use this for initialization</span></span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">Start</span> (<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>  &#123;</span><br><span class="line">    <span class="comment">// 分别构造Hero类型的对象</span></span><br><span class="line">    <span class="comment">// 和Soldier类型的对象，并</span></span><br><span class="line">    <span class="comment">// 对它们的字段进行初始化</span></span><br><span class="line">    heroInstance = <span class="keyword">new</span> Hero();</span><br><span class="line">    heroInstance.id = <span class="number">10000</span>;</span><br><span class="line">    heroInstance.attack = <span class="number">10000f</span>;</span><br><span class="line">    heroInstance.defence = <span class="number">90000f</span>;</span><br><span class="line">    heroInstance.name = <span class="string">"DefaultHeroName"</span>;</span><br><span class="line">    <span class="comment">// </span></span><br><span class="line">    soldierInstance = <span class="keyword">new</span> Soldier();</span><br><span class="line">    soldierInstance.id = <span class="number">90</span>;</span><br><span class="line">    soldierInstance.attack = <span class="number">90f</span>;</span><br><span class="line">    soldierInstance.defence = <span class="number">100f</span>;</span><br><span class="line">    soldierInstance.name = <span class="string">"DefaultSoldierName"</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">OnGUI</span> (<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>  &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(GUILayout.Button(<span class="string">"save(Serialize)"</span>,GUILayout.Width(<span class="number">200</span>)))</span><br><span class="line">    &#123;</span><br><span class="line">      FileStream fs = <span class="keyword">new</span> FileStream(<span class="string">"HeroAndSoldierData.dat"</span>, FileMode.Create);</span><br><span class="line"></span><br><span class="line">      BinaryFormatter formatter = <span class="keyword">new</span> BinaryFormatter();</span><br><span class="line">      <span class="keyword">try</span></span><br><span class="line">      &#123;</span><br><span class="line">        <span class="comment">// 将两个对象经过序列化后的字节块</span></span><br><span class="line">        <span class="comment">// 全都存放在同一个流中</span></span><br><span class="line">        formatter.Serialize(fs, <span class="keyword">this</span>.heroInstance);</span><br><span class="line">        formatter.Serialize(fs, <span class="keyword">this</span>.soldierInstance);</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">catch</span> (SerializationException e)</span><br><span class="line">      &#123;</span><br><span class="line">        Console.WriteLine(<span class="string">"Failed to serialize．Reason: "</span> + e.Message);</span><br><span class="line">        <span class="keyword">throw</span>;</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">finally</span></span><br><span class="line">      &#123;</span><br><span class="line">        fs.Close();</span><br><span class="line">        <span class="keyword">this</span>.heroInstance = <span class="literal">null</span>;</span><br><span class="line">        <span class="keyword">this</span>.soldierInstance = <span class="literal">null</span>;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>(GUILayout.Button(<span class="string">"load(Deserialize)"</span>,GUILayout.Width(<span class="number">200</span>)))</span><br><span class="line">    &#123;</span><br><span class="line">      FileStream fs = <span class="keyword">new</span> FileStream(<span class="string">"HeroAndSoldierData.dat"</span>, FileMode.Open);</span><br><span class="line">          <span class="keyword">try</span></span><br><span class="line">          &#123;</span><br><span class="line">              BinaryFormatter formatter = <span class="keyword">new</span> BinaryFormatter();</span><br><span class="line">              <span class="comment">// 从同一个流中分别获得两个对象</span></span><br><span class="line">              <span class="keyword">this</span>.heroInstance = (Hero) formatter.Deserialize(fs);</span><br><span class="line">              <span class="keyword">this</span>.soldierInstance = (Soldier) formatter.Deserialize(fs);</span><br><span class="line">          &#125;</span><br><span class="line">          <span class="keyword">catch</span> (SerializationException e)</span><br><span class="line">          &#123;</span><br><span class="line">              Console.WriteLine(<span class="string">"Failed to deserialize．Reason: "</span> + e.Message);</span><br><span class="line">              <span class="keyword">throw</span>;</span><br><span class="line">          &#125;</span><br><span class="line">          <span class="keyword">finally</span></span><br><span class="line">          &#123;</span><br><span class="line">              fs.Close();</span><br><span class="line">        Debug.Log(<span class="keyword">this</span>.heroInstance.id.ToString());</span><br><span class="line">        Debug.Log(<span class="keyword">this</span>.heroInstance.attack.ToString());</span><br><span class="line">        Debug.Log(<span class="keyword">this</span>.heroInstance.defence.ToString());</span><br><span class="line">        Debug.Log(<span class="keyword">this</span>.heroInstance.name);</span><br><span class="line"></span><br><span class="line">        Debug.Log(<span class="keyword">this</span>.soldierInstance.id.ToString());</span><br><span class="line">        Debug.Log(<span class="keyword">this</span>.soldierInstance.attack.ToString());</span><br><span class="line">        Debug.Log(<span class="keyword">this</span>.soldierInstance.defence.ToString());</span><br><span class="line">        Debug.Log(<span class="keyword">this</span>.soldierInstance.name);</span><br><span class="line">          &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>执行这个脚本，可以看到在Unity 3D的调试窗口分别输出了那两个最初被序列化的对象的字段的值。证明我们的确可以将不同类型的不同对象经过序列化后在同一个流中存放。</p>
+<p>第三个需要注意的一点，同时也是在开发中常常忽略的一点，就是序列化和反序列化与程序集的关系。当代码在对对象进行序列化时，写入流的内容之中还包括类型的全名以及类型定义程序集的全名。而在反序列化时，格式化器首先获取的也是程序集的标识信息，然后再通过调用System.Reflection.Assembly的Load方法将目标程序集加载进入当前的AppDomain中。只有当程序集加载完成后，格式化器才能够在程序集中查找和需要被反序列化的对象的类型相同的类型信息。一旦找到符合要求的类型，接下来便是创建该类型的实例，然后再从流中获取和该实例字段相对应的值为该实例的字段赋值。如果程序集中的类型字段和从流中读取的字段名称不能完全匹配，则会抛出System.Runtime.Serialization.SerializationException异常，一旦抛出异常则反序列化操作立刻终止。如果在程序集中找不到和要被反序列化的对象相同的类型，同样会抛出异常，反序列化操作同样会立刻终止，不会再对之后的对象进行反序列化操作。关于序列化、反序列化和程序集相关的内容，以及在Unity3D中的具体体现，在介绍Unity3D中的序列化、反序列化操作时还会具体阐述。</p>
+<h1 id="控制类型的序列化和反序列化"><a href="#控制类型的序列化和反序列化" class="headerlink" title="控制类型的序列化和反序列化"></a>控制类型的序列化和反序列化</h1><h2 id="如何使类型可以序列化"><a href="#如何使类型可以序列化" class="headerlink" title="如何使类型可以序列化"></a>如何使类型可以序列化</h2><p>在之前关于定制特性的章节中，已经简单地介绍过开发人员在设计类型时，如果该类型需要被序列化，则一定要注意它与不能被序列化的类型的区别。因为类型在默认状态下是无法被序列化的，例如在下面的这个例子中的Hero类型，代码如下。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Hero</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> id;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> currentHp;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> maxHp;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> attack;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> defence;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span> name;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Hero</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个普通的类型中有若干个实例字段，同时还有一个构造方法，看上去是一个很普通的类型的定义了。如果还按照上一节中的方式，对它进行序列化，是否可以正常的执行呢？下面就试验一下。仍旧执行在上一节中使用的那个游戏脚本，这次在Unity的调试窗口中看到的输出内容如图10-2所示。</p>
+<p>图10-2　对不可序列化的对象进行序列化抛出的异常</p>
+<p>可以看到抛出了一个SerializationException异常，原因是“Type Hero is not marked as Serializable.”英雄Hero类并没有被标记为可以被序列化的。这是为什么呢？问题的原因其实很简单，那就是我们在设计Hero类型时并没有显式的指出Hero类型的对象可以被序列化，但是在序列化对象时，格式化器首先会确认每个类型的对象是否可以被序列化。如果有对象不可被序列化，则格式化器的Serialize方法就会抛出SerializationException这个异常。而这个问题的解决方法也十分简单，那就是在定义类型时对类型应用定制特性System.SerializableAttribute，代码如下。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line">[<span class="meta">Serializable</span>]</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Hero</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> id;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> currentHp;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> maxHp;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> attack;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> defence;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span> name;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Hero</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>重新运行刚刚的游戏脚本，可以看到一切能够正常运行了，英雄Hero类的对象又可以被顺利地序列化到流中了。</p>
+<p>需要注意的是，System.SerializableAttribute特性只能用于引用类型（class）、值类型（struct）、枚举类型（enum）以及委托类型（delegate）。但是由于枚举类型和委托类型总是可以被序列化的，因此无须显式的应用System.SerializableAttribute特性。还需要注意的一点是，基类的System.SerializableAttribute特性并不会被派生出的子类继承，例如英雄Hero类、士兵Solider类都派生自基础单位BaseUnit类，它们的定义的代码如下。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">[<span class="meta">Serializable</span>]</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">BaseUnit</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">BaseUnit</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">[<span class="meta">Serializable</span>]</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Hero</span> : <span class="title">BaseUnit</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Hero</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Solider</span> : <span class="title">BaseUnit</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Solider</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这3个类型中，BaseUnit类和Hero类都可以被序列化，但是由于System.SerializableAttribute特性无法通过继承应用到派生类上，因此Solider类无法被序列化。</p>
+<p>但是如果派生类应用了System.SerializableAttribute特性，而基类反而没有应用System.SerializableAttribute特性，从该基类派生而来的任何派生类即便应用了System.SerializableAttribute特性，也无法被序列化。这点十分容易理解，基类的实例一旦无法被序列化，那么它的字段便无法被序列化，而继承自该基类的派生类的实例中的字段同样包括基类的字段，因此自然而然是无法被序列化的。因此如果看C#中所有类型的基类System.Object的定义，就可以发现它其实早已经应用了System.SerializableAttribute特性。</p>
+<p>不过有一点需要注意的是，在默认情况下序列化会读取对象的所有字段，无论这些字段在声明时的可访问权限是public、protected、internal或者是private。因此，如果对象中的一些字段并不适合被序列化（例如包含某些敏感信息或者是没有价值的字段）时，是否能够在序列化时略过这些不需要进行序列化的字段呢？答案是当然可以。</p>
+<h2 id="如何选择序列化的字段和控制反序列化的流程"><a href="#如何选择序列化的字段和控制反序列化的流程" class="headerlink" title="如何选择序列化的字段和控制反序列化的流程"></a>如何选择序列化的字段和控制反序列化的流程</h2><p>和标识类型可以被序列化类似，我们仍然通过在不需要被序列化的字段上应用相应的特性标识该字段在对象被序列化时不被序列化。而这个特性便是System.NonSerializedAttribute，下面就使用该特性来重新定义一下英雄Hero类，在英雄Hero类中我们增加了一个新的字段powerRank，它用来表示该英雄的战斗力，战斗力是根据一个计算公式，对英雄的攻击力、防御力以及血量进行加权求值而得到的，代码如下。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Hero</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> id;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> currentHp;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> maxHp;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> attack;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> defence;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span> name;</span><br><span class="line">    [<span class="meta">NonSerialized</span>]</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">float</span> powerRank;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Hero</span>(<span class="params"><span class="keyword">int</span> id, <span class="keyword">float</span> maxHp, <span class="keyword">float</span> attack, <span class="keyword">float</span> defence</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">this</span>.id = id;</span><br><span class="line">        <span class="keyword">this</span>.maxHp = maxHp;</span><br><span class="line">        <span class="keyword">this</span>.currentHp = <span class="keyword">this</span>.maxHp;</span><br><span class="line">        <span class="keyword">this</span>.attack = attack;</span><br><span class="line">        <span class="keyword">this</span>.defence = defence;</span><br><span class="line">        <span class="keyword">this</span>.powerRank = <span class="number">0.5f</span> * maxHp + <span class="number">0.2f</span> * attack + <span class="number">0.3f</span> * defence;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个定义中，英雄Hero类的对象可以被序列化。但是格式化器在进行序列化操作时，不会对应用了System.NonSerializedAttribute定制特性的powerRank字段的值进行序列化。这里要提醒一下各位读者，System.NonSerializedAttribute定制特性和System.SerializableAttribute特性不能被派生类继承相比，前者是可以被派生类继承的。而且在同一个类型中System.NonSerializedAttribute定制特性可以应用在多个不同的字段上，来标识多个目标字段不可序列化。</p>
+<p>因此，如果按照如下的代码来构造一个新的英雄Hero类的实例，代码如下。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Hero heroInstance = <span class="keyword">new</span> Hero(<span class="number">1000</span>, <span class="number">5000f</span>, <span class="number">1000f</span>, <span class="number">1000f</span>);</span><br></pre></td></tr></table></figure>
+
+<p>在Hero实例heroInstance的内部，根据公式“0.5f * maxHp + 0.2f * attack + 0.3f * defence”可以计算出该英雄的战斗力为3000，因此字段powerRank此时的值为3000。但是，在该实例进行序列化时，由于powerRank字段不能被序列化，因此如我们所愿，它的值（3000）不会被写入流中。所以在将经过序列化得到的二进制文件再经过反序列化来获取一个新的Hero类型的实例时，该实例其余的字段都会被赋予正确的值，而由于字段powerRank的值当初并没有被写入流中，因此它的初始值只能设置为0，而不是3000。运行一下之前的序列化和反序列化例子中的脚本，可以在Unity 3D的调试窗口中获得如下所示的输出信息，可以看到经过反序列化之后得到的Hero实例的powerRank字段的值的确是0。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hero powerRank: 0</span><br><span class="line">UnityEngine.Debug:Log(Object)</span><br></pre></td></tr></table></figure>
+
+<p>正是由于powerRank字段的值是根据英雄的其余的属性字段的值，根据一个计算公式计算而来，因此为了增加灵活性（例如修改了计算公式），类似powerRank这种计算出来的值的确不必在序列化时写入流中，但是在反序列化时我们又往往希望能够根据此时正确的公式和属性值计算出正确的战斗力的值，进而为powerRank赋值，而不是用一个初始值0来代替。那么是否能够控制反序列化的流程，来实现这个目标呢？答案是当然可以。</p>
+<p>这次同样要通过使用定制特性实现在反序列的过程中调用特定的方法，来实现根据正确的计算公式和属性值计算英雄的战斗力的操作。那么这个定制特性就是System.Runtime.Serialization.OnDeserializedAttribute定制特性。重新修改一下Hero类的定义，通过在Hero类中增加一个应用了System.Runtime.Serialization.OnDeserializedAttribute定制特性的方法来实现每次格式化器在反序列化Hero类型的实例时，都要调用一次该方法来计算最新的英雄战斗力数值的功能。需要注意的是System.Runtime.Serialization.OnDeserializedAttribute特性定义在命名空间System.Runtime.Serialization中，所以在使用该特性之前要先使用System.Runtime.Serialization命名空间，代码如下。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"><span class="keyword">using</span> System.Runtime.Serialization;</span><br><span class="line"></span><br><span class="line">[<span class="meta">Serializable</span>]</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Hero</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> id;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> currentHp;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> maxHp;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> attack;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> defence;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span> name;</span><br><span class="line">    [<span class="meta">NonSerialized</span>]</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">float</span> powerRank;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Hero</span>(<span class="params"><span class="keyword">int</span> id, <span class="keyword">float</span> maxHp, <span class="keyword">float</span> attack, <span class="keyword">float</span> defence</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">    <span class="keyword">this</span>.id = id;</span><br><span class="line">    <span class="keyword">this</span>.maxHp = maxHp;</span><br><span class="line">    <span class="keyword">this</span>.currentHp = <span class="keyword">this</span>.maxHp;</span><br><span class="line">    <span class="keyword">this</span>.attack = attack;</span><br><span class="line">    <span class="keyword">this</span>.defence = defence;</span><br><span class="line">    <span class="keyword">this</span>.powerRank = <span class="number">0.5f</span> * maxHp + <span class="number">0.2f</span> * attack + <span class="number">0.3f</span> * defence;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    [<span class="meta">OnDeserialized</span>]</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">CaculateRightPowerRank</span>(<span class="params">StreamingContext context</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">    Debug.Log(<span class="string">"call CaculateRightPowerRank"</span>);</span><br><span class="line">    <span class="keyword">this</span>.powerRank = <span class="number">0.3f</span> * maxHp + <span class="number">0.2f</span> * attack + <span class="number">0.3f</span> * defence;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>修改后的Hero类，我们增加了CaculateRightPowerRank方法，在CaculateRightPowerRank方法中使用了新的计算英雄战斗力的公式，将maxHp的权重从0.5下调到了0.3。之前通过计算得到的powerRank的值是3000，但是使用新的公式计算出来的powerRank的值变成了2000。运行修改后的游戏脚本，Unity 3D输出的内容如下所示。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">call CaculateRightPowerRank</span><br><span class="line">UnityEngine.Debug:Log(Object)</span><br><span class="line">hero powerRank: 2000</span><br><span class="line">UnityEngine.Debug:Log(Object)</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，第一行输出的是CaculateRightPowerRank方法中打印的一个字符串的内容，证明该方法被调用；第三行则输出了通过新的计算公式计算出正确的powerRank的值是2000。</p>
+<p>当然，如果使用了System.Runtime.Serialization这个命名空间后，除了获得使用OnDeserializedAttribute定制特性的权力之外，同时还可以使用一些相关的其他特性，包括OnDeserializingAttribute特性、OnSerializedAttribute特性以及OnSerializingAttribute特性等。这些特性都有一个共同点，那就是它们都是被应用于类型中定义的方法的，通过它们可以对序列化和反序列化进行更多的控制，而它们的作用阶段可以从它们的名字一窥究竟。在格式化器序列化对象时，格式化器首先会调用对象中那些被标记了OnSerializing特性的所有方法，而不是序列化对象的字段。当所有标记了OnSerializing特性的方法被调用完成后，才会去序列化对象的字段。最后，则是调用所有被标记为OnSerialized的所有方法。与序列化类似，在反序列化的过程中，格式化器同样首先会调用标记了OnDeserializing特性的所有方法，然后会反序列化对象的所有字段，最后则是调用被标记为OnDeserialized特性的所有方法。</p>
+<p>而凡是被这4个特性修饰的方法，都有一个共同的特征，那就是必须要获取一个StreamingContext（流的上下文）类型的参数，并且返回为void。至于方法的方法名则没有强制规定，可以是我们希望的任何名称。另外需要注意的一点是，为了提高代码的安全性，以及养成良好的编写代码的习惯，对于这种方法一般会声明为private，例如在上个例子中定义的CaculateRightPowerRank方法，代码如下。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[<span class="meta">OnDeserialized</span>]</span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">CaculateRightPowerRank</span>(<span class="params">StreamingContext context</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Debug.Log(<span class="string">"call CaculateRightPowerRank"</span>);</span><br><span class="line">    <span class="keyword">this</span>.powerRank = <span class="number">0.5f</span> * maxHp + <span class="number">0.2f</span> * attack + <span class="number">0.3f</span> * defence;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="序列化、反序列化中流的上下文介绍及应用"><a href="#序列化、反序列化中流的上下文介绍及应用" class="headerlink" title="序列化、反序列化中流的上下文介绍及应用"></a>序列化、反序列化中流的上下文介绍及应用</h2><p>我们已经了解了应用了OnDeserializedAttribute特性、OnDeserializingAttribute特性、OnSerializedAttribute特性以及OnSerializingAttribute特性的方法，必须要获取一个StreamingContext类型的参数。而StreamingContext便是流的上下文。StreamingContext事实上是一个值类型，也就是说它是一个结构。首先来看看它的定义，代码如下。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// StreamingContext结构在基础类库中的定义</span></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">System.Runtime.Serialization</span> </span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">using</span> System.Runtime.Remoting;</span><br><span class="line">    <span class="keyword">using</span> System;</span><br><span class="line"></span><br><span class="line">    [<span class="meta">Serializable</span>]</span><br><span class="line">[<span class="meta">System.Runtime.InteropServices.ComVisible(true)</span>]</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">struct</span> StreamingContext </span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">internal</span> Object m_additionalContext;</span><br><span class="line">        <span class="keyword">internal</span> StreamingContextStates m_state;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">StreamingContext</span>(<span class="params">StreamingContextStates state</span>)</span></span><br><span class="line"><span class="function">            : <span class="title">this</span> (<span class="params">state, <span class="literal">null</span></span>) </span></span><br><span class="line"><span class="function"></span>            &#123;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">StreamingContext</span>(<span class="params">StreamingContextStates state, Object additional</span>) </span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            m_state = state;</span><br><span class="line">            m_additionalContext = additional;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> Object Context </span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">get</span> &#123; <span class="keyword">return</span> m_additionalContext; &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">bool</span> <span class="title">Equals</span>(<span class="params">Object obj</span>)</span> &#123;</span><br><span class="line">            <span class="keyword">if</span> (!(obj <span class="keyword">is</span> StreamingContext)) </span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (((StreamingContext)obj).m_additionalContext == m_additionalContext ＆＆</span><br><span class="line">                ((StreamingContext)obj).m_state == m_state) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">int</span> <span class="title">GetHashCode</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">return</span> (<span class="keyword">int</span>)m_state;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> StreamingContextStates State </span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">get</span> &#123; <span class="keyword">return</span> m_state; &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//  *********************************************************</span></span><br><span class="line">    <span class="comment">//  Keep these in [....] with the version in vm\runtimehandles.h</span></span><br><span class="line">    <span class="comment">//  *********************************************************</span></span><br><span class="line">[<span class="meta">Serializable</span>]</span><br><span class="line">[<span class="meta">Flags</span>]</span><br><span class="line">[<span class="meta">System.Runtime.InteropServices.ComVisible(true)</span>]</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">enum</span> StreamingContextStates &#123;</span><br><span class="line">        CrossProcess=<span class="number">0x01</span>,</span><br><span class="line">        CrossMachine=<span class="number">0x02</span>,</span><br><span class="line">        File        =<span class="number">0x04</span>,</span><br><span class="line">        Persistence =<span class="number">0x08</span>,</span><br><span class="line">        Remoting    =<span class="number">0x10</span>,</span><br><span class="line">        Other       =<span class="number">0x20</span>,</span><br><span class="line">        Clone       =<span class="number">0x40</span>,</span><br><span class="line">        CrossAppDomain =<span class="number">0x80</span>,</span><br><span class="line">        All         =<span class="number">0xFF</span>,</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到StreamingContext结构的定义十分简单，除了它的构造函数和继承自Object的重载方法之外，我们只需要关心两个公共只读属性——State和Context。两个属性的类型和作用，如表10-1所示。</p>
+<p>表10-1　State和Context属性</p>
+<p>属性  类型  作用<br>State   StreamingContextStates  　用来说明要序列化和反序列化的对象的来源和目的地<br>Context Object  　一个上下文对象的引用，包含了用户希望得到的任何上下文信息<br>而StreamingContext结构存在的意义便是通过State属性的值描述给定的序列化流的源和目标，并利用Context属性提供一个由调用方定义的附加上下文。但是知道序列化流的源和目标有什么意义呢？如前文所述，同一个被序列化好的对象，可能会有不同的目的地。例如同一个进程中、同一个机器但是不同的进程中、不同的机器不同的进程中等。如果一个对象能够知道它要在什么地方被反序列化，那么就可以采用特定的方式生成它的状态。而用来表示序列化流可能的源和目的地的State属性可能的值已经包含在上面的代码中了。下面再做个归纳，以便各位读者可以加深对序列化中流的印象，代码如下。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span> StreamingContextStates </span><br><span class="line">&#123;</span><br><span class="line">    CrossProcess=<span class="number">0x01</span>,<span class="comment">// 来源和目的地是同一台机器的不同进程</span></span><br><span class="line">    CrossMachine=<span class="number">0x02</span>,<span class="comment">// 来源和目的地不在同一台机器上</span></span><br><span class="line">    File        =<span class="number">0x04</span>,<span class="comment">// 来源或目的地是文件。不承诺反序列化数据的是同一进程</span></span><br><span class="line">    Persistence =<span class="number">0x08</span>,<span class="comment">// 和File类似，来源或目的地是持久化的，例如文件或// 数据库。同样不承诺反序列化数据的是同一进程</span></span><br><span class="line">    Remoting    =<span class="number">0x10</span>,<span class="comment">// 来源或目的地是远程的</span></span><br><span class="line">    Other       =<span class="number">0x20</span>,<span class="comment">// 来源或目的地未知</span></span><br><span class="line">    Clone       =<span class="number">0x40</span>,<span class="comment">// 用来克隆对象。可以认为是同一个进程进行序列化和反序列</span></span><br><span class="line">    CrossAppDomain =<span class="number">0x80</span>,<span class="comment">// 来源或目的地是不同的AppDomain</span></span><br><span class="line">    All         =<span class="number">0xFF</span>,<span class="comment">// 来源或目的地包含以上各种可能。默认设定</span></span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过以上分析，各位读者应该已经掌握了如何根据序列化中流的上下文来确定序列化和反序列化的源和目标了。但是，作为开发者是否可以在序列化之前手动设置StreamingContext呢？答案是肯定的。在我们构造格式化器的实例时（无论是BinaryFormatter还是SoapFormatter），它有一个StreamingContext类型的可读可写属性Context会被初始化，其中Context的StreamingContextStates类型的属性State会被设置为All，而Context的Object属性Context会被设置为null。所以可以通过修改格式化器的实例中的Context属性来设置流的上下文的设置。下面就利用修改流的上下文的设置，来实现对一个对象的深度克隆，代码如下。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> System.IO;</span><br><span class="line"><span class="keyword">using</span> System.Runtime.Serialization.Formatters.Binary;</span><br><span class="line"><span class="keyword">using</span> System.Runtime.Serialization;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">SerializationTest</span> : <span class="title">MonoBehaviour</span> </span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> Hero heroInstance;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//  Use this for initialization</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span> (<span class="params"></span>)</span> &#123;</span><br><span class="line">        heroInstance = <span class="keyword">new</span> Hero(<span class="number">1000</span>, <span class="number">5000f</span>, <span class="number">1000f</span>, <span class="number">1000f</span>);</span><br><span class="line">        <span class="comment">// 克隆</span></span><br><span class="line">        Hero newHero = (Hero) <span class="keyword">this</span>.DeepCloneTest(heroInstance);</span><br><span class="line">        <span class="comment">// 打印出克隆得到的对象的字段值</span></span><br><span class="line">        Debug.Log(newHero.id.ToString());</span><br><span class="line">        Debug.Log(newHero.attack.ToString());</span><br><span class="line">        Debug.Log(newHero.defence.ToString());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">object</span> <span class="title">DeepCloneTest</span>(<span class="params"><span class="keyword">object</span> oldHero</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 构造临时内存流</span></span><br><span class="line">        <span class="keyword">using</span>(MemoryStream stream = <span class="keyword">new</span> MemoryStream())&#123;</span><br><span class="line">            <span class="comment">// 构造格式化器，用来进行序列化</span></span><br><span class="line">            BinaryFormatter binaryFormatter = <span class="keyword">new</span> BinaryFormatter();</span><br><span class="line">            <span class="comment">// 设置流的上下文设置</span></span><br><span class="line">            binaryFormatter.Context = <span class="keyword">new</span> StreamingContext(StreamingContextStates.Clone);</span><br><span class="line">            <span class="comment">// 将要被克隆的对象序列化到内存中</span></span><br><span class="line">            binaryFormatter.Serialize(stream, oldHero);</span><br><span class="line">            <span class="comment">// 在进行反序列化之前，需要先定位到内存流的起始位置</span></span><br><span class="line">            stream.Position = <span class="number">0</span>;</span><br><span class="line">            <span class="comment">// 将内存流中的内容反序列化成新的对象</span></span><br><span class="line">            <span class="keyword">return</span> binaryFormatter.Deserialize(stream);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样我们就利用序列化和反序列实现了对一个对象的深度克隆。</p>
+<h1 id="Unity-3D中的序列化和反序列化"><a href="#Unity-3D中的序列化和反序列化" class="headerlink" title="Unity 3D中的序列化和反序列化"></a>Unity 3D中的序列化和反序列化</h1><p>通过前两节的内容，相信各位读者已经掌握了在C#语言中如何使用序列化和反序列化了。那么让我们回到使用Unity 3D的开发中来，本节就来分析一下Unity 3D中的序列化和反序列化系统。通过加深对Unity 3D中的序列化和反序列化的了解，能让我们明白如何更好地使用Unity 3D引擎、写出效率更好的游戏脚本。因为序列化和反序列化对Unity 3D而言是一个十分核心的内容，很多功能都是基于序列化而构建的。</p>
+<h2 id="Unity-3D的序列化概览"><a href="#Unity-3D的序列化概览" class="headerlink" title="Unity 3D的序列化概览"></a>Unity 3D的序列化概览</h2><p>在Unity 3D中究竟都有哪些和序列化相关的部分呢？</p>
+<p>（1）属性监视板（Inspector）中的那些数值：每当我们查看属性监视板中某个对象的信息时，那些可以被显示的数值并不是Unity 3D临时调用游戏脚本中的C#接口获取的。相反，Inspector窗口的内容是直接通过被观察的对象反序列化它自己而得到的那些属性数值。Inspector窗口中展示的数值便是这么来的。</p>
+<p>（2）预制体Prefab：预制体是一种资源类型，即存储在项目视图中的一种可重复使用的游戏对象。预置可以多次放入到多个场景中。当添加一个预置到场景中，就创建了它的一个实例。所有的预置实例链接到原始预置，基本上是它的克隆。不管项目存在多少实例，当你对预置进行任何更改时，将看到这些更改应用于所有实例。事实上，从本质上来说，预制体Prefab其实是那些游戏对象或组件经过序列化后得到的文件，它可以是二进制文件也可以是文本文件，格式为YMAL。关于Prefab究竟是以什么格式出现，可以在Unity 3D编辑器中设定。选择菜单栏中的“Edit”菜单项，在下拉菜单中选中“Project Settings→Editor”菜单项，如图10-3所示。</p>
+<p>图10-3　修改Prefab的格式设置</p>
+<p>在左侧出现的窗口中，修改“Asset Serialization”的选项即可，分别是“Force text serialization”对应文本格式和“Force Binary”对应二进制格式。如下所示是同一个Prefab，不同格式下的内容。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">// 文本格式</span><br><span class="line">%YAML 1.1</span><br><span class="line">%TAG !u! tag:unity3d.com,2011:</span><br><span class="line">--- !u!1002 ＆100001</span><br><span class="line">EditorExtensionImpl:</span><br><span class="line">  serializedVersion: 6</span><br><span class="line">--- !u!1002 ＆100003</span><br><span class="line">….</span><br><span class="line">// 二进制格式</span><br><span class="line">0000 b077 0000 be50 0000 0009 0000 b090</span><br><span class="line">0000 0000 342e 352e 3366 3300 feff ffff</span><br><span class="line">0700 0000 ffff ffff 4d6f 6e6f 4265 6861</span><br><span class="line">7669 6f75 7200 4261 7365 00ff ffff ff00</span><br><span class="line">0000 0000 0000 0001 0000 0000 8000 000a</span><br><span class="line">0000 0075 6e73 6967 6e65 6420 696e 7400</span><br><span class="line">…</span><br></pre></td></tr></table></figure>
+
+<p>每个预制体Prefab的实例便是用来在游戏运行时经过反序列化，从而得到真正的游戏对象的。因此，严格来说预制体Prefab这个概念应该仅仅存在于编辑器的阶段，而不是游戏运行的阶段。一旦游戏运行，并且需要从目标预制体Prefab来实例化一个新的游戏对象时，对应的预制体Prefab会变为一个正常的反序列化流，从而被反序列化成一个新的游戏对象。而该游戏对象实例化完成之后，这个通过Prefab实例化而来的游戏对象并不知道它来自所谓的Prefab，而是作为一个正常的游戏对象存在于游戏世界中。</p>
+<p>1．实例化：在实现游戏对象的实例化时，往往要使用一个名叫Instantiate的方法。所以首先来看一看Instantiate方法的签名，对它有一个初步的印象，内容如下所示。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title">Instantiate</span>(<span class="params">Object original, Vector3 position, Quaternion rotation</span>)</span>;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title">Instantiate</span>(<span class="params">Object original</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到Instantiate方法有两个重载的版本，但无论哪个版本都需要一个Object类型的参数用来作为被实例化的原始对象。因此，在调用Instantiate方法时，无论参数original是来自Prefab反序列化后得到的对象，还是已经在游戏中存在的游戏对象，或者是任何派生自UnityEngine.Object类型且可以被序列化的对象。Instantiate要做的事情都是一样的，那就是首先将传入的参数original所引用的对象进行序列化操作，然后创建出一个新的对象，需要注意的是这个新创建出来的对象的各个字段的值都是默认值，而不是我们想要的值，因此紧接着Instantiate方法要做的便是将刚刚序列化的那个对象进行反序列化，将对应字段的值赋值给新的对象。事实上，实例化十分类似于深度克隆的过程，关于预制体Prefab和实例化的内容会在10.4节中具体介绍。</p>
+<p>2．存储场景：如果在文档编辑器中打开一个以.unity作为后缀结尾的场景文件，和Prefab部分类似，可以看到场景文件的不同形式——文本型的YMAL和二进制型的。所以也就明白了在Unity 3D中，游戏场景也是经过序列化来保存的。</p>
+<p>3．载入场景：如果存储场景涉及到了序列化，那么载入场景也和序列化相关也就不会让人那么吃惊了。事实上，无论在编辑器中YAML文件的载入还是在游戏运行过程中读取场景和素材，都需要用到序列化。</p>
+<p>4．重载编辑器代码：主要发生在开发人员拓展编辑器的时候，如果开发人员修改编辑器的脚本代码，则Unity 3D要将旧的编辑器窗口的数据进行序列化。当Unity 3D加载新的编辑器脚本代码并重新构建新的编辑器窗口之后，Unity 3D便会将旧窗口的数据反序列化，并提供给新的窗口使用。</p>
+<p>5．Resource.GarbageCollectSharedAssets()方法：这个是Unity 3D所提供的垃圾回收机制，要注意和C#语言本身的垃圾回收GC机制的区别。当我们的场景（假设为scene2）在Unity 3D中加载完成后，Unity 3D会查找出上一个场景（假设为scene1）中但是在新加载的scene2场景中并不需要的游戏物体，因此引擎会卸载这些物体。而Unity 3D所提供的这个垃圾回收器就是利用了序列化的机制，来获取所有有外部引用的对象（UnityEngine.Objects类型）。依据这个，游戏引擎才能够在scene2加载完成后卸载在scene1中使用的素材。</p>
+<p>Unity 3D的底层逻辑事实上是由C++来实现的，而C#作为面向游戏开发者的游戏脚本语言，其实仅仅是Unity 3D提供给用户的一套相比C++更加简单方便的脚本接口。因此除了C#语言自身所提供的序列化机制之外，Unity 3D引擎自身的一部分序列化逻辑同样在C++部分实现。而Unity 3D所提供的序列化机制面向的对象主要是Unity 3D中脚本系统所提供的一些类型，例如Textures类、AnimationClip类、Camera类等。当然，和C#语言中的序列化机制差别不大，这里只是想要再次强调一下，Unity 3D引擎本身是C++实现的，而C#仅仅是Unity 3D的用户所使用的脚本语言。</p>
+<h2 id="对Unity-3D游戏脚本进行序列化的注意事项"><a href="#对Unity-3D游戏脚本进行序列化的注意事项" class="headerlink" title="对Unity 3D游戏脚本进行序列化的注意事项"></a>对Unity 3D游戏脚本进行序列化的注意事项</h2><p>我们并没有因为不了解序列化和反序列化而出现什么重大的问题。但是当我们需要使用格式化器对Unity 3D游戏脚本中的MonoBehaviour游戏组件进行序列化化时，可能会遇到一些问题。这是因为在Unity 3D中，引擎的序列化对性能要求很高。因此在某些情况下，序列化并不能完全按照开发者所预想的那样进行，下面就简单总结一下在Unity 3D中如果要进行序列化需要注意哪些方面。</p>
+<p>在Unity3D中，要被序列化的字段最好是什么样的呢？</p>
+<p>（1）最好是公开可访问的，即public。或者使用了[SerializeField]定制特性。</p>
+<p>（2）不是静态的static。</p>
+<p>（3）不是const的。</p>
+<p>（4）不是readonly的。</p>
+<p>（5）字段类型必须是可以被序列化的。</p>
+<p>那么在Unity 3D的脚本语言中，什么样的类型是可以被序列化的呢？</p>
+<p>（1）自定义的非抽象类（引用类型），且必须使用[Serializable]定制特性。</p>
+<p>（2）自定义的结构体（值类型），且必须使用[Serializable]特性。</p>
+<p>（3）所有派生自UntiyEngine.Object类的类型。</p>
+<p>（4）C#的基元类型，例如常见的int、float、double、bool、string等。</p>
+<p>（5）元素类型为以上4种之一的数组Array。</p>
+<p>（6）元素类型为以上4种之一的列表List&lt;T&gt;。</p>
+<p>那么除了了解了如何在Unity 3D的游戏脚本中定义可以被Unity 3D游戏引擎序列化的字段之后，我们还要了解Unity 3D引擎中的序列化特有的一些特点。</p>
+<p>首先是自定义的类的实例在Unity 3D中进行序列化时的行为类似值类型。</p>
+<p>下面通过一个例子进行讲解，代码如下。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[<span class="meta">Serializable</span>]</span><br><span class="line"><span class="keyword">class</span> <span class="title">Animal</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span> name;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">MyScript</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> Animal[] animals;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果在脚本MyScript中的数组类型的字段animals中添加5个对同一个Animal类的对象的引用，在Unity 3D引擎进行序列化时，我们会在序列化流中发现存在5个对象。因此一旦对其进行反序列化操作，可以想象会有5个不同的对象生成。这看起来是不是和值类型十分相似呢？即引用已不再像是引用，反而“变成”了对象本身。因此，当在Unity 3D引擎中对一个内部包含很多引用的复杂对象进行序列化操作时，往往无法直接利用Unity 3D中的序列化机制自动的进行序列化。此时就需要我们自己操作，以使得目标能够被正确的序列化。需要注意的是，这条注意事项仅仅针对自定义的类。对于那些派生自UnityEngine.Object的类型的对象引用则不存在这种现象，例如下面这行代码中定义的字段myCamera。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> Camera myCamera</span><br></pre></td></tr></table></figure>
+
+<p>由于Camera类派生自UnityEngine.Object，因此在Unity 3D引擎中能够被正确的序列化。</p>
+<p>其次还需要注意的一点是在Unity 3D引擎中，对声明为自定义类型，但是值为null的字段无法正确的序列化。下面通过一段简单的代码解释一下这种情况，代码如下。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">Test</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> Trouble t;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">[<span class="meta">Serializable</span>]</span><br><span class="line"><span class="keyword">class</span> <span class="title">Trouble</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> Trouble t1;</span><br><span class="line">    <span class="keyword">public</span> Trouble t2;</span><br><span class="line">    <span class="keyword">public</span> Trouble t3;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果这个脚本被反序列化，那么会有几个对象被反序列化出来呢？</p>
+<p>有人可能会回答将有一个对象被反序列化出来，那个对象就是Test的对象。也有人可能会回答将有两个对象被反序列化出来，除了刚刚说的Test的对象之外，还有一个在Test内部引用的Trouble类型的对象。</p>
+<p>那么正确的答案是多少呢？729个！这是因为Unity 3D中的序列化器并不支持空值null。如果使用这个序列化器来序列化一个为null的对象或字段，它就会默认创建一个新的该类型的实例作为要被序列化的对象，并对它进行序列化。很显然的一点便是由于在Trouble类中定义的3个Trouble字段都是null，那么序列化器便会进入一个死循环。为了防止它一直无限循环下去，Unity 3D引擎提供了一个循环次数的上限，一旦到了上限，序列化器便会自动停止对目标的序列化。但即便有一个上限来防止序列化无限的进行下去，但是在到达上限之前已经序列化了很多对象，这样将会导致的一个后果便是会产生一个很大的序列化流。而在Unity 3D中绝大多数的系统都是依靠序列化系统的，因此Test脚本有可能会导致Unity 3D的很多子系统的运行性能变得更慢。不过值得庆幸的是，这一点已经引起了Unity 3D开发团队的重视，他们已经在4.5版本之后的Unity 3D中对这种代码增加了警告。</p>
+<p>最后还需要注意的一点是，Unity 3D所提供的序列化系统支持自定义类型的多态。例如下面这行代码中定义的字段。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> Animal[] animals</span><br></pre></td></tr></table></figure>
+
+<p>假设我们从animals类还派生了很多具体的小动物的类型，例如dog类、cat类、giraffe类。此时如果分别将dog类的对象、cat类的对象以及giraffe类的对象加入到animals这个数组中，通过序列化和反序列化后，会得到3个Animal类的实例，而不是dog、cat或是giraffe的实例。同样，这个局限也仅仅是针对于我们自定义的类型而言的，对于派生自UnityEngine.Object类的类型的实例而言，多态是不受影响的。</p>
+<h2 id="如何利用Unity3D提供的序列化器对自定义类型进行序列化"><a href="#如何利用Unity3D提供的序列化器对自定义类型进行序列化" class="headerlink" title="如何利用Unity3D提供的序列化器对自定义类型进行序列化"></a>如何利用Unity3D提供的序列化器对自定义类型进行序列化</h2><p>假如无法准确地被Unity 3D进行序列化的自定义类型我们不得不使用，而同时又很想让它们能够被正确的序列化，是否有什么好的办法呢？一个可行的想法便是能否将我们的数据类型在要进行序列化时转换成Unity 3D能够正确序列化的类型，而在运行时进行反序列化时再转换为我们所需要的数据类型呢？</p>
+<p>设想一个情景，假设此时我们自定义了一个树形数据结构要在Unity 3D中进行序列化。如果直接让Unity 3D序列化这个数据结构，那么那些对自己定义的类型的限制便会产生影响，例如对null的支持性很差。因此最后的结果很有可能是数据流变得十分大，从而导致很多引擎内部的系统的性能下降。例如下面这个例子中的代码所示。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">VerySlowBehaviourDoNotDoThis</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    [<span class="meta">Serializable</span>]</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Node</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">string</span> interestingValue = <span class="string">"value"</span>;</span><br><span class="line"></span><br><span class="line">       <span class="comment">// The field below is what makes the serialization data become huge because</span></span><br><span class="line">       <span class="comment">// it introduces a 'class cycle'.</span></span><br><span class="line">       <span class="keyword">public</span> List\&lt;Node\&gt; children = <span class="keyword">new</span> List\&lt;Node\&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// this gets serialized</span></span><br><span class="line">    <span class="keyword">public</span> Node root = <span class="keyword">new</span> Node();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">OnGUI</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Display (root);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Display</span>(<span class="params">Node node</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        GUILayout.Label (<span class="string">"Value: "</span>);</span><br><span class="line">        node.interestingValue = GUILayout.TextField(node.interestingValue, GUILayout.Width(<span class="number">200</span>));</span><br><span class="line"></span><br><span class="line">        GUILayout.BeginHorizontal ();</span><br><span class="line">        GUILayout.Space (<span class="number">20</span>);</span><br><span class="line">        GUILayout.BeginVertical ();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">foreach</span> (<span class="keyword">var</span> child <span class="keyword">in</span> node.children)</span><br><span class="line">            Display (child);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (GUILayout.Button (<span class="string">"Add child"</span>))</span><br><span class="line">            node.children.Add (<span class="keyword">new</span> Node ());</span><br><span class="line"></span><br><span class="line">        GUILayout.EndVertical ();</span><br><span class="line">        GUILayout.EndHorizontal ();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个例子中的代码直接使Unity 3D引擎对树形数据结构进行了序列化操作，各位读者可以自己尝试操作，看看会有怎样的结果。</p>
+<p>那么与此相反的是，再换另外一种方式，即不让Unity 3D引擎直接对这个树形结构进行序列化，而是创建一个可以被Unity 3D正确处理的“中间”类型作为对树形结构的包装。先看下面这个例子中的代码是如何实现的，代码如下。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">BehaviourWithTree</span> : <span class="title">MonoBehaviour</span>, <span class="title">ISerializationCallbackReceiver</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// node class that is used at runtime</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Node</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">string</span> interestingValue = <span class="string">"value"</span>;</span><br><span class="line">        <span class="keyword">public</span> List\&lt;Node\&gt; children = <span class="keyword">new</span> List\&lt;Node\&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// node class that we will use for serialization</span></span><br><span class="line">    [<span class="meta">Serializable</span>]</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">struct</span> SerializableNode</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">string</span> interestingValue;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">int</span> childCount;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">int</span> indexOfFirstChild;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// the root of what we use at runtime．not serialized.</span></span><br><span class="line">    Node root = <span class="keyword">new</span> Node();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// the field we give unity to serialize.</span></span><br><span class="line">    <span class="keyword">public</span> List\&lt;SerializableNode\&gt; serializedNodes;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">OnBeforeSerialize</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// unity is about to read the serializedNodes field's contents．lets make sure</span></span><br><span class="line">        <span class="comment">// we write out the correct data into that field "just in time".</span></span><br><span class="line">        serializedNodes.Clear();</span><br><span class="line">        AddNodeToSerializedNodes(root);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">AddNodeToSerializedNodes</span>(<span class="params">Node n</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">var</span> serializedNode = <span class="keyword">new</span> SerializableNode () &#123;</span><br><span class="line">            interestingValue = n.interestingValue,</span><br><span class="line">            childCount = n.children.Count,</span><br><span class="line">            indexOfFirstChild = serializedNodes.Count+<span class="number">1</span></span><br><span class="line">        &#125;;</span><br><span class="line"></span><br><span class="line">        serializedNodes.Add (serializedNode);</span><br><span class="line">        <span class="keyword">foreach</span> (<span class="keyword">var</span> child <span class="keyword">in</span> n.children)</span><br><span class="line">            AddNodeToSerializedNodes (child);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">OnAfterDeserialize</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// Unity has just written new data into the serializedNodes field.</span></span><br><span class="line">        <span class="comment">// let's populate our actual runtime data with those new values.</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (serializedNodes.Count \&gt; <span class="number">0</span>)</span><br><span class="line">            root = ReadNodeFromSerializedNodes (<span class="number">0</span>);</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            root = <span class="keyword">new</span> Node ();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">Node <span class="title">ReadNodeFromSerializedNodes</span>(<span class="params"><span class="keyword">int</span> index</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">var</span> serializedNode = serializedNodes [index];</span><br><span class="line">        <span class="keyword">var</span> children = <span class="keyword">new</span> List\&lt;Node\&gt; ();</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>; i!= serializedNode.childCount; i++)</span><br><span class="line">            children.Add(ReadNodeFromSerializedNodes(serializedNode.indexOfFirstChild + i));</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Node() &#123;</span><br><span class="line">            interestingValue = serializedNode.interestingValue,</span><br><span class="line">            children = children</span><br><span class="line">        &#125;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">OnGUI</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Display (root);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Display</span>(<span class="params">Node node</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        GUILayout.Label (<span class="string">"Value: "</span>);</span><br><span class="line">        node.interestingValue = GUILayout.TextField(node.interestingValue, GUILayout.Width(<span class="number">200</span>));</span><br><span class="line"></span><br><span class="line">        GUILayout.BeginHorizontal ();</span><br><span class="line">        GUILayout.Space (<span class="number">20</span>);</span><br><span class="line">        GUILayout.BeginVertical ();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">foreach</span> (<span class="keyword">var</span> child <span class="keyword">in</span> node.children)</span><br><span class="line">            Display (child);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (GUILayout.Button (<span class="string">"Add child"</span>))</span><br><span class="line">            node.children.Add (<span class="keyword">new</span> Node ());</span><br><span class="line"></span><br><span class="line">        GUILayout.EndVertical ();</span><br><span class="line">        GUILayout.EndHorizontal ();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在这个例子中，并没有直接对Node类型的实例进行序列化和反序列化操作。相反，我们新创建了一个类型——SerializableNode，并且定义了一个类型为List&lt;SerializableNode&gt;的字段——serializedNodes。事实上是对serializedNodes来进行序列化和反序列化的。在游戏运行时，Unity 3D会在序列化对象之前调用OnBeforeSerialize方法，该方法会将树形结构的各个节点读入serializedNodes列表中，将其变为可以被Unity 3D正常序列化的形式。而Unity 3D在反序列化后，会调用OnAfterDeserialize方法，将反序列化得来的serializedNodes再转换成树形结构。</p>
+<h1 id="Prefab和实例化之谜——序列化和反序列化的过程"><a href="#Prefab和实例化之谜——序列化和反序列化的过程" class="headerlink" title="Prefab和实例化之谜——序列化和反序列化的过程"></a>Prefab和实例化之谜——序列化和反序列化的过程</h1><p>经过前面几节的讲解，相信各位读者已经掌握了C#语言的序列化以及Unity 3D中的序列化系统。本节将更进一步解释一些更加高级的序列化和反序列化的技术，深入探讨Unity 3D是如何序列化和反序列化对象字段的。</p>
+<p>不过在介绍序列化的具体过程之前，还是将目光投向在使用Unity 3D开发时最常见的——Prefab。</p>
+<h2 id="认识预制体Prefab"><a href="#认识预制体Prefab" class="headerlink" title="认识预制体Prefab"></a>认识预制体Prefab</h2><p>预制体Prefab是一种存储在项目视图中的一种可重复使用的游戏对象的资源类型。Prefab的特点可以总结为以下4点。</p>
+<p>（1）Prefab可以被放入多个场景中，也可以在一个场景中被多次放入。</p>
+<p>（2）当在一个场景中增加一个Prefab，就实例化了一个Prefab的实例。</p>
+<p>（3）所有Prefab实例都是Prefab的克隆，所以如果是在运行中生成对象会有（Clone）的标记。</p>
+<p>（4）只要Prefab原型发生改变，场景中所有的Prefab实例都会产生变化。</p>
+<p>因此，Prefab可以多次放入到多个场景中。而当添加一个Prefab到场景中时，事实上就创建了它的一个实例。与此同时，所有的Prefab实例都链接到原始预制体，基本上是它的克隆。不管项目存在多少Prefab的实例，当对Prefab进行任何更改时，将看到这些更改应用于所有实例。</p>
+<p>可Prefab的这几个特点到底有什么用途呢？假设我们在构建一个角色扮演类的游戏。通过Unity 3D引擎，我们可以很方便地来增加恰当的游戏组件和设置合适的属性数值在场景中加入一个NPC角色。但是在这个游戏中，这个NPC角色的出现不止一次，也不止在一个场景中。虽然它们在游戏中是同一个NPC角色，但是我们在开发中却不得不复制多个GameObject来表示这个NPC角色。那么会带来什么问题呢？那就是维护起来不方便。设想一下，每次对这个NPC角色的修改对应到Unity 3D中的游戏物体可能就是多次的修改，因为每个代表这个NPC角色的GameObject都是独立的。自然而然，此时我们最希望的是如果只修改一个代表该NPC角色的原始GameObject，就可以同步游戏中所有的该NPC角色的GameObject该多好。此时Prefab便应运而生，它具备的那4个特点使它在处理这种情景的时候得心应手。</p>
+<p>那么应该如何创建一个Prefab呢？首先应该先创建一个空白的Prefab，从菜单选择“Assets→Create→Prefab”选项，并为新预置命名即可。要注意的是，这个新建的空白Prefab不包含游戏对象，因此我们不能直接使用它来创建它的实例。此时这个空白的Prefab就像是一个空的容器，等着用游戏对象数据来填充。那么接下来就填充一个Prefab，在层次视图（Hierarchy View）中，选择我们想使之成为预置的游戏对象，然后拖动该对象到项目视图中的新Prefab上。当完成这些步骤后，游戏对象和其所有子对象就已经复制到了Prefab的数据中。该Prefab现在可以被实例化成实例，并且被重复使用了。层次视图中的原始游戏对象已经成为了该Prefab的一个实例，如图所示10-4所示。</p>
+<p>在层次视图（Hierarchy View）中，有3个蓝色且名为player的Prefab的实例。此时如果修改这个叫作player的Prefab文件，则这3个实例都会被修改。与此同时，在层次视图中还有两个叫作player_noPrefab的白色游戏对象，由于它们和Prefab无关，因此在修改它们中的任何一个都不会对另外一个产生影响。</p>
+<p>如果选中3个蓝色的Prefab实例中的任何一个Prefab实例，就可以在编辑窗口右侧的监控视窗中看到Prefab特有的3个按钮，即Select、Revert、Apply，如图10-5所示。</p>
+<p>图10-5　Prefab的3个按钮</p>
+<p>Select按钮的作用：单击此按钮后会立即定位到Project视图中的原始Prefab文件。<br>Revert按钮的作用：如果不小心破坏了Hierarchy视图中当前这个Prefab对象，单击此按钮可以还原至Project视图中原始Prefab对象。<br>Apply按钮的作用：如果想批量修改所有Prefab对象，比如添加一个新的组件后，单击此按钮可以把所有对象以及原始的Prefabe文件都应用成当前编辑的对象。还有一种方法也可以达到这种效果，即在Unity导航菜单栏中选择“GameObject→Apply Changes To Prefab”选项。<br>Prefab其实是Unity 3D经过序列化之后生成的资源文件。同样，我们也知道了在Unity 3D中经过序列化之后主要产生两种格式的文件：一种是可读的YAML格式（当然也可以是JSON格式）；另一种便是二进制格式。在Unity 3D的世界中，各种各样的游戏物体都可以被序列化为YAML格式，不仅仅是Prefab是这样，场景文件、材质文件等都是如此。而二进制格式与YAML格式类似，只不过是将数据从可读的格式转化为了不可读的二进制格式。那么Unity 3D的这两种序列化格式究竟应该如何选用呢？事实上这取决于我们自己的需求，当我们需要能够看懂序列化之后的数据时，就选择文本格式的序列化格式。如果没有这个需求，那么就应该选择二进制的序列化格式，特别是当数据量十分大的时候更应如此。这是因为仅仅从序列化速度上而言，使用二进制要比文本快得多。</p>
+<h2 id="实例化一个游戏对象"><a href="#实例化一个游戏对象" class="headerlink" title="实例化一个游戏对象"></a>实例化一个游戏对象</h2><p>这里说的实例化，往往要用到Unity 3D脚本语言中的Object.Instantiate方法。</p>
+<p>首先来看看Object.Instantiate方法的签名，如下所示。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title">Instantiate</span>(<span class="params">Object original, Vector3 position, Quaternion rotation</span>)</span>;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title">Instantiate</span>(<span class="params">Object original</span>)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到Instantiate方法有两个重载版本，而常用的是需要3个参数的Instantiate版本。下面就介绍一下Instantiate方法的这3个参数的含义，以及它们的作用，如表10-2所示。</p>
+<p>表10-2　Instantiate方法参数</p>
+<p>参数名称    参数作用<br>original    要拷贝的目标，一个已经存在的游戏对象<br>position    新游戏对象的位置<br>rotation    新游戏对象的方向<br>看完Instantiate方法的签名后，就能明白它的作用主要是克隆原始游戏对象，并返回克隆之后的新游戏对象。克隆原始的游戏对象，位置设置为position，旋转设置为rotation（默认情况下克隆之后的游戏对象的位置为Vector3.zero，旋转为Quaternion.identity），返回的则是克隆后的物体。这实际上和在Unity 3D的编辑器中使用复制（Ctrl+D）命令是一样的。如果一个游戏物体、组件或脚本实例被传入，实例将克隆整个游戏物体的层次，以及它所有的子对象。</p>
+<p>既然实例化事实上是要将一个已经存在的游戏对象克隆为另一个新的游戏对象，那么具体应该如何操作呢？因为在C#中，引用类型的变量仅仅是对某个游戏对象的引用。因此简单的赋值克隆的仅仅是对同一个对象的引用，而不是克隆出一个新的游戏对象。例如下面的这段代码。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Test</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//  Use this for initialization</span></span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span> (<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">       NumberTest a = <span class="keyword">new</span> NumberTest();</span><br><span class="line">       a.numValue = <span class="number">10</span>;</span><br><span class="line">       NumberTest b= a;</span><br><span class="line">       b.numValue = <span class="number">20</span>;</span><br><span class="line">       Console.WriteLine(a.numValue);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">NumberTest</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> numValue;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>简单的将变量a的值赋值给变量b，事实上仅仅是新建了一个对a所引用的游戏对象的引用赋值给了b，而并没有创建出一个新的游戏对象。因此如果修改b所引用的对象的numValue字段的值，修改的其实也是a所引用的游戏对象。因此在打印a的numValue字段时，输出的是修改之后的值20。因此这种简单的赋值，显然不能真正克隆一个游戏对象。那么应该如何真正实现克隆游戏对象呢？</p>
+<p>想想序列化和反序列化的过程。我们可以通过序列化将一个对象保存为一个二进制文件以实现永久保存。同时，我们还可以将这个二进制文件反序列化成为一个和被序列化的游戏对象一样的新的游戏对象。是不是有了思路呢？Instantiate方法便是这么做的。在Instantiate方法内部，会首先将参数original所引用的游戏对象序列化，得到了经过序列化之后的序列化流后，再使用反序列化机制将这个序列化流反序列化生成一个新的游戏对象。</p>
+<p>可以发现，通过Instantiate方法来克隆现有的可复用的游戏对象，显然要比直接在代码中创建游戏对象方便得多。而可复用便是Prefab的一大特点，因此Instantiate方法常常和Prefab配合使用。而由于Instantiate方法是克隆操作，因此如果想要修改游戏对象的数据，仅仅修改对应的Prefab即可。相反，如果不使用Instantiate方法而是直接在代码中构建游戏对象，那么显然会带来修改数据和调试的复杂度。这也是使用Prefab和Instantiate的一大理由。那么下面就通过几段代码对比一下直接在代码中构建游戏对象和Prefab、Instantiate配合使用的区别，代码如下。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 在代码中构建游戏对象</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Instantiation</span> : <span class="title">MonoBehaviour</span> </span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> y = <span class="number">0</span>; y \&lt; <span class="number">5</span>; y++) </span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> x = <span class="number">0</span>; x \&lt; <span class="number">5</span>; x++) </span><br><span class="line">            &#123;</span><br><span class="line">                GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);</span><br><span class="line">                cube.AddComponent\&lt;Rigidbody\&gt;();</span><br><span class="line">                cube.transform.position = <span class="keyword">new</span> Vector3(x, y, <span class="number">0</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，在游戏脚本中直接构建一个游戏对象，首先要创建一个新的游戏对象，然后为它添加各种需要的组件Component，有的时候还需要设置它的位置信息、方向信息等。代码显得十分臃肿且不易维护。那么如果把这个游戏对象保存为一个Prefab，然后使用Instantiate按照Prefab克隆出新的游戏对象会如何呢？代码如下。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 使用Prefab和Instantiate方法</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Instantiation</span> : <span class="title">MonoBehaviour</span> </span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">public</span> Transform brick;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">      <span class="keyword">for</span> (<span class="keyword">int</span> y = <span class="number">0</span>; y \&lt; <span class="number">5</span>; y++) </span><br><span class="line">      &#123;</span><br><span class="line">          <span class="keyword">for</span> (<span class="keyword">int</span> x = <span class="number">0</span>; x \&lt; <span class="number">5</span>; x++) </span><br><span class="line">          &#123;</span><br><span class="line">              Instantiate(brick, <span class="keyword">new</span> Vector3(x, y, <span class="number">0</span>), Quaternion.identity);</span><br><span class="line">          &#125;</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>首先在编辑器的脚本检视窗口为brick变量赋值（使用Prefab），然后可以在代码中看到和刚刚直接在代码中创建游戏对象不同，使用Prefab和Instantiate方法只需要一行代码，并且不包含对这个游戏对象是如何组成的逻辑。因此，如果想要修改这个游戏对象进行调试，仅仅修改对应的Prefab即可，无须修改代码。</p>
+<h2 id="序列化和反序列化之谜"><a href="#序列化和反序列化之谜" class="headerlink" title="序列化和反序列化之谜"></a>序列化和反序列化之谜</h2><p>序列化和反序列化的具体过程究竟都发生了什么呢？</p>
+<p>我们已经知道了如何使用格式化器来序列化一个对象。为了简化格式化器的使用，借助Mono的底层实现，Unity 3D在它的游戏脚本中的System.Runtime.Serialization命名空间定义了一个叫作FormatterServices的类型。需要特别指出的是FormatterServices类不能被实例化，且只包含一些静态方法。下面就来看看Unity 3D是如何在游戏脚本中利用格式化器，实现了自动序列化那些应用了SerializableAttribute特性的类型的对象。</p>
+<p>格式化器序列化的第1步</p>
+<p>格式化器会调用FormatterServices类的一个方法名为GetSerializableMembers的方法。该方法的签名如下所示。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> MemberInfo[] <span class="title">GetSerializableMembers</span>(<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">  Type type</span></span></span><br><span class="line"><span class="function"><span class="params"></span>)</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> MemberInfo[] <span class="title">GetSerializableMembers</span>(<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">  Type type,</span></span></span><br><span class="line"><span class="function"><span class="params">  StreamingContext context</span></span></span><br><span class="line"><span class="function"><span class="params"></span>)</span></span><br></pre></td></tr></table></figure>
+
+<p>可见该方法有两个重载版本，常用的是第二个版本，下面就来看一看该方法的两个参数和返回类型。首先是type参数，它的类型为System.Type，表示正在序列化或克隆的类型；第二个是context参数，它的类型是System.Runtime.Serialization.StreamingContext，表示发生序列化的上下文。而返回类型为System.Reflection.MemberInfo[]，即一个由MemberInfo类型对象构成的数组，该数组中的每个元素都对应一个可以被序列化的实例字段。</p>
+<p>格式化器序列化的第2步</p>
+<p>当获得了由MemberInfo对象所构成的数组后，就进入了对象被序列化的阶段。此时格式化器要调用FormatterServices类的另一个静态方法，即GetObjectData，该方法的签名如下所示。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Object[] <span class="title">GetObjectData</span>(<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">  Object obj,</span></span></span><br><span class="line"><span class="function"><span class="params">  MemberInfo[] members</span></span></span><br><span class="line"><span class="function"><span class="params"></span>)</span></span><br></pre></td></tr></table></figure>
+
+<p>可以看到GetObjectData方法需要两个参数，一个是obj参数，类型为System.Object，代表的是要写入序列化程序的对象；另一个是members参数，类型为System.Reflection.MemberInfo[]，代表的是从对象中所提取的成员。也就是格式化器在第一步中所获取的MemberInfo对象数组。而GetObjectData方法返回的是一个System.Object数组，该数组包含了存储在 members 参数中并与 obj 参数关联的数据。即其中每个元素标识了被序列化的那个对象中的一个字段的值。返回的这个Object数组中索引为0的元素，事实上是members参数这个数组中索引为0的元素（类型的成员）所对应的值。</p>
+<p>格式化器序列化的第3步</p>
+<p>格式化器经过前两个步骤已经获取了对象的成员和其对应的值。因此下面就需要将这些信息写入流中，所以在这一步需要先将程序集标识，以及类型的完整名称写入流中。</p>
+<p>格式化器序列化的第4步</p>
+<p>将程序集标识以及类型的完整名称写入流中之后，格式化器接下来会遍历在第一步和第二步得到的两个数组以获得成员名称和与其对应的值，最后将这些信息也写入流中。</p>
+<p>上面这4个步骤便是在C#语言中使用格式化器序列化对象的过程。接下来再分析一下格式化器是如何反序列化生成新的对象的。</p>
+<p>格式化器反序列化的第1步</p>
+<p>和序列化第4步对应，在反序列化的一开始，格式化器显然需要从流中读取程序集标识和完整的类型名称。需要注意的是，能够正确读取程序集标识的前提是该程序集已经被加载到了AppDomain中，如果还没有被加载则加载它。如果在加载的过程中出现错误，就会抛出一个SerializationException异常，并且终止反序列化接下来的操作。如果程序集已经被正确加载，那么格式化器就会调用FormatterServices类的另一个静态方法——GetTypeFromAssembly，并且将读取的程序集标识和完整的类型名称作为参数传入该方法中。GetTypeFromAssembly方法的签名如下所示。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Type <span class="title">GetTypeFromAssembly</span>(<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">  Assembly assem,</span></span></span><br><span class="line"><span class="function"><span class="params">  <span class="keyword">string</span> name</span></span></span><br><span class="line"><span class="function"><span class="params"></span>)</span></span><br></pre></td></tr></table></figure>
+
+<p>可以看到除了刚刚提到的两个参数之外，GetTypeFromAssembly方法还会返回一个System.Type类型的对象，它便是要反序列化的对象的类型。经过反序列化的第1步，格式化器便获得了对象的类型。</p>
+<p>格式化器反序列化的第2步</p>
+<p>获得了要反序列化的对象的类型后，接下来就要在内存上为新的对象分配一块内存空间了。此时格式化器会调用FormatterServices类的GetUninitializedObject方法。该方法的签名如下所示。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title">GetUninitializedObject</span>(<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">  Type type</span></span></span><br><span class="line"><span class="function"><span class="params"></span>)</span></span><br></pre></td></tr></table></figure>
+
+<p>它的参数便是在第1步中获得的对象类型，而它的作用就是为type的新对象分配内存空间。不过需要注意的是，此时并没有调用构造函数，且对象的所有字节都被初始化为null或是0。</p>
+<p>格式化器反序列化的第3步</p>
+<p>当格式化器已经为新的对象分配好了内存空间之后，接下来就要获取序列化中保存的对象的信息了。首先格式化器会调用FormatterServices类的GetSerializableMembers方法来构造并初始化一个新的MemberInfo数组。这样格式化器就获得了一个已经序列化好，现在等待被反序列化的一组字段。</p>
+<p>格式化器反序列化的第4步</p>
+<p>当格式化器获取了对象的字段信息之后，下一步的目标自然就变成了获取对象字段所对应数值的信息。因此在这一步中，格式化器会根据流中包含的数据创建一个Object数组，并且对它进行初始化。到了这一步，就像前面讲述的序列化过程一样，获得了对象的字段信息以及与字段对应的数值信息，当然还有一个新分配的对象。</p>
+<p>格式化器反序列化的第5步</p>
+<p>需要根据字段和与字段对应的值为新分配的对象进行初始化。这里又要使用FormatterServices类的静态方法，这次的静态方法叫作PopulateObjectMembers，该方法的签名如下所示。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Object <span class="title">PopulateObjectMembers</span>(<span class="params"></span></span></span><br><span class="line"><span class="function"><span class="params">  Object obj,</span></span></span><br><span class="line"><span class="function"><span class="params">  MemberInfo[] members,</span></span></span><br><span class="line"><span class="function"><span class="params">  Object[] data</span></span></span><br><span class="line"><span class="function"><span class="params"></span>)</span></span><br></pre></td></tr></table></figure>
+
+<p>PopulateObjectMembers方法所需要的3个参数，第一个是Object类型的obj参数，便是要被填充的对象，即新分配的对象；第二个参数是一个MemberInfo数组members，它的元素便是对象需要被填充的字段或属性；第3个参数是一个Object数组data，它的元素便是要被填充的字段和属性所对应的具体值。因此，PopulateObjectMembers方法通过遍历数组将对象的每个字段和属性初始化为对应的值，到此反序列化的过程就结束了。</p>
+<p>在这一小节中，我们了解了在Unity 3D的脚本语言C#中序列化和反序列化的具体操作步骤，希望各位读者能够加深对这两个过程的理解，在处理类似的问题时能够更加清楚地认识到它的本质，而不仅仅是满足于表面的使用。</p>
+<h1 id="本章总结"><a href="#本章总结" class="headerlink" title="本章总结"></a>本章总结</h1><p>通过学习本章的内容，相信各位读者已经了解了在Unity 3D的游戏脚本语言C#中，序列化和反序列化的过程，以及Unity 3D自身的序列化和反序列化的机制。在此希望各位读者能够认识到序列化和反序列机制对于Unity 3D的重要意义，以及能够熟练掌握基于Unity 3D和C#语言的序列化和反序列化机制所派生出的各种功能和机制，例如Unity 3D内部的数据存储、玩家数据本地化类playerprefs，以及Prefab的使用等。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Unity3D脚本编程/" rel="tag"># Unity3D脚本编程</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/09/18/命令模式-1/" rel="next" title="命令模式">
+                <i class="fa fa-chevron-left"></i> 命令模式
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/09/19/Unity3D中的定制特性/" rel="prev" title="Unity3D中的定制特性">
+                Unity3D中的定制特性 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">483</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">51</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2019/09/22/职责链模式-2/" title="职责链模式" target="_blank">职责链模式</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/09/22/备忘录模式-2/" title="备忘录模式" target="_blank">备忘录模式</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/09/21/抽象工厂模式-1/" title="抽象工厂模式" target="_blank">抽象工厂模式</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/09/21/简单工厂模式/" title="简单工厂模式" target="_blank">简单工厂模式</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/09/21/工厂方法模式/" title="工厂方法模式" target="_blank">工厂方法模式</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#初识序列化和反序列化"><span class="nav-number">1.</span> <span class="nav-text">初识序列化和反序列化</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#控制类型的序列化和反序列化"><span class="nav-number">2.</span> <span class="nav-text">控制类型的序列化和反序列化</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#如何使类型可以序列化"><span class="nav-number">2.1.</span> <span class="nav-text">如何使类型可以序列化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何选择序列化的字段和控制反序列化的流程"><span class="nav-number">2.2.</span> <span class="nav-text">如何选择序列化的字段和控制反序列化的流程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#序列化、反序列化中流的上下文介绍及应用"><span class="nav-number">2.3.</span> <span class="nav-text">序列化、反序列化中流的上下文介绍及应用</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Unity-3D中的序列化和反序列化"><span class="nav-number">3.</span> <span class="nav-text">Unity 3D中的序列化和反序列化</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Unity-3D的序列化概览"><span class="nav-number">3.1.</span> <span class="nav-text">Unity 3D的序列化概览</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对Unity-3D游戏脚本进行序列化的注意事项"><span class="nav-number">3.2.</span> <span class="nav-text">对Unity 3D游戏脚本进行序列化的注意事项</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何利用Unity3D提供的序列化器对自定义类型进行序列化"><span class="nav-number">3.3.</span> <span class="nav-text">如何利用Unity3D提供的序列化器对自定义类型进行序列化</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Prefab和实例化之谜——序列化和反序列化的过程"><span class="nav-number">4.</span> <span class="nav-text">Prefab和实例化之谜——序列化和反序列化的过程</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#认识预制体Prefab"><span class="nav-number">4.1.</span> <span class="nav-text">认识预制体Prefab</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实例化一个游戏对象"><span class="nav-number">4.2.</span> <span class="nav-text">实例化一个游戏对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#序列化和反序列化之谜"><span class="nav-number">4.3.</span> <span class="nav-text">序列化和反序列化之谜</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#本章总结"><span class="nav-number">5.</span> <span class="nav-text">本章总结</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">3.3m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">49:18</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>
