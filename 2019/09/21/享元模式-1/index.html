@@ -111,10 +111,17 @@
 <meta property="og:site_name" content="车斌的博客">
 <meta property="og:description" content="思考并回答以下问题：">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-09-22T04:51:29.682Z">
+<meta property="og:image" content="http://chebincarl.github.io/2019/09/21/享元模式-1/1.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/09/21/享元模式-1/1-1.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/09/21/享元模式-1/2.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/09/21/享元模式-1/3.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/09/21/享元模式-1/5.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/09/21/享元模式-1/1.png">
+<meta property="og:updated_time" content="2019-09-23T13:31:55.321Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="享元模式">
 <meta name="twitter:description" content="思考并回答以下问题：">
+<meta name="twitter:image" content="http://chebincarl.github.io/2019/09/21/享元模式-1/1.png">
 
 
 
@@ -443,7 +450,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-09-22 12:51:29" itemprop="dateModified" datetime="2019-09-22T12:51:29+08:00">2019-09-22</time>
+                <time title="修改时间：2019-09-23 21:31:55" itemprop="dateModified" datetime="2019-09-23T21:31:55+08:00">2019-09-23</time>
               
             
           </span>
@@ -489,7 +496,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">4.4k</span>
+                <span title="本文字数">8.5k</span>
               
 
               
@@ -503,7 +510,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">4 分钟</span>
+                <span title="阅读时长">8 分钟</span>
               
             </div>
           
@@ -526,22 +533,135 @@
         <p>思考并回答以下问题：</p>
 <a id="more"></a>
 
-<p><strong>本章导学</strong></p>
-<p>当系统中存在大量相同或者相似的对象时，享元模式是一种值得考虑的  解决方案,它通过共享技术实现相同或相似的细粒度对象的复用,从而节约内  存空间,提高系统性能。在享元模式中提供了一个享元池用于存储已经创建  好的享元对象,并通过享元工厂类将享元对象提供给客户端使用。  本章将学习享元模式的定义与结构,学习如何设计享元池和享元工厂,  并结合实例学习如何实现无外部状态的享元模式以及有外部状态的享元  模式。 </p>
-<p><strong>本章知识点</strong></p>
-<p>享元模式的定义。  享元模式的结构。  享元模式的实现。  享元模式的应用。  享元模式的优缺点。  享元模式的适用环境。  有外部状态的享元模式。  单纯享元模式与复合享元模式。</p>
-<p>14.1享元模式概述<br>如果一个软件系统在运行时所创建的相同或相似的对象数量太多,将导致运行代价过  高,带来系统资源浪费、性能下降等问题。例如在一个文本字符串中存在很多重复的字符,  如果每一个字符都用一个单独的对象来表示,将会占用较多的内存空间,那么如何避免系统  中出现大量相同或相似的对象,同时又不影响客户端程序通过面向对象的方式对这些对象  进行操作呢?享元模式正是为解决这一类问题而“诞生”。享元模式通过共享技术实现相同或相似对象的重用,在逻辑上每一个出现的字符都有一个对象与之对应,然而在物理上它们  却共享同一个享元对象,这个对象可以出现在一个字符串的不同地方,相同的字符对象都指  向同一个实例。在享元模式中,存储这些共享实例对象的地ell  方称为享元池(Flyweight Pool),用户可以针对每一个不同  的字符创建一个享元对象,将其放在享元池中,待需要时再 abede1ghijkim享元池  从享元池中取出。字符享元对象示意图如图14-1所示。nopqrstuvwxyz  享元模式以共享的方式高效地支持大量细粒度对象的 图14-1 字符享元对象示意图  重用,享元对象能做到共享的关键是区分了内部状态  (Intrinsic State)和外部状态(Extrinsic State)。下面对享元的内部状态和外部状态进行简  单的介绍。  (1)内部状态是存储在享元对象内部并且不会随环境改变而改变的状态,内部状态可  以共享。例如字符的内容,不会随外部环境的变化而变化,无论在任何环境下字符”a”始终  是“a”,都不会变成“b”。<br>态退</p>
-<p>(2)外部状态是随环境改变而改变的、不可以共享的状态。享元对象的外部状态通常  由客户端保存,并在享元对象被创建之后,需要使用的时候再传入享元对象内部。一个外部  状态与另一个外部状态之间是相互独立的。例如字符的颜色,可以在不同的地方有不同的  颜色,例如有的“a”是红色的,有的”a”是绿色的,字符的大小也是如此,有的“a”是五号字,有  的“a”是四号字。而且字符的颜色和大小是两个独立的外部状态,它们可以独立变化,相互  之间没有影响,客户端可以在使用时将外部状态注入享元对象中。  正因为区分了内部状态和外部状态,可以将具有相同内部状态的对象存储到享元池中,  享元池中的对象是可以实现共享的,需要的时候将对象从享元池中取出,即可实现对象的复  用。通过向取出的对象注入不同的外部状态,可以得到一系列相似的对象,而这些对象在内  存中实际上只存储一份。  享元模式的定义如下:<br>享元模式:运用共享技术有效地支持大量细粒度对象的复用。 </p>
-<p>享元模式要求能够被共享的对象必须是细粒度对象,它又称为轻量级模式,享元模式是  一种对象结构型模式。<br>14.2享元模式的结构与实现<br>14.2.1 享元模式的结构<br>享元模式结构较为复杂,通常结合工厂模式一起使用,在它的结构图中包含了一个享元  工厂类,其结构如图14-2所示。  由图14-2可知,享元模式包含以下4个角色。</p>
-<p>图14-2享元模式结构图w<br>(1) Flyweight(抽象享元类):它通常是一个接口或抽象类,在抽象享元类中声明了具  体享元类公共的方法,这些方法可以向外界提供享元对象的内部数据(内部状态),同时也可  以通过这些方法设置外部数据(外部状态)。  (2) ConcreteFlyweight(具体享元类):它实现了抽象享元类,其实例称为享元对象,并  在具体享元类中为内部状态提供了存储空间。通常可以结合单例模式来设计具体享元类,  为每一个具体享元类提供唯一的享元对象。  3) UnsharedConcretelyweight(非共享具体享元类):并不是所有的抽象享元类的子  类都需要被共享,用户可以将不能被共享的子类设计为非共享具体享元类,当需要一个非共  享具体享元类的对象时可以直接通过实例化创建。  (4) FlyweightFactory (享元工厂类):享元工厂类用于创建并管理享元对象,它针对抽  象享元类编程,将各种类型的具体享元对象存储在一个享元池中,享元池一般设计为一个存  储“键值对”的集合(也可以是其他类型的集合),可以结合工厂模式进行设计。当用户请求  一个具体享元对象时,享元工厂提供一个存储在享元池中已创建的实例或者创建一个新的  实例(如果不存在),返回新创建的实例并将其存储在享元池中。<br>4.2.2 享元模式的实现</p>
-<p>享元类Flyweight的设计是享元模式的要点之一,为了提高系统的可扩展性,通常要定  义一个抽象享元类作为所有具体享元类的公共父类。典型的抽象享元类代码如下:</p>
-<p>图14-3围棋软件界面效果图<br>该软件公司开发人员通过对围棋软件进行分析发现,在图14-3  中,围棋棋盘中包含大量的黑子和白子,它们的形状、大小都一模-  样,只是出现的位置不同而已。如果将每一个棋子都作为一个独立的  对象存储在内存中,将导致该围棋软件在运行时所需的内存空间较  大,如何降低运行代价、提高系统性能是需要解决的一个问题。为了  解决该问题,现使用享元模式来设计该围棋软件的棋子对象。</p>
-<p>棋子颜色:黑色  棋子颜色:黑色  棋子颜色:白色  棋子颜色:白色<br>从输出结果可以看出,虽然在客户端代码中获取了3个黑子对象和两个白子对象,但是  3个黑子的内存地址相同,两个白子的内存地址也相同,也就是说,实际上只有两个对象。  在实现享元工厂类时使用了单例模式和简单工厂模式,确保了享元工厂对象的唯一性,并提  供了工厂方法向客户端返回享元对象。<br>14.4有外部状态的享元模式<br>在14.3节的应用实例中,对围棋棋子进行进一步分析,不难发现,虽然黑色棋子和白色  棋子可以共享,但是它们将显示在棋盘的不同位置,如何让相同的黑子或者白子能够多次重  复显示但位于一个棋盘的不同地方?解决方法之一就是将棋子的位置定义为棋子的一个外  部状态,在需要时再进行设置。因此,在图14-4的基础上增加了一个新的类Coordinates  (坐标类),用于存储每一个棋子的位置,修改之后的结构如图14-5所示。</p>
-<p>14.5 单纯享元模式和复合享元模式<br>标准的享元模式结构图中既包含可以共享的具体享元类,也包含不可以共享的非共享  具体享元类。但是在实际使用的过程中,有时候会用到两种特殊的享元模式:单纯享元模  式和复合享元模式,下面对这两种特殊的享元模式进行简单的介绍。  1．单纯享元模式  在单纯享元模式中,所有的具体享元类都是可以共享的,不存在非共享具体享元类。单  纯享元模式的结构如图14-6所示。</p>
-<p>14.6享元模式的优缺点与适用环境<br>当系统中存在大量相同或者相似的对象时,享元模式是一种较好的解决方案,它通过共  享技术实现相同或相似的细粒度对象的复用,从而节约了内存空间,提高了系统性能。相比  其他结构型设计模式,享元模式的使用频率并不算太高,但是作为一种以“节约内存,提高性  能”为出发点的设计模式,它在软件开发中还是得到了一定程度的应用。<br>14.6.1 享元模式的优点<br>享元模式的主要优点如下:  (1)享元模式可以减少内存中对象的数量,使得相同或者相似的对象在内存中只保存  一份,从而可以节约系统资源,提高系统性能  (2)在享元模式中,外部状态相对独立,而且不会影响其内部状态,从而使得享元对象  可以在不同的环境中被共享。  14.6.2享元模式的缺点<br>享元模式的主要缺点如下:  (1)享元模式使得系统变得复杂,需要分离出内部状态和外部状态,这使得程序的逻辑</p>
-<p>享元模式的主要缺点如下:  (1)享元模式使得系统变得复杂,需要分离出内部状态和外部状态,这便得t  复杂化。  (2)为了使对象可以共享,享元模式需要将享元对象的部分状态外部化,而读取外部状  态将使得运行时间变长。<br>14.6.3 享元模式的适用环境<br>在以下情况下可以考虑使用享元模式:  (1)一个系统有大量相同或者相似的对象,造成了内存的大量耗费。  (2)对象的大部分状态都可以外部化,可以将这些外部状态传入对象中。  (3)在使用享元模式时需要维护一个存储享元对象的享元池,而这需要耗费一定的系  统资源,因此,在需要多次重复使用享元对象时才值得使用享元模式。<br>14.7本章小结<br>(1)享元模式运用共享技术有效地支持大量细粒度对象的复用。通过使用享元模式,  系统只需使用少量的对象,而这些对象都很相似,状态变化很小,因此可以实现对象的多次  复用,享元模式是一种对象结构型模式。  (2)享元模式包含抽象享元类、具体享元类、非共享具体享元类和享元工厂类4个角  色。其中,在抽象享元类中声明了具体享元类公共的方法;具体享元类实现了抽象享元接  口,为内部状态提供了存储空间;非共享具体享元是不能被共享的抽象享元类的子类;享</p>
-<p>元工厂类用于创建并管理享元对象,它针对抽象享元类编程,将各种类型的具体享元对象存  储在一个享元池中。  (3)享元模式的主要优点是可以极大地减少内存中对象的数量,使得相同或相似的对  象在内存中只保存一份,从而节约系统资源,提高系统性能。其主要缺点是使得系统变得复  杂,需要分离出内部状态和外部状态,这使得程序的逻辑复杂化;此外,享元模式需要将享  元对象的部分状态外部化,而读取外部状态将使得运行时间变长。  (4)享元模式适用的环境:一个系统有大量相同或者相似的对象,造成内存的大量耗  费;对象的大部分状态都可以外部化,可以将这些外部状态传入对象中;需要多次重复使  用享元对象。  (5)享元模式以共享的方式高效地支持大量细粒度对象的重用,享元对象能做到共享  的关键是区分了内部状态和外部状态。内部状态是存储在享元对象内部并且不会随环境改  变而改变的状态,内部状态可以共享;外部状态是随环境改变而改变的、不可以共享的  状态。  (6)在单纯享元模式中,所有的具体享元类都是可以共享的,不存在非共享具体享元  类。将一些单纯享元对象使用组合模式加以组合,还可以形成复合享元对象。</p>
+<p><font size="3"><strong>本章导学</strong></font></p>
+<p>当系统中存在大量相同或者相似的对象时，享元模式是一种值得考虑的解决方案，它通过共享技术实现相同或相似的细粒度对象的复用，从而节约内存空间，提高系统性能。在享元模式中提供了一个享元池用于存储已经创建好的享元对象，并通过享元工厂类将享元对象提供给客户端使用。  </p>
+<p>本章将学习享元模式的定义与结构，学习如何设计享元池和享元工厂，并结合实例学习如何实现无外部状态的享元模式以及有外部状态的享元模式。 </p>
+<p><font size="3"><strong>本章知识点</strong></font></p>
+<ul>
+<li>享元模式的定义  </li>
+<li>享元模式的结构  </li>
+<li>享元模式的实现  </li>
+<li>享元模式的应用  </li>
+<li>享元模式的优缺点 </li>
+<li>享元模式的适用环境  </li>
+<li>有外部状态的享元模式  </li>
+<li>单纯享元模式与复合享元模式</li>
+</ul>
+<h1 id="享元模式概述"><a href="#享元模式概述" class="headerlink" title="享元模式概述"></a><span style="color:#339AFF;">享元模式概述</span></h1><p>如果一个软件系统在运行时所创建的相同或相似的对象数量太多，将导致运行代价过高，带来系统资源浪费、性能下降等问题。例如在一个文本字符串中存在很多重复的字符，如果每一个字符都用一个单独的对象来表示，将会占用较多的内存空间，那么如何避免系统中出现大量相同或相似的对象，同时又不影响客户端程序通过面向对象的方式对这些对象进行操作呢？享元模式正是为解决这一类问题而“诞生”。享元模式通过共享技术实现相同或相似对象的重用，在逻辑上每一个出现的字符都有一个对象与之对应，然而在物理上它们  却共享同一个享元对象，这个对象可以出现在一个字符串的不同地方，相同的字符对象都指向同一个实例。在享元模式中，存储这些共享实例对象的地方称为享元池（Flyweight Pool），用户可以针对每一个不同的字符创建一个享元对象，将其放在享元池中，待需要时再从享元池中取出。字符享元对象示意图如图1所示。享元模式以共享的方式高效地支持大量细粒度对象的重用，享元对象能做到共享的关键是区分了内部状态（Intrinsic State）和外部状态（Extrinsic State）。</p>
+<blockquote>
+<p>图1 字符享元对象示意图</p>
+</blockquote>
+<img src="/2019/09/21/享元模式-1/1.png">
 
+<img src="/2019/09/21/享元模式-1/1-1.png">
+
+<p>下面对享元的内部状态和外部状态进行简单的介绍。  </p>
+<p>(1)内部状态是存储在享元对象内部并且不会随环境改变而改变的状态，内部状态可以共享。例如字符的内容，不会随外部环境的变化而变化，无论在任何环境下字符“a”始终是“a”，都不会变成“b”。</p>
+<p>(2)外部状态是随环境改变而改变的、不可以共享的状态。享元对象的外部状态通常由客户端保存，并在享元对象被创建之后，需要使用的时候再传入享元对象内部。一个外部状态与另一个外部状态之间是相互独立的。例如字符的颜色，可以在不同的地方有不同的颜色，例如有的“a”是红色的，有的“a”是绿色的，字符的大小也是如此，有的“a”是五号字，有的“a”是四号字。而且字符的颜色和大小是两个独立的外部状态，它们可以独立变化，相互之间没有影响，客户端可以在使用时将外部状态注入享元对象中。  </p>
+<p>正因为区分了内部状态和外部状态，可以将具有相同内部状态的对象存储到享元池中，享元池中的对象是可以实现共享的，需要的时候将对象从享元池中取出，即可实现对象的复用。通过向取出的对象注入不同的外部状态，可以得到一系列相似的对象，而这些对象在内存中实际上只存储一份。  </p>
+<p>享元模式的定义如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">运用共享技术有效地支持大量细粒度对象的复用。</span><br></pre></td></tr></table></figure>
+
+<p>享元模式要求能够被共享的对象必须是细粒度对象，它又称为轻量级模式，享元模式是一种对象结构型模式。</p>
+<h1 id="享元模式的结构与实现"><a href="#享元模式的结构与实现" class="headerlink" title="享元模式的结构与实现"></a><span style="color:#339AFF;">享元模式的结构与实现</span></h1><h2 id="享元模式的结构"><a href="#享元模式的结构" class="headerlink" title="享元模式的结构"></a><span style="color:#00ACC1;">享元模式的结构</span></h2><p>享元模式结构较为复杂，通常结合工厂模式一起使用，在它的结构图中包含了一个享元工厂类，其结构如图2所示。  </p>
+<p>由图2可知，享元模式包含以下4个角色。</p>
+<blockquote>
+<p>图2享元模式结构图</p>
+</blockquote>
+<img src="/2019/09/21/享元模式-1/2.png">
+
+<p>(1)<strong>Flyweight（抽象享元类）</strong>：它通常是一个接口或抽象类，在抽象享元类中声明了具体享元类公共的方法，这些方法可以向外界提供享元对象的内部数据（内部状态），同时也可以通过这些方法设置外部数据（外部状态）。  </p>
+<p>(2)<strong>ConcreteFlyweight（具体享元类）</strong>：它实现了抽象享元类，其实例称为享元对象，并在具体享元类中为内部状态提供了存储空间。通常可以结合单例模式来设计具体享元类，为每一个具体享元类提供唯一的享元对象。  </p>
+<p>(3)<strong>UnsharedConcretelyweight（非共享具体享元类）</strong>：并不是所有的抽象享元类的子类都需要被共享，用户可以将不能被共享的子类设计为非共享具体享元类，当需要一个非共享具体享元类的对象时可以直接通过实例化创建。  </p>
+<p>(4)<strong>FlyweightFactory（享元工厂类）</strong>：享元工厂类用于创建并管理享元对象，它针对抽象享元类编程，将各种类型的具体享元对象存储在一个享元池中，享元池一般设计为一个存储“键值对”的集合（也可以是其他类型的集合），可以结合工厂模式进行设计。当用户请求一个具体享元对象时，享元工厂提供一个存储在享元池中已创建的实例或者创建一个新的实例（如果不存在），返回新创建的实例并将其存储在享元池中。</p>
+<h2 id="享元模式的实现"><a href="#享元模式的实现" class="headerlink" title="享元模式的实现"></a><span style="color:#00ACC1;">享元模式的实现</span></h2><p>享元类Flyweight的设计是享元模式的要点之一，为了提高系统的可扩展性，通常要定义一个抽象享元类作为所有具体享元类的公共父类。典型的抽象享元类代码如下：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">Flyweight</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">Operation</span>(<span class="params"><span class="keyword">string</span> extrinsicState</span>)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">ConcreteFlyweight</span> : <span class="title">Flyweight</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//内部状态intrinsicState作为成员变量，同一个享元对象其内部状态是一致的</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">string</span> intrinsicState;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ConcreteFlyweight</span>(<span class="params"><span class="keyword">string</span> intrinsicState</span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">	    <span class="keyword">this</span>.intrinsicState = intrinsicState;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//外部状态extrinsicState在使用时由外部设置，不保存在享元对象中，即使是同一个对象，在每一次调用时可以传入不同的外部状态</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Operation</span>(<span class="params"><span class="keyword">string</span> extrinsicState</span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">	    <span class="comment">//实现业务方法</span></span><br><span class="line">    &#125;	</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">UnsharedConcreteFlyweight</span> : <span class="title">Flyweight</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Operation</span>(<span class="params"><span class="keyword">string</span> extrinsicState</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">//实现业务方法</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">FlyweightFactory</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//定义一个Hashtable用于存储享元对象，实现享元池</span></span><br><span class="line">    <span class="keyword">private</span> Hashtable flyweights = <span class="keyword">new</span> Hashtable();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Flyweight <span class="title">GetFlyweight</span>(<span class="params"><span class="keyword">string</span> key</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">//如果对象存在，则直接从享元池获取</span></span><br><span class="line">        <span class="keyword">if</span> (flyweights.ContainsKey(key))</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">return</span> (Flyweight)flyweights[key];</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//如果对象不存在，先创建一个新的对象添加到享元池中，然后返回</span></span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">        &#123;</span><br><span class="line">            Flyweight fw = <span class="keyword">new</span> ConcreteFlyweight(<span class="string">"state"</span>);</span><br><span class="line">            flyweights.Add(key,fw);</span><br><span class="line">            <span class="keyword">return</span> fw;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>图3 围棋软件界面效果图</p>
+</blockquote>
+<img src="/2019/09/21/享元模式-1/3.png">
+
+<blockquote>
+<p>该软件公司开发人员通过对围棋软件进行分析发现，在图3中，围棋棋盘中包含大量的黑子和白子，它们的形状、大小都一模一样，只是出现的位置不同而已。如果将每一个棋子都作为一个独立的对象存储在内存中，将导致该围棋软件在运行时所需的内存空间较大，如何降低运行代价、提高系统性能是需要解决的一个问题。为了解决该问题，现使用享元模式来设计该围棋软件的棋子对象。</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">棋子颜色：黑色 </span><br><span class="line">棋子颜色：黑色  </span><br><span class="line">棋子颜色：白色  </span><br><span class="line">棋子颜色：白色</span><br></pre></td></tr></table></figure>
+
+<p>从输出结果可以看出，虽然在客户端代码中获取了3个黑子对象和两个白子对象，但是3个黑子的内存地址相同，两个白子的内存地址也相同，也就是说，实际上只有两个对象。  </p>
+<p>在实现享元工厂类时使用了单例模式和简单工厂模式，确保了享元工厂对象的唯一性，并提供了工厂方法向客户端返回享元对象。</p>
+<h1 id="有外部状态的享元模式"><a href="#有外部状态的享元模式" class="headerlink" title="有外部状态的享元模式"></a><span style="color:#339AFF;">有外部状态的享元模式</span></h1><p>在上一节的应用实例中，对围棋棋子进行进一步分析，不难发现，虽然黑色棋子和白色棋子可以共享，但是它们将显示在棋盘的不同位置，如何让相同的黑子或者白子能够多次重复显示但位于一个棋盘的不同地方?解决方法之一就是将棋子的位置定义为棋子的一个外部状态，在需要时再进行设置。因此，在图4的基础上增加了一个新的类Coordinates（坐标类），用于存储每一个棋子的位置，修改之后的结构如图5所示。</p>
+<blockquote>
+<p>图5 </p>
+</blockquote>
+<img src="/2019/09/21/享元模式-1/5.png">
+
+<h1 id="单纯享元模式和复合享元模式"><a href="#单纯享元模式和复合享元模式" class="headerlink" title="单纯享元模式和复合享元模式"></a><span style="color:#339AFF;">单纯享元模式和复合享元模式</span></h1><p>标准的享元模式结构图中既包含可以共享的具体享元类，也包含不可以共享的非共享具体享元类。但是在实际使用的过程中，有时候会用到两种特殊的享元模式:单纯享元模式和复合享元模式，下面对这两种特殊的享元模式进行简单的介绍。  </p>
+<p>1.单纯享元模式  </p>
+<p>在单纯享元模式中，所有的具体享元类都是可以共享的，不存在非共享具体享元类。单纯享元模式的结构如图6所示。</p>
+<blockquote>
+<p>图6 </p>
+</blockquote>
+<img src="/2019/09/21/享元模式-1/1.png">
+
+<h1 id="享元模式的优缺点与适用环境"><a href="#享元模式的优缺点与适用环境" class="headerlink" title="享元模式的优缺点与适用环境"></a><span style="color:#339AFF;">享元模式的优缺点与适用环境</span></h1><p>当系统中存在大量相同或者相似的对象时，享元模式是一种较好的解决方案，它通过共享技术实现相同或相似的细粒度对象的复用，从而节约了内存空间，提高了系统性能。相比其他结构型设计模式，享元模式的使用频率并不算太高，但是作为一种以“节约内存，提高性能”为出发点的设计模式，它在软件开发中还是得到了一定程度的应用。</p>
+<h2 id="享元模式的优点"><a href="#享元模式的优点" class="headerlink" title="享元模式的优点"></a><span style="color:#00ACC1;">享元模式的优点</span></h2><p>享元模式的主要优点如下：</p>
+<ul>
+<li><p>(1)享元模式可以减少内存中对象的数量，使得相同或者相似的对象在内存中只保存一份，从而可以节约系统资源，提高系统性能。  </p>
+</li>
+<li><p>(2)在享元模式中，外部状态相对独立，而且不会影响其内部状态，从而使得享元对象可以在不同的环境中被共享。  </p>
+</li>
+</ul>
+<h2 id="享元模式的缺点"><a href="#享元模式的缺点" class="headerlink" title="享元模式的缺点"></a><span style="color:#00ACC1;">享元模式的缺点</span></h2><p>享元模式的主要缺点如下：</p>
+<ul>
+<li><p>(1)享元模式使得系统变得复杂，需要分离出内部状态和外部状态，这使得程序的逻辑复杂化。</p>
+</li>
+<li><p>(2)为了使对象可以共享，享元模式需要将享元对象的部分状态外部化，而读取外部状态将使得运行时间变长。</p>
+</li>
+</ul>
+<h2 id="享元模式的适用环境"><a href="#享元模式的适用环境" class="headerlink" title="享元模式的适用环境"></a><span style="color:#00ACC1;">享元模式的适用环境</span></h2><p>在以下情况下可以考虑使用享元模式： </p>
+<ul>
+<li><p>(1)一个系统有大量相同或者相似的对象，造成了内存的大量耗费。  </p>
+</li>
+<li><p>(2)对象的大部分状态都可以外部化，可以将这些外部状态传入对象中。  </p>
+</li>
+<li><p>(3)在使用享元模式时需要维护一个存储享元对象的享元池，而这需要耗费一定的系统资源，因此，在需要多次重复使用享元对象时才值得使用享元模式。</p>
+</li>
+</ul>
+<h1 id="本章小结"><a href="#本章小结" class="headerlink" title="本章小结"></a><span style="color:#339AFF;">本章小结</span></h1><p>(1)享元模式运用共享技术有效地支持大量细粒度对象的复用。通过使用享元模式，系统只需使用少量的对象，而这些对象都很相似，状态变化很小，因此可以实现对象的多次复用，享元模式是一种对象结构型模式。  </p>
+<p>(2)享元模式包含抽象享元类、具体享元类、非共享具体享元类和享元工厂类4个角色。其中，在抽象享元类中声明了具体享元类公共的方法；具体享元类实现了抽象享元接口，为内部状态提供了存储空间；非共享具体享元是不能被共享的抽象享元类的子类；享元工厂类用于创建并管理享元对象，它针对抽象享元类编程，将各种类型的具体享元对象存储在一个享元池中。  </p>
+<p>(3)享元模式的主要优点是可以极大地减少内存中对象的数量，使得相同或相似的对象在内存中只保存一份，从而节约系统资源，提高系统性能。其主要缺点是使得系统变得复杂，需要分离出内部状态和外部状态，这使得程序的逻辑复杂化；此外，享元模式需要将享元对象的部分状态外部化，而读取外部状态将使得运行时间变长。 </p>
+<p>(4)享元模式适用的环境：一个系统有大量相同或者相似的对象，造成内存的大量耗费；对象的大部分状态都可以外部化，可以将这些外部状态传入对象中；需要多次重复使用享元对象。  </p>
+<p>(5)享元模式以共享的方式高效地支持大量细粒度对象的重用，享元对象能做到共享的关键是区分了内部状态和外部状态。内部状态是存储在享元对象内部并且不会随环境改变而改变的状态，内部状态可以共享；外部状态是随环境改变而改变的、不可以共享的状态。  </p>
+<p>(6)在单纯享元模式中，所有的具体享元类都是可以共享的，不存在非共享具体享元类。将一些单纯享元对象使用组合模式加以组合，还可以形成复合享元对象。</p>
+<blockquote>
+<p>IgoChessman.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">FlyweightSample</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">IgoChessman</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">string</span> <span class="title">GetColor</span>(<span class="params"></span>)</span>;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Display</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">		    Console.WriteLine(<span class="string">"棋子颜色："</span> + <span class="keyword">this</span>.GetColor());	</span><br><span class="line">	    &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Display</span>(<span class="params">Coordinates coord</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            Console.WriteLine(<span class="string">"棋子颜色：&#123;0&#125;，棋子位置：&#123;1&#125;，&#123;2&#125;"</span>, <span class="keyword">this</span>.GetColor(),coord.X,coord.Y);	</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>WhiteIgoChessman.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> <span class="title">FlyweightSample</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title">WhiteIgoChessman</span> : <span class="title">IgoChessman</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">string</span> <span class="title">GetColor</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="string">"白色"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> <span class="title">FlyweightSample</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title">BlackIgoChessman</span> : <span class="title">IgoChessman</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">string</span> <span class="title">GetColor</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="string">"黑色"</span>;</span><br><span class="line">        &#125;	</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>IgoChessmanFactory</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">FlyweightSample</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title">IgoChessmanFactory</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">static</span> IgoChessmanFactory instance = <span class="keyword">new</span> IgoChessmanFactory();</span><br><span class="line">        <span class="keyword">private</span> Hashtable ht; <span class="comment">//使用Hashtable来存储享元对象，充当享元池</span></span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">private</span> <span class="title">IgoChessmanFactory</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            ht = <span class="keyword">new</span> Hashtable();</span><br><span class="line">            IgoChessman black, white;</span><br><span class="line">            black = <span class="keyword">new</span> BlackIgoChessman();</span><br><span class="line">            ht.Add(<span class="string">"b"</span>, black);</span><br><span class="line">            white = <span class="keyword">new</span> WhiteIgoChessman();</span><br><span class="line">            ht.Add(<span class="string">"w"</span>, white);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//返回享元工厂类的唯一实例</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> IgoChessmanFactory <span class="title">GetInstance</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">return</span> instance;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//通过key来获取存储在Hashtable中的享元对象</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> IgoChessman <span class="title">GetIgoChessman</span>(<span class="params"><span class="keyword">string</span> color</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">return</span> (IgoChessman)ht[color];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>Program.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">FlyweightSample</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="keyword">string</span>[] args</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            IgoChessman black1,black2,black3,white1,white2;</span><br><span class="line">		    IgoChessmanFactory factory;</span><br><span class="line">        </span><br><span class="line">            <span class="comment">//获取享元工厂对象</span></span><br><span class="line">		    factory = IgoChessmanFactory.GetInstance();</span><br><span class="line"></span><br><span class="line">            <span class="comment">//通过享元工厂获取三颗黑子</span></span><br><span class="line">		    black1 = factory.GetIgoChessman(<span class="string">"b"</span>);</span><br><span class="line">		    black2 = factory.GetIgoChessman(<span class="string">"b"</span>);</span><br><span class="line">		    black3 = factory.GetIgoChessman(<span class="string">"b"</span>);</span><br><span class="line">		    Console.WriteLine(<span class="string">"判断两颗黑子是否相同："</span> + (black1 == black2));</span><br><span class="line"></span><br><span class="line">            <span class="comment">//通过享元工厂获取两颗白子</span></span><br><span class="line">		    white1 = factory.GetIgoChessman(<span class="string">"w"</span>);</span><br><span class="line">		    white2 = factory.GetIgoChessman(<span class="string">"w"</span>);</span><br><span class="line">            Console.WriteLine(<span class="string">"判断两颗白子是否相同："</span> + (white1 == white2));</span><br><span class="line"></span><br><span class="line">            <span class="comment">//显示棋子</span></span><br><span class="line">            <span class="comment">/*</span></span><br><span class="line"><span class="comment">		    black1.Display();</span></span><br><span class="line"><span class="comment">		    black2.Display();</span></span><br><span class="line"><span class="comment">		    black3.Display();</span></span><br><span class="line"><span class="comment">		    white1.Display();</span></span><br><span class="line"><span class="comment">		    white2.Display();</span></span><br><span class="line"><span class="comment">             * */</span></span><br><span class="line"></span><br><span class="line">            <span class="comment">//显示棋子，同时设置棋子的坐标位置</span></span><br><span class="line">            black1.Display(<span class="keyword">new</span> Coordinates(<span class="number">1</span>, <span class="number">2</span>));</span><br><span class="line">            black2.Display(<span class="keyword">new</span> Coordinates(<span class="number">3</span>, <span class="number">4</span>));</span><br><span class="line">            black3.Display(<span class="keyword">new</span> Coordinates(<span class="number">1</span>, <span class="number">3</span>));</span><br><span class="line">            white1.Display(<span class="keyword">new</span> Coordinates(<span class="number">2</span>, <span class="number">5</span>));</span><br><span class="line">            white2.Display(<span class="keyword">new</span> Coordinates(<span class="number">2</span>, <span class="number">4</span>));</span><br><span class="line"></span><br><span class="line">            Console.Read();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
       
     </div>
 
@@ -633,8 +753,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <div class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -651,7 +780,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">486</span>
+                    <span class="site-state-item-count">490</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -803,7 +932,11 @@
                     
                       
                     
-                    <span class="site-state-item-count">51</span>
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">53</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -834,23 +967,23 @@
                 
                 
                   <li>
-                    <a href="/2019/09/22/模板模式/" title="模板方法模式" target="_blank">模板方法模式</a>
+                    <a href="/2019/09/23/网络游戏的开端-Echo/" title="网络游戏的开端--Echo" target="_blank">网络游戏的开端--Echo</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/22/策略模式-1/" title="策略模式" target="_blank">策略模式</a>
+                    <a href="/2019/09/23/扫雷/" title="扫雷" target="_blank">扫雷</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/22/原型模式-1/" title="原型模式" target="_blank">原型模式</a>
+                    <a href="/2019/09/23/适配器模式-3/" title="适配器模式" target="_blank">适配器模式</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/22/职责链模式-2/" title="职责链模式" target="_blank">职责链模式</a>
+                    <a href="/2019/09/23/益智休闲类游戏———火车行动/" title="益智休闲类游戏———火车行动" target="_blank">益智休闲类游戏———火车行动</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/22/备忘录模式-2/" title="备忘录模式" target="_blank">备忘录模式</a>
+                    <a href="/2019/09/22/模板方法模式-1/" title="模板方法模式" target="_blank">模板方法模式</a>
                   </li>
                 
               </ul>
@@ -865,6 +998,23 @@
         </div>
       </div>
 
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#享元模式概述"><span class="nav-number">1.</span> <span class="nav-text">享元模式概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#享元模式的结构与实现"><span class="nav-number">2.</span> <span class="nav-text">享元模式的结构与实现</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#享元模式的结构"><span class="nav-number">2.1.</span> <span class="nav-text">享元模式的结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#享元模式的实现"><span class="nav-number">2.2.</span> <span class="nav-text">享元模式的实现</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#有外部状态的享元模式"><span class="nav-number">3.</span> <span class="nav-text">有外部状态的享元模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#单纯享元模式和复合享元模式"><span class="nav-number">4.</span> <span class="nav-text">单纯享元模式和复合享元模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#享元模式的优缺点与适用环境"><span class="nav-number">5.</span> <span class="nav-text">享元模式的优缺点与适用环境</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#享元模式的优点"><span class="nav-number">5.1.</span> <span class="nav-text">享元模式的优点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#享元模式的缺点"><span class="nav-number">5.2.</span> <span class="nav-text">享元模式的缺点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#享元模式的适用环境"><span class="nav-number">5.3.</span> <span class="nav-text">享元模式的适用环境</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#本章小结"><span class="nav-number">6.</span> <span class="nav-text">本章小结</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
       
 
       
@@ -905,7 +1055,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">49:37</span>
+    <span title="站点阅读时长">50:32</span>
   
 </div>
 
