@@ -123,7 +123,7 @@
 <meta property="og:image" content="http://chebincarl.github.io/2019/09/23/网络游戏的开端-Echo/10-1.jpg">
 <meta property="og:image" content="http://chebincarl.github.io/2019/09/23/网络游戏的开端-Echo/11.jpg">
 <meta property="og:image" content="http://chebincarl.github.io/2019/09/23/网络游戏的开端-Echo/12.jpg">
-<meta property="og:updated_time" content="2019-09-23T14:57:14.454Z">
+<meta property="og:updated_time" content="2019-09-24T11:51:13.917Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="网络游戏的开端--Echo">
 <meta name="twitter:description" content="思考并回答以下问题：">
@@ -439,12 +439,24 @@
                 
               
 
-              <time title="创建时间：2019-09-23 22:24:59 / 修改时间：22:57:14" itemprop="dateCreated datePublished" datetime="2019-09-23T22:24:59+08:00">2019-09-23</time>
+              <time title="创建时间：2019-09-23 22:24:59" itemprop="dateCreated datePublished" datetime="2019-09-23T22:24:59+08:00">2019-09-23</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-24 19:51:13" itemprop="dateModified" datetime="2019-09-24T19:51:13+08:00">2019-09-24</time>
               
             
           </span>
@@ -490,7 +502,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">3.5k</span>
+                <span title="本文字数">3.4k</span>
               
 
               
@@ -534,7 +546,7 @@
 <img src="/2019/09/23/网络游戏的开端-Echo/1.jpg">
 
 <p>本章会先介绍Socket（套接字）的概念，然后着手开发Echo程序。学完本章，读者能够动手编写基础网络应用程序，还能够编写一套时间查询程序。本章的知识是网络游戏中最基础的。</p>
-<h1 id="藏在幕后的服务端"><a href="#藏在幕后的服务端" class="headerlink" title="藏在幕后的服务端"></a>藏在幕后的服务端</h1><p>一款网络游戏分为客户端和服务端两个部分，客户端程序运行在用户的电脑或手机上，服务端程序运行在游戏运营商的服务器上。如图2所示，多个客户端通过网络与服务端通信。图1-2中间的TCP连接指的是一种游戏中常用的网络通信协议，与之对应的还有UDP协议、KCP协议、HTTP协议等。</p>
+<h1 id="藏在幕后的服务端"><a href="#藏在幕后的服务端" class="headerlink" title="藏在幕后的服务端"></a>藏在幕后的服务端</h1><p>一款网络游戏分为客户端和服务端两个部分，客户端程序运行在用户的电脑或手机上，服务端程序运行在游戏运营商的服务器上。如图2所示，多个客户端通过网络与服务端通信。图2中间的TCP连接指的是一种游戏中常用的网络通信协议，与之对应的还有UDP协议、KCP协议、HTTP协议等。</p>
 <blockquote>
 <p>图2 典型的网络游戏架构</p>
 </blockquote>
@@ -583,13 +595,12 @@
 </blockquote>
 <img src="/2019/09/23/网络游戏的开端-Echo/4.jpg">
 
-<p>服务端与服务端之间通常使用TCP网络通信，如图1-5所示，各个服务端相互连接，形成服务端集群。</p>
+<p>服务端与服务端之间通常使用TCP网络通信，如图5所示，各个服务端相互连接，形成服务端集群。</p>
 <p>客户端和服务端之间、服务端和服务端之间都是使用TCP网络通信的。网络编程是开发网络游戏的基础，那么，我们就从最基础的Socket开始吧！</p>
 <blockquote>
 <p>图5 服务端的分布式架构</p>
 </blockquote>
 <img src="/2019/09/23/网络游戏的开端-Echo/5.jpg">
-
 
 <h1 id="网络连接的端点：Socket"><a href="#网络连接的端点：Socket" class="headerlink" title="网络连接的端点：Socket"></a>网络连接的端点：Socket</h1><p>网络上的两个程序通过一个双向的通信连接实现数据交换，这个连接的一端称为一个Socket。一个Socket包含了进行网络通信必需的五种信息：连接使用的协议、本地主机的IP地址、本地的协议端口、远程主机的IP地址和远程协议端口（如图6所示）。如果把Socket理解成一台手机，那么本地主机IP地址和端口相当于自己的手机号码，远程主机IP地址和端口相当于对方的号码。至少需要两台手机才能打电话，同样地，至少需要两个Socket才能进行网络通信。</p>
 <blockquote>
@@ -629,14 +640,19 @@
 </blockquote>
 <img src="/2019/09/23/网络游戏的开端-Echo/10-1.jpg">
 
-<h2 id="Socket通信的流程"><a href="#Socket通信的流程" class="headerlink" title="Socket通信的流程"></a>Socket通信的流程</h2><p>为了能够理解下一节的程序，请务必认真阅读本节。图1-11展示了一套基本的Socket通信流程。这个过程和手机通话很相似，连接方（客户端）和监听方（服务端）有着不同的流程。图1-11中的Socket、Connect、Bind、Listen等词汇指的是Socket通信过程中所需要调用的API，三次握手、四次挥手等词汇指的是操作系统内部的处理过程。</p>
+<h2 id="Socket通信的流程"><a href="#Socket通信的流程" class="headerlink" title="Socket通信的流程"></a>Socket通信的流程</h2><p>为了能够理解下一节的程序，请务必认真阅读本节。图11展示了一套基本的Socket通信流程。这个过程和手机通话很相似，连接方（客户端）和监听方（服务端）有着不同的流程。图11中的Socket、Connect、Bind、Listen等词汇指的是Socket通信过程中所需要调用的API，三次握手、四次挥手等词汇指的是操作系统内部的处理过程。</p>
 <p>1）开启一个连接之前，需要创建一个Socket对象（使用API Socket），然后绑定本地使用的端口（使用API Bind）。对服务端而言，绑定的步骤相当于给手机插上SIM卡，确定了“手机号”。对客户端而言，连接时（使用API Connect）会由系统分配端口，可以省去绑定步骤。</p>
 <blockquote>
 <p>图11 Socket通信的基本流程</p>
 </blockquote>
 <img src="/2019/09/23/网络游戏的开端-Echo/11.jpg">
 
-<p>2）服务端开启监听（使用API Listen），等待客户端接入。相当于电话开机，等待别人呼叫。<br>3）客户端连接服务器（使用API Connect），相当于手机拨号。<br>4）服务器接受连接（使用API Accept），相当于接听电话并说出“喂”。<br>通过这4个步骤，成功建立连接，可以收发数据。<br>5）客户端和服务端通过Send和Receive等API收发数据，操作系统会自动完成数据的确认、重传等步骤，确保传输的数据准确无误。<br>6）某一方关闭连接（使用API Close），操作系统会执行“四次挥手”的步骤，关闭双方连接，相当于挂断电话。</p>
+<p>2）服务端开启监听（使用API Listen），等待客户端接入。相当于电话开机，等待别人呼叫。</p>
+<p>3）客户端连接服务器（使用API Connect），相当于手机拨号。</p>
+<p>4）服务器接受连接（使用API Accept），相当于接听电话并说出“喂”。</p>
+<p>通过这4个步骤，成功建立连接，可以收发数据。</p>
+<p>5）客户端和服务端通过Send和Receive等API收发数据，操作系统会自动完成数据的确认、重传等步骤，确保传输的数据准确无误。</p>
+<p>6）某一方关闭连接（使用API Close），操作系统会执行“四次挥手”的步骤，关闭双方连接，相当于挂断电话。</p>
 <h2 id="TCP和UDP协议"><a href="#TCP和UDP协议" class="headerlink" title="TCP和UDP协议"></a>TCP和UDP协议</h2><p>从概念上讲，TCP是一种面向连接的、可靠的、基于字节流的传输层通信协议，与TCP相对应的UDP协议是无连接的、不可靠的、但传输效率较高的协议。在本章的语义中，“Socket通信”特指使用TCP协议的Socket通信。</p>
 <p>也许能够以寄快递的例子解释不同协议的区别。有些快递公司收费低，对快递员的要求也低，丢件的事情频频发生；有些公司收费高，但要求快递员在每个节点都做检查和记录，丢件率很低。不同快递公司有着不同的行为规则，有的奉行低价优先，有的奉行服务至上。TCP、UDP协议对应不同快递公司的行为规则。它们的目的都是将数据发送给接收方，但使用的策略不同：TCP注重传输的可靠性，确保数据不会丢失，但速度慢；UDP注重传输速度，但不保证所有发送的数据对方都能够收到。至于孰优孰劣，得看具体的应用场景。游戏开发最常用的是TCP协议，所以本书也以TCP为主。</p>
 <h1 id="开始网络编程：Echo"><a href="#开始网络编程：Echo" class="headerlink" title="开始网络编程：Echo"></a>开始网络编程：Echo</h1><h2 id="什么是Echo程序"><a href="#什么是Echo程序" class="headerlink" title="什么是Echo程序"></a>什么是Echo程序</h2><p>Echo程序是网络编程中最基础的案例。建立网络连接后，客户端向服务端发送一行文本，服务端收到后将文本发送回客户端（见图12）。</p>
@@ -646,8 +662,7 @@
 <img src="/2019/09/23/网络游戏的开端-Echo/12.jpg">
 
 <p>Echo程序分为客户端和服务端两个部分，客户端部分使用Unity实现，为了技术的统一，服务端使用C#语言实现。</p>
-<h2 id="编写客户端程序"><a href="#编写客户端程序" class="headerlink" title="编写客户端程序"></a>编写客户端程序</h2><p>由于本书偏重于开发网络游戏，重点讲解网络相关的内容。假定你对Unity的基本操作、UGUI有一定的了解（如果你对此还不是很了解，推荐阅读本书第1版中的入门章节）。</p>
-<p>打开Unity，新建名为Echo的项目，制作简单的UGUI界面。在场景中添加两个按钮（右击Hierarchy面板，选择UI→Button，分别命名为ConnButton和SendButton。Unity会自动添加名为Canvas的画布和名为EventSystem的事件系统），添加一个输入框（命名为InputField）和一个文本框（命名为Text），如图13和表3所示。</p>
+<h2 id="编写客户端程序"><a href="#编写客户端程序" class="headerlink" title="编写客户端程序"></a>编写客户端程序</h2><p>打开Unity，新建名为Echo的项目，制作简单的UGUI界面。在场景中添加两个按钮（右击Hierarchy面板，选择UI→Button，分别命名为ConnButton和SendButton。Unity会自动添加名为Canvas的画布和名为EventSystem的事件系统），添加一个输入框（命名为InputField）和一个文本框（命名为Text），如图13和表3所示。</p>
 
       
     </div>
@@ -693,6 +708,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/09/24/UML类图/" rel="prev" title="UML类图">
+                UML类图 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -763,7 +782,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">490</span>
+                    <span class="site-state-item-count">501</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -950,23 +969,23 @@
                 
                 
                   <li>
-                    <a href="/2019/09/23/网络游戏的开端-Echo/" title="网络游戏的开端--Echo" target="_blank">网络游戏的开端--Echo</a>
+                    <a href="/2019/09/24/建造者模式-1/" title="建造者模式" target="_blank">建造者模式</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/23/扫雷/" title="扫雷" target="_blank">扫雷</a>
+                    <a href="/2019/09/24/装饰模式-1/" title="装饰模式" target="_blank">装饰模式</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/23/适配器模式-3/" title="适配器模式" target="_blank">适配器模式</a>
+                    <a href="/2019/09/24/打地鼠/" title="打地鼠" target="_blank">打地鼠</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/23/益智休闲类游戏———火车行动/" title="益智休闲类游戏———火车行动" target="_blank">益智休闲类游戏———火车行动</a>
+                    <a href="/2019/09/24/面向对象设计原则/" title="面向对象设计原则" target="_blank">面向对象设计原则</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/22/模板方法模式-1/" title="模板方法模式" target="_blank">模板方法模式</a>
+                    <a href="/2019/09/24/通用服务端框架/" title="通用服务端框架" target="_blank">通用服务端框架</a>
                   </li>
                 
               </ul>
@@ -1027,7 +1046,7 @@
     
       <span class="post-meta-item-text">站点总字数：</span>
     
-    <span title="站点总字数">3.3m</span>
+    <span title="站点总字数">3.4m</span>
   
 
   
@@ -1038,7 +1057,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">50:32</span>
+    <span title="站点阅读时长">51:04</span>
   
 </div>
 
