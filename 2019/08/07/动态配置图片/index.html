@@ -111,10 +111,13 @@
 <meta property="og:site_name" content="车斌的博客">
 <meta property="og:description" content="思考并回答以下问题：  如果使用本地的图片，看看需要做哪些改变呢？">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-08-08T13:55:37.326Z">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/07/动态配置图片/1.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/07/动态配置图片/2.png">
+<meta property="og:updated_time" content="2019-10-11T11:50:49.162Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="动态配置图片">
 <meta name="twitter:description" content="思考并回答以下问题：  如果使用本地的图片，看看需要做哪些改变呢？">
+<meta name="twitter:image" content="http://chebincarl.github.io/2019/08/07/动态配置图片/1.png">
 
 
 
@@ -443,7 +446,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-08-08 21:55:37" itemprop="dateModified" datetime="2019-08-08T21:55:37+08:00">2019-08-08</time>
+                <time title="修改时间：2019-10-11 19:50:49" itemprop="dateModified" datetime="2019-10-11T19:50:49+08:00">2019-10-11</time>
               
             
           </span>
@@ -489,7 +492,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">3.3k</span>
+                <span title="本文字数">3.2k</span>
               
 
               
@@ -529,35 +532,44 @@
 </ul>
 <a id="more"></a>
 
-<p>怎么最大程度提高程序的扩展性呢？最好图片和文字说明是可以动态替换的。</p>
-<p>这个问题用我们这两周学的配置文件和读取文件的知识，串起来就可以搞定这个问题了！</p>
+<p>图片和文字说明是可以动态替换的。使用配置文件和读取文件的知识，串起来就可以搞定这个问题了。</p>
 <p>基本思路是这样的：</p>
-<p>使用json配置图片的路径和文字说明<br>动态获取外部的图片，这样图片可以在外面替换，不用重新发布程序</p>
-<p>创建场景</p>
-<p>1、先创建一个虚拟展厅的场景，我这里偷懒就使用一个3D Object-&gt;Quad创建了一面墙，然后调整物体的Scale。<br>2、由于主要是展示图片和文字，在这里就用3D UI进行搭建，这里面有几点需要注意。</p>
-<p>注意图片选择Raw Image组件。RawImage可以直接显示Texture类型的贴图，而不用转换为Sprite。</p>
-<p>Canvas设置为World Space，然后设置位置和Scale，符合三维场景中墙壁的尺寸。</p>
-<p>这里我将Text作为了图片的子物体（如果你的层级结构不同，下面获取图片对应的代码需要做相应的修改）</p>
+<ul>
+<li>使用json配置图片的路径和文字说明</li>
+<li>动态获取外部的图片，这样图片可以在外面替换，不用重新发布程序</li>
+</ul>
+<h1 id="创建场景"><a href="#创建场景" class="headerlink" title="创建场景"></a><span style="color:#339AFF;">创建场景</span></h1><p>1、3D Object-&gt;Quad创建一面墙，然后调整物体的Scale。<br>2、由于主要是展示图片和文字，在这里就用3D UI进行搭建，这里面有几点需要注意。</p>
+<ul>
+<li>注意图片选择Raw Image组件。RawImage可以直接显示Texture类型的贴图，而不用转换为Sprite。</li>
+<li>Canvas设置为World Space，然后设置位置和Scale，符合三维场景中墙壁的尺寸。</li>
+<li>这里将Text作为了图片的子物体（如果你的层级结构不同，下面获取图片对应的代码需要做相应的修改）</li>
+</ul>
+<blockquote>
 <p>创建完成大致的结构如下</p>
-<p>配置图片和说明</p>
-<p>配置的json文件如下：</p>
+</blockquote>
+<img src="/2019/08/07/动态配置图片/1.png">
+
+<h1 id="配置图片和说明"><a href="#配置图片和说明" class="headerlink" title="配置图片和说明"></a><span style="color:#339AFF;">配置图片和说明</span></h1><p>配置的json文件如下：</p>
 <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">[</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="attr">"Id"</span>: <span class="number">1</span>,</span><br><span class="line">        <span class="attr">"Url"</span>: <span class="string">"http://www.zyzw.com/sjmhxs/sjmhxst/sjmhxst003.jpg"</span>,</span><br><span class="line">        <span class="attr">"Name"</span>: <span class="string">"蒙娜丽莎"</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="attr">"Id"</span>: <span class="number">2</span>,</span><br><span class="line">        <span class="attr">"Url"</span>: <span class="string">"http://www.zyzw.com/sjmhxs/sjmhxst/sjmhxst003.jpg"</span>,</span><br><span class="line">        <span class="attr">"Name"</span>: <span class="string">"蒙娜丽莎"</span></span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="attr">"Id"</span>: <span class="number">3</span>,</span><br><span class="line">        <span class="attr">"Url"</span>: <span class="string">"http://www.zyzw.com/sjmhxs/sjmhxst/sjmhxst003.jpg"</span>,</span><br><span class="line">        <span class="attr">"Name"</span>: <span class="string">"蒙娜丽莎"</span></span><br><span class="line">     &#125;</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
 
 <p>一定要注意保存的文件不要有BOM头。</p>
-<p>这里面你会注意到我加了一个Id，这个Id是用来和场景中的物体进行对应，便于修改与调试。否则我们就只能通过数组的索引来访问，很不方便。</p>
-<p>不知道你还记不记得，Unity自带的JsonUtility无法解析最外层是数组的JSON字符串，如果你像我上面那样写，需要导入LitJson。<br>ConfigManager</p>
-<p>由于我们很多对象中都需要获取这个配置信息，所以我们通过一个通用的管理类来获取配置的数据。</p>
+<p>这里面你会注意到加了一个Id，这个Id是用来和场景中的物体进行对应，便于修改与调试。否则就只能通过数组的索引来访问，很不方便。</p>
+<blockquote>
+<p>Unity自带的JsonUtility无法解析最外层是数组的JSON字符串，需要导入LitJson。</p>
+</blockquote>
+<h1 id="ConfigManager"><a href="#ConfigManager" class="headerlink" title="ConfigManager"></a><span style="color:#339AFF;">ConfigManager</span></h1><p>由于很多对象中都需要获取这个配置信息，所以通过一个通用的管理类来获取配置的数据。</p>
 <figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"><span class="keyword">using</span> System.IO;</span><br><span class="line"><span class="keyword">using</span> System.Linq;</span><br><span class="line"><span class="keyword">using</span> LitJson;</span><br><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> UnityEngine.Networking;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 图片信息</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">PicData</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> Id;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span> Url;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span> Name;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ConfigManager</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 设置为静态，方便在其他地方访问</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> PicData[] Data;</span><br><span class="line"></span><br><span class="line">    <span class="function">IEnumerator <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">var</span> uri = <span class="keyword">new</span> Uri(Path.Combine(Application.streamingAssetsPath, <span class="string">"data.json"</span>));</span><br><span class="line">        <span class="keyword">var</span> request = UnityWebRequest.Get(uri);</span><br><span class="line">        <span class="keyword">yield</span> <span class="keyword">return</span> request.SendWebRequest();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (request.isHttpError || request.isNetworkError)</span><br><span class="line">            Debug.Log(request.error);</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            ParseJsonStr(request.downloadHandler.text);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 解析获取到的JSON字符串</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">ParseJsonStr</span>(<span class="params"><span class="keyword">string</span> json</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Data = JsonMapper.ToObject‹PicData[]›(json);</span><br><span class="line">        Debug.Log(Data.Length);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 使用Linq获取第一个符合Id的数据</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> PicData <span class="title">GetData</span>(<span class="params"><span class="keyword">int</span> id</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> Data.First(t =› t.Id == id);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>记得把LitJson导入到工程中，如果忘了回去看看195节哦。</p>
+<p>记得把LitJson导入到工程中。</p>
 <p>创建一个Manager空物体，将这个脚本挂到Manager空物体上。</p>
-<p>针对每个图片物体的脚本</p>
-<p>下面的代码用于从配置类中获取信息，然后去下载对应的图片。</p>
+<h1 id="针对每个图片物体的脚本"><a href="#针对每个图片物体的脚本" class="headerlink" title="针对每个图片物体的脚本"></a><span style="color:#339AFF;">针对每个图片物体的脚本</span></h1><p>下面的代码用于从配置类中获取信息，然后去下载对应的图片。</p>
 <figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> UnityEngine.Networking;</span><br><span class="line"><span class="keyword">using</span> UnityEngine.UI;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Picture</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> Id;</span><br><span class="line"></span><br><span class="line">    <span class="function">IEnumerator <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 防止配置文件还没读取完毕</span></span><br><span class="line">        <span class="keyword">while</span> (ConfigManager.Data == <span class="literal">null</span>) <span class="keyword">yield</span> <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">var</span> data = ConfigManager.GetData(Id);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 如果Id有误，没有对应的数据则退出此协程</span></span><br><span class="line">        <span class="keyword">if</span> (data == <span class="literal">null</span>) <span class="keyword">yield</span> <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">var</span> uri = <span class="keyword">new</span> Uri(data.Url);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 使用UnityWebRequestTexture类来获取图片</span></span><br><span class="line">        <span class="keyword">var</span> request = UnityWebRequestTexture.GetTexture(uri);</span><br><span class="line">        <span class="keyword">yield</span> <span class="keyword">return</span> request.SendWebRequest();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (request.isHttpError || request.isNetworkError)</span><br><span class="line">            Debug.Log(request.error);</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            GetComponent‹RawImage›().texture = DownloadHandlerTexture.GetContent(request);</span><br><span class="line"></span><br><span class="line">        GetComponentInChildren‹Text›().text = data.Name;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>将这个脚本挂在Pic1、Pic2、Pic3物体上并设置相应的Id即可。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>最后的结果如下：</p>
-<p>如果你想改变墙上的图片和内容，即使发布出来以后，也只需要修改json文件即可，不需要重新发布。</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a><span style="color:#339AFF;">总结</span></h1><p>最后的结果如下：</p>
+<img src="/2019/08/07/动态配置图片/2.png">
+
+<p>如果想改变墙上的图片和内容，即使发布出来以后，也只需要修改json文件即可，不需要重新发布。</p>
 
       
     </div>
@@ -677,7 +689,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">516</span>
+                    <span class="site-state-item-count">512</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -710,7 +722,11 @@
                     
                       
                     
-                    <span class="site-state-item-count">8</span>
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">10</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -833,7 +849,11 @@
                     
                       
                     
-                    <span class="site-state-item-count">53</span>
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">55</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -864,23 +884,23 @@
                 
                 
                   <li>
-                    <a href="/2019/10/07/序列模式-双缓冲模式/" title="序列模式--双缓冲模式" target="_blank">序列模式--双缓冲模式</a>
+                    <a href="/2019/10/11/PureMVC入门与进阶/" title="PureMVC入门与进阶" target="_blank">PureMVC入门与进阶</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/10/07/序列模式--更新方法/" title="序列模式--更新方法" target="_blank">序列模式--更新方法</a>
+                    <a href="/2019/10/11/SimpleFramework/" title="SimpleFramework" target="_blank">SimpleFramework</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/30/PureMVC/" title="PureMVC" target="_blank">PureMVC</a>
+                    <a href="/2019/10/11/ToLua框架下C-与Lua代码的互调/" title="ToLua框架下C#与Lua代码的互调" target="_blank">ToLua框架下C#与Lua代码的互调</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/26/工厂方法模式-1/" title="工厂方法模式" target="_blank">工厂方法模式</a>
+                    <a href="/2019/10/11/LuaFramework/" title="LuaFramework" target="_blank">LuaFramework</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/09/26/模板方法模式-2/" title="模板方法模式" target="_blank">模板方法模式</a>
+                    <a href="/2019/10/11/UnityWebRequest详解/" title="UnityWebRequest详解" target="_blank">UnityWebRequest详解</a>
                   </li>
                 
               </ul>
@@ -906,7 +926,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">1.</span> <span class="nav-text">总结</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#创建场景"><span class="nav-number">1.</span> <span class="nav-text">创建场景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#配置图片和说明"><span class="nav-number">2.</span> <span class="nav-text">配置图片和说明</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#ConfigManager"><span class="nav-number">3.</span> <span class="nav-text">ConfigManager</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#针对每个图片物体的脚本"><span class="nav-number">4.</span> <span class="nav-text">针对每个图片物体的脚本</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
             
 
           </div>
@@ -952,7 +972,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">53:39</span>
+    <span title="站点阅读时长">53:42</span>
   
 </div>
 

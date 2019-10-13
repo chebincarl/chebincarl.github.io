@@ -1,0 +1,1661 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="思考并回答以下问题：  通过dll实现代码热更新的优缺点是什么？ 将你已有工程中的一部分代码打包成dll使用。 完成dll热更新的程序逻辑，然后试着修改外部dll中的代码逻辑。">
+<meta name="keywords" content="大话Unity2018">
+<meta property="og:type" content="article">
+<meta property="og:title" content="通过dll实现代码热更新">
+<meta property="og:url" content="http://chebincarl.github.io/2019/07/16/通过dll实现代码热更新/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="思考并回答以下问题：  通过dll实现代码热更新的优缺点是什么？ 将你已有工程中的一部分代码打包成dll使用。 完成dll热更新的程序逻辑，然后试着修改外部dll中的代码逻辑。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://chebincarl.github.io/2019/07/16/通过dll实现代码热更新/1.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/07/16/通过dll实现代码热更新/2.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/07/16/通过dll实现代码热更新/3.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/07/16/通过dll实现代码热更新/4.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/07/16/通过dll实现代码热更新/5.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/07/16/通过dll实现代码热更新/6.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/07/16/通过dll实现代码热更新/7.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/07/16/通过dll实现代码热更新/8.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/07/16/通过dll实现代码热更新/9.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/07/16/通过dll实现代码热更新/10.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/07/16/通过dll实现代码热更新/11.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/07/16/通过dll实现代码热更新/12.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/07/16/通过dll实现代码热更新/13.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/07/16/通过dll实现代码热更新/14.png">
+<meta property="og:updated_time" content="2019-10-09T14:42:01.694Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="通过dll实现代码热更新">
+<meta name="twitter:description" content="思考并回答以下问题：  通过dll实现代码热更新的优缺点是什么？ 将你已有工程中的一部分代码打包成dll使用。 完成dll热更新的程序逻辑，然后试着修改外部dll中的代码逻辑。">
+<meta name="twitter:image" content="http://chebincarl.github.io/2019/07/16/通过dll实现代码热更新/1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/07/16/通过dll实现代码热更新/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>通过dll实现代码热更新 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">专注，重复10遍</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/07/16/通过dll实现代码热更新/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">通过dll实现代码热更新
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-07-16 15:46:28" itemprop="dateCreated datePublished" datetime="2019-07-16T15:46:28+08:00">2019-07-16</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-10-09 22:42:01" itemprop="dateModified" datetime="2019-10-09T22:42:01+08:00">2019-10-09</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Unity/" itemprop="url" rel="index"><span itemprop="name">Unity</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">5.7k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">5 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>思考并回答以下问题：</p>
+<ul>
+<li>通过dll实现代码热更新的优缺点是什么？</li>
+<li>将你已有工程中的一部分代码打包成dll使用。</li>
+<li>完成dll热更新的程序逻辑，然后试着修改外部dll中的代码逻辑。</li>
+</ul>
+<a id="more"></a>
+
+<p>代码逻辑热更新的方案，最简单的是通过dll进行热更新。虽然这种热更新方案不是主流方案，兼容性也无法覆盖所有平台，但是思路及过程还是值得学习的。</p>
+<h1 id="通过dll实现代码热更新"><a href="#通过dll实现代码热更新" class="headerlink" title="通过dll实现代码热更新"></a><span style="color:#339AFF;">通过dll实现代码热更新</span></h1><p>通过dll实现代码热更新，顾名思义就是将代码打包到dll中，通过动态加载dll，实现代码的热更新。</p>
+<blockquote>
+<p>什么是dll？<br><br>dll全称是Dynamic Link Library，动态链接库文件。DLL文件中存放的是各类程序的函数（子过程）实现过程，当程序需要调用函数时需要先载入DLL，然后取得函数的地址，最后进行调用。dll是将一些代码进行编译并打包成了一个dll文件。</p>
+</blockquote>
+<p>先说这种方式的局限性：主要就是<span style="color:red">不支持iOS平台</span>。</p>
+<p>但是这种方式的好处是：简单，无需太多额外的学习成本。</p>
+<p>这种热更方式的思路其实和其他一些方案也是类似的，而且这过程中可以学习到打包dll、C#的反射的相关知识，所以我们从这个比较简单的热更技术开始学习。</p>
+<p>这种热更新的流程一般分为以下几步：</p>
+<ul>
+<li>1、<strong>编写</strong>逻辑dll</li>
+<li>2、动态<strong>加载</strong>逻辑dll</li>
+<li>3、<strong>读取</strong>逻辑dll，<strong>执行</strong>外部dll中的代码</li>
+<li>4、<strong>替换</strong>dll，实现逻辑的热更新</li>
+</ul>
+<h2 id="1、编写逻辑dll"><a href="#1、编写逻辑dll" class="headerlink" title="1、编写逻辑dll"></a><span style="color:#00ACC1;">1、编写逻辑dll</span></h2><p>先来编写一个外部的dll。</p>
+<h3 id="创建一个类库工程"><a href="#创建一个类库工程" class="headerlink" title="创建一个类库工程"></a>创建一个类库工程</h3><p>打开Visual Studio，新建一个项目，选择：</p>
+<blockquote>
+<p>创建新项目</p>
+</blockquote>
+<img src="/2019/07/16/通过dll实现代码热更新/1.png">
+
+<p>如果没有这个类库的选项，说明你的Visual Studio没有安装相应的组件，可以看下面这一小节进行安装。</p>
+<p><font size="3"><strong>安装Visual Studio相应组件</strong></font></p>
+<blockquote>
+<p>1.打开Visual Studio Installer</p>
+</blockquote>
+<img src="/2019/07/16/通过dll实现代码热更新/2.png">
+
+<blockquote>
+<p>2.选择修改</p>
+</blockquote>
+<img src="/2019/07/16/通过dll实现代码热更新/3.png">
+
+<blockquote>
+<p>3.选中.Net桌面开发，右边可选的所有选项可以取消勾选</p>
+</blockquote>
+<img src="/2019/07/16/通过dll实现代码热更新/4.png">
+
+<h3 id="编写代码"><a href="#编写代码" class="headerlink" title="编写代码"></a>编写代码</h3><p>工程创建完成后，你就可以编写C#代码了，这些代码在编译的时候会生成一个dll文件，可以供我们程序进行调用。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> <span class="title">ClassLibrary</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Class1</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">string</span> <span class="title">GetName</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="string">"大智"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面就是一段最简单的代码，可以从代码中获取一段名称。</p>
+<p><font size="3"><strong>调用Unity API</strong></font></p>
+<p>当然了，通常我们的代码不可能这么简单，通常需要调用Unity的API。</p>
+<p>比如我们新建一个类，叫ConfigMgr.cs，添加如下代码：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> <span class="title">ClassLibrary</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title">ConfigMgr</span>:<span class="title">MonoBehaviour</span></span><br><span class="line">    &#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面代码里使用到了Unity的API，你会发现有报错：</p>
+<blockquote>
+<p>报错</p>
+</blockquote>
+<img src="/2019/07/16/通过dll实现代码热更新/5.png">
+
+<p>这是因为平时我们通过Unity打开的VS工程，Unity自动帮我们处理好了相关dll的引用工作，但是如果是我们自己创建的类库需要调用Unity的API，那需要我们自己添加引用Unity的dll。</p>
+<blockquote>
+<p>在引用上右键，添加引用</p>
+</blockquote>
+<img src="/2019/07/16/通过dll实现代码热更新/6.png">
+
+<blockquote>
+<p>点击下方的浏览，到对应的路径获取Unity的dll</p>
+</blockquote>
+<img src="/2019/07/16/通过dll实现代码热更新/7.png">
+
+<p>比如我的路径是：C:\ProgramFiles\Unity\Hub\Editor\2018.3.6f1\Editor\Data\Managed</p>
+<blockquote>
+<p>添加引用dll</p>
+</blockquote>
+<img src="/2019/07/16/通过dll实现代码热更新/8.png">
+
+<blockquote>
+<p>最后一步，记得勾选后确定</p>
+</blockquote>
+<img src="/2019/07/16/通过dll实现代码热更新/9.png">
+
+<p>这时候这样的代码就可以了：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">ClassLibrary</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title">ConfigMgr</span>:<span class="title">MonoBehaviour</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            Debug.Log(<span class="string">"我是外部的dll"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="编译dll"><a href="#编译dll" class="headerlink" title="编译dll"></a>编译dll</h3><p>代码写好以后，我们需要将这些代码编译为dll，这个过程也很简单。</p>
+<p>点击菜单栏 生成 &gt; 生成解决方案 即可（快捷键F6）。</p>
+<blockquote>
+<p>编译生成</p>
+</blockquote>
+<img src="/2019/07/16/通过dll实现代码热更新/10.png">
+
+<p>在左下角看到生成成功，那就是dll生成完毕。可以在这个类库工程目录的bin/Debug中找到生成的dll。</p>
+<blockquote>
+<p>生成好的dll</p>
+</blockquote>
+<img src="/2019/07/16/通过dll实现代码热更新/11.png">
+
+<blockquote>
+<p>为什么目录中会有一个Debug目录呢？<br><br>这是因为一般都存在调试模式和发布模式，可以在VS中切换，生产环境中建议使用Release。<br></p>
+</blockquote>
+<blockquote>
+<p>调试模式和发布模式</p>
+</blockquote>
+<img src="/2019/07/16/通过dll实现代码热更新/12.png">
+
+<h3 id="在工程内使用dll"><a href="#在工程内使用dll" class="headerlink" title="在工程内使用dll"></a>在工程内使用dll</h3><blockquote>
+<p>添加到Unity工程</p>
+</blockquote>
+<img src="/2019/07/16/通过dll实现代码热更新/13.png">
+
+<p>添加到Unity工程后如上图所示，可以看到Dll文件和一个ConfigMgr类。</p>
+<p>继承了MonoBehaviour的类会单独显示出来，这样可以将这个类拖到场景中的GameObject上。</p>
+<blockquote>
+<p>将ConfigMgr类拖到场景物体上，运行后在Console的显示</p>
+</blockquote>
+<img src="/2019/07/16/通过dll实现代码热更新/14.png">
+
+<p>可以显示出Log说明我们已经成功调用了这个dll。</p>
+<h2 id="2、动态加载逻辑dll"><a href="#2、动态加载逻辑dll" class="headerlink" title="2、动态加载逻辑dll"></a>2、动态加载逻辑dll</h2><p>打包dll只能叫做封装代码，要想做到动态加载就必须了解C#中的反射的技术。</p>
+<p>既然是动态加载dll，那就意味着这个dll是在运行时才加载进来。我们平时使用dll时都是直接放到工程中，那么如何动态加载进来呢？</p>
+<h3 id="动态加载dll"><a href="#动态加载dll" class="headerlink" title="动态加载dll"></a>动态加载dll</h3><p>我们先将ClassLibrary.dll放到StreamingAssets目录中准备在运行时加载它。</p>
+<blockquote>
+<p>放到StreamingAssets目录中的资产会保持原样，比如代码或dll文件都不会被引擎编译加载。</p>
+</blockquote>
+<p>动态加载Dll的基础代码如下：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System.IO;</span><br><span class="line"><span class="keyword">using</span> System.Reflection;</span><br><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">HotDllManager</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">var</span> path = Path.Combine(Application.streamingAssetsPath, <span class="string">"ClassLibrary.dll"</span>);</span><br><span class="line">        <span class="keyword">var</span> dll = Assembly.LoadFile(path);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">foreach</span> (<span class="keyword">var</span> i <span class="keyword">in</span> dll.GetTypes())</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">//调试代码</span></span><br><span class="line">            Debug.Log(i.Name);</span><br><span class="line">            gameObject.AddComponent(i);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>通过log可以看到执行的流程</p>
+</blockquote>
+<p>由于我们的dll中有两个类，一个继承了MonoBehaviour，一个没有继承，所以Class1不能被当作组件添加到GameObject上。</p>
+<p>那如何获取dll中特定的类来使用呢？</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System.IO;</span><br><span class="line"><span class="keyword">using</span> System.Reflection;</span><br><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">SpecDllManager</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">var</span> path = Path.Combine(Application.streamingAssetsPath, <span class="string">"ClassLibrary.dll"</span>);</span><br><span class="line">        <span class="keyword">var</span> dll = Assembly.LoadFile(path);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 注意要写类型的全路径</span></span><br><span class="line">        <span class="keyword">var</span> type = dll.GetType(<span class="string">"ClassLibrary.ConfigMgr"</span>);</span><br><span class="line">        Debug.Log(type.Name);</span><br><span class="line">        gameObject.AddComponent(type);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意：由于ConfigMgr上面还有命名空间，所以需要写全路径才能去获取这个类型。</p>
+<p>不过如果执行这段代码，你会发现有一个报错！</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">NullReferenceException: Object reference not set to an instance of an object</span><br><span class="line">SpecDllManager.Start () (at Assets/Scripts/SpecDllManager.cs:14)</span><br></pre></td></tr></table></figure>
+
+<p>这是怎么回事呢？明明之前我们已经加载成功了啊！</p>
+<p>如果回到昨天，你会看到我们的ConfigMgr类并没有加public修饰符。<br>GetTypes方法可以获取到所有的类，但是GetType只能获取到公共的类，通过下面的代码可以看出来：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System.IO;</span><br><span class="line"><span class="keyword">using</span> System.Reflection;</span><br><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">HotDllManager</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">var</span> path = Path.Combine(Application.streamingAssetsPath, <span class="string">"ClassLibrary.dll"</span>);</span><br><span class="line">        <span class="keyword">var</span> dll = Assembly.LoadFile(path);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">foreach</span> (<span class="keyword">var</span> i <span class="keyword">in</span> dll.GetTypes())</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">//GetTypes</span></span><br><span class="line">            Debug.Log(<span class="string">"GetTypes:"</span> + i.Name);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">foreach</span> (<span class="keyword">var</span> i <span class="keyword">in</span> dll.GetExportedTypes())</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">//GetExportedTypes</span></span><br><span class="line">            Debug.Log(<span class="string">"Exported:"</span> + i.Name);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面你就能看到导出的公共类只有Class1，如果想要加载ConfigMgr，需要将ConfigMgr的类修饰符改成public。</p>
+<h3 id="反射Reflection"><a href="#反射Reflection" class="headerlink" title="反射Reflection"></a>反射Reflection</h3><p>反射指程序可以访问、检测和修改它本身状态或行为的一种能力。</p>
+<p>程序集包含模块，而模块包含类型，类型又包含成员。反射则提供了封装程序集、模块和类型的对象。</p>
+<p>你可以使用反射动态地创建类型的实例，将类型绑定到现有对象，或从现有对象中获取类型。然后，可以调用类型的方法或访问其字段和属性。</p>
+<p><strong>优缺点</strong></p>
+<p>优点：</p>
+<ul>
+<li>1、反射提高了程序的灵活性和扩展性。</li>
+<li>2、降低耦合性，提高自适应能力。</li>
+<li>3、它允许程序创建和控制任何类的对象，无需提前硬编码目标类。</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>1、性能问题：使用反射基本上是一种解释操作，用于字段和方法接入时要远慢于直接代码。因此反射机制主要应用在对灵活性和拓展性要求很高的系统框架上，普通程序不建议使用。</li>
+<li>2、使用反射会模糊程序内部逻辑；程序员希望在源代码中看到程序的逻辑，反射却绕过了源代码的技术，因而会带来维护的问题，反射代码比相应的直接代码更复杂。</li>
+</ul>
+<p><strong>反射（Reflection）的用途</strong></p>
+<p>反射（Reflection）有下列用途：</p>
+<ul>
+<li>它允许在运行时查看特性（attribute）信息。</li>
+<li>它允许审查集合中的各种类型，以及实例化这些类型。</li>
+<li>它允许延迟绑定的方法和属性（property）。</li>
+<li>它允许在运行时创建新类型，然后使用这些类型执行一些任务。</li>
+</ul>
+<p><strong>C#中反射的常用方法</strong></p>
+<p>首先是加载外部dll的方法，也就是：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 从文件加载</span></span><br><span class="line"><span class="keyword">var</span> dll = Assembly.LoadFile(path);</span><br><span class="line"><span class="comment">// 从字节流加载</span></span><br><span class="line"><span class="keyword">var</span> dll2 = Assembly.Load(bytes);</span><br><span class="line">从dll中加载类型：</span><br><span class="line"></span><br><span class="line"><span class="comment">// 注意要写全路径</span></span><br><span class="line"><span class="keyword">var</span> type = dll.GetType(<span class="string">"Namespace.ClassName"</span>);</span><br><span class="line">调用类型中的方法：</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> method = type.GetMethod(<span class="string">"MethodName"</span>);</span><br><span class="line"><span class="comment">// 如果为静态方法，第一个可传null，如果为实例方法，应该传实例对象</span></span><br><span class="line">method.Invoke(<span class="literal">null</span>, <span class="literal">null</span>);</span><br></pre></td></tr></table></figure>
+
+<p>常用的一些反射的方法就是这些，遇到具体的问题可以具体分析。</p>
+<h2 id="3-替换dll，实现热更新"><a href="#3-替换dll，实现热更新" class="headerlink" title="3.替换dll，实现热更新"></a>3.替换dll，实现热更新</h2><p>上面我们发现了一个bug，如果是往常的开发模式，我们需要修改源代码，重新编译发布。</p>
+<p>但是！现在不用了，即使是在发布后发现了这个问题，我们只需要修改这个dll就可以实现bug的修复。</p>
+<p>按照下图修改我们类库中的代码并重新编译发布。</p>
+<p>将生成的dll覆盖原来的dll。</p>
+<blockquote>
+<p>虽然我们在这为了简便，是在编辑器中进行操作，但即使发布出来以后也只需要替换dll就可以实现热更新。</p>
+</blockquote>
+<p>这时候再运行SpecDllMgr，你就会发现：</p>
+<p>大功告成了！</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ul>
+<li>将一些经常复用的类打包成dll，方便在不同项目间共享。</li>
+<li>打包成dll后，无法直接看到源码，可以一定程度地保护代码（反编译还是可以看到大部分代码）。</li>
+<li><ul>
+<li>如果需要更好地保护代码，可以学习一下代码混淆的知识（这样虽然还是可以被反编译，但是反编译后的各种类名、变量名都是无意义的符号，拿到的代码几乎没有价值）</li>
+</ul>
+</li>
+</ul>
+<p>如果想在商业项目中使用这种热更新的方案，一定要记住以下两点：</p>
+<ul>
+<li>使用这种方案就和iOS系统无缘了</li>
+<li>尽量减少工程和动态dll的耦合性，只通过一个或几个类完成工程中的代码和热更新dll的交互。</li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/大话Unity2018/" rel="tag"># 大话Unity2018</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/07/16/什么是热更新？/" rel="next" title="什么是热更新？">
+                <i class="fa fa-chevron-left"></i> 什么是热更新？
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/07/17/C-的插入排序和二分查找/" rel="prev" title="C#的插入排序和二分查找">
+                C#的插入排序和二分查找 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">512</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">55</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2019/10/11/PureMVC入门与进阶/" title="PureMVC入门与进阶" target="_blank">PureMVC入门与进阶</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/10/11/SimpleFramework/" title="SimpleFramework" target="_blank">SimpleFramework</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/10/11/ToLua框架下C-与Lua代码的互调/" title="ToLua框架下C#与Lua代码的互调" target="_blank">ToLua框架下C#与Lua代码的互调</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/10/11/LuaFramework/" title="LuaFramework" target="_blank">LuaFramework</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/10/11/UnityWebRequest详解/" title="UnityWebRequest详解" target="_blank">UnityWebRequest详解</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#通过dll实现代码热更新"><span class="nav-number">1.</span> <span class="nav-text">通过dll实现代码热更新</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1、编写逻辑dll"><span class="nav-number">1.1.</span> <span class="nav-text">1、编写逻辑dll</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建一个类库工程"><span class="nav-number">1.1.1.</span> <span class="nav-text">创建一个类库工程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编写代码"><span class="nav-number">1.1.2.</span> <span class="nav-text">编写代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#编译dll"><span class="nav-number">1.1.3.</span> <span class="nav-text">编译dll</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在工程内使用dll"><span class="nav-number">1.1.4.</span> <span class="nav-text">在工程内使用dll</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2、动态加载逻辑dll"><span class="nav-number">1.2.</span> <span class="nav-text">2、动态加载逻辑dll</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#动态加载dll"><span class="nav-number">1.2.1.</span> <span class="nav-text">动态加载dll</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#反射Reflection"><span class="nav-number">1.2.2.</span> <span class="nav-text">反射Reflection</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-替换dll，实现热更新"><span class="nav-number">1.3.</span> <span class="nav-text">3.替换dll，实现热更新</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">2.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">3.5m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">53:42</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>
