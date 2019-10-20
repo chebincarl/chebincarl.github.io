@@ -104,7 +104,7 @@
 
 
   <meta name="description" content="思考并回答以下问题：  command必有对service或model的引用。command必有的Execute里面执行的是service的方法。command里面没有维护dispatcher，service里面维护。怎么理解？">
-<meta name="keywords" content="Unity框架">
+<meta name="keywords" content="StrangeIOC">
 <meta property="og:type" content="article">
 <meta property="og:title" content="StrangeIOC">
 <meta property="og:url" content="http://chebincarl.github.io/2019/10/13/StrangeIOC/index.html">
@@ -112,7 +112,7 @@
 <meta property="og:description" content="思考并回答以下问题：  command必有对service或model的引用。command必有的Execute里面执行的是service的方法。command里面没有维护dispatcher，service里面维护。怎么理解？">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://chebincarl.github.io/2019/10/13/StrangeIOC/1.png">
-<meta property="og:updated_time" content="2019-10-18T11:12:03.033Z">
+<meta property="og:updated_time" content="2019-10-20T14:32:40.571Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="StrangeIOC">
 <meta name="twitter:description" content="思考并回答以下问题：  command必有对service或model的引用。command必有的Execute里面执行的是service的方法。command里面没有维护dispatcher，service里面维护。怎么理解？">
@@ -445,7 +445,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-10-18 19:12:03" itemprop="dateModified" datetime="2019-10-18T19:12:03+08:00">2019-10-18</time>
+                <time title="修改时间：2019-10-20 22:32:40" itemprop="dateModified" datetime="2019-10-20T22:32:40+08:00">2019-10-20</time>
               
             
           </span>
@@ -491,7 +491,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">8.5k</span>
+                <span title="本文字数">9.3k</span>
               
 
               
@@ -544,9 +544,35 @@
 <li>3.不需要特殊的接口，绝大多数对象可以做到完全不必依赖容器。</li>
 </ul>
 <p>依赖注入的基本原则是：应用组件不应该负责查找资源或者其他依赖的协作对象。配置对象的工作应该由IoC容器负责，“查找资源”的逻辑应该从应用组件的代码中抽取出来，交给IoC容器负责。</p>
-<h1 id="StrangeIOC"><a href="#StrangeIOC" class="headerlink" title="StrangeIOC"></a><span style="color:#339AFF;">StrangeIOC</span></h1><img src="/2019/10/13/StrangeIOC/1.png">
+<h2 id="为什么要用IOC？"><a href="#为什么要用IOC？" class="headerlink" title="为什么要用IOC？"></a>为什么要用IOC？</h2><p>第一：对象的实例化不是一件简单的事情，比如对象的关系比较复杂，依赖关系往往需要程序员去维护，这是一件非常头疼的事。 </p>
+<p>第二：解耦，由容器去维护具体的对象。 </p>
+<p>第三：托管了类的产生过程，比如我们需要在类的产生过程中做一些处理，最直接的例子就是代理，如果有容器程序可以把这部分过程交给容器，应用程序则无需去关心类是如何完成代理的。</p>
+<h2 id="控制反转（Inverse-of-Control）"><a href="#控制反转（Inverse-of-Control）" class="headerlink" title="控制反转（Inverse of Control）"></a>控制反转（Inverse of Control）</h2><p>控制反转即IoC（Inversion of Control），从字面上理解就是控制反转，将对在自身对象中的一个内置对象的控制权反转。所谓的反转，即把内置对象的控制权反转给一个容器，而应用程序只需要提供对象的类型即可。</p>
+<p>这是一种解耦的设计思想，并不是什么具体的技术。基本思想是：借助于“第三方”实现具有依赖关系的对象之间的解耦。实现IOC的技术手段：DI（依赖注入）和DL（依赖查找）。</p>
+<p>这里引用3张图就非常明显表示IOC容器的作用：解耦</p>
+<blockquote>
+<p>软件系统中耦合的对象</p>
+</blockquote>
 
-<p>MVCS：S是Service。</p>
+
+<blockquote>
+<p>IOC解耦过程</p>
+</blockquote>
+
+
+<blockquote>
+<p>拿掉IOC容器后的各个对象</p>
+</blockquote>
+
+
+<h2 id="依赖注入（Depedency-Injection）"><a href="#依赖注入（Depedency-Injection）" class="headerlink" title="依赖注入（Depedency Injection）"></a>依赖注入（Depedency Injection）</h2><p>意思是自身对象中的内置对象是通过注入的方式进行创建。依赖注入有两种实现方式：Setter方式（传值方式）和构造器方式（引用方式）。</p>
+<p>容器全权负责组件的装配，它会把符合依赖关系的对象通过属性（setter）或者是构造子传递给需要的对象。</p>
+<p>相对于IoC而言，依赖注入（DI）更加准确地描述了IoC的设计理念。所谓依赖注入，即组件之间的依赖关系由容器在应用系统运行期来决定，也就是由容器动态地将某种依赖关系的目标对象实例注入到应用系统中的各个关联的组件之中。</p>
+<h1 id="StrangeIOC"><a href="#StrangeIOC" class="headerlink" title="StrangeIOC"></a><span style="color:#339AFF;">StrangeIOC</span></h1>
+
+<img src="/2019/10/13/StrangeIOC/1.png">
+
+<p>MVCS：S是Service。Controller是核心层。View只负责UI的显示，提供数据更新的接口给Mediator，Mediator与外界交互，例如取得外界的数据。</p>
 <h1 id="代码"><a href="#代码" class="headerlink" title="代码"></a><span style="color:#339AFF;">代码</span></h1><blockquote>
 <p>Demo1ContextView.cs 挂载到空物体ContextView，继承View。</p>
 </blockquote>
@@ -623,7 +649,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Unity框架/" rel="tag"># Unity框架</a>
+            <a href="/tags/StrangeIOC/" rel="tag"># StrangeIOC</a>
           
         </div>
       
@@ -719,7 +745,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">522</span>
+                    <span class="site-state-item-count">529</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -885,7 +911,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">56</span>
+                      
+                    
+                    <span class="site-state-item-count">57</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -916,23 +944,23 @@
                 
                 
                   <li>
-                    <a href="/2019/10/18/热更新/" title="热更新" target="_blank">热更新</a>
+                    <a href="/2019/10/19/ILRuntime中的编程2/" title="ILRuntime中的编程2" target="_blank">ILRuntime中的编程2</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/10/16/LuaFramework-prefab加载和Button事件/" title="LuaFramework--prefab加载和Button事件" target="_blank">LuaFramework--prefab加载和Button事件</a>
+                    <a href="/2019/10/19/ILRuntime中的编程1/" title="ILRuntime中的编程1" target="_blank">ILRuntime中的编程1</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/10/16/世界上最好的学习法：费曼学习法/" title="世界上最好的学习法：费曼学习法" target="_blank">世界上最好的学习法：费曼学习法</a>
+                    <a href="/2019/10/19/为什么iOS无法动态加载Dll？/" title="为什么iOS无法动态加载Dll？" target="_blank">为什么iOS无法动态加载Dll？</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/10/16/LuaFramework-1/" title="LuaFramework" target="_blank">LuaFramework</a>
+                    <a href="/2019/10/19/热更新之ILRuntime/" title="热更新之ILRuntime" target="_blank">热更新之ILRuntime</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/10/16/AudioManager/" title="AudioManager" target="_blank">AudioManager</a>
+                    <a href="/2019/10/19/构建AssetBundle/" title="构建AssetBundle" target="_blank">构建AssetBundle</a>
                   </li>
                 
               </ul>
@@ -958,7 +986,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#IoC"><span class="nav-number">1.</span> <span class="nav-text">IoC</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#StrangeIOC"><span class="nav-number">2.</span> <span class="nav-text">StrangeIOC</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#代码"><span class="nav-number">3.</span> <span class="nav-text">代码</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#View"><span class="nav-number">3.1.</span> <span class="nav-text">View</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Model"><span class="nav-number">3.2.</span> <span class="nav-text">Model</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Service"><span class="nav-number">3.3.</span> <span class="nav-text">Service</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Command"><span class="nav-number">3.4.</span> <span class="nav-text">Command</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#StrangeIOC中的设计模式"><span class="nav-number">4.</span> <span class="nav-text">StrangeIOC中的设计模式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#命令模式"><span class="nav-number">4.1.</span> <span class="nav-text">命令模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#中介者模式"><span class="nav-number">4.2.</span> <span class="nav-text">中介者模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#观察者模式"><span class="nav-number">4.3.</span> <span class="nav-text">观察者模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#单例模式"><span class="nav-number">4.4.</span> <span class="nav-text">单例模式</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#IoC"><span class="nav-number">1.</span> <span class="nav-text">IoC</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#为什么要用IOC？"><span class="nav-number">1.1.</span> <span class="nav-text">为什么要用IOC？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#控制反转（Inverse-of-Control）"><span class="nav-number">1.2.</span> <span class="nav-text">控制反转（Inverse of Control）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#依赖注入（Depedency-Injection）"><span class="nav-number">1.3.</span> <span class="nav-text">依赖注入（Depedency Injection）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#StrangeIOC"><span class="nav-number">2.</span> <span class="nav-text">StrangeIOC</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#代码"><span class="nav-number">3.</span> <span class="nav-text">代码</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#View"><span class="nav-number">3.1.</span> <span class="nav-text">View</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Model"><span class="nav-number">3.2.</span> <span class="nav-text">Model</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Service"><span class="nav-number">3.3.</span> <span class="nav-text">Service</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Command"><span class="nav-number">3.4.</span> <span class="nav-text">Command</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#StrangeIOC中的设计模式"><span class="nav-number">4.</span> <span class="nav-text">StrangeIOC中的设计模式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#命令模式"><span class="nav-number">4.1.</span> <span class="nav-text">命令模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#中介者模式"><span class="nav-number">4.2.</span> <span class="nav-text">中介者模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#观察者模式"><span class="nav-number">4.3.</span> <span class="nav-text">观察者模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#单例模式"><span class="nav-number">4.4.</span> <span class="nav-text">单例模式</span></a></li></ol></li></ol></div>
             
 
           </div>
@@ -993,7 +1021,7 @@
     
       <span class="post-meta-item-text">站点总字数：</span>
     
-    <span title="站点总字数">3.6m</span>
+    <span title="站点总字数">3.7m</span>
   
 
   
@@ -1004,7 +1032,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">55:15</span>
+    <span title="站点阅读时长">55:46</span>
   
 </div>
 
