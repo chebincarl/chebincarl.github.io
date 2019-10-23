@@ -111,7 +111,7 @@
 <meta property="og:site_name" content="车斌的博客">
 <meta property="og:description" content="思考并回答以下问题：">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-10-19T08:04:54.324Z">
+<meta property="og:updated_time" content="2019-10-23T14:38:28.240Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ILRuntime中的编程2">
 <meta name="twitter:description" content="思考并回答以下问题：">
@@ -426,12 +426,24 @@
                 
               
 
-              <time title="创建时间：2019-10-19 15:32:56 / 修改时间：16:04:54" itemprop="dateCreated datePublished" datetime="2019-10-19T15:32:56+08:00">2019-10-19</time>
+              <time title="创建时间：2019-10-19 15:32:56" itemprop="dateCreated datePublished" datetime="2019-10-19T15:32:56+08:00">2019-10-19</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-10-23 22:38:28" itemprop="dateModified" datetime="2019-10-23T22:38:28+08:00">2019-10-23</time>
               
             
           </span>
@@ -533,7 +545,8 @@
 <p>这里面有两个需要注意的地方：</p>
 <p>适配器需要继承CrossBindingAdaptor并实现其中的方法</p>
 <p>实际的适配器类需要继承你想继承的那个类，并且实现CrossBindingAdaptorType接口</p>
-<p>ILRuntime中的反射<br>用C#开发项目，很多时候会需要使用反射来实现某些功能。但是在脚本中使用反射其实是一个非常困难的事情。因为这需要把ILRuntime中的类型转换成一个真实的C#运行时类型，并把它们映射起来。</p>
+<p>ILRuntime中的反射</p>
+<p>用C#开发项目，很多时候会需要使用反射来实现某些功能。但是在脚本中使用反射其实是一个非常困难的事情。因为这需要把ILRuntime中的类型转换成一个真实的C#运行时类型，并把它们映射起来。</p>
 <p>默认情况下，System.Reflection命名空间中的方法，并不可能得知ILRuntime中定义的类型，因此无法通过Type.GetType等接口取得热更DLL里面的类型。而且ILRuntime里的类型也并不是一个System.Type。</p>
 <p>为了解决这个问题，ILRuntime额外实现了几个用于反射的辅助类：ILRuntimeType，ILRuntimeMethodInfo，ILRuntimeFieldInfo等，来模拟系统的类型来提供部分反射功能。</p>
 <p>在热更DLL中使用反射跟原生C#没有任何区别，那如何在主工程中反射热更DLL中的类型呢？</p>
@@ -546,7 +559,8 @@
 <p>取得Type之后就可以按照我们熟悉的方式来反射调用了:</p>
 <figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> ctor = type.GetConstructor(<span class="keyword">new</span> System.Type[<span class="number">0</span>]);</span><br><span class="line"><span class="keyword">var</span> obj = ctor.Invoke(<span class="literal">null</span>);</span><br><span class="line">Debug.Log(<span class="string">"打印一下结果"</span>);</span><br><span class="line">Debug.Log(obj);</span><br><span class="line">Debug.Log(<span class="string">"我们试一下用反射给字段赋值"</span>);</span><br><span class="line"><span class="keyword">var</span> fi = type.GetField(<span class="string">"id"</span>, System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);</span><br><span class="line">fi.SetValue(obj, <span class="number">111111</span>);</span><br><span class="line">Debug.Log(<span class="string">"我们用反射调用属性检查刚刚的赋值"</span>);</span><br><span class="line"><span class="keyword">var</span> pi = type.GetProperty(<span class="string">"ID"</span>);</span><br><span class="line">Debug.Log(<span class="string">"ID = "</span> + pi.GetValue(obj, <span class="literal">null</span>));</span><br></pre></td></tr></table></figure>
 
-<p>ILRuntime与LitJson<br>LitJson我们之前学到过，可以用来序列化和反序列化JSON。</p>
+<p>ILRuntime与LitJson</p>
+<p>LitJson我们之前学到过，可以用来序列化和反序列化JSON。</p>
 <p>ILRuntime也集成了LitJson，可以更好地在热更的dll中使用JSON，由于涉及到跨域，在反序列化时直接使用会有问题。</p>
 <p>在使用LitJson前，需要对LitJson进行注册，注册方法很简单，只需要在ILRuntime初始化阶段，在注册CLR绑定之前，执行下面这行代码即可：</p>
 <figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">InitializeILRuntime</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//这里做一些ILRuntime的注册，这里我们对LitJson进行注册</span></span><br><span class="line">    LitJson.JsonMapper.RegisterILRuntimeCLRRedirection(appdomain);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -598,6 +612,10 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/10/21/PureMVC使用与源码分析/" rel="prev" title="PureMVC使用与源码分析">
+                PureMVC使用与源码分析 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -668,7 +686,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">529</span>
+                    <span class="site-state-item-count">533</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -836,7 +854,13 @@
                     
                       
                     
-                    <span class="site-state-item-count">57</span>
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">60</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -867,23 +891,23 @@
                 
                 
                   <li>
-                    <a href="/2019/10/19/ILRuntime中的编程2/" title="ILRuntime中的编程2" target="_blank">ILRuntime中的编程2</a>
+                    <a href="/2019/10/23/xLua游戏中的热更新/" title="xLua游戏中的热更新" target="_blank">xLua游戏中的热更新</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/10/19/ILRuntime中的编程1/" title="ILRuntime中的编程1" target="_blank">ILRuntime中的编程1</a>
+                    <a href="/2019/10/22/xLua热更新5之Hotfix（下篇）/" title="xLua热更新5之Hotfix（下篇）" target="_blank">xLua热更新5之Hotfix（下篇）</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/10/19/为什么iOS无法动态加载Dll？/" title="为什么iOS无法动态加载Dll？" target="_blank">为什么iOS无法动态加载Dll？</a>
+                    <a href="/2019/10/22/xLua热更新4之Hotfix（上篇）/" title="xLua热更新4之Hotfix（上篇）" target="_blank">xLua热更新4之Hotfix（上篇）</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/10/19/热更新之ILRuntime/" title="热更新之ILRuntime" target="_blank">热更新之ILRuntime</a>
+                    <a href="/2019/10/21/贪吃蛇/" title="贪吃蛇" target="_blank">贪吃蛇</a>
                   </li>
                 
                   <li>
-                    <a href="/2019/10/19/构建AssetBundle/" title="构建AssetBundle" target="_blank">构建AssetBundle</a>
+                    <a href="/2019/10/21/Json读取配置文件/" title="Json读取配置文件" target="_blank">Json读取配置文件</a>
                   </li>
                 
               </ul>
@@ -955,7 +979,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">55:46</span>
+    <span title="站点阅读时长">56:28</span>
   
 </div>
 
