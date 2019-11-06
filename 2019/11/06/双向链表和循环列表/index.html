@@ -1,0 +1,1546 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="思考并回答以下问题：">
+<meta name="keywords" content="数据结构（C#语言版）">
+<meta property="og:type" content="article">
+<meta property="og:title" content="双向链表和循环列表">
+<meta property="og:url" content="http://chebincarl.github.io/2019/11/06/双向链表和循环列表/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="思考并回答以下问题：">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://chebincarl.github.io/2019/11/06/双向链表和循环列表/1.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/11/06/双向链表和循环列表/2.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/11/06/双向链表和循环列表/3.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/11/06/双向链表和循环列表/4.png">
+<meta property="og:updated_time" content="2019-11-06T22:09:07.163Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="双向链表和循环列表">
+<meta name="twitter:description" content="思考并回答以下问题：">
+<meta name="twitter:image" content="http://chebincarl.github.io/2019/11/06/双向链表和循环列表/1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/11/06/双向链表和循环列表/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>双向链表和循环列表 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">专注，重复10遍</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/11/06/双向链表和循环列表/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">双向链表和循环列表
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-11-06 16:10:59" itemprop="dateCreated datePublished" datetime="2019-11-06T16:10:59+08:00">2019-11-06</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-11-07 06:09:07" itemprop="dateModified" datetime="2019-11-07T06:09:07+08:00">2019-11-07</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/数据结构与算法/" itemprop="url" rel="index"><span itemprop="name">数据结构与算法</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">6.7k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">6 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>思考并回答以下问题：</p>
+<a id="more"></a>
+
+<h1 id="双向链表"><a href="#双向链表" class="headerlink" title="双向链表"></a>双向链表</h1><p>前面介绍的单链表允许从一个结点直接访问它的后继结点，所以，找直接后继结点的时间复杂度是O(1)。但是，要找某个结点的直接前驱结点，只能从表的头引用开始遍历各结点。如果某个结点的Next等于该结点，那么，这个结点就是该结点的直接前驱结点。也就是说，找直接前驱结点的时间复杂度是O(n)，n是单链表的长度。当然，我们也可以在结点的引用域中保存直接前驱结点的地址而不是直接后继结点的地址。这样，找直接前驱结点的时间复杂度只有O(1)，但找直接后继结点的时间复杂度是O(n)。如果希望找直接前驱结点和直接后继结点的时间复杂度都是O(1)，那么，需要在结点中设两个引用域，一个保存直接前驱结点的地址，叫prev，一个直接后继结点的地址，叫next，这样的链表就是双向链表（Doubly Linked List）。双向链表的结点结构示意图如图1所示。</p>
+<blockquote>
+<p>图1 双向链表的结点结构示意图</p>
+</blockquote>
+<img src="/2019/11/06/双向链表和循环列表/1.png">
+
+<p>双向链表结点的定义与单链表的结点的定义很相似，只是双向链表多了一个字段prev。双向链表结点类的实现如下所示。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line">public class DbNode&lt;T&gt;</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> T data; <span class="comment">// 数据域</span></span><br><span class="line">    <span class="keyword">private</span> DbNode&lt;T&gt; prev; <span class="comment">// 前驱引用域</span></span><br><span class="line">    <span class="keyword">private</span> DbNode&lt;T&gt; next; <span class="comment">// 后继引用域</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 构造器</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">DbNode</span>(<span class="params">T val, DbNode&lt;T&gt; p</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        data = val;</span><br><span class="line">        next = p;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 构造器</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">DbNode</span>(<span class="params">DbNode&lt;T&gt; p</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        next = p;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 构造器</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">DbNode</span>(<span class="params">T val</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        data = val;</span><br><span class="line">        next = <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 构造器</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">DbNode</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        data = <span class="keyword">default</span>(T);</span><br><span class="line">        next = <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 数据域属性</span></span><br><span class="line">    <span class="keyword">public</span> T Data</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">get</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">return</span> data;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">set</span></span><br><span class="line">        &#123;</span><br><span class="line">            data = <span class="keyword">value</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 前驱引用域属性</span></span><br><span class="line">    <span class="keyword">public</span> DbNode&lt;T&gt; Prev</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">get</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">return</span> prev;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">set</span></span><br><span class="line">        &#123;</span><br><span class="line">            prev = <span class="keyword">value</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 后继引用域属性</span></span><br><span class="line">    <span class="keyword">public</span> DbNode&lt;T&gt; Next</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">get</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">return</span> next;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">set</span></span><br><span class="line">        &#123;</span><br><span class="line">            next = <span class="keyword">value</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>由于双向链表的结点有两个引用，所以，在双向链表中插入和删除结点比单链表要复杂。双向链表中结点的插入分为在结点之前插入和在结点之后插入，插入操作要对四个引用进行操作。下面以在结点之后插入结点为例来说明在双向链表中插入结点的情况。</p>
+<p>设p是指向双向链表中的某一结点，即p存储的是该结点的地址，现要将一个结点s插入到结点p的后面，插入过程如图2所示（以p的直接后继结点存在为例）。</p>
+<blockquote>
+<p>图2 双向链表结点插入示意图</p>
+</blockquote>
+<img src="/2019/11/06/双向链表和循环列表/2.png">
+
+<p>操作如下：</p>
+<p>①p.Next.Prev = s;</p>
+<p>②s.Prev = p;</p>
+<p>③s.Next = p.Next;</p>
+<p>④p.Next = s;</p>
+<p>引用域值的操作的顺序不是唯一的，但也不是任意的，操作③必须放到操作④的前面完成，否则p直接后继结点的就找不到了。这一点需要读者把每个操作的含义搞清楚。</p>
+<p>双向链表中结点的删除：</p>
+<p>以在结点之后删除为例来说明在双向链表中删除结点的情况。设p是指向双向链表中的某一结点，即p存储的是该结点的地址，现要将一个结点s插入到结点p的后面，插入过程如图3所示（以p的直接后继结点存在为例）。</p>
+<p>操作如下：</p>
+<p>①p.Next = P.Next.Next;</p>
+<p>②p.Next.Prev = p.Prev;</p>
+<blockquote>
+<p>图3 双向链表结点插入示意图</p>
+</blockquote>
+<img src="/2019/11/06/双向链表和循环列表/3.png">
+
+<p>双向链表的其他操作与单链表相似，这里就不一一列举了，读者可以作为习题把双向链表整个类的实现写出来，具体要求见习题的第10题。</p>
+<h2 id="循环链表"><a href="#循环链表" class="headerlink" title="循环链表"></a>循环链表</h2><p>有些应用不需要链表中有明显的头尾结点。在这种情况下，可能需要方便地从最后一个结点访问到第一个结点。此时，最后一个结点的引用域不是空引用，而是保存的第一个结点的地址（如果该链表带结点，则保存的是头结点的地址），也就是头引用的值。带头结点的循环链表（Circular Linked List）如图4所示。</p>
+<blockquote>
+<p>图4 带头结点的单循环链表</p>
+</blockquote>
+<img src="/2019/11/06/双向链表和循环列表/4.png">
+
+<p>循环链表的基本操作与单链表大体相同，只是判断链表结束的条件并不是判断结点的引用域是否为空，而是判断结点的引用域是否为头引用，其它没有较大的变化，所以，这里不再一一详述了，读者可以作为习题把循环链表整个类的实现写出来，具体要求见习题的第11题。</p>
+<h1 id="C-中的线性表"><a href="#C-中的线性表" class="headerlink" title="C#中的线性表"></a>C#中的线性表</h1><p>IList接口表示一个集合，该集合中的项可被排序且可按索引任意访问。在C#1.1中只提供了非泛型IList接口，接口中项的类型是object。非泛型IList接口是从ICollection接口继承而来，是所有线性表的基接口。IList的实现分成三类：只读的，大小不变的和大小可变的。只读的IList不能被修改，也就是说，既不能修改表中的项，也不能在表中插入或删除项。大小不变的Ilist不能在表中插入或删除项，但可以修改表中的项。大小可变的IList不仅可以修改表中的项，还可以插入或删除项。</p>
+<p>非泛型的IList接口的声明如下：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">interface</span> <span class="title">IList</span> : <span class="title">ICollection</span>,<span class="title">IEnumerable</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 公有属性</span></span><br><span class="line">    <span class="keyword">bool</span> IsFixedSize&#123;<span class="keyword">get</span>;&#125; <span class="comment">// 只读，如果IList有固定大小，其值为true,否则为false。</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">bool</span> IsReadOnly&#123;<span class="keyword">get</span>;&#125; <span class="comment">// 只读，如果IList是只读的，其值为true,否则为false。</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">object</span> <span class="keyword">this</span> [T index] &#123;<span class="keyword">get</span>;<span class="keyword">set</span>;&#125; <span class="comment">// 索引器，得到或设置某个索引的项 公有方法</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">Add</span>(<span class="params"><span class="keyword">object</span> <span class="keyword">value</span></span>)</span>; <span class="comment">//添加某项到表中，返回被插入的新项在表中的位置。</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Clear</span>(<span class="params"></span>)</span>; <span class="comment">//清空表。</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">int</span> <span class="title">IndexOf</span>(<span class="params"><span class="keyword">object</span> <span class="keyword">value</span></span>)</span>; <span class="comment">// 如果表中有与value相等的项，返回其在表中的索引，否则，返回-1。</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">Contains</span>(<span class="params"><span class="keyword">object</span> <span class="keyword">value</span></span>)</span>; <span class="comment">// 如果表中有与value相等的项，返回true，否则为false。</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Insert</span>(<span class="params"><span class="keyword">int</span> index,<span class="keyword">object</span> <span class="keyword">value</span></span>)</span>; <span class="comment">// 把值为value的项插入到索引为index的位置。</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Remove</span>(<span class="params"><span class="keyword">object</span> <span class="keyword">value</span></span>)</span>; <span class="comment">//删除表中第一个值为value的项。</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">RemoveAt</span>(<span class="params"><span class="keyword">int</span> index</span>)</span>; <span class="comment">//删除表中索引index处的项。</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>读者可把本书声明的IListDS接口与IList接口进行比较。</p>
+<p>.NET框架中的一些集合类实现了IList接口，如ArrayList、ListDictionary、StringCollection、StringDictionary。下面以ArrayList为例进行说明。</p>
+<p>ArrayList类使用数组来实现IList接口，所以ArrayList可看作顺序表。ArrayList 的容量可动态增长，通常情况下，当ArrayList中的元素满时，容量增加一倍，把原来的元素复制到新的空间中。当在ArrayList中插入一个元素时，该元素被添加到ArrayList的尾部，元素个数自动加1。另外，需要注意的是，ArrayList中对元素的操作前提是ArrayList是一个有序表，但ArrayList本身并不一定是有序的。所以，在对ArrayList中的元素进行操作之前，应该对ArrayList进行排序。</p>
+<p>本书不对 ArrayList 类进行详细的介绍，读者可参看.NET 框架的有关书籍，下面以一道例题来说明 ArrayList 的应用。</p>
+<p>【例 2-7】ArrayList 的使用。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">Using System;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">SamplesArrayList</span></span><br><span class="line">&#123;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"><span class="comment">// 创建和初始化一个新的 ArrayList.</span></span><br><span class="line">ArrayList myAL = <span class="keyword">new</span> ArrayList();</span><br><span class="line">myAL.Add(“Hello”);</span><br><span class="line">myAL.Add(“World”);</span><br><span class="line">myAL.Add(“!”);</span><br><span class="line"><span class="comment">//显示 ArrayList 的属性和值</span></span><br><span class="line">Console.WriteLine(“myAL”);</span><br><span class="line">Console.WriteLine(“Count:&#123;<span class="number">0</span>&#125;”, myAL.Count);</span><br><span class="line">Console.WriteLine(“Capacity: &#123;<span class="number">0</span>&#125;”, myAL.Capacity);</span><br><span class="line">Console.Write(“Values:”);</span><br><span class="line">PrintValues(myAL);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//方法，输出 ArrayList 中的每个元素</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">PrintValues</span>(<span class="params">Ienumerable myList</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"><span class="keyword">foreach</span>(<span class="keyword">object</span> obj <span class="keyword">in</span> myList)</span><br><span class="line">&#123;</span><br><span class="line">Console.Write(“&#123;<span class="number">0</span>&#125;”, obj);</span><br><span class="line">Console.WriteLine();</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在 C# 2.0 中不仅提供了非泛型的 Ilist 接口，而且还提供了泛型 Ilist 接口。<br>泛型 Ilist 接口是从 Icollection 泛型接口继承而来，是所有的泛型表的基接口。实<br>现泛型 Ilist 接口的集合提供类似于列表的语法，包括在列表中任意点访问个别项<br>以及插入和删除成员等操作。<br>泛型的 Ilist 接口的声明如下：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> inrterface Ilist&lt;T&gt; : Icollection&lt;T&gt;,Ienumerable&lt;T&gt;,</span><br><span class="line">Ienumerable</span><br><span class="line">&#123;</span><br><span class="line"><span class="comment">//公有属性</span></span><br><span class="line">T <span class="keyword">this</span> [<span class="keyword">int</span> index] &#123;<span class="keyword">get</span>;<span class="keyword">set</span>;&#125; <span class="comment">//索引器，得到或设置某个索引的项</span></span><br><span class="line"><span class="comment">//公有方法</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">IndexOf</span>(<span class="params">T <span class="keyword">value</span></span>)</span>; <span class="comment">//如果表中有与 value 相等的项，返回</span></span><br><span class="line"><span class="comment">//其在表中的索引,否则，返回-1。</span></span><br><span class="line"><span class="function">Void <span class="title">Insert</span>(<span class="params"><span class="keyword">int</span> index,T <span class="keyword">value</span></span>)</span>; <span class="comment">//把值为 value 的项插入到索</span></span><br><span class="line"><span class="comment">//引为 index 的位置。</span></span><br><span class="line"><span class="function">Void <span class="title">Remove</span>(<span class="params">T <span class="keyword">value</span></span>)</span>; <span class="comment">//删除表中第一个值为 value 的项。</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>.NET 框架中的一些集合类实现了 Ilist<t>接口，如 List<t>。Ilist<t>相对于<br>Ilist 的变化是通用的属性和方法被移植入 Icollection<t>了，仅剩下对列表有效的</t></t></t></t></p>
+<p>基于索引访问的属性和方法。<br>List<t>是 ArrayList 在泛型中的替代品。List<t>的性能比 ArrayList 有很大<br>改变，因为动态数组是.NET 程序使用的最基本的数据结构之一，它的性能影响<br>到应用程序的全局。例如，以前 ArrayList 默认的 Capacity 是 16，而 List<t>的<br>默认 Capacity 是 4，这样可以尽量减小应用程序的工作集。另外，List<t>的方法<br>不是虚拟方法（ArrayList 的方法是虚拟方法），这样可以利用函数内联来提高性<br>能（虚函数不可以被内联）。List<t>也不支持问题很多的 Synchronized 同步访问<br>模式。</t></t></t></t></t></p>
+<h1 id="本章小结"><a href="#本章小结" class="headerlink" title="本章小结"></a>本章小结</h1><p>线性表是最简单、最基本、最常用的数据结构，线性表的特点是数据元素之间存在一对一的线性关系，也就是说，除第一个和最后一个数据元素外，其余数<br>据元素都有且只有一个直接前驱和直接后继。<br>线性表有两种不同的存储结构，即顺序存储结构和链式存储结构。顺序存储的线性表称为顺序表，顺序表中的存储单元是连续的，在 C#语言中用数组来实<br>现顺序存储。链式存储的线性表称为链表，链表中的存储单元不一定是连续的，所以在一个结点有数据域存放数据元素本身的信息，还有引用域存放其相邻的数<br>据元素的地址信息。单链表的结点只有一个引用域，存放其直接后继结点的地址信息，双向链表的结点有两个引用域，存放其直接前驱结点和直接后继结点的地<br>址信息。循环链表的最后一个结点的引用域存放头引用的值。<br>对线性表的基本操作有查找、插入、删除等操作。顺序表由于具有随机存储的特点，所以查找比较方便，效率很高，但插入和删除数据元素都需要移动大量<br>的数据元素，所以效率很低。而链表由于其存储空间不要求是连续的，所以插入和删除数据元素的效率很高，但查找需要从头引用开始遍历链表，所以效率很低。<br>因此，线性表采用何种存储结构取决于实际问题，如果只是进行查找等操作而不经常插入和删除线性表中的数据元素，则线性表采用顺序存储结构；反之，采用<br>链式存储结构。</p>
+<h1 id="习题"><a href="#习题" class="headerlink" title="习题"></a>习题</h1><p>1 说出下面几个概念的含义。</p>
+<p>线性表 顺序表 头引用 头结点 单链表 循环链表 双向链表</p>
+<p>2.2 在顺序表中进行插入和删除时为什么必须移动数据元素？</p>
+<p>2.3 设一顺序表（单链表）中的元素值递增有序。写一算法，将元素 x 插入到表中适当的位置，并保持顺序表（单链表）的有序性。分析算法的时间复杂度。</p>
+<p>2.4 已知一整型顺序表 L，编写算法输出表总元素的最大值和最小值。</p>
+<p>2.5 编写一算法将整型顺序表 A 中大于 0 的元素放入顺序表 B 中，把小于 0 的元素放入顺序表 C 中。</p>
+<p>2.6 对比顺序表和链表，说明二者的主要优点和主要缺点。</p>
+<p>2.7 编写算法，逐个输出顺序表中所有的元素。</p>
+<p>2.8 在链表设计中，为什么通常采用带头结点的链表结构？</p>
+<p>2.9 编写算法，逐个输出单链表中所有结点的值。</p>
+<p>2.10 写出双向链表类的实现。</p>
+<p>2.11 写出循环链表类的实现。</p>
+<p>2.12 写一个复制顺序表的算法。</p>
+<p>2.13 写一个复制单链表的算法。</p>
+<p>2.14 写一个遍历顺序表的算法。</p>
+<p>2.15 写一个遍历单链表的算法。</p>
+<p>2.16 将求线性表的长度、判断线性表是否为空及判断线性表是否为满等方法改为属性，重新实现 IListDS<t>、SeqList<t>、LinkList<t>。</t></t></t></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/数据结构（C-语言版）/" rel="tag"># 数据结构（C#语言版）</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/11/06/线性表/" rel="next" title="线性表">
+                <i class="fa fa-chevron-left"></i> 线性表
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">555</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">11</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">63</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2019/11/06/双向链表和循环列表/" title="双向链表和循环列表" target="_blank">双向链表和循环列表</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/11/06/线性表/" title="线性表" target="_blank">线性表</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/11/06/单链表/" title="单链表" target="_blank">单链表</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/11/06/WWW类封装/" title="WWW类封装" target="_blank">WWW类封装</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/11/05/UI框架设计/" title="UI框架设计" target="_blank">UI框架设计</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#双向链表"><span class="nav-number">1.</span> <span class="nav-text">双向链表</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#循环链表"><span class="nav-number">1.1.</span> <span class="nav-text">循环链表</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#C-中的线性表"><span class="nav-number">2.</span> <span class="nav-text">C#中的线性表</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#本章小结"><span class="nav-number">3.</span> <span class="nav-text">本章小结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#习题"><span class="nav-number">4.</span> <span class="nav-text">习题</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">4m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">60:12</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>
