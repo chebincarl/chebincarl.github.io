@@ -111,7 +111,7 @@
 <meta property="og:site_name" content="车斌的博客">
 <meta property="og:description" content="思考并回答以下问题：  Lua中每一个值都有metatable。想到了C#的什么？只能设置table的元表吗？ Lua如何计算两个table的相加操作？ setmeta和getmeta是做什么用的？ __index元方法是干嘛用的？可以写函数吗？参数是什么？ __newindex元方法是干嘛用的？ 元表是如何做到简化代码功能的？">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-11-04T13:16:40.171Z">
+<meta property="og:updated_time" content="2019-11-07T11:05:58.225Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Lua编程7之metatable">
 <meta name="twitter:description" content="思考并回答以下问题：  Lua中每一个值都有metatable。想到了C#的什么？只能设置table的元表吗？ Lua如何计算两个table的相加操作？ setmeta和getmeta是做什么用的？ __index元方法是干嘛用的？可以写函数吗？参数是什么？ __newindex元方法是干嘛用的？ 元表是如何做到简化代码功能的？">
@@ -443,7 +443,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-11-04 21:16:40" itemprop="dateModified" datetime="2019-11-04T21:16:40+08:00">2019-11-04</time>
+                <time title="修改时间：2019-11-07 19:05:58" itemprop="dateModified" datetime="2019-11-07T19:05:58+08:00">2019-11-07</time>
               
             
           </span>
@@ -533,7 +533,6 @@
 <li>元表是如何做到简化代码功能的？</li>
 </ul>
 <a id="more"></a>
-
 
 <h1 id="Lua元表"><a href="#Lua元表" class="headerlink" title="Lua元表"></a><span style="color:#039BE5;">Lua元表</span></h1><p>元表是在普通表的基础上扩展出来的表，元表本质上也是一个表，但是里面有很多的元方法，可以为表添加操作符。</p>
 <p>没有元表的时候：</p>
@@ -653,14 +652,14 @@
 
 <p>从上述代码的输出结果即可看出，一旦设置了__metatable字段，getmetatable就会返回这个字段的值，而setmetatable将引发一个错误。</p>
 <h2 id="table访问的元方法"><a href="#table访问的元方法" class="headerlink" title="table访问的元方法"></a><span style="color:#EF7060;">table访问的元方法</span></h2><p>算术类和关系类运算符的元方法都为各种错误情况定义了行为，它们不会改变语言的常规行为。但是Lua还提供了一种可以改变table行为的方法。有两种可以改变的table行为：查询table及修改table中不存在的字段。</p>
-<p><strong>__index元方法</strong></p>
+<p><font size="3"><strong>__index元方法</strong></font></p>
 <p>这是metatable最常用的键（key）。</p>
 <p><span style="color:red">当你通过键来访问table的时候，如果这个键没有值，那么Lua就会寻找该table的metatable（假定有metatable）中的__index键。如果__index包含一个表，Lua会在表中查找相应的键。</span></p>
 <p>例如：</p>
 <figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">other = &#123; foo = <span class="number">3</span> &#125; </span><br><span class="line">t = <span class="built_in">setmetatable</span>(&#123;&#125;, &#123; <span class="built_in">__index</span> = other &#125;) </span><br><span class="line"><span class="built_in">print</span>(t.foo) <span class="comment">-- 3</span></span><br><span class="line"><span class="built_in">print</span>(t.bar) <span class="comment">-- nil</span></span><br></pre></td></tr></table></figure>
 
 <p>如果__index包含一个函数的话，Lua就会调用那个函数，table和键会作为参数传递给函数。</p>
-<p>__index 元方法查看表中元素是否存在，如果不存在，返回结果为nil；如果存在则由__index返回结果。</p>
+<p>__index元方法查看表中元素是否存在，如果不存在，返回结果为nil；如果存在则由__index返回结果。</p>
 <figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">mytable = <span class="built_in">setmetatable</span>(&#123;key1 = <span class="string">"value1"</span>&#125;, &#123;</span><br><span class="line">  <span class="built_in">__index</span> = <span class="function"><span class="keyword">function</span><span class="params">(mytable, key)</span></span></span><br><span class="line">    <span class="keyword">if</span> key == <span class="string">"key2"</span> <span class="keyword">then</span></span><br><span class="line">      <span class="keyword">return</span> <span class="string">"metatablevalue"</span></span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">      <span class="keyword">return</span> <span class="literal">nil</span></span><br><span class="line">    <span class="keyword">end</span></span><br><span class="line">  <span class="keyword">end</span></span><br><span class="line">&#125;)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(mytable.key1,mytable.key2)</span><br></pre></td></tr></table></figure>
 
 <p>实例输出结果为：</p>
@@ -687,7 +686,7 @@
 <li>判断元表有没有__index方法，如果__index方法为nil，则返回nil；如果__index方法是一个表，则重复1、2、3；如果__index方法是一个函数，则返回该函数的返回值。</li>
 </ul>
 <p><strong>__newindex元方法</strong></p>
-<p>__index则用来对表访问，__newindex元方法则用来对表更新。</p>
+<p>__index用来对表访问，__newindex元方法则用来对表更新。</p>
 <p>当你给表的一个缺少的索引赋值，解释器就会查找__newindex元方法：如果存在则调用这个函数而不进行赋值操作。</p>
 <p>以下实例演示了__newindex元方法的应用：</p>
 <figure class="highlight lua"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">mymetatable = &#123;&#125;</span><br><span class="line">mytable = <span class="built_in">setmetatable</span>(&#123;key1 = <span class="string">"value1"</span>&#125;, &#123; <span class="built_in">__newindex</span> = mymetatable &#125;)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(mytable.key1)</span><br><span class="line"></span><br><span class="line">mytable.newkey = <span class="string">"新值2"</span></span><br><span class="line"><span class="built_in">print</span>(mytable.newkey,mymetatable.newkey)</span><br><span class="line"></span><br><span class="line">mytable.key1 = <span class="string">"新值1"</span></span><br><span class="line"><span class="built_in">print</span>(mytable.key1,mymetatable.key1)</span><br></pre></td></tr></table></figure>
@@ -826,7 +825,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">555</span>
+                    <span class="site-state-item-count">558</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -1008,7 +1007,11 @@
                     
                       
                     
-                    <span class="site-state-item-count">63</span>
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">65</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -1039,23 +1042,23 @@
                 
                 
                   <li>
+                    <a href="/2019/11/08/暗黑战神/" title="暗黑战神" target="_blank">暗黑战神</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/11/08/神启/" title="神启" target="_blank">神启</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2019/11/08/Unity接入微信支付宝/" title="Unity接入微信支付宝" target="_blank">Unity接入微信支付宝</a>
+                  </li>
+                
+                  <li>
                     <a href="/2019/11/06/双向链表和循环列表/" title="双向链表和循环列表" target="_blank">双向链表和循环列表</a>
                   </li>
                 
                   <li>
                     <a href="/2019/11/06/线性表/" title="线性表" target="_blank">线性表</a>
-                  </li>
-                
-                  <li>
-                    <a href="/2019/11/06/单链表/" title="单链表" target="_blank">单链表</a>
-                  </li>
-                
-                  <li>
-                    <a href="/2019/11/06/WWW类封装/" title="WWW类封装" target="_blank">WWW类封装</a>
-                  </li>
-                
-                  <li>
-                    <a href="/2019/11/05/UI框架设计/" title="UI框架设计" target="_blank">UI框架设计</a>
                   </li>
                 
               </ul>
@@ -1127,7 +1130,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">60:12</span>
+    <span title="站点阅读时长">60:53</span>
   
 </div>
 
