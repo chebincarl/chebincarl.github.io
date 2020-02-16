@@ -1,0 +1,1670 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="思考并回答以下问题：  为什么要使用事件？事件的主体是发布者怎么理解？ 什么是回调方法和事件处理程序？ 事件使你无法直接访问委托怎么理解？ 事件被触发时发生了什么？ 事件（event）可以声明为private吗？ 事件可以申明为静态吗？怎么使用？委托可以为静态吗？为什么？ 事件是类型吗？如果不是那是什么？事件可以声明在类或结构外面吗？ 事件的初始值是什么？ EventHandler是干嘛用的？ 多">
+<meta name="keywords" content="C#图解教程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="事件">
+<meta property="og:url" content="http://chebincarl.github.io/2019/07/25/事件/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="思考并回答以下问题：  为什么要使用事件？事件的主体是发布者怎么理解？ 什么是回调方法和事件处理程序？ 事件使你无法直接访问委托怎么理解？ 事件被触发时发生了什么？ 事件（event）可以声明为private吗？ 事件可以申明为静态吗？怎么使用？委托可以为静态吗？为什么？ 事件是类型吗？如果不是那是什么？事件可以声明在类或结构外面吗？ 事件的初始值是什么？ EventHandler是干嘛用的？ 多">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://chebincarl.github.io/2019/07/25/事件/1.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/07/25/事件/2.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/07/25/事件/3.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/07/25/事件/4.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/07/25/事件/100.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/07/25/事件/101.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/07/25/事件/102.png">
+<meta property="og:updated_time" content="2019-07-27T15:10:41.282Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="事件">
+<meta name="twitter:description" content="思考并回答以下问题：  为什么要使用事件？事件的主体是发布者怎么理解？ 什么是回调方法和事件处理程序？ 事件使你无法直接访问委托怎么理解？ 事件被触发时发生了什么？ 事件（event）可以声明为private吗？ 事件可以申明为静态吗？怎么使用？委托可以为静态吗？为什么？ 事件是类型吗？如果不是那是什么？事件可以声明在类或结构外面吗？ 事件的初始值是什么？ EventHandler是干嘛用的？ 多">
+<meta name="twitter:image" content="http://chebincarl.github.io/2019/07/25/事件/1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/07/25/事件/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>事件 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">专注，重复10遍</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/07/25/事件/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">事件
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-07-25 09:57:16" itemprop="dateCreated datePublished" datetime="2019-07-25T09:57:16+08:00">2019-07-25</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-07-27 23:10:41" itemprop="dateModified" datetime="2019-07-27T23:10:41+08:00">2019-07-27</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C#</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">13k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">11 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>思考并回答以下问题：</p>
+<ul>
+<li>为什么要使用事件？事件的主体是发布者怎么理解？</li>
+<li>什么是回调方法和事件处理程序？</li>
+<li>事件使你无法直接访问委托怎么理解？</li>
+<li>事件被触发时发生了什么？</li>
+<li>事件（event）可以声明为private吗？</li>
+<li>事件可以申明为静态吗？怎么使用？委托可以为静态吗？为什么？</li>
+<li>事件是类型吗？如果不是那是什么？事件可以声明在类或结构外面吗？</li>
+<li>事件的初始值是什么？</li>
+<li>EventHandler是干嘛用的？</li>
+<li>多播委托多种方法同样的参数怎么理解？</li>
+</ul>
+<a id="more"></a>
+<p>本章涵盖：</p>
+<ul>
+<li>1.发布者和订阅者</li>
+<li>2.源代码组件概览</li>
+<li>3.声明事件</li>
+<li>4.订阅事件</li>
+<li>5.触发事件</li>
+<li>6.标准事件的用法</li>
+<li>7.事件访问器</li>
+</ul>
+<h1 id="发布者和订阅者"><a href="#发布者和订阅者" class="headerlink" title="发布者和订阅者"></a><span style="color:#039BE5;">发布者和订阅者</span></h1><p>很多程序都有一个共同的需求，即当一个特定的程序事件发生时，程序的其他部分可以得到该事件已经发生的通知。</p>
+<blockquote>
+<p>你对钱的增加感兴趣，然后我负责监控，每增加12块钱，我就去做你交给我的事情，但你需要先把事情写在我给你的本子上。<br>反了，上面陈述的主体是订阅者，主体应该是发布者才对。我想叫两个人帮我算钱，他们先把计数的按钮放在我的工具箱里，我每增加12块钱，我就打开工具箱按下按钮，他们接收到消息就各自进行处理。</p>
+</blockquote>
+<p><strong>发布者/订阅者模式（publisher/subscriber pattern）</strong>可以满足这种需求。在这种模式中，发布者类定义了一系列程序的其他部分可能感兴趣的事件。其他类可以“注册”，以便在这些事件发生时发布者可以通知它们。这些订阅者类通过向发布者提供一个方法来“注册”以获取通知。当事件发生时，发布者“触发事件”，然后执行订阅者提交的所有事件。</p>
+<p><span style="color:red">由订阅者提供的方法称为回调方法</span>，因为发布者通过执行这些方法来“往回调用订阅者的方法”。还可以将它们称为事件处理程序，因为它们是为处理事件而调用的代码。图1演示了这个过程，展示了拥有一个事件的发布者以及该事件的三个订阅者。</p>
+<blockquote>
+<p>图1 发布者和订阅者<br><img src="/2019/07/25/事件/1.png"></p>
+</blockquote>
+<p>下面是一些有关事件的重要事项。</p>
+<ul>
+<li><span style="color:blue">发布者（publisher）</span> 发布某个事件的类或结构，其他类可以在该事件发生时得到通知。</li>
+<li><span style="color:blue">订阅者（subscriber）</span>注册并在事件发生时得到通知的类或结构。</li>
+<li><span style="color:blue">事件处理程序（event handler）</span> 由订阅者注册到事件的方法，在发布者触发事件时执行。事件处理程序方法可以定义在事件所在的类或结构中，也可以定义在不同的类或结构中。</li>
+<li><span style="color:blue">触发（raise）事件</span> 调用（invoke）或触发（fire）事件的术语。当事件触发时，所有注册到它的方法都会被依次调用。</li>
+</ul>
+<p>事件的很多部分都与委托类似。实际上，事件就像是专门用于某种特殊用途的简单委托。委托和事件的行为之所以相似，是有充分理由的。事件包含了一个私有的委托，如图2所示。</p>
+<blockquote>
+<p>图2 事件有被封装的委托<br><img src="/2019/07/25/事件/2.png"></p>
+</blockquote>
+<p>有关事件的私有委托需要了解的重要事项如下。</p>
+<ul>
+<li>事件提供了对它的私有控制委托的结构化访问：也就是说，你无法直接访问委托。</li>
+<li>事件中可用的操作比委托要少，对于事件我们只可以添加、删除或调用事件处理程序。</li>
+<li>事件被触发时，它调用委托来依次调用调用列表中的方法。</li>
+</ul>
+<p>注意，在图2中，只有+=和-=运算符在事件框的左边。因为，它们是事件唯一允许的操作（除了调用事件本身）。</p>
+<p>图3演示了一个叫做Incrementer（Publisher）的类，它按照某种方式进行计数。</p>
+<ul>
+<li>Incrementer定义了一个CountedADozen事件，每次累积到12个项时将会触发该事件。</li>
+<li>订阅者类Dozens和SomeOtherClass（Subscriber）各有一个注册到CountedADozen事件的事件处理程序。</li>
+<li>每当触发事件时，都会调用这些处理程序。</li>
+</ul>
+<blockquote>
+<p>图3 具有一个事件的类的结构和术语<br><img src="/2019/07/25/事件/3.png"></p>
+</blockquote>
+<h1 id="源代码组件概览"><a href="#源代码组件概览" class="headerlink" title="源代码组件概览"></a><span style="color:#039BE5;">源代码组件概览</span></h1><p>需要在事件中使用的代码有5部分，如图4所示。这些组件如下所示。</p>
+<ul>
+<li><span style="color:blue">委托类型声明</span> 事件和事件处理程序必须有共同的签名和返回类型，它们通过委托类型进行描述。</li>
+<li><span style="color:blue">事件处理程序声明</span> 订阅者类中会在事件触发时执行的方法声明。它们不一定是有显式命名的方法，还可以是匿名方法或Lambda表达式。</li>
+<li><span style="color:blue">事件声明</span> 发布者类必须声明一个订阅者类可以注册的事件成员。当声明的事件为public时，称为发布了事件。</li>
+<li><span style="color:blue">事件注册</span> 订阅者必须订阅事件才能在它被触发时得到通知。</li>
+<li><span style="color:blue">触发事件的代码</span> 发布者类中“触发”事件并导致调用注册的所有事件处理程序的代码。</li>
+</ul>
+<blockquote>
+<p>图4 使用事件时的5个源代码组件<br><img src="/2019/07/25/事件/4.png"></p>
+</blockquote>
+<h1 id="声明事件"><a href="#声明事件" class="headerlink" title="声明事件"></a><span style="color:#039BE5;">声明事件</span></h1><p>发布者类必须提供事件对象。创建事件比较简单——只需要委托类型和名字。事件声明的语法如下代码所示，代码中声明了一个叫做CountADozen的事件。注意如下有关CountedADozen事件的内容。</p>
+<ul>
+<li>事件声明在一个类中。</li>
+<li>它需要委托类型的名称，任何附加到事件（如注册）的处理程序都必须与委托类型的签名和返回类型匹配。</li>
+<li>它声明为public，这样其他类和结构可以在它上面注册事件处理程序。</li>
+<li>不能使用对象创建表达式（new表达式）来创建它的对象。</li>
+</ul>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">Incrementer</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// event是关键字</span></span><br><span class="line">    <span class="comment">// EventHandler是委托类型</span></span><br><span class="line">    <span class="comment">// CountedADozen是事件名</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">event</span> EventHandler CountedADozen;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>EventHandler是系统定义的委托，原型如下：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">region</span> 程序集 mscorlib.dll, v4.0.0.0</span></span><br><span class="line"><span class="comment">// C:\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.5\mscorlib.dll</span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">endregion</span></span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> System.Runtime.InteropServices;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">System</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 摘要: </span></span><br><span class="line">    <span class="comment">//     表示将处理不包含事件数据的事件的方法。</span></span><br><span class="line">    <span class="comment">//</span></span><br><span class="line">    <span class="comment">// 参数: </span></span><br><span class="line">    <span class="comment">//   sender:</span></span><br><span class="line">    <span class="comment">//     事件源。</span></span><br><span class="line">    <span class="comment">//</span></span><br><span class="line">    <span class="comment">//   e:</span></span><br><span class="line">    <span class="comment">//     不包含任何事件数据的 System.EventArgs。</span></span><br><span class="line">    [<span class="meta">Serializable</span>]</span><br><span class="line">    [<span class="meta">ComVisible(true)</span>]</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">delegate</span> <span class="keyword">void</span> <span class="title">EventHandler</span>(<span class="params"><span class="keyword">object</span> sender, EventArgs e</span>)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>我们可以通过使用逗号分隔的列表在一个声明语句中声明一个以上的事件。例如，下面语句声明了3个事件。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">event</span> EventHandler MyEvent1, MyEvent2, OtherEvent;</span><br></pre></td></tr></table></figure></p>
+<p>我们还可以使用static关键字让事件变成静态的，如下声明所示:<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">event</span> EventHandler CountedADozen;</span><br></pre></td></tr></table></figure></p>
+<p><span style="color:red"><strong>事件是成员</strong></span></p>
+<p>一个常见的误解是把事件认为是类型，然而它不是。和方法、属性一样，事件是类或结构的成员，这一点引出了几个重要的特性。</p>
+<ul>
+<li>由于事件是成员：<ul>
+<li>我们不能在一段可执行代码中声明事件；</li>
+<li>它必须声明在类或结构中，和其他成员一样。</li>
+</ul>
+</li>
+<li>事件成员被隐式自动初始化为null。</li>
+</ul>
+<p>事件声明需要委托类型的名字，我们可以声明一个委托类型或使用已存在的。如果我们声明一个委托类型，它必须指定事件保存的方法的签名和返回类型。</p>
+<p>BCL声明了一个叫做EventHandler的委托，专门用于系统事件。</p>
+<h1 id="订阅事件"><a href="#订阅事件" class="headerlink" title="订阅事件"></a><span style="color:#039BE5;">订阅事件</span></h1><p>订阅者向事件添加事件处理程序。对于一个要添加到事件的事件处理程序来说，它必须具有与事件的委托相同的返回类型和签名。</p>
+<ul>
+<li>使用+=运算符来为事件增加事件处理程序，如下面代码所示。事件处理程序位于该运算符的右边。</li>
+<li>事件处理程序的规范可以是以下任意一种：<ul>
+<li>实例方法的名称；</li>
+<li>静态方法的名称；</li>
+<li>匿名方法；</li>
+<li>Lambda达式。</li>
+</ul>
+</li>
+</ul>
+<p>例如，下面代码为CountedADozen事件增加了3个方法：</p>
+<p>第一个是使用方法形式的实例方法；<br>第二个是使用方法形式的静态方法；<br>第三个是使用委托形式的实例方法。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// incrementer是类名，CountedADozen是事件成员</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// Increment.DozensCount是实例方法</span></span><br><span class="line">incrementer.CountedADozen += Increment.DozensCount; <span class="comment">// 方法引用形式</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// ClassB.CounterHandlerB是静态方法</span></span><br><span class="line">incrementer.CountedADozen += ClassB.CounterHandlerB; <span class="comment">// 方法引用形式</span></span><br><span class="line">      </span><br><span class="line">mc.CountedADozen += <span class="keyword">new</span> EventHandler(cc.CounterHandlerC); <span class="comment">// 委托形式</span></span><br></pre></td></tr></table></figure>
+<p>和委托一样，我们可以使用匿名方法和Lambda表达式来添加事件处理程序。例如，如下代码先使用Lambda表达式然后使用了匿名方法。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Lambda表达式</span></span><br><span class="line">incrementer.CountedADozen += () =&gt; DozensCount++;</span><br><span class="line"><span class="comment">// 匿名方法</span></span><br><span class="line">incrementer.CountedADozen += <span class="keyword">delegate</span> &#123; DozensCount++; &#125;;</span><br></pre></td></tr></table></figure></p>
+<h1 id="触发事件"><a href="#触发事件" class="headerlink" title="触发事件"></a><span style="color:#039BE5;">触发事件</span></h1><p>事件成员本身只是保存了需要被调用的事件处理程序。如果事件没有被触发，什么都不会发生。我们需要确保在合适的时候有代码来做这件事情。</p>
+<p>例如，如下代码触发了CountedADozen事件。注意如下有关代码的事项。</p>
+<ul>
+<li>在触发事件之前和null进行比较，从而查看是否包含事件处理程序，如果事件是null，则表示没有，不能执行。</li>
+<li>触发事件的语法和调用方法一样:<ul>
+<li>使用事件名称，后面跟的参数列表包含在圆括号中；</li>
+<li>参数列表必须与事件的委托类型相匹配。</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// CountedADozen 事件名</span></span><br><span class="line"><span class="keyword">if</span> (CountedADozen != <span class="literal">null</span>) <span class="comment">//确认有方法可以执行</span></span><br><span class="line">    CountedADozen(source, args);  <span class="comment">// 触发事件</span></span><br></pre></td></tr></table></figure>
+<p>把事件声明和触发事件的代码放在一起便有了如下的发布者类声明。这段代码包含了两个成员：事件和一个叫做DoCount的方法，它将在适当的时候触发该事件。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">Incrementer</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">event</span> EventHandler CountADozen; <span class="comment">// 创建事件并发布</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">DoCount</span>(<span class="params"><span class="keyword">object</span> source, EventArgs args</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">int</span> i;</span><br><span class="line">        <span class="keyword">for</span> (i = <span class="number">1</span>; i &lt; <span class="number">101</span>; i++)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (i % <span class="number">12</span> == <span class="number">0</span> &amp;&amp; CountADozen != <span class="literal">null</span>) <span class="comment">// 确认有方法可以执行</span></span><br><span class="line">            &#123;</span><br><span class="line">                CountADozen(source, args); <span class="comment">// 触发事件</span></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>下面的代码展示了整个程序，包含发布者类Incrementer和订阅者类Dozens。代码需要注意的地方如下:</p>
+<ul>
+<li>在构造函数中，Dozens类订阅事件，将IncrementDozensCount作为事件处理程序；</li>
+<li>在Incrementer类的DoCount方法中，每增长12个数就触发CountedADozen事件。</li>
+</ul>
+<blockquote>
+<p>包含发布者和订阅者的完整程序，展示了使用事件所必需的5个部分</p>
+<p>发布者Publisher Incrementer.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">Test</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">delegate</span> <span class="keyword">void</span> <span class="title">Handler</span>(<span class="params"></span>)</span>; <span class="comment">// 声明委托</span></span><br><span class="line">    <span class="keyword">class</span> <span class="title">Incrementer</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">event</span> Handler CountedADozen; <span class="comment">// 创建事件并发布</span></span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">DoCount</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">int</span> i;</span><br><span class="line">            <span class="keyword">for</span> (i = <span class="number">1</span>; i &lt; <span class="number">101</span>; i++)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span> (i % <span class="number">12</span> == <span class="number">0</span> &amp;&amp; CountedADozen != <span class="literal">null</span>)</span><br><span class="line">                &#123;</span><br><span class="line">                    CountedADozen(); <span class="comment">// 每增加12个计数触发事件一次</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>订阅者Subscriber Dozens.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">Test</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title">Dozens</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">int</span> DozensCount &#123;<span class="keyword">get</span>; <span class="keyword">private</span> <span class="keyword">set</span>; &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">Dozens</span>(<span class="params">Incrementer incrementer</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            incrementer.CountedADozen += IncrementDozensCount; <span class="comment">// 订阅事件</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 声明事件处理程序</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">IncrementDozensCount</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            DozenCount++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Program.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">Test</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="keyword">string</span>[] args</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            Incrementer incrementer = <span class="keyword">new</span> Incrementer();</span><br><span class="line">            Dozens dozensCount = <span class="keyword">new</span> Dozens(incrementer);</span><br><span class="line"></span><br><span class="line">            incrementer.DoCount();</span><br><span class="line"></span><br><span class="line">            Console.WriteLine(<span class="string">"Number of dozens = &#123;0&#125;"</span>, dozensCount.DozensCount);</span><br><span class="line">            </span><br><span class="line">            Console.ReadKey();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>产生如下的结果：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Number of dozens = <span class="number">8</span></span><br></pre></td></tr></table></figure></p>
+<h1 id="标准事件的用法"><a href="#标准事件的用法" class="headerlink" title="标准事件的用法"></a><span style="color:#039BE5;">标准事件的用法</span></h1><p>GUI编程是事件驱动的，也就是说在程序运行时，它可以在任何时候被事件打断，比如按钮点击、按下按键或系统定时器。在这些情况发生时，程序需要处理事件然后继续其他事情。</p>
+<p>显然，程序事件的异步处理是使用C#事件的绝佳场景。Windows GUI编程如此广泛地使用了事件，对于事件的使用，.NET框架提供了一个标准模式。事件使用的标准模式的根本就是System命名空间声明的EventHandler委托类型。EventHandler委托类型的声明如下代码所示。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">delegate</span> <span class="keyword">void</span> <span class="title">EventHandler</span>(<span class="params"><span class="keyword">object</span> sender, EventArgs e</span>)</span>;</span><br></pre></td></tr></table></figure></p>
+<p>关于该声明需要注意以下几点：</p>
+<ul>
+<li>第一个参数用来保存触发事件的对象的引用。由于是object类型的，所以可以匹配任何类型的实例；</li>
+<li>第二个参数用来保存状态信息，指明什么类型适用于该应用程序；</li>
+<li>返回类型是void。</li>
+</ul>
+<p>EventHandler委托类型的第二个参数是EventArgs类的对象，它声明在System命名空间中。你可能会想，既然第二个参数用于传递数据，EventArgs类的对象应该可以保存一些类型的数据。你可能错了。</p>
+<ul>
+<li>EventArgs设计为不能传递任何数据。它用于不需要传递数据的事件处理程序——通常会被忽略。</li>
+<li>如果你希望传递数据，必须声明一个派生自EventArgs的类，使用合适的字段来保存需要传递的数据。</li>
+</ul>
+<p>尽管EventArgs类实际上并不传递数据，但它是使用EventHandler委托模式的重要部分。不管参数使用的实际类型是什么，object类和EventArgs总是基类。这样EventHandler就能提供一个对所有事件和事件处理器都通用的签名，只允许两个参数，而不是各自都有不同签名。</p>
+<p>如下代码所示，我们修改Incrementer程序使之使用EventHandler委托。注意以下几点。</p>
+<ul>
+<li>在声明中使用系统定义的EventHandler委托替换Handler.</li>
+<li>订阅者中声明的事件处理程序的签名必须与事件委托（现在使用object和EventArgs参数）的签名（和返回类型）匹配。对于IncrementDozensCount事件处理程序来说，该方法忽略了正式的参数。</li>
+<li>触发事件的代码在调用事件时必须使用适当的参数类型的对象。</li>
+</ul>
+<blockquote>
+<p>发布者Publisher Increment.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">Test</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title">Increment</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">event</span> EventHandler CountADozen; <span class="comment">// 使用系统定义的EventHandler委托</span></span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">DoCount</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">int</span> i;</span><br><span class="line">            <span class="keyword">for</span> (i = <span class="number">1</span>; i &lt; <span class="number">101</span>; i++)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span> (i % <span class="number">12</span> == <span class="number">0</span> &amp;&amp; CountADozen != <span class="literal">null</span>) </span><br><span class="line">                &#123;</span><br><span class="line">                    CountADozen(<span class="keyword">this</span>, <span class="literal">null</span>); <span class="comment">// 触发事件时使用EventHandler的参数</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>订阅者Subscriber Dozens.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">Test</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title">Dozens</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">int</span> DozenCount &#123;<span class="keyword">get</span>; <span class="keyword">private</span> <span class="keyword">set</span>; &#125;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">Dozens</span>(<span class="params">Increment increment</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            DozenCount = <span class="number">0</span>;</span><br><span class="line">            increment.CountADozen += IncrementDozenCount; <span class="comment">// 订阅事件</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 事件处理程序的签名必须与委托的签名匹配</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">IncrementDozenCount</span>(<span class="params"><span class="keyword">object</span> source, EventArgs e</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            DozenCount++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Program.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">Test</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="keyword">string</span>[] args</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            Increment increment = <span class="keyword">new</span> Increment();</span><br><span class="line">            Dozens dozenCount = <span class="keyword">new</span> Dozens(increment);</span><br><span class="line"></span><br><span class="line">            increment.DoCount();</span><br><span class="line"></span><br><span class="line">            Console.WriteLine(<span class="string">"Number of dozens = &#123;0&#125;"</span>, dozenCount.DozenCount);</span><br><span class="line">            </span><br><span class="line">            Console.ReadKey();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="事件访问器"><a href="#事件访问器" class="headerlink" title="事件访问器"></a>事件访问器</h1><h1 id="自己的总结"><a href="#自己的总结" class="headerlink" title="自己的总结"></a><span style="color:#039BE5;">自己的总结</span></h1><p>事件只能用+=<br>委托在类里面<br>别的类.委托字段 调用不安全</p>
+<p>事件是由委托进化来的。</p>
+<p>订阅 </p>
+<p>可以往里面装方法，但是没有办法执行。只有类才能执行。所以事件只能定义在类里面。</p>
+<p>事件的出现是一个渐进的过程，从安全性出发进行修改从而得到了订阅机制。</p>
+<p>委托写在命名空间下和写在类里是不同的。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">Test</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">delegate</span> <span class="keyword">void</span> <span class="title">MyDel</span>(<span class="params"></span>)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">class</span> <span class="title">Tool</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">public</span> MyDel del;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">class</span> <span class="title">Weapon</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">public</span> MyDel del2;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>此时的Program.cs<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">Test</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="keyword">string</span>[] args</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            Tool tool1 = <span class="keyword">new</span> Tool();</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 多播委托</span></span><br><span class="line">            tool1.del = Show;</span><br><span class="line">            tool1.del += Run;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 执行委托</span></span><br><span class="line">            tool1.del();</span><br><span class="line"></span><br><span class="line">            Console.ReadKey();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Show</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            Console.WriteLine(<span class="string">"Show被调用了"</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Run</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            Console.WriteLine(<span class="string">"Run被调用了"</span>);        </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>此时产生了什么问题呢？即<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tool1.del();</span><br></pre></td></tr></table></figure></p>
+<p>不安全，任意一个类new Tool后都可以执行这个委托，而这个委托是属于Tool的，本该由Tool类来执行。</p>
+<p>这边可以在Tool里加一个方法<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">Tool</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> MyDel del;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ProcessDel</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span> (del != <span class="literal">null</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            del();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>则Program可以这样执行<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tool1.ProcessDel();</span><br></pre></td></tr></table></figure></p>
+<p>但是tool1.del();还可以执行，又不能把它变成private，变成私有的则tool1.del = Show;tool1.del += Run;就失效了。</p>
+<p>这时候该事件出场了，Tool中给del变量加一个event关键字<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">event</span> MyDel del;</span><br></pre></td></tr></table></figure></p>
+<p>此时Program报错如下：</p>
+<img src="/2019/07/25/事件/100.png">
+<p>无法直接调用tool1.del()了。这时候是想要的结果，逼着你只能使用tool1.ProcessDel();来执行委托，也就是用委托所在的类来执行，保证安全性。</p>
+<p>接着注释掉tool1.del()这一行，添加tool1.ProcessDel();，还是报错</p>
+<img src="/2019/07/25/事件/101.png">
+<p>因为事件只能用+=号，最后修改如下：</p>
+<img src="/2019/07/25/事件/102.png">
+<blockquote>
+<p>Tool.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">Test</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">delegate</span> <span class="keyword">void</span> <span class="title">MyDel</span>(<span class="params"></span>)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">class</span> <span class="title">Tool</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">event</span> MyDel del;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ProcessDel</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">if</span> (del != <span class="literal">null</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                del();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Program.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">Test</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="keyword">string</span>[] args</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            Tool tool1 = <span class="keyword">new</span> Tool();</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 多播委托</span></span><br><span class="line">            tool1.del += Show;</span><br><span class="line">            tool1.del += Run;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 执行委托</span></span><br><span class="line">            <span class="comment">//tool1.del();</span></span><br><span class="line"></span><br><span class="line">            tool1.ProcessDel();</span><br><span class="line"></span><br><span class="line">            Console.ReadKey();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Show</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            Console.WriteLine(<span class="string">"Show被调用了"</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Run</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            Console.WriteLine(<span class="string">"Run被调用了"</span>);        </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样就实现了订阅。</p>
+<h2 id="通过扩展EventArgs来传递数据"><a href="#通过扩展EventArgs来传递数据" class="headerlink" title="通过扩展EventArgs来传递数据"></a>通过扩展EventArgs来传递数据</h2><p>为了向自己的事件处理程序的第二个参数传入数据，并且又符合标准惯例，我们需要声明一个派生自EventArgs的自定义类，它可以保存我们需要传入的数据。类的名称应该以EventArgs结尾。例如，如下代码声明了一个自定义类，它能将字符串存储在名称为Message的字段中<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// IncrementerEventArgs是自对应类，EventArgs是基类</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">IncrementerEventArgs</span> : <span class="title">EventArgs</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> IterationCount&#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125; <span class="comment">// 存储整数</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>现在我们有了一个自定义的类，可以对事件处理程序的第二个参数传递数据，你需要一个使用新自定义类的委托类型。要获得该类，可以使用泛型版本的委托EventHandler&lt;&gt;。第17章将详细介绍C#泛型，所以现在你只需要观察。要使用泛型委托，需要做到以下两点，随后的代码也表达了这个意思。</p>
+<ul>
+<li>将自定义类的名称放在尖括号内。</li>
+<li>在需要使用自定义委托类型的时候使用整个字符串。例如，event声明可能为如下形式：<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 泛型委托使用自定义类</span></span><br><span class="line"><span class="comment">// CountedADozen是事件名称</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">event</span> EventHandler&lt;IncrementerEventArgs&gt; CountedADozen;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>下面我们在处理事件的其他4部分代码中使用自定义类和自定义委托。例如，下面的代码更新了Incrementer，使用自定义的EventArgs类IncrementerEventArgs和泛型EventHandlerk\<incrementereventargs\>委托。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure></incrementereventargs\></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C-图解教程/" rel="tag"># C#图解教程</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/07/24/面向对象设计原则 (2)/" rel="next" title="面向对象设计原则 (2)">
+                <i class="fa fa-chevron-left"></i> 面向对象设计原则 (2)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/07/25/第13章-事件/" rel="prev" title="第13章-事件">
+                第13章-事件 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">354</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">55</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2020/02/16/游戏设计快乐之道（第2版）/" title="游戏设计快乐之道（第2版）" target="_blank">游戏设计快乐之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/14/游戏剧本怎么写/" title="游戏剧本怎么写" target="_blank">游戏剧本怎么写</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/04/通关！游戏设计之道（第2版）/" title="通关！游戏设计之道（第2版）" target="_blank">通关！游戏设计之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/26/游戏设计艺术（第2版）/" title="游戏设计艺术（第2版）" target="_blank">游戏设计艺术（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/22/大师谈游戏设计创意与节奏/" title="大师谈游戏设计创意与节奏" target="_blank">大师谈游戏设计创意与节奏</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#发布者和订阅者"><span class="nav-number">1.</span> <span class="nav-text">发布者和订阅者</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#源代码组件概览"><span class="nav-number">2.</span> <span class="nav-text">源代码组件概览</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#声明事件"><span class="nav-number">3.</span> <span class="nav-text">声明事件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#订阅事件"><span class="nav-number">4.</span> <span class="nav-text">订阅事件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#触发事件"><span class="nav-number">5.</span> <span class="nav-text">触发事件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#标准事件的用法"><span class="nav-number">6.</span> <span class="nav-text">标准事件的用法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#事件访问器"><span class="nav-number">7.</span> <span class="nav-text">事件访问器</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#自己的总结"><span class="nav-number">8.</span> <span class="nav-text">自己的总结</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#通过扩展EventArgs来传递数据"><span class="nav-number">8.1.</span> <span class="nav-text">通过扩展EventArgs来传递数据</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">3.7m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">56:23</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

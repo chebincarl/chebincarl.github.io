@@ -1,0 +1,1705 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="思考并回答以下问题：">
+<meta name="keywords" content="Lua">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ToLua框架下C#与Lua代码的互调">
+<meta property="og:url" content="http://chebincarl.github.io/2019/10/11/ToLua框架下C-与Lua代码的互调/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="思考并回答以下问题：">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-10-11T11:50:49.147Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="ToLua框架下C#与Lua代码的互调">
+<meta name="twitter:description" content="思考并回答以下问题：">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/10/11/ToLua框架下C-与Lua代码的互调/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>ToLua框架下C#与Lua代码的互调 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">专注，重复10遍</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/10/11/ToLua框架下C-与Lua代码的互调/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">ToLua框架下C#与Lua代码的互调
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-10-11 14:48:56 / 修改时间：19:50:49" itemprop="dateCreated datePublished" datetime="2019-10-11T14:48:56+08:00">2019-10-11</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Unity/" itemprop="url" rel="index"><span itemprop="name">Unity</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">13k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">12 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>思考并回答以下问题：</p>
+<a id="more"></a>
+<p>所谓“互调”，当然要包括两个方面，一是通过C#调用Lua代码，二是通过Lua代码调用C#脚本，第二点还包括注册在C#脚本里的Unity物体。</p>
+<p>1.ToLua的简单实现原理</p>
+<p>ToLua框架主要是通过静态绑定来实现C#与Lua之间的交互的，基本原理是通过建立一个Lua虚拟机来映射C#脚本，然后再通过这个虚拟机来运行Lua脚本，Lua脚本在运行时可以通过虚拟机反过来调用C#脚本里注册过的物体，这种方式的优势在于比起使用反射的uLua来说效率更高，但要注意，在这个框架中映射的过程里进行了大量的拆装箱，即使不算Lua本身的效率低下，这个巨大的拆装箱的量也会对性能造成非常大的影响，对于一些性能敏感的游戏最好还是选择性能更好的开发方案。<br>ToLua框架下可以将实现分成三大部分：普通的Unity+C#部分、ToLua虚拟机部分和Lua脚本部分，结构见下图：<br>ToLua结构<br>目前国内需要热更的手游一般都将主要的逻辑框架和组件功能用C#实现，而具体功能和调用放在Lua中，因为C#是不能被打包进AssetBundle中的，所以无法通过AssetBundle对代码进行改动，但是Lua是即时编译型语言，并且可以被打包进入AssetBundle中，在需要修改简单功能时，将Lua代码通过AssetBundle进行更新即可。</p>
+<ol>
+<li>ToLua的下载的安装<br>首先是下载地址：<br>ToLua<br>这是作者的github地址，进入以后点击下载Zip，完成后解压到自己需要的目录，再用Unity打开即可。<br>点击下载zip即可</li>
+</ol>
+<p>第一次打开工程时会提示是否需要自动生成注册文件，新手可以选择直接生成，若选择了取消，也可以在编辑器菜单中手动注册。——这是一个非常重要的操作，后文也会提到。<br>下面开始关于使用的正文。</p>
+<ol>
+<li>ToLua的基本使用<br>前面有提到过ToLua的基本实现方式，这里可以再细化一点：创建虚拟机——绑定数据——调用Lua代码，这套步骤在框架自带的Example里也非常清晰。<br>首先脱离Example实现一下这三个步骤。</li>
+</ol>
+<p>ToLua虚拟机的创建非常简单，只需要new一个LuaState即可，我们建立一个C#脚本作为入口，引用LuaInterface命名空间，输入以下代码，将文件挂载到场景中的一个空物体上即可。<br>using LuaInterface;<br>using UnityEngine;</p>
+<p>public class LuaScene : MonoBehaviour<br>{</p>
+<pre><code>string luaString = @&quot;
+                    print(&#39;这是一个使用DoString的Lua程序&#39;)
+                                    &quot;;
+string luaFile = &quot;LuaStudy&quot;;
+LuaState state;
+
+
+void Start()
+{
+
+    state = new LuaState();//建立Lua虚拟机
+    state.Start();//启动虚拟机
+
+    //使用string调用Lua
+    state.DoString(luaString);
+
+    //使用文件调用Lua
+    //手动添加一个lua文件搜索地址
+    string sceneFile = Application.dataPath + &quot;/LuaStudy&quot;;
+    state.AddSearchPath(sceneFile);
+    state.DoFile(luaFile);
+    state.Require(luaFile);
+
+    state.Dispose();//使用完毕回收虚拟机
+    Debug.LogFormat(&quot;当前虚拟机状态：{0}&quot;, null == state);//验证虚拟机状态
+}
+</code></pre><p>}</p>
+<p>这里使用的Lua脚本也非常简单<br>print(‘这是一个使用DoFile的Lua程序’)<br>Lua挂载<br>ToLua直接调用Lua代码的方式有两种，一种是DoString，另一种是DoFile；此外还有一个Require方法，这个方法和前两个方法不同的是，ToLua会将调用的Lua文件载入Lua栈中，而前两者只是运行一次，运行之后保存在缓存中，虽然也可以后续调用，但是会。<br>在上述代码中要注意，使用DoFile和Require方法时，要手动给目标文件添加一个文件搜索位置。<br>运行结果如下：<br>Lua运行结果<br>最后，使用完毕记得清理虚拟机，我使用null==state来进行判断，最后输出“true”,说明调用LuaState.Dispose()后，虚拟机已经被清理。</p>
+<ol>
+<li>C#中调用Lua变量/函数<br>我们上面实现了C#调用Lua文件和string，其实对于ToLua而且，直接调用string和文件并没有本质区别，最后都会转换成byte[]进行载入。<br>接下来实现一下ToLua调用指定Lua变量和函数,这里通过文件导入Lua代码。</li>
+</ol>
+<p>首先是我们的Lua代码，这一段Lua代码一共有一个普通变量、一个带有函数的表，一个无参函数，一个有参函数，功能非常简单，并且在这一段代码中没有调用。<br>num = 0<br>mytable={1,2,3,4}<br>mytable.tableFunc=function()<br>    print(‘调用TableFunc’);<br>end</p>
+<p>function Count()<br>    num=num+1<br>    print(‘计数器+1,当前计数器为’..num)<br>    return num;<br>end</p>
+<p>function InputValue( param)<br>    print(‘[lua中调用：]InputValue方法传入参数:’..tostring( param))<br>end<br>然后是C#代码，还是一样的套路，先创建虚拟机，读入Lua文件。下面依次说明普通变量、无参函数、有参函数和table的调用。<br>注意：如果带有local标识，那么C#中无法直接获取<br>普通变量<br>普通变量的调用非常简单，在载入文件后，通过LuaState[string]的形式就可以直接获取到，也可以通过这个表达式来直接赋值。<br>无参函数<br>函数的调用有两种方式，一是先缓存为LuaFunction类型后调用，二是直接能过Call方法调用。<br>有参函数<br>有参函数和无参函数调用的区别在于参数的传入，在ToLua中重载了非常多的传参函数，与无参函数的调用方法相同，有参函数也有两种调用方式，这里具体说明一下传入参数的不同方式。<br>传入参和调用分离。<br>这种方式一般需要先将函数缓存为LuaFunction，然后使用BeginPcall方法标记函数，再使用Push或者PushArgs方法将参数传入函数，最后调用PCall，还可以调用EndPcall标记结束。<br>        //对方法传入参数<br>        LuaFunction valueFunc = state.GetFunction(“InputValue”);<br>        valueFunc.BeginPCall();<br>        valueFunc.Push(“—push方法从C#中传入参数—“);<br>        valueFunc.PCall();<br>调用时直接传入参数。<br>这是最符合一般操作逻辑的方式，但是查看实现代码会发现，事实上只是LuaFunction中封装的一套实现，其本质和上一种是一样的。<br>4.table<br>table是lua中的一个百宝箱，一切东西都可以往里装，table里可以有普通的变量，还可以有table，也可以有方法。<br>在ToLua里对table的数据结构进行了解析，实现了非常多的方法，这里完全可以将table看一个LuaState来进行操作，两者没有什么区别。</p>
+<p>以下是完整的C#代码,运行结果后附。</p>
+<p>using LuaInterface;<br>using UnityEngine;</p>
+<p>public class LuaAccess : MonoBehaviour<br>{<br>    string luaFile = “LuaAccess”;<br>    LuaState state;</p>
+<pre><code>void Start()
+{
+    state = new LuaState();
+    state.Start();
+
+    //使用文件调用Lua
+    //手动添加一个lua文件搜索地址
+    string sceneFile = Application.dataPath + &quot;/LuaStudy&quot;;
+    state.AddSearchPath(sceneFile);
+
+    state.Require(luaFile);//载入文件
+
+    //获取Lua变量
+    Debug.Log(&quot;获取文件中变量：&quot; + state[&quot;num&quot;]);
+    state[&quot;num&quot;] = 10;
+    Debug.Log(&quot;设置文件中变量为：&quot; + state[&quot;num&quot;]);
+
+    //调用Lua方法
+    LuaFunction luaFunc = state.GetFunction(&quot;Count&quot;);
+    luaFunc.Call();
+    Debug.Log(&quot;C#调用LuaFunc,函数返回值：&quot; + state[&quot;num&quot;]);
+
+    Debug.Log(&quot;C#直接调用Count方法。&quot;);
+    state.Call(&quot;Count&quot;, false);
+
+
+    //对方法传入参数
+    LuaFunction valueFunc = state.GetFunction(&quot;InputValue&quot;);
+    valueFunc.BeginPCall();
+    valueFunc.Push(&quot;--push方法从C#中传入参数--&quot;);
+    valueFunc.PCall();
+    valueFunc.EndPCall();
+
+    valueFunc.Call(&quot;--直接Call方法从C#传入参数--&quot;);
+
+
+    //获取LuaTable
+    LuaTable table = state.GetTable(&quot;mytable&quot;);
+    table.Call(&quot;tableFunc&quot;);
+    LuaFunction tableFunc = table.GetLuaFunction(&quot;tableFunc&quot;);
+    Debug.Log(&quot;C#调用table中的func&quot;);
+    tableFunc.Call();
+
+    Debug.Log(&quot;获取table中的num值：&quot;+table[&quot;num&quot;]);
+
+    //通过下标直接获取
+    for (int i = 0; i &lt; table.Length; i++)
+    {
+        Debug.Log(&quot;获取table的值：&quot; + table[i]);
+    }
+
+
+    //转换成LuaDictTable
+    LuaDictTable dicTable = table.ToDictTable();
+    foreach (var item in dicTable)
+    {
+        Debug.LogFormat(&quot;遍历table:{0}--{1}&quot;, item.Key, item.Value);
+    }
+
+
+    state.Dispose();
+}
+</code></pre><p>}<br>Lua访问变量</p>
+<ol>
+<li>Lua中调用C#方法/变量<br>之前在 @罗夏L的文章里看过一篇他关于lua调用C#的笔记，但总觉得少了点什么，所以在我自己记笔记的时候特别注意了一下具体的实现。<br>在@罗夏L的文章中，将一个C#对象作为参数传入列表中，然后直接在Lua代码里运行对应的方法名，其中少了几个关键的步骤，如果只是进行了这几步，是实现不了在Lua里引用的。</li>
+</ol>
+<p>首先还是从实现原理说起，在文章开始的第一节我提过ToLua的基本实现思路，并且将这套系统分成了三部分，在这三部分之中，ToLua作为一个桥梁实现了沟通Lua脚本和C#的功能，我们知道Lua的实质是通过字节码对C进行了一套封装，具有即时编译的特点，从C#或者其他语言中来调用Lua都不算太困难，只需要提前约定特定方法名然后载入脚本即可，但C#是需要提前编译的，怎么通过一段解释器来调用C#中的对象就是主要的难点了，ToLua实现的就是这两方面的功能。<br>从这方面来分析，我觉得大多数人会想到的最直接的实现思路大概都是通过反射来实现，uLua也是通过反射来实现的，但是反射的效率非常低，虽然确实可以实现，但问题还是非常明显。<br>ToLua是通过方法名绑定的方式来实现这个映射的，首先构造一个Lua虚拟机，在虚拟机启动后对所需的方法进行绑定，在虚拟机运行时可以在Lua中调用特定方法，虚拟机变相地实现了一个解释器的功能，在Lua调用特定方法和对象时，虚拟机会在已绑定的方法中找到对应的C#方法和对象进行操作，并且ToLua已经自动实现了一些绑定的方法 。</p>
+<p>基本原理大概了解以后，我们就可以来看看它的具体实现了。</p>
+<p>第一步还是建立虚拟机并且启动，为了实现Lua对C#的调用，首先我们要调用一下绑定方法，于是我们的代码变成了下面这样。可以看到，这里和之前的唯一区别是增加了LuaBinder.Bind(state)方法，这一个方法内部其实是对许多定义好的方法的绑定，也就是上面说的绑定方法。<br>using LuaInterface;<br>using UnityEngine;</p>
+<p>public class CSharpAccess : MonoBehaviour<br>{<br> private string luaFile = “LuaCall”;<br>    LuaState state;</p>
+<pre><code>void Start()
+{
+    state = new LuaState();
+    state.Start();
+
+    string sceneFile = Application.dataPath + &quot;/LuaStudy&quot;;
+    state.AddSearchPath(sceneFile);
+
+    //  注册方法调用
+    LuaBinder.Bind(state);
+
+    state.Require(luaFile);//载入文件
+}
+</code></pre><p>}<br>然后我们加入一个变量和一个方法，我们要实现的是完成在Lua中对这个方法和变量的调用。<br>    public string AccessVar = “++这是初始值++”;<br>    public void PrintArg(string arg)<br>    {<br>        Debug.Log(“C#输出变量值：” + arg);<br>    }<br>在有了目标方法之后，我们要将这个变量和方法绑定进入虚拟机中。<br>查看LuaState的实现代码，可以发现绑定主要有RegFunction、RegVar和RegConstant三个方法，分别用于绑定函数/委托、变量和常量。在这里ToLua是通过一个委托来实现方法的映射，这个委托需要传入一个luaState变量，类型是IntPtr，这个变量的实质是一个句柄，在实际操作中，会将虚拟机作为变量传入。<br>        public delegate int LuaCSFunction(IntPtr luaState);        </p>
+<pre><code>    public void RegFunction(string name, LuaCSFunction func);
+
+    public void RegVar(string name, LuaCSFunction get, LuaCSFunction set);
+
+    public void RegConstant(string name, double d);
+
+    public void RegConstant(string name, bool flag);
+</code></pre><p>总结一下几个方法的特点：<br>这几个方法都需要传入一个string name，这个name就是之后在Lua中调用的变量或方法名。<br>RegConstant方法比较简单，传入一个name再传入一个常量即可；<br>RegFunction和RegVar都是通过LuaCSFunction类型的委托实现；<br>RegFunction需要一个LuaCSFunction委托，这个委托需要对原方法重新进行一次实现；<br>RegVar除了name之外，还需要两个LuaCSFunction委托，可以理解为一个变量的get/set方法，如果只有get或set，另一个留null即可。<br>接下来我们对AccessVar和PrintArg方法进行一下LuaCSFunction形式的实现。<br>    private int PrintCall(System.IntPtr L)<br>    {<br>        try<br>        {<br>            ToLua.CheckArgsCount(L, 2); //对参数进行校验<br>            CSharpAccess obj = (CSharpAccess)ToLua.CheckObject(L, 1, typeof(CSharpAccess));//获取目标对象并转换格式<br>            string arg0 = ToLua.CheckString(L, 2);//获取特定值<br>            obj.PrintArg(arg0);//调用对象方法<br>            return 1;<br>        }<br>        catch (System.Exception e)<br>        {<br>            return LuaDLL.toluaL_exception(L, e);<br>        }<br>    }</p>
+<pre><code>private int GetAccesVar(System.IntPtr L)
+{
+    object o = null;
+
+    try
+    {
+        o = ToLua.ToObject(L, 1); //获得变量实例
+        CSharpAccess obj = (CSharpAccess)o; //转换目标格式
+        string ret = obj.AccessVar; //获取目标值
+        ToLua.Push(L, ret);//将目标对象传入虚拟机
+        return 1;
+    }
+    catch (System.Exception e)
+    {
+        return LuaDLL.toluaL_exception(L, e, o, &quot;attempt to index AccessVar on a nil value&quot;);
+    }
+}
+
+private int SetAccesVar(System.IntPtr L)
+{
+    object o = null;
+
+    try
+    {
+        o = ToLua.ToObject(L, 1);//获得变量实例
+        CSharpAccess obj = (CSharpAccess)o;//转换目标格式
+        obj.AccessVar = ToLua.ToString(L, 2);//将要修改的值进行设定
+        return 1;
+    }
+    catch (System.Exception e)
+    {
+        return LuaDLL.toluaL_exception(L, e, o, &quot;attempt to index AccessVar on a nil value&quot;);
+    }
+}
+</code></pre><p>可以看到这三个方法的格式都是一致的，通用的步骤如下：</p>
+<p>使用ToLua中的方法对L句柄进行校验，出现异常则抛出，本例中使用ToLua.CheckArgsCount方法；<br>获得目标类的实例，并转换格式，具体转换方法较多，可以根据需要在ToLua类中选择，本例中使用了ToLua.CheckObject和ToLua.ToObject等方法；<br>调用对应方法，不同的方法调用略有区别。<br>值得注意的是，这里进行了非常多的拆装箱操作，每次lua调用 C#数据都会进行一次拆箱转换。</p>
+<p>下一步将几个方法注册进lua虚拟机。<br>注意这里有两对方法，分别是BeginModule\EndModule和BeginClass\EndClass,BeginModule\EndModule用于绑定命名空间，可以逐层嵌套；而BeginClass\EndClass用于开启具体的类型空间，具体的方法和变量绑定必须在这成对的方法之中，否则会导致ToLua崩溃（百试百灵，别问我怎么知道的）。<br>    private void Bind(LuaState L)<br>    {<br>        L.BeginModule(null);</p>
+<pre><code>    L.BeginClass(typeof(CSharpAccess), typeof(UnityEngine.MonoBehaviour));
+
+    state.RegFunction(&quot;Debug&quot;, PrintCall);
+    state.RegVar(&quot;AccessVar&quot;, GetAccesVar, SetAccesVar);
+
+    L.EndClass();
+
+    L.EndModule();
+}
+</code></pre><p>最后是我们的Lua代码，非常简单，注意Debug和AccessVar调用的区别。<br>print(‘—进入Lua调用—‘)<br>local go = UnityEngine.GameObject.Find(“LuaScene”)<br>local access=go:GetComponent(“CSharpAccess”)<br>access:Debug(“Lua调用C#方法”)<br>access.AccessVar=”—这是修改值—“<br>print(‘—Lua调用结束—‘)<br>完整C#代码<br>using LuaInterface;<br>using UnityEngine;</p>
+<p>public class CSharpAccess : MonoBehaviour<br>{</p>
+<pre><code>private string luaFile = &quot;LuaCall&quot;;
+LuaState state;
+
+void Start()
+{
+    state = new LuaState();
+    state.Start();
+
+
+    string sceneFile = Application.dataPath + &quot;/LuaStudy&quot;;
+    state.AddSearchPath(sceneFile);
+
+    //  注册方法调用
+    LuaBinder.Bind(state);
+    Bind(state);
+
+
+    Debug.Log(&quot;AccessVar初始值：&quot; + AccessVar);
+
+    state.Require(luaFile);//载入文件
+    Debug.Log(&quot;C#查看：&quot; + AccessVar);
+
+    state.Dispose();
+}
+
+private void Bind(LuaState L)
+{
+    L.BeginModule(null);
+    L.BeginClass(typeof(CSharpAccess), typeof(UnityEngine.MonoBehaviour));
+    state.RegFunction(&quot;Debug&quot;, PrintCall);
+    state.RegVar(&quot;AccessVar&quot;, GetAccesVar, SetAccesVar);
+    L.EndClass();
+    L.EndModule();
+}
+
+private int PrintCall(System.IntPtr L)
+{
+    try
+    {
+        ToLua.CheckArgsCount(L, 2); //对参数进行校验
+        CSharpAccess obj = (CSharpAccess)ToLua.CheckObject(L, 1, typeof(CSharpAccess));//获取目标对象并转换格式
+        string arg0 = ToLua.CheckString(L, 2);//获取特定值
+        obj.PrintArg(arg0);//调用对象方法
+        return 1;
+    }
+    catch (System.Exception e)
+    {
+        return LuaDLL.toluaL_exception(L, e);
+    }
+}
+
+public void PrintArg(string arg)
+{
+    Debug.Log(&quot;C#输出变量值：&quot; + arg);
+}
+
+[System.NonSerialized]
+public string AccessVar = &quot;++这是初始值++&quot;;
+private int GetAccesVar(System.IntPtr L)
+{
+    object o = null;
+
+    try
+    {
+        o = ToLua.ToObject(L, 1); //获得变量实例
+        CSharpAccess obj = (CSharpAccess)o; //转换目标格式
+        string ret = obj.AccessVar; //获取目标值
+        ToLua.Push(L, ret);//将目标对象传入虚拟机
+        return 1;
+    }
+    catch (System.Exception e)
+    {
+        return LuaDLL.toluaL_exception(L, e, o, &quot;attempt to index AccessVar on a nil value&quot;);
+    }
+}
+private int SetAccesVar(System.IntPtr L)
+{
+    object o = null;
+
+    try
+    {
+        o = ToLua.ToObject(L, 1);//获得变量实例
+        CSharpAccess obj = (CSharpAccess)o;//转换目标格式
+        obj.AccessVar = ToLua.ToString(L, 2);//将要修改的值进行设定
+        return 1;
+    }
+    catch (System.Exception e)
+    {
+        return LuaDLL.toluaL_exception(L, e, o, &quot;attempt to index AccessVar on a nil value&quot;);
+    }
+}
+</code></pre><p>}<br>运行结果</p>
+<p>Lua调用C#<br>那么最后，我们回到本节开始， @罗夏L的文章里是哪里出现了问题？<br>我在lua中加入了一行access:PrintArg(“PrintArg”)调用方法，发现Unity报了这样的错误：<br>直接调用方法名报错.png<br>说明单纯这样是做不到直接调用方法的，仔细看文章，我发现他有提到这样的内容：</p>
+<p>首先将自己写的类 放到 CustomSettings 里 就是CallLuafunction<br>BindType[] customTypeList<br>放到这个数组里 注册进去供lua使用</p>
+<p>这里是不是他说得不够详细？我找到这个类，发现这个类里记录了非常多的Unity自带类，这让我想起了第一次启动Lua时的提示，心里生出了一个疑问：这些数据是不是用于自动注册生成类的呢？</p>
+<p> //在这里添加你要导出注册到lua的类型列表<br>    public static BindType[] customTypeList =<br>    {<br>        _GT(typeof(LuaInjectionStation)),<br>        _GT(typeof(InjectType)),<br>        _GT(typeof(Debugger)).SetNameSpace(null),<br>…以下部分省略<br>沿着调用链，我找到了这个变量的引用，果然，最这个数据是用于类型注册的。<br>我将这个类放到了数组的最后，点击Clear wrap files，完成后立即弹出了数据自动生成的对话框，点击确认，<br>重新生成注册</p>
+<p>自动生成</p>
+<p>接下来我重新运行了lua脚本：<br>print(‘—进入Lua调用—‘)<br>local go = UnityEngine.GameObject.Find(“LuaScene”)<br>local access=go:GetComponent(“CSharpAccess”)<br>access:Debug(“Lua调用C#方法”)<br>access.AccessVar=”—这是修改值—“<br>print(‘—Lua调用结束—‘)<br>access:PrintArg(“PrintArg”)<br>成功运行<br>成功运行，说明ToLua实现了一整套绑定方案，只需要将所需要的内容配置完成即可。</p>
+<p>6.总结<br>原本只是想简单写一写调用方式，最后又写成了一篇长文，但是从有计划开始到一整篇结束却花掉了近一整天的时间。<br>虽然如此，收获还是非常大的，对这套工具的使用熟练度又上了一个层次，以后也要加强总结。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Lua/" rel="tag"># Lua</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/10/11/UnityWebRequest详解/" rel="next" title="UnityWebRequest详解">
+                <i class="fa fa-chevron-left"></i> UnityWebRequest详解
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/10/11/SimpleFramework/" rel="prev" title="SimpleFramework">
+                SimpleFramework <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">354</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">55</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2020/02/16/游戏设计快乐之道（第2版）/" title="游戏设计快乐之道（第2版）" target="_blank">游戏设计快乐之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/14/游戏剧本怎么写/" title="游戏剧本怎么写" target="_blank">游戏剧本怎么写</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/04/通关！游戏设计之道（第2版）/" title="通关！游戏设计之道（第2版）" target="_blank">通关！游戏设计之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/26/游戏设计艺术（第2版）/" title="游戏设计艺术（第2版）" target="_blank">游戏设计艺术（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/22/大师谈游戏设计创意与节奏/" title="大师谈游戏设计创意与节奏" target="_blank">大师谈游戏设计创意与节奏</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">3.7m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">56:23</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

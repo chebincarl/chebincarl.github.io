@@ -1,0 +1,1536 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="思考并回答以下问题：">
+<meta name="keywords" content="游戏设计模式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="游戏设计模式--命令模式">
+<meta property="og:url" content="http://chebincarl.github.io/2019/09/11/游戏设计模式-命令模式/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="思考并回答以下问题：">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://chebincarl.github.io/2019/09/11/游戏设计模式-命令模式/1.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/09/11/游戏设计模式-命令模式/2.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/09/11/游戏设计模式-命令模式/4.png">
+<meta property="og:updated_time" content="2019-09-11T13:17:09.066Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="游戏设计模式--命令模式">
+<meta name="twitter:description" content="思考并回答以下问题：">
+<meta name="twitter:image" content="http://chebincarl.github.io/2019/09/11/游戏设计模式-命令模式/1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/09/11/游戏设计模式-命令模式/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>游戏设计模式--命令模式 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">专注，重复10遍</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/09/11/游戏设计模式-命令模式/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">游戏设计模式--命令模式
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-09-11 08:52:16 / 修改时间：21:17:09" itemprop="dateCreated datePublished" datetime="2019-09-11T08:52:16+08:00">2019-09-11</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Unity/" itemprop="url" rel="index"><span itemprop="name">Unity</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">9k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">8 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>思考并回答以下问题：</p>
+<a id="more"></a>
+<p>本章涵盖：</p>
+<p>命令模式是我最喜欢的模式之一。大多数我写的游戏或者别的什么之类的大型程序，都会在某处用到它。当在正确的地方使用时，它可以将复杂的代码清理干净。对于这样一个了不起的模式，不出所料地，GoF有个深奥的定义：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">将一个请求封装为一个对象，从而使你可用不同的请求对客户进行参数化；对请求排队或记录请求日志，以及支持可撤销的操作。</span><br></pre></td></tr></table></figure>
+<p>我想你也会觉得这个句子晦涩难懂。第一，它的比喻难以理解。在词语可以指代任何事物的狂野软件世界之外，“客户”是一个<strong>人</strong>——那些和你做生意的人。据我查证，人类不能被“参数化”。</p>
+<p>然后，句子余下的部分介绍了可能会使用这个模式的场景。如果你的场景不在这个列表中，那么这对你就没什么用处。我的命令模式精简定义为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">命令是具现化的方法调用。</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>“Reify（具现化）”来自于拉丁语“res”，意为“thing”（事物），加上英语后缀“–fy”。 所以它意为“thingify”，没准用“thingify”更合适。</p>
+</blockquote>
+<p>当然，“精简”往往意味着着“缺少必要信息”，所以这可能没有太大的改善。让我扩展一下。如果你没有听说过“具现化”的话，它的意思是“实例化，对象化”。具现化的另外一种解释方式是将某事物作为“第一公民”对待。</p>
+<blockquote>
+<p>在某些语言中的<strong>反射</strong>允许你在程序运行时命令式地和类型交互。你可以获得类的类型对象，可以与其交互看看这个类型能做什么。换言之，反射是<strong>具现化类型的系统</strong>。</p>
+</blockquote>
+<p>两种术语都意味着将<strong>概念</strong>变成<strong>数据</strong>——一个对象——可以存储在变量中，传给函数。所以称命令模式为“具现化方法调用”，意思是方法调用被存储在对象中。</p>
+<p>这听起来有些像“回调”，“第一公民函数”，“函数指针”，“闭包”，“偏函数”，取决于你在学哪种语言，事实上大致上是同一个东西。GoF随后说：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">命令模式是一种回调的面向对象实现。</span><br></pre></td></tr></table></figure></p>
+<p>这是一种对命令模式更好的解释。</p>
+<p>但这些都既抽象又模糊。我喜欢用实际的东西作为章节的开始，不好意思，搞砸了。作为弥补，从这里开始都是命令模式能出色应用的例子。</p>
+<h1 id="配置输入"><a href="#配置输入" class="headerlink" title="配置输入"></a><span style="color:#339AFF;">配置输入</span></h1><p>在每个游戏中都有一块代码读取用户的输入——按钮按下，键盘敲击，鼠标点击，诸如此类。这块代码会获取用户的输入，然后将其变为游戏中有意义的行为：</p>
+<p>一个手柄，A键调用swapWeapon()，B键调用lurch()，X键调用jump()，Y键调用fireGun()。</p>
+<img src="/2019/09/11/游戏设计模式-命令模式/1.png">
+<p>下面是一种简单的实现：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> InputHandler::handleInput()</span><br><span class="line">&#123;</span><br><span class="line">  <span class="keyword">if</span> (isPressed(BUTTON_X)) </span><br><span class="line">    jump();</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (isPressed(BUTTON_Y)) </span><br><span class="line">    fireGun();</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (isPressed(BUTTON_A)) </span><br><span class="line">    swapWeapon();</span><br><span class="line">  <span class="keyword">else</span> <span class="keyword">if</span> (isPressed(BUTTON_B)) </span><br><span class="line">    lurchIneffectively();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这个函数通常在游戏循环中每帧调用一次，我确信你可以理解它做了什么。在我们想将用户的输入和程序行为硬编码在一起时，这段代码可以正常工作，但是许多游戏允许玩家<strong>配置</strong>按键的功能。</p>
+<p>为了支持这点，需要将这些对jump()和fireGun()的直接调用转化为可以变换的东西。“变换”听起来有点像变量干的事，因此我们需要表示游戏行为的对象。进入：命令模式。</p>
+<p>我们定义了一个基类代表可触发的游戏行为：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Command</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="keyword">virtual</span> ~Command() &#123;&#125;</span><br><span class="line">        <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>当你有接口只包含一个没有返回值的方法时，很可能你可以使用命令模式。</p>
+<p>然后我们为不同的游戏行为定义相应的子类：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">JumpCommand</span> :</span> <span class="keyword">public</span> Command</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">()</span> </span></span><br><span class="line"><span class="function">        </span>&#123; </span><br><span class="line">            jump(); </span><br><span class="line">        &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FireCommand</span> :</span> <span class="keyword">public</span> Command</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">()</span> </span></span><br><span class="line"><span class="function">        </span>&#123; </span><br><span class="line">            fireGun(); </span><br><span class="line">        &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 你知道思路了吧</span></span><br></pre></td></tr></table></figure></p>
+<p>在代码的输入处理部分，为每个按键存储一个指向命令的指针。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">InputHandler</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">handleInput</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 绑定命令的方法……</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span>:</span><br><span class="line">        Command* buttonX_;</span><br><span class="line">        Command* buttonY_;</span><br><span class="line">        Command* buttonA_;</span><br><span class="line">        Command* buttonB_;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>现在输入处理部分这样处理：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> InputHandler::handleInput()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (isPressed(BUTTON_X)) </span><br><span class="line">        buttonX_-&gt;execute();</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (isPressed(BUTTON_Y)) </span><br><span class="line">        buttonY_-&gt;execute();</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (isPressed(BUTTON_A)) </span><br><span class="line">        buttonA_-&gt;execute();</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (isPressed(BUTTON_B)) </span><br><span class="line">        buttonB_-&gt;execute();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>注意在这里没有检测NULL了吗？这假设每个按键都与某些命令相连。</p>
+<p>如果想支持不做任何事情的按键又不想显式检测NULL，我们可以定义一个命令类，它的execute()什么也不做。这样，某些按键处理器不必设为NULL，只需指向这个类。这种模式被称为空对象。</p>
+<p>以前每个输入直接调用函数，现在会有一层间接寻址：</p>
+<p>一个手柄，每个按键都与一个特定的’button_’变量相关联，这个变量再与函数关联。</p>
+<img src="/2019/09/11/游戏设计模式-命令模式/2.png">
+<p>这是命令模式的简短介绍。如果你能够看出它的好处，就把这章剩下的部分作为奖励吧。</p>
+<h1 id="角色说明"><a href="#角色说明" class="headerlink" title="角色说明"></a><span style="color:#339AFF;">角色说明</span></h1><p>我们刚才定义的类可以在之前的例子上正常工作，但有很大的局限。问题在于假设了顶层的jump()，fireGun()之类的函数可以找到玩家角色，然后像木偶一样操纵它。</p>
+<p>这些假定的耦合限制了这些命令的用处。JumpCommand只能让玩家的角色跳跃。让我们放松这个限制。不让函数去找它们控制的角色，我们将函数控制的角色对象传进去：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Command</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  <span class="keyword">virtual</span> ~Command() &#123;&#125;</span><br><span class="line">  <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">(GameActor&amp; actor)</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>这里的GameActor是代表游戏世界中角色的“游戏对象”类。我们将其传给execute()，这样命令类的子类就可以调用所选游戏对象上的方法，就像这样：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">JumpCommand</span> :</span> <span class="keyword">public</span> Command</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">(GameActor&amp; actor)</span></span></span><br><span class="line"><span class="function">        </span>&#123;</span><br><span class="line">            actor.jump();</span><br><span class="line">        &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>现在，我们可以使用这个类让游戏中的任何角色跳来跳去了。在输入控制部分和在对象上调用命令部分之间，我们还缺了一块代码。第一，我们修改handleInput()，让它可以返回命令：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">Command* InputHandler::handleInput()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (isPressed(BUTTON_X)) </span><br><span class="line">        <span class="keyword">return</span> buttonX_;</span><br><span class="line">    <span class="keyword">if</span> (isPressed(BUTTON_Y)) </span><br><span class="line">        <span class="keyword">return</span> buttonY_;</span><br><span class="line">    <span class="keyword">if</span> (isPressed(BUTTON_A)) </span><br><span class="line">        <span class="keyword">return</span> buttonA_;</span><br><span class="line">    <span class="keyword">if</span> (isPressed(BUTTON_B)) </span><br><span class="line">        <span class="keyword">return</span> buttonB_;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 没有按下任何按键，就什么也不做</span></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里不能立即执行，因为还不知道哪个角色会传进来。这里我们享受了命令是具体调用的好处——延迟到调用执行时再知道。</p>
+<p>然后，需要一些接受命令的代码，作用在玩家角色上。像这样：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Command* command = inputHandler.handleInput();</span><br><span class="line"><span class="keyword">if</span> (command)</span><br><span class="line">&#123;</span><br><span class="line">    command-&gt;execute(actor);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>将actor视为玩家角色的引用，它会正确地按着玩家的输入移动，所以我们赋予了角色和前面例子中相同的行为。通过在命令和角色间增加了一层重定向，我们获得了一个灵巧的功能：我们可以让玩家控制游戏中的任何角色，只需向命令传入不同的角色。</p>
+<p>在实践中，这个特性并不经常使用，但是经常会有类似的用例跳出来。到目前为止，我们只考虑了玩家控制的角色，但是游戏中的其他角色呢？ 它们被游戏AI控制。我们可以在AI和角色之间使用相同的命令模式；AI代码只需生成Command对象。</p>
+<p>在选择命令的AI和展现命令的游戏角色间解耦给了我们很大的灵活度。我们可以对不同的角色使用不同的AI，或者为了不同的行为而混合AI。想要一个更加有攻击性的对手？插入一个更加有攻击性的AI为其生成命令。事实上，我们甚至可以为玩家角色加上AI，在展示阶段，游戏需要自动演示时，这是很有用的。</p>
+<p>把控制角色的命令变为第一公民对象，去除直接方法调用中严厉的束缚。 将其视为命令队列，或者是命令流：</p>
+<p>队列能为你做的更多事情，请看事件队列。</p>
+<p>一条连接AI到角色的管道。</p>
+<p>为什么我觉得需要为你画一幅“流”的图像？又是为什么它看上去像是管道？</p>
+<p>一些代码（输入控制器或者AI）产生一系列命令放入流中。 另一些代码（调度器或者角色自身）调用并消耗命令。 通过在中间加入队列，我们解耦了消费者和生产者。</p>
+<p>如果将这些指令序列化，我们可以通过网络流传输它们。 我们可以接受玩家的输入，将其通过网络发送到另外一台机器上，然后重现之。这是网络多人游戏的基础。</p>
+<h1 id="撤销和重做"><a href="#撤销和重做" class="headerlink" title="撤销和重做"></a>撤销和重做</h1><p>最后的这个例子是这种模式最广为人知的使用情况。 如果一个命令对象可以做一件事，那么它亦可以撤销这件事。 在一些策略游戏中使用撤销，这样你就可以回滚那些你不喜欢的操作。 它是创造游戏时必不可少的工具。 一个不能撤销误操作导致的错误的编辑器，肯定会让游戏设计师恨你。</p>
+<p>这是经验之谈。</p>
+<p>没有了命令模式，实现撤销非常困难，有了它，就是小菜一碟。 假设我们在制作单人回合制游戏，想让玩家能撤销移动，这样他们就可以集中注意力在策略上而不是猜测上。</p>
+<p>我们已经使用了命令来抽象输入控制，所以每个玩家的举动都已经被封装其中。 举个例子，移动一个单位的代码可能如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MoveUnitCommand</span> :</span> <span class="keyword">public</span> Command</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        MoveUnitCommand(Unit* unit, <span class="keyword">int</span> x, <span class="keyword">int</span> y)</span><br><span class="line">        : unit_(unit),</span><br><span class="line">            x_(x),</span><br><span class="line">            y_(y)</span><br><span class="line">        &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        unit_-&gt;moveTo(x_, y_);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span>:</span><br><span class="line">        Unit* unit_;</span><br><span class="line">        <span class="keyword">int</span> x_, y_;</span><br><span class="line">    &#125;;</span><br></pre></td></tr></table></figure></p>
+<p>注意这和前面的命令有些许不同。在前面的例子中，我们需要从修改的角色那里抽象命令。在这个例子中，我们将命令绑定到要移动的单位上。这条命令的实例不是通用的“移动某物”命令；而是游戏回合中特殊的一次移动。</p>
+<p>这展现了命令模式应用时的一种情形。就像之前的例子，指令在某些情形中是可重用的对象，代表了可执行的事件。我们早期的输入控制器将其实现为一个命令对象，然后在按键按下时调用其execute()方法。</p>
+<p>这里的命令更加特殊。它们代表了特定时间点能做的特定事件。这意味着输入控制代码可以在玩家下决定时创造一个实例。就像这样：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Command* <span class="title">handleInput</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Unit* unit = getSelectedUnit();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (isPressed(BUTTON_UP)) </span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 向上移动单位</span></span><br><span class="line">        <span class="keyword">int</span> destY = unit-&gt;y() - <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> MoveUnitCommand(unit, unit-&gt;x(), destY);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (isPressed(BUTTON_DOWN)) </span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 向下移动单位</span></span><br><span class="line">        <span class="keyword">int</span> destY = unit-&gt;y() + <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> MoveUnitCommand(unit, unit-&gt;x(), destY);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 其他的移动……</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">NULL</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>当然，在像C++这样没有垃圾回收的语言中，这意味着执行命令的代码也要负责释放内存。</p>
+</blockquote>
+<p>命令的一次性为我们很快地赢得了一个优点。为了让指令可被取消，我们为每个类定义另一个需要实现的方法：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Command</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="keyword">virtual</span> ~Command() &#123;&#125;</span><br><span class="line">        <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">        <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">undo</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>undo()方法回滚了execute()方法造成的游戏状态改变。 这里是添加了撤销功能后的移动命令：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MoveUnitCommand</span> :</span> <span class="keyword">public</span> Command</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        MoveUnitCommand(Unit* unit, <span class="keyword">int</span> x, <span class="keyword">int</span> y)</span><br><span class="line">        : unit_(unit),</span><br><span class="line">            xBefore_(<span class="number">0</span>),</span><br><span class="line">            yBefore_(<span class="number">0</span>),</span><br><span class="line">            x_(x),</span><br><span class="line">            y_(y)</span><br><span class="line">        &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="comment">// 保存移动之前的位置</span></span><br><span class="line">        <span class="comment">// 这样之后可以复原。</span></span><br><span class="line"></span><br><span class="line">        xBefore_ = unit_-&gt;x();</span><br><span class="line">        yBefore_ = unit_-&gt;y();</span><br><span class="line"></span><br><span class="line">        unit_-&gt;moveTo(x_, y_);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">undo</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        unit_-&gt;moveTo(xBefore_, yBefore_);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span>:</span><br><span class="line">        Unit* unit_;</span><br><span class="line">        <span class="keyword">int</span> xBefore_, yBefore_;</span><br><span class="line">        <span class="keyword">int</span> x_, y_;</span><br><span class="line">    &#125;;</span><br></pre></td></tr></table></figure></p>
+<p>注意我们为类添加了更多的状态。当单位移动时，它忘记了它之前是什么样的。如果我们想要撤销这个移动，我们需要记得单位之前的状态，也就是xBefore_和yBefore_的作用。</p>
+<blockquote>
+<p>这看上去是备忘录模式使用的地方，它从来没有有效地工作过。 由于命令趋向于修改对象状态的一小部分，对数据其他部分的快照就是浪费内存。手动内存管理的消耗更小。<br>持久化数据结构是另一个选项。 使用它，每次修改对象都返回一个新对象，保持原来的对象不变。巧妙的实现下，这些新对象与之前的对象共享数据，所以比克隆整个对象开销更小。</p>
+</blockquote>
+<p>使用持久化数据结构，每条命令都存储了命令执行之前对象的引用，而撤销只是切换回之前的对象。</p>
+<p>为了让玩家撤销移动，我们记录了执行的最后命令。当他们按下control+z时，我们调用命令的undo()方法。（如果他们已经撤销了，那么就变成了“重做”，我们会再一次执行命令。）</p>
+<p>支持多重的撤销也不太难。我们不单单记录最后一条指令，还要记录指令列表，然后用一个引用指向“当前”的那个。 当玩家执行一条命令，我们将其添加到列表，然后将代表“当前”的指针指向它。</p>
+<p>从旧到新排列的命令栈。</p>
+<p>一个当前箭头指向一条命令，一个“撤销”箭头指向之前的命令，一个“重做”指向之后的命令。</p>
+<img src="/2019/09/11/游戏设计模式-命令模式/4.png">
+<p>当玩家选择“撤销”，我们撤销现在的命令，将代表当前的指针往后退。当他们选择“重做”，我们将代表当前的指针往前进，执行该指令。如果在撤销后选择了新命令，那么清除命令列表中当前的指针所指命令之后的全部命令。</p>
+<p>第一次在关卡编辑器中实现这点时，我觉得自己简直就是个天才。我惊讶于它如此的简明有效。你需要约束自己，保证每个数据修改都通过命令完成，一旦你做到了，余下的都很简单。</p>
+<blockquote>
+<p>重做在游戏中并不常见，但重放常见。 一种简单的重放实现是记录游戏每帧的状态，这样它可以回放，但那会消耗太多的内存。<br>相反，很多游戏记录每个实体每帧运行的命令。为了重放游戏，引擎只需要正常运行游戏，执行之前存储的命令。</p>
+</blockquote>
+<h1 id="用类还是用函数？"><a href="#用类还是用函数？" class="headerlink" title="用类还是用函数？"></a>用类还是用函数？</h1><p>早些时候，我说过命令与第一公民函数或者闭包类似，但是在这里展现的每个例子都是通过类完成的。如果你更熟悉函数式编程，你也许会疑惑函数都在哪里。</p>
+<p>我用这种方式写例子是因为C++对第一公民函数支持非常有限。函数指针没有状态，函子很奇怪而且仍然需要定义类，在C++11中的lambda演算需要大量的人工记忆辅助才能使用。</p>
+<p>这并<strong>不是</strong>说你在其他语言中不可以用函数来完成命令模式。如果你使用的语言支持闭包，不管怎样，快去用它！在某种程度上说，命令模式是为一些没有闭包的语言模拟闭包。</p>
+<blockquote>
+<p>(我说某种程度上是因为，即使是那些支持闭包的语言，为命令建立真正的类或者结构也是很有用的。如果你的命令拥有多重操作（比如可撤销的命令），将其全部映射到同一函数中并不优雅。)<br>定义一个有字段的真实类能帮助读者理解命令包含了什么数据。闭包是自动包装状态的完美解决方案，但它们过于自动化而很难看清包装的真正状态有哪些。</p>
+</blockquote>
+<p>举个例子，如果我们使用javascript来写游戏，那么我们可以用这种方式来写让单位移动的命令：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">makeMoveUnitCommand</span>(<span class="params">unit, x, y</span>) </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// 这个函数就是命令对象:</span></span><br><span class="line">    <span class="keyword">return</span> <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">        unit.moveTo(x, y);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>我们可以通过一对闭包来为撤销提供支持：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">makeMoveUnitCommand</span>(<span class="params">unit, x, y</span>) </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">var</span> xBefore, yBefore;</span><br><span class="line">    <span class="keyword">return</span> </span><br><span class="line">    &#123;</span><br><span class="line">        execute: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function">        </span>&#123;</span><br><span class="line">            xBefore = unit.x();</span><br><span class="line">            yBefore = unit.y();</span><br><span class="line">            unit.moveTo(x, y);</span><br><span class="line">        &#125;,</span><br><span class="line">        undo: <span class="function"><span class="keyword">function</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">            unit.moveTo(xBefore, yBefore);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如果你习惯了函数式编程风格，这种做法是很自然的。如果你没有，我希望这章可以帮你了解一些。对于我而言，命令模式展现了函数式范式在很多问题上的高效性。</p>
+<h1 id="参见"><a href="#参见" class="headerlink" title="参见"></a><span style="color:#339AFF;">参见</span></h1><ul>
+<li>你最终可能会得到很多不同的命令类。为了更容易实现这些类，定义一个具体的基类，包含一些能定义行为的高层方法，往往会有帮助。这将命令的主体execute()转到子类沙箱中。</li>
+<li>在上面的例子中，我们明确地指定哪个角色会处理命令。在某些情况下，特别是当对象模型分层时，也可以不这么简单粗暴。对象可以响应命令，或者将命令交给它的从属对象。如果你这样做，你就完成了一个职责链模式。</li>
+<li>有些命令是无状态的纯粹行为，比如第一个例子中的JumpCommand。在这种情况下，有多个实例是在浪费内存，因为所有的实例是等价的。可以用享元模式解决。你可以将其实现为单例，但真朋友不会让你用单例。</li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/游戏设计模式/" rel="tag"># 游戏设计模式</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/09/10/简易对象池/" rel="next" title="简易对象池">
+                <i class="fa fa-chevron-left"></i> 简易对象池
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/09/11/游戏设计模式-享元模式/" rel="prev" title="游戏设计模式--享元模式">
+                游戏设计模式--享元模式 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">354</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">55</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2020/02/16/游戏设计快乐之道（第2版）/" title="游戏设计快乐之道（第2版）" target="_blank">游戏设计快乐之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/14/游戏剧本怎么写/" title="游戏剧本怎么写" target="_blank">游戏剧本怎么写</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/04/通关！游戏设计之道（第2版）/" title="通关！游戏设计之道（第2版）" target="_blank">通关！游戏设计之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/26/游戏设计艺术（第2版）/" title="游戏设计艺术（第2版）" target="_blank">游戏设计艺术（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/22/大师谈游戏设计创意与节奏/" title="大师谈游戏设计创意与节奏" target="_blank">大师谈游戏设计创意与节奏</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#配置输入"><span class="nav-number">1.</span> <span class="nav-text">配置输入</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#角色说明"><span class="nav-number">2.</span> <span class="nav-text">角色说明</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#撤销和重做"><span class="nav-number">3.</span> <span class="nav-text">撤销和重做</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#用类还是用函数？"><span class="nav-number">4.</span> <span class="nav-text">用类还是用函数？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参见"><span class="nav-number">5.</span> <span class="nav-text">参见</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">3.7m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">56:23</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

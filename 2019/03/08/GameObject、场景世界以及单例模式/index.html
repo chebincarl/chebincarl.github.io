@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="Unity中的游戏和世界可通过场景表达，其中场景表示为位于笛卡儿3D坐标系（定义了X、Y、Z轴）内的游戏对象集合。这里，场景单位采用Unity单位进行测算，在实际操作过程中，对应单位表示为米。通过Unity进行脚本设计时，应理解场景和对象的含义，以及对象间的交互方式。也就是说，需要了解场景中的单一、独立对象间的彼此通信方式，以使进程按照希望的方向发展。本章主要讨论本地Unity方法，进而通过优化方">
+<meta name="keywords" content="Unity脚本设计">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GameObject、场景世界以及单例模式">
+<meta property="og:url" content="http://chebincarl.github.io/2019/03/08/GameObject、场景世界以及单例模式/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="Unity中的游戏和世界可通过场景表达，其中场景表示为位于笛卡儿3D坐标系（定义了X、Y、Z轴）内的游戏对象集合。这里，场景单位采用Unity单位进行测算，在实际操作过程中，对应单位表示为米。通过Unity进行脚本设计时，应理解场景和对象的含义，以及对象间的交互方式。也就是说，需要了解场景中的单一、独立对象间的彼此通信方式，以使进程按照希望的方向发展。本章主要讨论本地Unity方法，进而通过优化方">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://chebincarl.github.io/2019/03/08/GameObject、场景世界以及单例模式/1.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/03/08/GameObject、场景世界以及单例模式/2.png">
+<meta property="og:updated_time" content="2019-07-17T14:44:48.010Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="GameObject、场景世界以及单例模式">
+<meta name="twitter:description" content="Unity中的游戏和世界可通过场景表达，其中场景表示为位于笛卡儿3D坐标系（定义了X、Y、Z轴）内的游戏对象集合。这里，场景单位采用Unity单位进行测算，在实际操作过程中，对应单位表示为米。通过Unity进行脚本设计时，应理解场景和对象的含义，以及对象间的交互方式。也就是说，需要了解场景中的单一、独立对象间的彼此通信方式，以使进程按照希望的方向发展。本章主要讨论本地Unity方法，进而通过优化方">
+<meta name="twitter:image" content="http://chebincarl.github.io/2019/03/08/GameObject、场景世界以及单例模式/1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/03/08/GameObject、场景世界以及单例模式/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>GameObject、场景世界以及单例模式 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">专注，重复10遍</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/03/08/GameObject、场景世界以及单例模式/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">GameObject、场景世界以及单例模式
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-03-08 21:46:47" itemprop="dateCreated datePublished" datetime="2019-03-08T21:46:47+08:00">2019-03-08</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-07-17 22:44:48" itemprop="dateModified" datetime="2019-07-17T22:44:48+08:00">2019-07-17</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Unity/" itemprop="url" rel="index"><span itemprop="name">Unity</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">18k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">17 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Unity中的游戏和世界可通过场景表达，其中场景表示为位于笛卡儿3D坐标系（定义了X、Y、Z轴）内的游戏对象集合。这里，场景单位采用Unity单位进行测算，在实际操作过程中，对应单位表示为米。通过Unity进行脚本设计时，应理解场景和对象的含义，以及对象间的交互方式。也就是说，需要了解场景中的单一、独立对象间的彼此通信方式，以使进程按照希望的方向发展。本章主要讨论本地Unity方法，进而通过优化方式搜索、引用并访问场景对象。除此之外，本章还将对相关方法进行逐一考察，并在具体应用环境中以及性能和效率方面对其予以评估。</p>
+<a id="more"></a>
+<h1 id="GameObject对象"><a href="#GameObject对象" class="headerlink" title="GameObject对象"></a>GameObject对象</h1><p>通常情况下，GameObject表示场景中的基本单元或实体，一般对应于常见场景中的某项“事物”。这里，具体的环境行为或者游戏中所需的实际对象并不重要，无论何种情形，用户仅需通过GameObject加以实现。GameObject对于游戏体验者而言不一定可见，例如声音、碰撞器以及管理类。另外，某些GameObject处于可见状态，其中包括网格、动画网格、精灵对象等。无论是否可见，GameObject通常在场景中作为相关组件集合予以实例化。实际上，<label style="color:red">组件表示为继承自MonoBehaviour的一个类</label>，并可绑定在场景中的GameObject上，进而调整其行为。各个GameObject至少包含一个组件且不可移除，即Transform组件（对于GUI对象则是RectTransform组件）。该组件记录对象的位置、旋转以及缩放状态。例如，如果在场景中创建了一个空游戏对象（通过应用菜单中的GameObject-&gt;Create Empty命令），场景中的新对象仅包含一个Transform组件。相应地，即使GameObject非空，但依然包含了空GameObject对象的组件，Transform组件用于维护其在场景中的物理位置。</p>
+<p>当然，GameObject可包含多个组件，对象的行为源自组件间的组合和交互结果。另外，用户还可通过Component菜单向对象添加更多的预置组件。通过将脚本拖曳至对象上，还可添加自定义组件。</p>
+<p>因此，GameObject由组件构成。在较高层次上，场景则由单一场景空间内的GameObject集合构成。进一步讲，对象自身彼此间存在着较为重要的关系，并通过层次结构加以定义。同时，对象还可能为其他对象的子对象，反之则称作父对象（即transform.parent）。对于对象的运动和转换方式，这一关系十分重要。简而言之，对象Transform组件的对应值向下级联，并添加至其子对象的转换中。通过该方式，子GameObject相对于其父对象偏移和转换；而父对象位置则表示为子对象位置的原点。然而，如果某一对象未包含父对象，则会相对于世界原点(0, 0, 0)进行转换。</p>
+<h1 id="组件间的交互方式"><a href="#组件间的交互方式" class="headerlink" title="组件间的交互方式"></a>组件间的交互方式</h1><p>如前所述，GameObject表示为组件的集合，关于组件间的交互和通信方式，需要考察其中的组织方式。其中，各个组件可高效地定义为自包含的脚本文件，且独立于其他组件，并与其他组件进行交互。特别地，用户常会访问变量，并在同一GameObject上调用其他组件中的函数，甚至会在每一帧中执行此类操作。本节将讨论这一类交互组件间的通信方式。</p>
+<p>一个对象绑定了10个CS文件。这10个文件间如何相互调用彼此的变量和方法？</p>
+<h2 id="SendMessage和BroadcastMessage"><a href="#SendMessage和BroadcastMessage" class="headerlink" title="SendMessage和BroadcastMessage"></a>SendMessage和BroadcastMessage</h2><p>一种调用其他组件函数的方法是使用SendMessage和BroadcastMessage，此类函数通常与类型无关。特别地，这一类方法可在脚本中的任意处调用，并通过与同一对象绑定的、其他组件中的名称调用相关方法，且无须考察具体的类型。也就是说，这一类函数并不关注组件的类型，因而便于使用。然而，该方案的问题也较为明显。</p>
+<p>缺点：</p>
+<p>首先，用户可能会通过其他组件上的名称调用某一函数，抑或根本不会采用这一方法。由于消息发送至全部组件中，因而用户无法对目标组件进行选取（SendMessage:Calls the method named methodName on every MonoBehaviour in this game object）。其次，SendMessage和BroadeastMessage方法在内部依赖于反射机制，因而频繁使用常会导致性能问题，例如在Update事件中调用此类函数，或者OnGUI事件（这将使情况变得更为糟糕）。因此，在实际操作过程中，应寻找相应的替代方案。</p>
+<h2 id="GetComponent函数"><a href="#GetComponent函数" class="headerlink" title="GetComponent函数"></a>GetComponent函数</h2><p>如果用户需要直接访问某一对象上的特定单一组件，且已知其数据类型，则可尝试使用GetComponent函数，如示例代码所示。该函数可访问与GameObject绑定的、首个匹配类型的组件。一旦获取其引用，则可像常规对象那样访问该组件，设置、获取其public变量，并调用其中的相关方法。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">MyCustomComponent</span> : <span class="title">MonoBehaviour</span> </span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// Reference to transform of object</span></span><br><span class="line">    <span class="keyword">private</span> Transform ThisTransform = <span class="literal">null</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">    	<span class="comment">// Get cached reference to transform</span></span><br><span class="line">        ThisTransform = GetComponent&lt;Transform&gt;(); </span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>     &#123;</span><br><span class="line">        <span class="keyword">if</span> (ThisTransform != <span class="literal">null</span> ) </span><br><span class="line">        &#123;</span><br><span class="line">            ThisTransform.localPosition += Time.deltaTime * <span class="number">10.0f</span> * ThisTransform.forward; </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li><p>第7行和第12行代码：变量ThisTransform声明为private类型，该变量将赋予与GameObject绑定的、指向Transform组件的引用。该操作将通过函数GetComponent并在Start事件中完成。当访问Transform组件时，还需进一步使用到派生的转换属性，例如“ThisTransform=transform;”。</p>
+</li>
+<li><p>第20行代码：ThisTransform变量直接用于设置GameObject的localPosition。再次强调，对于Transform组件，还可采用transform.localPosition。然而，该方法（transform）将从内部调用额外的函数（属性其实就是一个方法）：成员transform定义为C#属性而非标准变量（如果是变量就直接返回了）。因此，在Start或Awake事件内采用GetComponet函数（获取指向private类变量（即第7行）的组件引用）通常被认为是访问外部组件的一种高效方法，当组件频繁被访问时尤其如此，例如Update函数。</p>
+</li>
+</ul>
+<p>Transform组件定义了两个主要的位置成员，即position和localPosition，并以特定方式调整对象的位置。相对于世界原点，位置成员一般定义了对象在世界空间内的位置。因此，在脚本中设置该变量并不会与实际数字对应<br>（位于Object Inspector中的Transform组件）。若对象表示为另一个对象的子对象，且后者并未位于世界原点处，则Unity将相对于父对象偏移对象的局部位置,进而将其设置于世界空间中。相比较而言，localPosition成员则直接对应于Object Inspector中Transform组件的位置值。特别地，对象位置表示为相对于父对象位置的偏移值；如果该对象不包含父对象，则表示相对于世界原点的偏移量。此时，成员position和localPosition彼此相等。</p>
+<h2 id="获取多个组件"><a href="#获取多个组件" class="headerlink" title="获取多个组件"></a>获取多个组件</h2><p>有些情况下，用户需要获取列表中的多个组件，即全部组件列表或者仅与特定类型匹配的列表，用户可通过GetComponents函数实现这一操作，如示例代码所示。用户可在单次事件中调用该函数，例如Start和Awake事件，而非Update事件。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">MyCustomComponent</span> : <span class="title">MonoBehaviour</span> </span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// Reference to all components as array</span></span><br><span class="line">    <span class="keyword">private</span> Component[] AllComponents = <span class="literal">null</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">// Use this for initialization</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span> &#123;</span><br><span class="line">        <span class="comment">// Gets a list of all components attacted to this object</span></span><br><span class="line">        AllComponents = GetComponents&lt;Component&gt;();</span><br><span class="line"> </span><br><span class="line">        <span class="keyword">foreach</span>(Component C <span class="keyword">in</span> AllComponents)</span><br><span class="line">        &#123;</span><br><span class="line">            Debug.Log(C.ToString());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>关于GetComponent和GetComponents函数，Unity提供了相应的变化版本，并使用了对象间的通信机制，而非仅是同一对象中不同组件间的通信。这一类函数包括GetComponentsInChildren（获取子对象中全部组件的累计列表），以及GetComponentsInParent（获取父对象的全部组件）。</p>
+<h2 id="组件和消息"><a href="#组件和消息" class="headerlink" title="组件和消息"></a>组件和消息</h2><p>GetComponent函数族工作良好，可满足组件间通信的大多数要求，若使用得当，则优于SendMessage或BroadcastMessage方法。尽管如此，当给定GameObject后，基于SendMessage调用某一方法时依然十分有效，用户无须事先了解组件的类型。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">MyCustomComponent</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// Reference to component on which function must be called</span></span><br><span class="line">    <span class="keyword">public</span> MonoBehaviour Handler = <span class="literal">null</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">//Use this for initialization</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">//Call function immediately</span></span><br><span class="line">        Handler.Invoke(<span class="string">"OnSave"</span>, <span class="number">0.0f</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>第7行代码：对应类中包含了public引用变量Handler。通过该字段，用户可通过Object Inspector将任意组件拖曳至Handler字段中，并以此表示消息发送的组件。<label style="color:red">需要注意的是，该类表示为MonoBehaviour类型或者继承自MonoBehaviour。这也意味着，用户无须事先了解具体的对象类型。</label></p>
+</li>
+<li><p>第14行代码：MonoBehaviour的Invoke方法被调用，进而运行名称匹配的对应方法。其中，第二个浮点参数定义了时间值（以秒计），此后，相关函数将被调用。相应地，0表示为即时调用。</p>
+</li>
+</ul>
+<h1 id="GameObject和场景世界"><a href="#GameObject和场景世界" class="headerlink" title="GameObject和场景世界"></a>GameObject和场景世界</h1><p>Unity中的另一项重要任务则是根据脚本搜索场景中的对象，尤其是运行期内实例化的对象，例如玩家对象。场景中的全部敌方对象，这对于相关操作十分重要，其中包括生成敌方角色、拾取能量棒、重定位玩家，以及检测对象间的碰撞。为了获取特定GameObject的引用，Unity提供了一系列与GameObject类相关的函数集。尽管有效，但函数开销较大，因而建议在单次事件中进行调用，例如Start和Awake函数。下面讨论与获取对象协同工作的其他技术和方法。</p>
+<h2 id="获取GameObject"><a href="#获取GameObject" class="headerlink" title="获取GameObject"></a>获取GameObject</h2><p>获取场景中的某一对象可通过GameObject.Find或GameObject.FindObjectWithTag函数实现。其中，出于性能考虑，这里建议使用GameObject.FindObjectWithTag函数。下面首先考察GameObject.Find函数。该函数利用匹配名称搜索首次出现的对象所处的场景。此处，搜索名称应与Hierarchy面板中所呈现的名称匹配。对此，函数执行字符串比较操作并以此确定匹配结果，因而其执行速度较慢且相对烦琐。另外，该函数仅对包含唯一名称的对象有效，而某些时候，情况并非如此。尽管如此，若函数包含了适当的名称，GameObject.Find函数依然十分有效，如下所示。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Find Object with the name of player</span></span><br><span class="line">ObjPlayer = Gameobject.Find(<span class="string">"Player"</span>);</span><br></pre></td></tr></table></figure></p>
+<p>关于GameObject，读者可能会注意到Find函数定义为静态函数，因而无须执行GameObject的实例化操作以调用该函数。用户可通过GameObject.Find在源文件中实现随意调用。本章稍后将对静态和全局作用域予以介绍。</p>
+<p>GameObject.Find函数的执行速度较慢。对此，应在单次事件中使用该函数，例如Awake和Start事件。</p>
+<p>依据标签进行搜索可视为一种相对高效的方法。场景中的各个对象均包含一个标签成员，默认条件下设置为Untagged。该成员定义为唯一的标识符，用以标记独立对象或多个对象（整体形成一个集合）。总体而言，当采用标签搜索对象时，首先需要将标签显式地赋予某一对象中。用户可在脚本中利用GameObject.tag这一public成员实现这一行为。然而，通常情况下，用户多会使用Unity Editor，即单击Object Inspector中的Tag下拉菜单并选取一个标签。除此之外，用户还可选择Add Tag选项，进而创建新的自定义标签。其中，通用标签包括Player、Enemy、Weapon、Bonus、Prop、Environment、Light、Sound以及GameController等内容。</p>
+<p>当对一个或多个对象赋予了相应的标签后，用户可在代码中通过标签高效地搜索对象。对于包含匹配标签的对象，GameObject.FindGameObjectWithTag函数将搜索相应的场景，并返回首个对象（返回一个对象数组），如示例代码所示。需要注意的是，虽然GameObject.FindGameObjectWithTag函数使用字符串参数，但Unity在内部将该字符串转换为数值形式，进而提升标签的比较速度。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"> </span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ObjectFinder</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// Tag name of objects to find</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span> TagName = <span class="string">"Enemy"</span>;</span><br><span class="line">    <span class="comment">// Array of found objects matching tag</span></span><br><span class="line">    <span class="keyword">public</span> Gameobject[] FoundObjects;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">//Use this for initialization</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// Find objects of matching tag</span></span><br><span class="line">        FoundObjects = Gameobject.FindGameObjectsWithTag(TagName);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>某些时候，用户可能将多个标签赋予单一对象。然而， Unity目前尚不支持此项功能。当然，用户可绕开这一限定条件，将空游戏对象作为主对象的父对象，并将所需的标签赋予各个子对象中。当按照标签搜索对象时，应注意获取指向父对象的索引，即所需的实际对象。</p>
+<h2 id="对象比较"><a href="#对象比较" class="headerlink" title="对象比较"></a>对象比较</h2><p>当针对特定对象搜索场景时，GameObject搜索函数较为有效，但在一些场合下，用户需要对已获取的两个对象进行比较。一般情况下，该操作涉及两个对象间的名称和标签的比较。对此，可通过CompareTag函数实现这一功能，如下所示。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Compares tag of this object with another Obj_Y</span></span><br><span class="line">boo bMatch = gameObject.CompareTag(Obj_Y.tag);</span><br></pre></td></tr></table></figure></p>
+<p>除此之外，用户还需要比较两个对象的相等性，进而确定是否为同一对象，而非简单地判断二者是否具有同一标签。当对决策行为进行编码时，该操作十分重要。例如，在战斗过程中，当判断敌方角色是否投入战斗抑或逃离时，可进一步确定其附近是否存在其他作战单位，并对该角色予以支援。如前所述，用户可通过标签搜索获取场景中的全部敌方对象。对应结果中包含了执行呼救且制订决策的当前角色，因而应将其排除在外。示例代码展示了GetInstanceID的应用方法，如下所示。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Find objects of matching tag</span></span><br><span class="line">FoundObjects = GameObject.FindGameObjectsWithTag(TagName);</span><br><span class="line"><span class="comment">// Search through all objects and exclude ourselves</span></span><br><span class="line"><span class="keyword">foreach</span>(GameObject O <span class="keyword">in</span> FoundObjects)</span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">// If two objects are the same</span></span><br><span class="line">	<span class="keyword">if</span> (O.GetInstanceID() == gameObiect.GetInstanceID()) <span class="keyword">continue</span>; <span class="comment">// Skip this iteration</span></span><br><span class="line">	<span class="comment">// [...] Do stuff here</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="获取最近对象"><a href="#获取最近对象" class="headerlink" title="获取最近对象"></a>获取最近对象</h2><p>当给定GameObject数组后（可能返回自搜索结果），如何获取场景中线性距离最近的对象？对此，示例代码显示了此类对象的获取方式，其中，使用了Vector3.Distance函数计算场景中两点间的最短距离（以米计）。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Returns the nearest game object</span></span><br><span class="line"><span class="function">GameObject <span class="title">GetNearestGameObject</span>(<span class="params">GameObject Source, GameObject[] DestObjects</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="comment">//Assign first object</span></span><br><span class="line">	GameObject Nearest = DestObjects[<span class="number">0</span>];</span><br><span class="line"></span><br><span class="line">	<span class="comment">//Shortest distance</span></span><br><span class="line">	<span class="keyword">float</span> ShortestDistance = Vector3.Distance(Source.transform.position, DestObjects[<span class="number">0</span>].transform.position);</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Loop through all objects</span></span><br><span class="line">	<span class="keyword">foreach</span>(GameObject Obj <span class="keyword">in</span> DestObjects)</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="comment">// Calculate distance</span></span><br><span class="line">		<span class="keyword">float</span> Distance = Vector3.Distance(Source.transform.position, Obj.transform.position);</span><br><span class="line"></span><br><span class="line">		<span class="comment">// If this is shortest, then update</span></span><br><span class="line">		<span class="keyword">if</span> (Distance &lt; ShortestDistance)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="comment">//Is shortest, now update</span></span><br><span class="line">			Nearest = Obj;</span><br><span class="line">			ShortestDistance = Distance;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">// Return nearest</span></span><br><span class="line">	<span class="keyword">return</span> Nearest;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="获取特定类型的对象"><a href="#获取特定类型的对象" class="headerlink" title="获取特定类型的对象"></a>获取特定类型的对象</h2><p>有时，用户需要使用到场景中特定类型组件的列表，而并不关心所绑定的游戏对象。这一类组件包括敌方角色、所有可收集的对象、转换组件、碰撞器等。基于脚本的实现过程虽然简单但开销较大，如示例代码所示。特别地，通过调用Object.FindObjectsOfType函数，用户可获得特定场景对象实例的完整列表，除非对象处于禁用状态。考虑到该方法的计算开销，应避免在帧事件中对其加以调用；相反，该方法仅可在Start和Awake这一类非频发函数中加以使用，如下所示。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">	<span class="comment">//Get a list of all colliders in the scene</span></span><br><span class="line">	Collider[] Cols = Object.FindObjectsOfType&lt;Collider&gt;();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="GameObject之间的路径"><a href="#GameObject之间的路径" class="headerlink" title="GameObject之间的路径"></a>GameObject之间的路径</h2><p>当给定两个场景中的GameObject后，例如玩家和敌方角色，通常会测试二者间的路径。也就是说，测试是否存在一个碰撞器，并与两个对象间的虚拟直线相交，如下图所示。这在视见系统中十分有用，同时也用于对象剔除机制中，并以此实现相应的AI功能。</p>
+<img src="/2019/03/08/GameObject、场景世界以及单例模式/1.png">
+<p>对此，存在多种方法可实现上述行为，方法之一是使用Physics.LineCast函数，如示例代码所示。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"><span class="comment">//sample class to determine if a clear line or path exists between two objects</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ObjectPath</span> : <span class="title">MonoBehaviour</span> </span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">//Reference to sample enemy object</span></span><br><span class="line">	<span class="keyword">public</span> GameObject Enemy = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">//Layer mask to limit line detection</span></span><br><span class="line">	<span class="keyword">public</span> LayerMask LM;</span><br><span class="line">	<span class="comment">//----------------------------------------------------</span></span><br><span class="line">	<span class="comment">// Update is called once per frame</span></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>	&#123;</span><br><span class="line">		<span class="comment">//Check if clear path between objects</span></span><br><span class="line">		<span class="keyword">if</span>(!Physics.Linecast(transform.position, Enemy.transform.position, LM))</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="comment">//There is clear path</span></span><br><span class="line">			Debug.Log(<span class="string">"Path clear"</span>);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//----------------------------------------------------</span></span><br><span class="line">	<span class="comment">//Show helper debug line in viewport</span></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">OnDrawGizmos</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>	&#123;</span><br><span class="line">		Gizmos.DrawLine(transform.position, Enemy.transform.position);</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//----------------------------------------------------</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li><p>第07行代码：示例类与Player绑定；否则，另一个源对象将接收一个public成员变量Enemy，并对其进行路径测试。</p>
+</li>
+<li><p>第10行代码：LayerMask变量定义了一个位掩码，以此表示碰撞测试所用的场景层。</p>
+</li>
+<li><p>第16行代码：Physics.Linecast函数用于确定两个场景对象间是否存在一条连续路径。需要注意的是，如果两个对象均包含碰撞器，例如BoxColliders，则会在碰撞检测过程中对其加以使用。换而言之，对象自身的碰撞器可对LineCast调用产生影响。因此，可使用LayerMask变量包含或排除特定层。</p>
+</li>
+</ul>
+<h2 id="访问对象的层次结构"><a href="#访问对象的层次结构" class="headerlink" title="访问对象的层次结构"></a>访问对象的层次结构</h2><p>Unity中的Hierarchy面板提供了父子关系的可视化视图，并应用于场景中的全部GameObject中。由于子对象继承了其父对象的转换，因而该关系十分重要。尽管如此，在编辑器中定义并编辑层次结构关系还远远不够，通常还需要在代码中构建对象间的父子关系，遍历特定对象的子节点，进而处理数据或调用其中的功能项。下面首先考察父对象，示例代码显示了如何通过Transform组件将对象X绑定至对象Y上（作为子对象）。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Parenter</span> : <span class="title">MonoBehaviour</span> </span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">// Reference to child object in scene</span></span><br><span class="line">	<span class="keyword">private</span> GameObject Child;</span><br><span class="line">	<span class="comment">// Reference to parent object in scene</span></span><br><span class="line">	<span class="keyword">private</span> GameObject Parent;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// Use this for initialization</span></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>	&#123;</span><br><span class="line">		<span class="comment">// Get parent and child objects</span></span><br><span class="line">		Child = GameObject.Find(<span class="string">"Child"</span>);</span><br><span class="line">		Parent = GameObject.Find(<span class="string">"Parent"</span>);</span><br><span class="line"></span><br><span class="line">		<span class="comment">// Now parent them</span></span><br><span class="line">		Child.transform.parent = Parent.transform;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>下面讨论如何遍历与父对象绑定的全部子对象。再次强调，该过程通过Transform组件实现，如示例代码所示。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">CycleChildren</span> : <span class="title">MonoBehaviour</span> </span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">// Use this for initialization</span></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>	&#123;</span><br><span class="line">		<span class="comment">// Cycle though children of this object</span></span><br><span class="line">		<span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>; i &lt; transform.childCount; i++)</span><br><span class="line">		&#123;</span><br><span class="line">			<span class="comment">// Print name of child to console</span></span><br><span class="line">			Debug.Log(transform.GetChild(i).name);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="场景、时间和更新操作"><a href="#场景、时间和更新操作" class="headerlink" title="场景、时间和更新操作"></a>场景、时间和更新操作</h1><p>Unity中的场景体现了同一3D空间内的有限GameObjet集，并共享同一时间帧。由于动画通常意味着一段时间内的变化效果，因而游戏中需要建立统一的时间概念，进而实现同步动画和变化效果。在Unity中，Time类用于读取时间数据并负责在脚本中的传递操作。因此，对于游戏中可预测的、一致的运动行为，与该类协同工作则是一项十分重要的技能。</p>
+<p>游戏中均体现了一定的帧速率，且定义为每秒的帧数（FPS），并可在Game选项卡的Stats面板中进行查看。FPS表示1秒内游戏代码的循环次数，并依据相机将相关内容绘制至屏幕上。其中，每次循环过程称作一帧，帧速率随时间以及不同的计算机设备动态变化，并会受到计算机功耗、运行中的其他处理操作，以及当前帧中的渲染内容等因素的影响。也就是说，随着时间的推移以及设备间的变化，用户难以获取一致的FPS。</p>
+<img src="/2019/03/08/GameObject、场景世界以及单例模式/2.png">
+<p>关于帧这一概念的近似描述，Unity提供了MonoBehaviour类可实现的3个类事件，并执行随时间连续更新、变化的各项功能。</p>
+<ul>
+<li><p>Update：针对场景中处于活动状态的各个GameObjet，Update事件将对其上的活动组件逐帧调用一次。如果对象通过MonoBehaviour.SetActive方法被禁用，则Update事件将不再被该对象调用，直至其再次处于激活状态。简而言之，Update最大程度上准确地描述了Unity中的帧这一概念，因此，对于一段时间内需更新或监视的重复性行为，这一概念十分有用，例如玩家输入事件、键盘事件以及鼠标单击事件。需要注意的是，对于各帧，此处无法保证Update事件在全部组件间的调用顺序。例如，在某一帧内，用户无法保证对象X上的Update函数是否先于对象Y被调用。</p>
+</li>
+<li><p>FixedUpdate：类似于Update事件，该事件通常在每帧内被调用多次，但调用模式具有一定的规律，即各次调用间采用了固定的时间间隔。FixedUpdate事件最为常见的应用则是与Unity物理内容协同工作。随着时间变化，如果用户希望更新速度或Rigidbody组件上的属性，则可使用FixedUpdate事件而非Update。</p>
+</li>
+<li><p>LateUpdate：类似于Update，该事件在每帧内被调用。然而，LateUpdate通常在Update和FixedUpdate之后被调用，这也表明，当调用LateUpdate时，可确保针对当前帧中的各个对象，Update和FixedUpdate已被调用完毕。因此，LateUpdate常用于更新相机运动，特别是第三人称相机，以使相机可于当前帧内的最新位置尾随对象。</p>
+</li>
+</ul>
+<p>当创建随时间变化的运动行为时，Update，FixedUpdate和LateUpdate的细节内容，以及时间和FPS等概念，对于游戏的编码方式有着重要的指导意义。</p>
+<h2 id="规则1—帧的重要性"><a href="#规则1—帧的重要性" class="headerlink" title="规则1—帧的重要性"></a>规则1—帧的重要性</h2><p>帧通常在每秒内出现多次，否则，游戏将处于不连续状态。在各帧内，Update事件将对场景中各个活动的MonoBehaviour调用一次。在很大程度上，各帧中场景的计算复杂度（以及性能）主要取决于Update事件中的内容。随着功能的增加，其处理时间和负载也将随之增长，对于CPU或GPU皆是如此。对于包含大量对象和组件的场景，如果在Update函数中对代码缺乏有效的规划，并有效地降低载荷量，将极易产生失控状态。因此，应对Update事件以及规则调用的帧事件加以精心设计。简而言之，仅在必要时，例如读取玩家输入或查看鼠标的运动行为，方可将对应代码置于其中。对此，事件驱动编程可有效地降低Update函数中的负载量。</p>
+<h2 id="规则2—相对于时间的运动"><a href="#规则2—相对于时间的运动" class="headerlink" title="规则2—相对于时间的运动"></a>规则2—相对于时间的运动</h2><p>鉴于帧频率无法得到有效保证（帧速率随着时间和不同的计算机设备发生变化），因而需要对运动和变化行为的代码予以精心设计，进而提供一致的游戏体验。下面考察场景中的立方体对象在一段时间内的平滑运动行为。示例代码显示了一种运动行为的构建方法（并非是最佳方案）。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Mover</span> : <span class="title">MonoBehaviour</span> </span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">// Amount to move cube per frame</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">float</span> Speed = <span class="number">1.0f</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Update is called once per frame</span></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>	&#123;</span><br><span class="line">		<span class="comment">// Move cube along x axis</span></span><br><span class="line">		transform.localPosition += <span class="keyword">new</span> Vector3(AmountToMove, <span class="number">0</span>, <span class="number">0</span>);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上述代码在一定范围内有效，并在各帧或者通过AmountToMove变量移动绑定对象，其问题在于，对应行为与帧速率相关。当前，鉴于帧随时间和计算机设备的不同而发生变化，因而各用户将得到不同的体验结果。特别地，立方体对象将以不同的速度运动。由于无法预测游戏针对特定用户的运行方式，因而情况变得不容乐观。对此，可将运动行为映射至时间上，而非帧。帧处于变化状态，但时间始终保持一致。因此，这里可使用Time类中的deltaTime变量，参见示例代码，即上面代码的修正版本。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Mover</span> : <span class="title">MonoBehaviour</span> </span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">//Speed of cube</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">float</span> Speed = <span class="number">1.0f</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Update is called once per frame</span></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>	&#123;</span><br><span class="line">		<span class="comment">//Move cube along forward direction by speed</span></span><br><span class="line">		transform.localPosition += transform.forward * Speed * Time.deltaTime;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>deltaTime定义为浮点值，表示为自上一次Update函数调用后的时间量（以秒计）。例如，0.5表示自上一帧起时间经历了0.5秒。考虑到deltaTime可用于乘数，因而该值十分有用。在各帧中，当deltaTime与速度相乘时，即可知晓对象的运动距离，即距离=速度x时间。因此，针对对象的运动行为，deltaTime与帧速率无关。</p>
+<h1 id="永久对象"><a href="#永久对象" class="headerlink" title="永久对象"></a>永久对象</h1><p>默认状态下，Unity假设各个对象处于自闭合的时间和场景空间内。场景间的差别类似于各个独立的天体间的差别。最终结果可描述为，对象无法在所属的场景之外存在；同时，当活动场景变化时，对象也将不复存在。由于场景间彼此不同且相互独立，因而这体现了对象的一般行为方式。即使如此，某些对象依然需要被保留，并会在不同场景间被载入，例如玩家角色、积分榜系统或者GameManager类。这一类高优先级对象，其存在不应受到特定场景的限制，并可跨越多个场景。通过DontDestroyOnLoad函数，用户可生成持久性对象，其中包含了某些较为重要的结果。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="comment">// This object will survive scene changes</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">PersistentObj</span> : <span class="title">MonoBehaviour</span> </span><br><span class="line">&#123;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// Use this for initialization</span></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>	&#123;</span><br><span class="line">		<span class="comment">// Make this object survive</span></span><br><span class="line">		DontDestroyOnLoad(gameObject);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>场景间的对象持久性十分重要，对象将持有这一特性并在不同场景间运动。这也意味着，子对象中也继承了这一类持久性对象，及其所采用的数据和资源，例如网格、纹理以及声音等。据此，持久性对象可采用轻量级方式构建，例如不包含子对象的空游戏对象，其中仅涉及了可保证正常工作的基本组件，以使场景变化过程中仅保留某些必要、重要的数据。</p>
+<p>当改变Unity中的活动场景时，可使用SceneManager.LoadScene函数或SceneManager.LoadSceneAsync。</p>
+<p>如前所述，DontDestroyOnLoad函数在活动场景中现有对象上被调用，并防止场景变化时对象被销毁。此时，将会产生与对象复制相关的问题。特别地，如果随后重新载入或者返回至持久对象所处的原场景时，将产生对象的持久特性复制。也就是说，源自上一个场景的原持久性特征，以及针对新创建场景实例的最新对象实例。当然，当每次重新进入场景时，问题还会被再次放大—每次均会产生新的复制，这并非是期望结果。通常情况下，用户仅需要一个对象实例：一名玩家、一个游戏管理器以及一个积分榜。对此，用户需要创建单例对象。</p>
+<h1 id="理解单例模式"><a href="#理解单例模式" class="headerlink" title="理解单例模式"></a>理解单例模式</h1><p>某些类的实例化方式与其他类有所不同，大多数类针对属性集和行为定义了模板，并可在场景中多次实例化为GameObject。例如，敌方角色类可用于实例化多个对象；能量棒类可创建多个对象，等等。然而，某些类则需要作为单一实体存在，例如GameManager、HighScoreManager、AudioManager以及SaveGameManager，并包含统一的行为集合。简单地讲，任何时候只可包含一个类实例。否则，这将混淆对象的含义，并使其有效性大打折扣。此类对象称作单例对象，通常作为持久对象存在于各场景中。单例的核心内容可描述为，任意时刻内存中仅包含一个类实例。下面将在GameManager类中创建单例对象。</p>
+<p>在实际操作过程中，各游戏均包含GameManager或GameController类，且均为持久性单例对象。实际上，GameManager负责处理游戏中的全部高层功能项。例如，游戏是否处于暂停状态，是否满足胜利条件，以及任意时刻的决策方式。示例代码显示了GameManager类的部分内容。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Sample Game Manager class</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">GameManager</span> : <span class="title">MonoBehaviour</span> </span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">// High score</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">int</span> HighScore = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Is game paused</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">bool</span> IsPaused = <span class="literal">false</span>;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// Is player input allowed</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">bool</span> InputAllowed = <span class="literal">true</span>;</span><br><span class="line">	</span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>	&#123;</span><br><span class="line">		<span class="comment">// Make game manager persistent</span></span><br><span class="line">		DontDestroyOnLoad(gameObject);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>此类对象在场景中持久存在，但如何依此创建单例对象？示例代码实现了这一功能，如下所示。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Sample Game Manager class - Singleton Object</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">GameManager</span> : <span class="title">MonoBehaviour</span> </span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">// C# Property to get access to singleton instance</span></span><br><span class="line">	<span class="comment">// Read only - only has get accessor</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">static</span> GameManager Instance</span><br><span class="line">	&#123;</span><br><span class="line">		<span class="comment">// return reference to private instance</span></span><br><span class="line">		<span class="keyword">get</span></span><br><span class="line">		&#123;</span><br><span class="line">			<span class="keyword">return</span> instance;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> GameManager instance = <span class="literal">null</span>;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// High score</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">int</span> HighScore = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// Is game paused</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">bool</span> IsPaused = <span class="literal">false</span>;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// Is player input allowed</span></span><br><span class="line">	<span class="keyword">public</span> <span class="keyword">bool</span> InputAllowed = <span class="literal">true</span>;</span><br><span class="line">	</span><br><span class="line">	<span class="comment">// Use this for initialization</span></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">Awake</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>	&#123;</span><br><span class="line">		<span class="comment">// Check if any existing instance of the class exists in the scene</span></span><br><span class="line">		<span class="comment">// If so, then destroy this instance</span></span><br><span class="line">		<span class="keyword">if</span>(instance)</span><br><span class="line">		&#123;</span><br><span class="line">			DestroyImmediate(gameObject);</span><br><span class="line">			<span class="keyword">return</span>;</span><br><span class="line">		&#125;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// Make this active and only instance</span></span><br><span class="line">		instance = <span class="keyword">this</span>;</span><br><span class="line"></span><br><span class="line">		<span class="comment">// Make game manager persistent</span></span><br><span class="line">		DontDestroyOnLoad(gameObject);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li><p>第9-18行代码：private成员被添加至Manager类中，并被声明为static。如果存在多个实例，该变量将在全部实例间被共享。当创建新实例后，可确定内存中是否存在现有的实例。另外，该变量还可通过Instance属性予以访问，且仅包含一个get成员并以此体现其只读特征。</p>
+</li>
+<li><p>第34-41行代码：在Awake事件中（在对象创建时被调用），将对实例变量进行检测，以查看内存中是否已存在现有的类实例。若存在，由于只可存在唯一的类实例，因而需要删除当前对象。这也表明，GameManager在场景变化过程中依然保持了持久性，且场景中仅包含唯一的原对象实例。</p>
+</li>
+</ul>
+<p>在示例代码中，GameManager类使用了Awake函数，而非Start函数。</p>
+<p>Start和Awake函数之间的差别在于：Awake函数通常在Start函数之前被调用。Awake函数一般在对象创建时被调用。Start函数则在首帧被调用，其中，GameObject处于激活状态。如果GameObject某个场景下处于禁用状态，则Start函数不会被调用，直至该对象处于活动状态。对于默认条件下处于活动状态的对象，Start函数在场景开始处被调用，且位于Awake事件之后。</p>
+<p>如果用户需要将组件引用缓存至类的局部变量中，例如ThisTransform中的Transform组件，则需要使用Awake事件而非Start事件。在Start事件中，可假设对象的全部引用均已处于有效状态。</p>
+<p>GameManager的全局静态Instance属性的最大优势在于，可直接访问任何脚本文件，且无须使用到任何局部变量或对象引用。这意味着，各个类可直接访问全部GameManager属性，并调用较高层次的游戏功能。例如，可通过不同的类设置GameManager上的游戏积分变量，如示例代码所示。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ScoreSetter</span> : <span class="title">MonoBehaviour</span> </span><br><span class="line">&#123;</span><br><span class="line">	<span class="comment">// Use this for initialization</span></span><br><span class="line">	<span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>	&#123;</span><br><span class="line">		<span class="comment">//Set score on GameManager</span></span><br><span class="line">		GameManager.Instance.HighScore = <span class="number">100</span>;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="本章小结"><a href="#本章小结" class="headerlink" title="本章小结"></a>本章小结</h1><p>本章讨论了GameObject、场景、组件及其在场景中的应用方式。初看之下，此类问题较为简单，但理解其应用方法并对对象进行管理则颇具技巧，这一类技术常出现于Unity的游戏开发项目中。特别地，本章着重阐述了GameObject，即以交互方式生成同一行为的组件集。同时，Transform组件同样十分重要。除此之外，本章还介绍了场景内容，即GameObject所处的独立时间和空间。一般情况下，场景表示为一个自封闭的实体，并防止对象位于其外部空间。进一步讲，各场景均涉及时间概念，并以此生成变化和动画效果。其中，时间可采用deltaTime变量进行测算，并可表示为一个乘数因子，以实现与帧速率无关的运动行为。最后，本章还探讨了单例设计模式，通过静态成员定义类—在实际操作过程中，任意时刻内存中仅可包含一个活动实例。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Unity脚本设计/" rel="tag"># Unity脚本设计</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/06/人工智能/" rel="next" title="人工智能">
+                <i class="fa fa-chevron-left"></i> 人工智能
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/09/事件驱动程序设计/" rel="prev" title="事件驱动程序设计">
+                事件驱动程序设计 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">354</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">55</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2020/02/16/游戏设计快乐之道（第2版）/" title="游戏设计快乐之道（第2版）" target="_blank">游戏设计快乐之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/14/游戏剧本怎么写/" title="游戏剧本怎么写" target="_blank">游戏剧本怎么写</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/04/通关！游戏设计之道（第2版）/" title="通关！游戏设计之道（第2版）" target="_blank">通关！游戏设计之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/26/游戏设计艺术（第2版）/" title="游戏设计艺术（第2版）" target="_blank">游戏设计艺术（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/22/大师谈游戏设计创意与节奏/" title="大师谈游戏设计创意与节奏" target="_blank">大师谈游戏设计创意与节奏</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#GameObject对象"><span class="nav-number">1.</span> <span class="nav-text">GameObject对象</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#组件间的交互方式"><span class="nav-number">2.</span> <span class="nav-text">组件间的交互方式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#SendMessage和BroadcastMessage"><span class="nav-number">2.1.</span> <span class="nav-text">SendMessage和BroadcastMessage</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GetComponent函数"><span class="nav-number">2.2.</span> <span class="nav-text">GetComponent函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#获取多个组件"><span class="nav-number">2.3.</span> <span class="nav-text">获取多个组件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#组件和消息"><span class="nav-number">2.4.</span> <span class="nav-text">组件和消息</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#GameObject和场景世界"><span class="nav-number">3.</span> <span class="nav-text">GameObject和场景世界</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#获取GameObject"><span class="nav-number">3.1.</span> <span class="nav-text">获取GameObject</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对象比较"><span class="nav-number">3.2.</span> <span class="nav-text">对象比较</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#获取最近对象"><span class="nav-number">3.3.</span> <span class="nav-text">获取最近对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#获取特定类型的对象"><span class="nav-number">3.4.</span> <span class="nav-text">获取特定类型的对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GameObject之间的路径"><span class="nav-number">3.5.</span> <span class="nav-text">GameObject之间的路径</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#访问对象的层次结构"><span class="nav-number">3.6.</span> <span class="nav-text">访问对象的层次结构</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#场景、时间和更新操作"><span class="nav-number">4.</span> <span class="nav-text">场景、时间和更新操作</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#规则1—帧的重要性"><span class="nav-number">4.1.</span> <span class="nav-text">规则1—帧的重要性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#规则2—相对于时间的运动"><span class="nav-number">4.2.</span> <span class="nav-text">规则2—相对于时间的运动</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#永久对象"><span class="nav-number">5.</span> <span class="nav-text">永久对象</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#理解单例模式"><span class="nav-number">6.</span> <span class="nav-text">理解单例模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#本章小结"><span class="nav-number">7.</span> <span class="nav-text">本章小结</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">3.7m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">56:23</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

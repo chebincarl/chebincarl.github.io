@@ -1,0 +1,1752 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="思考并回答以下问题：  访问者模式的官方定义是什么？ 访问者模式属于什么类型的模式？应用场景有哪些？ 为什么说访问者模式是最难的设计模式？">
+<meta name="keywords" content="设计模式与游戏完美开发">
+<meta property="og:type" content="article">
+<meta property="og:title" content="角色信息查询--访问者模式">
+<meta property="og:url" content="http://chebincarl.github.io/2019/08/19/角色信息查询-访问者模式/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="思考并回答以下问题：  访问者模式的官方定义是什么？ 访问者模式属于什么类型的模式？应用场景有哪些？ 为什么说访问者模式是最难的设计模式？">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/19/角色信息查询-访问者模式/1.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/19/角色信息查询-访问者模式/2.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/19/角色信息查询-访问者模式/3.png">
+<meta property="og:updated_time" content="2020-01-23T02:09:02.028Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="角色信息查询--访问者模式">
+<meta name="twitter:description" content="思考并回答以下问题：  访问者模式的官方定义是什么？ 访问者模式属于什么类型的模式？应用场景有哪些？ 为什么说访问者模式是最难的设计模式？">
+<meta name="twitter:image" content="http://chebincarl.github.io/2019/08/19/角色信息查询-访问者模式/1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/08/19/角色信息查询-访问者模式/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>角色信息查询--访问者模式 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">专注，重复10遍</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/08/19/角色信息查询-访问者模式/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">角色信息查询--访问者模式
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-08-19 00:00:49" itemprop="dateCreated datePublished" datetime="2019-08-19T00:00:49+08:00">2019-08-19</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2020-01-23 10:09:02" itemprop="dateModified" datetime="2020-01-23T10:09:02+08:00">2020-01-23</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Unity/" itemprop="url" rel="index"><span itemprop="name">Unity</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">39k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">35 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>思考并回答以下问题：</p>
+<ul>
+<li>访问者模式的官方定义是什么？</li>
+<li>访问者模式属于什么类型的模式？应用场景有哪些？</li>
+<li>为什么说访问者模式是最难的设计模式？</li>
+</ul>
+<a id="more"></a>
+<p>本章涵盖：</p>
+<ul>
+<li>角色信息的提供</li>
+<li>访问者模式<ul>
+<li>访问者模式的定义</li>
+<li>访问者模式的说明</li>
+<li>访问者模式的实现范例</li>
+</ul>
+</li>
+<li>使用访问者模式实现角色信息查询<ul>
+<li>角色信息查询的实现设计</li>
+<li>实现说明</li>
+<li>使用访问者模式的优点</li>
+<li>实现访问者模式时的注意事</li>
+</ul>
+</li>
+<li>访问者模式面对变化时</li>
+<li>结论</li>
+</ul>
+<h1 id="角色信息的提供"><a href="#角色信息的提供" class="headerlink" title="角色信息的提供"></a><span style="color:#339AFF;">角色信息的提供</span></h1><p>“角色”是游戏的重点，在《P级阵地》中也同样如此。游戏内提供了6种角色，分别属于不同的阵营，各有不同的造型和特色，再加上“角色属性”的设计，让每种角色在战场中的能力都不一样。因此，游戏要提供一个用户界面，让玩家可以了解每一个角色的状态。</p>
+<p><strong><font size="3">角色信息界面</font></strong></p>
+<p>《P级阵地》游戏中的主角就是双方阵营的角色，玩家角色是通过玩家对兵营下达训练指令后，不断地产生新单位进入战场；而敌方角色则是由关卡系统（Stage System）产生。玩家一般是通过观察战场上各个角色的数量，来决定接下来要训练什么单位上场，所以如果能提供双方角色的信息作为引用，就能让玩家下达更正确的训练指令来防守玩家的阵地。</p>
+<p>玩家阵营角色信息界面（SoldierInfoUI）是用来显示当前在战场上一个玩家阵营角色的信息，如图1所示。</p>
+<blockquote>
+<p>图1 角色信息界面</p>
+</blockquote>
+<img src="/2019/08/19/角色信息查询-访问者模式/1.png">
+<p>玩家只要利用鼠标选中战场中的玩家角色，系统就会将该角色的信息显示在界面上，就和<a href="/2019/08/12/角色的组装-建造者模式/" title="角色的组装-建造者模式">角色的组装-建造者模式</a>的“利用增加鼠标单击判断脚本，在兵营对象上完成显示兵营信息”的运行原理是相同的。玩家角色在产生的过程中，有一个步骤会为角色加上鼠标单击判断的脚本组件（AddOnClickScript）：</p>
+<blockquote>
+<p>Listing1 利用Builder接口来构建对象（CharacterBuilderSystem.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">CharacterBuilderSystem</span> : <span class="title">IGameSystem</span></span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment">// 构造</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Construct</span>(<span class="params">ICharacterBuilder theBuilder</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 使用Builder产生各个部分加入Product中</span></span><br><span class="line">        theBuilder.LoadAsset( ++m_GameObjectID );</span><br><span class="line">        theBuilder.AddOnClickScript();</span><br><span class="line">        theBuilder.AddWeapon();</span><br><span class="line">        theBuilder.SetCharacterAttr();</span><br><span class="line">        theBuilder.AddAI();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 加入管理器内</span></span><br><span class="line">        theBuilder.AddCharacterSystem(m_PBDGame);</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在角色建造者系统（CharacterBuilderSystem）中插入了一个AddOnClickScript步骤，用来加入玩家单击判断的脚本组件。因为角色建造者系统实现了建造者模式（Builder），所以只需要在建造流程中加入此步骤即可。但当前只有玩家角色需要判断是否被玩家单击，即只有玩家角色的建造者（SoldierBuilder）重新实现了这个方法：</p>
+<blockquote>
+<p>Listing2 Soldier各部位的构建（SoldierBuilder.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">SoldierBuilder</span> : <span class="title">ICharacterBuilder</span></span><br><span class="line">&#123;</span><br><span class="line">    ..</span><br><span class="line">    <span class="comment">// 加入OnClickScript</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">AddOnClickScript</span> (<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        SoldierOnClick Script = m_BuildParam.NewCharacter.GetGameObject().AddComponent&lt;SoldierOnClick&gt;();</span><br><span class="line">        Script.Soldier = m_BuildParam.NewCharacter <span class="keyword">as</span> ISoldier;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>被加入的脚本组件是SoldierOnClick，用来负责判断玩家阵营的角色是否被单击：</p>
+<blockquote>
+<p>Listing3 角色是否被单击（SoldierOnClick.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">SoldierOnClick</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> ISoldier Soldier = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span> (<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">OnClick</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 通知显示角色信息</span></span><br><span class="line">        PBaseDefenseGame.Instance.ShowSoldierInfo(Soldier);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>脚本组件中声明的OnClick方法，会在系统判断“单击到某一个角色”时被调用。而该鼠标单击判断与兵营的单击判断是一样的，也是实现在PBaseDefenseGame类中用来负责判断玩家输入行为的方法（InputProcess）：</p>
+<blockquote>
+<p>Listing4 实现角色单击判断（PBaseDefenseGame.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">PBaseDefenseGame</span></span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment">// 玩家输入</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">InputProcess</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">//  Mouse左键</span></span><br><span class="line">        <span class="keyword">if</span>(Input.GetMouseButtonUp( <span class="number">0</span> ) ==<span class="literal">false</span>)</span><br><span class="line">            <span class="keyword">return</span> ;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 由摄像机产生一条射线</span></span><br><span class="line">        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);</span><br><span class="line">        RaycastHit[] hits = Physics.RaycastAll(ray);        </span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 遍历每一个被Hit到的GameObject</span></span><br><span class="line">        <span class="keyword">foreach</span> (RaycastHit hit <span class="keyword">in</span> hits)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// 是否有兵营被鼠标单击</span></span><br><span class="line">            CampOnClick CampClickScript = hit.transform.gameObject.GetComponent&lt;CampOnClick&gt;();</span><br><span class="line">            <span class="keyword">if</span>( CampClickScript!=<span class="literal">null</span> )</span><br><span class="line">            &#123;</span><br><span class="line">                CampClickScript.OnClick();</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 是否有角色被鼠标单击</span></span><br><span class="line">            SoldierOnClick SoldierClickScript = hit.transform.gameObject.GetComponent&lt;SoldierOnClick&gt;();</span><br><span class="line">            <span class="keyword">if</span>( SoldierClickScript!=<span class="literal">null</span> )</span><br><span class="line">            &#123;</span><br><span class="line">                SoldierClickScript.OnClick();</span><br><span class="line">                <span class="keyword">return</span> ;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果判断被鼠标单击的GameObject包含的SoldierOnClick脚本组件是玩家阵营单位，就通过调用脚本组件中的OnClick方法，将玩家阵营角色的信息显示在玩家阵营角色信息界面（SoldierInfoUI）上：</p>
+<blockquote>
+<p>Listing5 Soldier界面（SoldierInfoUI.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">SoldierInfoUI</span> : <span class="title">IUserInterface</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> ISoldier m_Soldier = <span class="literal">null</span>; <span class="comment">// 显示的Soldier</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 界面组件</span></span><br><span class="line">    <span class="keyword">private</span> Image  m_Icon = <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">private</span> Text   m_NameTxt = <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">private</span> Text   m_HPTxt = <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">private</span> Text   m_LvTxt = <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">private</span> Text   m_AtkTxt = <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">private</span> Text   m_AtkRangeTxt = <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">private</span> Text   m_SpeedTxt = <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">private</span> Slider m_HPSlider = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">SoldierInfoUI</span>(<span class="params"> PBaseDefenseGame PBDGame </span>)：<span class="title">base</span>(<span class="params">PBDGame</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Initialize();</span><br><span class="line">    &#125;</span><br><span class="line">        </span><br><span class="line">    <span class="comment">// 初始化</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Initialize</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_RootUI = UITool.FindUIGameObject( <span class="string">"SoldierInfoUI"</span> );</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 图像</span></span><br><span class="line">        m_Icon = UITool.GetUIComponent&lt;Image&gt;(m_RootUI, <span class="string">"SoldierIcon"</span>);</span><br><span class="line">        <span class="comment">// 名称</span></span><br><span class="line">        m_NameTxt = UITool.GetUIComponent&lt;Text&gt;(m_RootUI, <span class="string">"SoldierNameText"</span>);</span><br><span class="line">        <span class="comment">// HP</span></span><br><span class="line">        m_HPTxt = UITool.GetUIComponent&lt;Text&gt;(m_RootUI, <span class="string">"SoldierHPText"</span>);</span><br><span class="line">        <span class="comment">// 等级</span></span><br><span class="line">        m_LvTxt = UITool.GetUIComponent&lt;Text&gt;(m_RootUI, <span class="string">"SoldierLvText"</span>);</span><br><span class="line">        <span class="comment">// Atk</span></span><br><span class="line">        m_AtkTxt = UITool.GetUIComponent&lt;Text&gt;(m_RootUI, <span class="string">"SoldierAtkText"</span>);</span><br><span class="line">        <span class="comment">// Atk 距离</span></span><br><span class="line">        m_AtkRangeTxt = UITool.GetUIComponent&lt;Text&gt;(m_RootUI, <span class="string">"SoldierAtkRangeText"</span>);</span><br><span class="line">        <span class="comment">// Speed</span></span><br><span class="line">        m_SpeedTxt = UITool.GetUIComponent&lt;Text&gt;(m_RootUI, <span class="string">"SoldierSpeedText"</span>);</span><br><span class="line">        <span class="comment">// HP图示 </span></span><br><span class="line">        m_HPSlider = UITool.GetUIComponent&lt;Slider&gt;(m_RootUI, <span class="string">"SoldierSlider"</span>);  </span><br><span class="line"></span><br><span class="line">        <span class="comment">// 注册游戏事件</span></span><br><span class="line">        m_PBDGame.RegisterGameEvent( ENUM_GameEvent.SoldierKilled, <span class="keyword">new</span> SoldierKilledObserverUI( <span class="keyword">this</span> ));</span><br><span class="line">        m_PBDGame.RegisterGameEvent( ENUM_GameEvent.SoldierUpgate, <span class="keyword">new</span> SoldierUpgateObserverUI( <span class="keyword">this</span> ));</span><br><span class="line"></span><br><span class="line">        Hide();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Hide</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Hide</span> (<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">base</span>.Hide ();</span><br><span class="line">        m_Soldier = <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 显示信息</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ShowInfo</span>(<span class="params">ISoldier Soldier</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">//Debug.Log("显示Soldier信息");</span></span><br><span class="line">        m_Soldier = Soldier;</span><br><span class="line">        <span class="keyword">if</span>( m_Soldier == <span class="literal">null</span> || m_Soldier.IsKilled())</span><br><span class="line">        &#123;</span><br><span class="line">            Hide ();</span><br><span class="line">            <span class="keyword">return</span> ;</span><br><span class="line">        &#125;</span><br><span class="line">        Show ();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 显示Soldier信息</span></span><br><span class="line">        <span class="comment">// Icon</span></span><br><span class="line">        IAssetFactory Factory = PBDFactory.GetAssetFactory();</span><br><span class="line">        m_Icon.sprite = Factory.LoadSprite( m_Soldier.GetIconSpriteName());</span><br><span class="line">        <span class="comment">// 名称</span></span><br><span class="line">        m_NameTxt.text =  m_Soldier.GetName();</span><br><span class="line">        <span class="comment">// 等级</span></span><br><span class="line">        m_LvTxt.text =<span class="keyword">string</span>.Format(<span class="string">"等级：&#123;0&#125;"</span>, m_Soldier.GetSoldierValue().GetSoldierLv());</span><br><span class="line">        <span class="comment">// Atk</span></span><br><span class="line">        m_AtkTxt.text = <span class="keyword">string</span>.Format( <span class="string">"攻击力：&#123;0&#125;"</span>,m_Soldier.GetWeapon().GetAtkValue());</span><br><span class="line">        <span class="comment">// Atk距离</span></span><br><span class="line">        m_AtkRangeTxt.text = <span class="keyword">string</span>.Format( <span class="string">"攻击距离：&#123;0&#125;"</span>,m_Soldier.GetWeapon().GetAtkRange());</span><br><span class="line">        <span class="comment">// Speed</span></span><br><span class="line">        m_SpeedTxt.text = <span class="keyword">string</span>.Format(<span class="string">"移动速度：&#123;0&#125;"</span>, m_Soldier.GetSoldierValue().GetMoveSpeed());;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 更新HP信息</span></span><br><span class="line">        RefreshHPInfo();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 更新</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">RefreshSoldier</span>(<span class="params"> ISoldier Soldier  </span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span>( Soldier==<span class="literal">null</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            m_Soldier=<span class="literal">null</span>;</span><br><span class="line">            Hide ();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>( m_Soldier != Soldier)</span><br><span class="line">            <span class="keyword">return</span> ;</span><br><span class="line"></span><br><span class="line">        ShowInfo( Soldier );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 更新HP信息</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">RefreshHPInfo</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">int</span> NowHP = m_Soldier.GetSoldierValue().GetNowHP();</span><br><span class="line">        <span class="keyword">int</span> MaxHP = m_Soldier.GetSoldierValue().GetMaxHP();</span><br><span class="line"></span><br><span class="line">        m_HPTxt.text = <span class="keyword">string</span>.Format(<span class="string">"HP(&#123;0&#125;/&#123;1&#125;)"</span>, NowHP, MaxHP);</span><br><span class="line">        <span class="comment">// HP图示</span></span><br><span class="line">        m_HPSlider.maxValue = MaxHP;</span><br><span class="line">        m_HPSlider.minValue = <span class="number">0</span>;</span><br><span class="line">        m_HPSlider.<span class="keyword">value</span> = NowHP;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 更新</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Update</span> (<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">base</span>.Update ();     </span><br><span class="line">        <span class="keyword">if</span>(m_Soldier==<span class="literal">null</span>)</span><br><span class="line">            <span class="keyword">return</span> ;</span><br><span class="line">        <span class="comment">// 是否死亡</span></span><br><span class="line">        <span class="keyword">if</span>(m_Soldier.IsKilled())</span><br><span class="line">        &#123;</span><br><span class="line">            m_Soldier = <span class="literal">null</span>;</span><br><span class="line">            Hide ();</span><br><span class="line">            <span class="keyword">return</span> ;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 更新HP信息</span></span><br><span class="line">        RefreshHPInfo();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>和实现其他界面相同，先获取界面上的显示组件后，通过ShowInfo方法将鼠标单击的角色信息显示出来。另外，类中也定义了几个提供给其他系统使用的方法。</p>
+<p><strong><font size="3">角色数量的统计</font></strong></p>
+<p>当前双方角色在战场上的数量，是另一项玩家下决策时引用的依据，尤其对于攻防类型的游戏来说，当双方进入交战状态时，角色会交错站位、重叠显示，不容易看出当前双方角色的数量。因此，《P级阵地》决定在界面上增加一个“显示敌我双方数量”的信息，并且在兵营界面（CampInfoUI）上也显示由该兵营产生的角色当前还有多少存活于战场上，如图2所示。</p>
+<blockquote>
+<p>图2 角色信息界面、兵营界面</p>
+</blockquote>
+<img src="/2019/08/19/角色信息查询-访问者模式/2.png">
+<p>在当前的《P级阵地》角色系统（CharacterSystem）中，已经将双方角色分别使用不同的泛型容器进行管理：</p>
+<blockquote>
+<p>Listing6 管理产生出来的角色（CharacterSystem.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">CharacterSystem</span> : <span class="title">IGameSystem</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> List&lt;ICharacter&gt; m_Soldiers = <span class="keyword">new</span> List&lt;ICharacter&gt;();</span><br><span class="line">    <span class="keyword">private</span> List&lt;ICharacter&gt; m_Enemys = <span class="keyword">new</span> List&lt;ICharacter&gt;(); </span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果要满足第一个需求：将双方阵营的角色数量显示出来，那么简单的实现方式就是，增加角色系统（CharacterSystem）的操作方法，让外界可以获取这两个容器的数量：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">CharacterSystem</span> : <span class="title">IGameSystem</span></span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment">// 获取Soldier数量</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">GetSoldierCount</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> m_Soldiers.Count;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取Enemy数量</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">GetEnemyCount</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> m_Enemys.Count();</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>因为PBaseDefenseGame本身运用了多种设计模式，其中外观模式（Facade）和中介者模式（Mediator）分别作为各个游戏系统对外及对内的沟通接口，所以在PBaseDefenseGame类中，也必须增加对应的方法，让有需要的客户端或其他游戏系统来存取：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">PBaseDefenseGame</span></span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment">// 当前Soldier数量</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">GetSoldierCount</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span> (m_CharacterSystem != <span class="literal">null</span>)</span><br><span class="line">            <span class="keyword">return</span> m_CharacterSystem.GetSoldierCount();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 当前Enemy数量</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">GetEnemyCount</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span> (m_CharacterSystem != <span class="literal">null</span>)</span><br><span class="line">            <span class="keyword">return</span> m_CharacterSystem.GetEnemyCount();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这样就完成了第一项需求：获取双方阵营的角色数量。那么对于第二项需求：兵营产生的角色当前还有多少存活在战场上，也可使用相同的步骤来完成。首先在角色系统（CharacterSystem）中增加方法：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">CharacterSystem</span> : <span class="title">IGameSystem</span></span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment">// 获取各Soldier单位的数量</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">GetSoldierCount</span>(<span class="params">ENUM_Soldier emSoldier</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">int</span> Count = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">foreach</span> (ISoldier pSoldier <span class="keyword">in</span> m_Soldiers)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (pSoldier == <span class="literal">null</span>)</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (pSoldier.GetSoldierType() == emSoldier)</span><br><span class="line">                Count++;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> Count;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">然后在PBaseDefenseGame增加对应的方法：</span><br><span class="line">```cs</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">PBaseDefenseGame</span></span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment">// 当前Soldier数量</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">GetSoldierCount</span>(<span class="params">ENUM_Soldier emSoldier</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span> (m_CharacterSystem != <span class="literal">null</span>)</span><br><span class="line">            <span class="keyword">return</span> m_CharacterSystem.GetSoldierCount(emSoldier);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如此，接口就可以通过这些方法来获取所需要的信息。但是，在完成这两项需求的同时，读者应该会发现，每加入一个与角色相关的功能需求时，就必须增加角色系统（CharacterSystem）的方法，也必须一并修改PBaseDefenseGame的接口。</p>
+<p>然而，随着系统功能的增加，必须让两个类修改接口的实现方式就有缺点了。除了必须更改原本类的接口设计外，还增加了两个类的接口复杂度，使得后续的维护更为困难。假如现在系统又增加了第三个需求，要求统计当前场上敌方阵营不同角色的数量时，就势必得追加角色系统（CharacterSystem）的方法并修改PBaseDefenseGame类接口。</p>
+<p>所以，针对角色系统中“管理双方的角色对象”，应该要提出一套更好的解决方式，将这种“针对每一个角色进行遍历或判断”的功能一致化，使其不随不同需求的增加而修改接口。</p>
+<p>GoF的访问者模式提供了解决方案，让针对一群对象遍历或判断的功能，都能运用“同一组接口”方法来完成，过程中只会新增该功能本身的实现文件，对于原有的接口并不会产生任何更改。</p>
+<h1 id="访问者模式"><a href="#访问者模式" class="headerlink" title="访问者模式"></a><span style="color:#339AFF;">访问者模式</span></h1><p>笔者当初在学会访问者模式之后，第一个联想到的是C++ STL（STL是“Standard Template Library”的缩写，中文译为“标准模板库”，提供了通用的模板类和函数，这些模板类和函数可以实现多种流行和常用的算法和数据结构，如向量、链表、队列、栈。）当中的Function Object应用。</p>
+<p>一个函数对象，即一个重载了括号操作符“()”的对象。当用该对象调用此操作符时，其表现形式如同普通函数调用一般，因此取名叫函数对象。</p>
+<p>如果一个类将()运算符重载为成员函数，这个类就称为函数对象类，这个类的对象就是函数对象。函数对象是一个对象，但是使用的形式看起来像函数调用，实际上也执行了函数调用，因而得名。</p>
+<p>下面是一个函数对象的例子。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;iostream&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> <span class="built_in">std</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CAverage</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="function"><span class="keyword">double</span> <span class="title">operator</span><span class="params">()</span><span class="params">(<span class="keyword">int</span> a1, <span class="keyword">int</span> a2, <span class="keyword">int</span> a3)</span></span></span><br><span class="line"><span class="function">        </span>&#123;  </span><br><span class="line">            <span class="comment">// 重载()运算符</span></span><br><span class="line">            <span class="keyword">return</span> (<span class="keyword">double</span>)(a1 + a2 + a3) / <span class="number">3</span>;</span><br><span class="line">        &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    CAverage average;  <span class="comment">//能够求三个整数平均数的函数对象</span></span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; average(<span class="number">3</span>, <span class="number">2</span>, <span class="number">3</span>);  <span class="comment">//等价于cout &lt;&lt; average.operator(3, 2, 3);</span></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>程序的输出结果是：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2.66667</span><br></pre></td></tr></table></figure></p>
+<p>()是数目不限的运算符，因此重载为成员函数时，有多少个参数都可以。</p>
+<p>average 是一个对象，average(3, 2, 3)实际上就是average.operator(3, 2, 3)，这使得average看上去像函数的名字，故称其为函数对象。</p>
+<blockquote>
+<p>Listing7 计算某类型对象的数量并加总（C++程序代码）</p>
+</blockquote>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="keyword">typename</span> T&gt;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Accumulater</span> </span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">private</span> :</span><br><span class="line">        <span class="keyword">int</span> * m_Count;</span><br><span class="line">        T * m_Total;</span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        Accumulater(<span class="keyword">int</span> *count, T * total )</span><br><span class="line">        &#123;</span><br><span class="line">            m_Count = count;</span><br><span class="line">            m_Total = total;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">operator</span><span class="params">()</span><span class="params">(T i)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        (*m_Count)++;</span><br><span class="line">        (*m_Total)+=i;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;; </span><br><span class="line"></span><br><span class="line"><span class="comment">// 测试程序代码</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// 产生数据</span></span><br><span class="line">    <span class="built_in">vector</span>&lt;<span class="keyword">int</span>&gt; Data;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>; i&lt;<span class="number">10</span>, ++i)</span><br><span class="line">        Data.push_back(i+<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 利用function object计算加总及个数</span></span><br><span class="line">    <span class="keyword">int</span> Total = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">int</span> Count = <span class="number">0</span>;</span><br><span class="line">    Accumulater&lt;<span class="keyword">int</span>&gt; Sum(&amp;Count, &amp; Total);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 遍历并加总</span></span><br><span class="line">    for_each(Data.begin(), Data.end(), Sum);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 显示 </span></span><br><span class="line">    <span class="comment">// cout用于在计算机屏幕上显示信息</span></span><br><span class="line">    <span class="comment">// cout语句的一般格式为：cout&lt;&lt;表达式1&lt;&lt;表达式2&lt;&lt;……&lt;&lt;表达式n;</span></span><br><span class="line">    <span class="built_in">cout</span> &lt;&lt; <span class="string">"Count:"</span> &lt;&lt; Count &lt;&lt; <span class="string">" Total:"</span> &lt;&lt; Total &lt;&lt; <span class="built_in">endl</span>; <span class="comment">// endl的作用是换行</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>重新定义了一个具有计算功能（Accumulater\<t\>）类的function operator，然后利用for_each遍历整个vector\<int\>容器，STL会自动调用Accumulater\<int\>类的function operator，并对容器内的每一个对象进行操作。上面的应用方式符合访问者模式的定义。虽然上面的范例要求T类还需要定义其他的operator才能正确通过编译（compile），但是就范例来看，访问者模式也已经“内化到”程序设计语言（包含函数库）中。因此，接下来，我们将呈现在C#中实现访问者模式的方式。</int\></int\></t\></p>
+<h2 id="访问者模式的定义"><a href="#访问者模式的定义" class="headerlink" title="访问者模式的定义"></a><span style="color:#00ACC1;">访问者模式的定义</span></h2><p>GoF对于访问者模式（Visitor）的定义是：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">定义一个能够在一个对象结构中对于所有元素执行的操作，访问者让你可以定义一个新的操作，而不必更改到被操作元素的类接口。</span><br></pre></td></tr></table></figure></p>
+<p>笔者认为上述定义的重点在于：定义一个新的操作，而不必更改到被操作元素的类接口，这完全符合“开一闭原则”（OCP）的要求，利用新增的方法来增加功能，而不是修改现有的程序代码来完成。下面通过实际例子来说明：</p>
+<p>首先，我们回顾一下<a href="/2019/08/09/角色与武器的实现-桥接模式/" title="角色与武器的实现-桥接模式">角色与武器的实现-桥接模式</a>介绍桥接模式（Bridge）时所提到的范例，一个绘图引擎所使用到的IShape类群组，但此处我们另外再增加一些方法，类结构如图3所示。</p>
+<blockquote>
+<p>图3 IShape类群组增加一些方法后的类结构图</p>
+</blockquote>
+<img src="/2019/08/19/角色信息查询-访问者模式/3.png">
+<blockquote>
+<p>Listing8 绘图引擎的实现</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">RenderEngine</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">Render</span>(<span class="params"><span class="keyword">string</span> ObjName</span>)</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">Text</span>(<span class="params"><span class="keyword">string</span> Text</span>)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// DirectX引擎 </span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">DirectX</span> : <span class="title">RenderEngine</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Render</span>(<span class="params"><span class="keyword">string</span> ObjName</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        DXRender(ObjName);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Text</span>(<span class="params"><span class="keyword">string</span> Text</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        DXRender(Text);         </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">DXRender</span>(<span class="params"><span class="keyword">string</span> ObjName</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Debug.Log (<span class="string">"DXRender:"</span>+ObjName);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// OpenGL引擎 </span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">OpenGL</span> : <span class="title">RenderEngine</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Render</span>(<span class="params"><span class="keyword">string</span> ObjName</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        GLRender(ObjName);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Text</span>(<span class="params"><span class="keyword">string</span> Text</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        GLRender(Text);         </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">GLRender</span>(<span class="params"><span class="keyword">string</span> ObjName</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Debug.Log (<span class="string">"OpenGL:"</span>+ObjName);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 形状</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">IShape</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">protected</span> RenderEngine m_RenderEngine = <span class="literal">null</span>; <span class="comment">// 使用的绘图引擎</span></span><br><span class="line">    <span class="keyword">protected</span> Vector3 m_Position = Vector3.zero; <span class="comment">// 显示位置</span></span><br><span class="line">    <span class="keyword">protected</span> Vector3 m_Scale = Vector3.zero; <span class="comment">// 大小（缩放）</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">SetRenderEngine</span>(<span class="params"> RenderEngine theRenderEngine </span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_RenderEngine = theRenderEngine;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Vector3 <span class="title">GetPosition</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> m_Position;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Vector3 <span class="title">GetScale</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> m_Scale;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span>    <span class="title">Draw</span>(<span class="params"></span>)</span>;      <span class="comment">// 绘出</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">float</span>   <span class="title">GetVolume</span>(<span class="params"></span>)</span>; <span class="comment">// 获取体积</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">int</span>     <span class="title">GetVectorCount</span>(<span class="params"></span>)</span>; <span class="comment">// 获取顶点数</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 球体</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Sphere</span> : <span class="title">IShape</span></span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Sphere</span>(<span class="params">RenderEngine theRenderEngine</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">base</span>.SetRenderEngine( theRenderEngine );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Draw</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_RenderEngine.Render(<span class="string">"Sphere"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">float</span> <span class="title">GetVolume</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">int</span> <span class="title">GetVectorCount</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 立方体</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Cube</span> : <span class="title">IShape</span></span><br><span class="line">&#123;   </span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Cube</span>(<span class="params">RenderEngine theRenderEngine</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">base</span>.SetRenderEngine( theRenderEngine );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Draw</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_RenderEngine.Render(<span class="string">"Cube"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">float</span> <span class="title">GetVolume</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">int</span> <span class="title">GetVectorCount</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 圆柱体</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Cylinder</span> : <span class="title">IShape</span></span><br><span class="line">&#123;   </span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Cylinder</span>(<span class="params">RenderEngine theRenderEngine</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">base</span>.SetRenderEngine( theRenderEngine );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Draw</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_RenderEngine.Render(<span class="string">"Cylinder"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">float</span> <span class="title">GetVolume</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">int</span> <span class="title">GetVectorCount</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>与那一章使用的IShape类一样，此处的IShape类也拥有一个RenderEngine的对象，用来在特定3D引擎下绘出形状。另外还增加了一些Shape类的方法，作为本章范例使用，同样也存在3个子类，所以基本上可以使用一个管理器类来管理所有产生的形状：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 形状容器</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ShapeContainer</span></span><br><span class="line">&#123;</span><br><span class="line">    List&lt;IShape&gt; m_Shapes = <span class="keyword">new</span> List&lt;IShape&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ShapeContainer</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 新增</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">AddShape</span>(<span class="params">IShape theShape</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_Shapes.Add ( theShape );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>有了管理器之后，就可以将所有产生的形状都加入管理器中：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">CreateShape</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    DirectX theDirectX = <span class="keyword">new</span> DirectX();</span><br><span class="line">        </span><br><span class="line">    <span class="comment">// 加入形状</span></span><br><span class="line">    ShapeContainer theShapeContainer = <span class="keyword">new</span> ShapeContainer();</span><br><span class="line">    theShapeContainer.AddShape( <span class="keyword">new</span> Cube(theDirectX) );</span><br><span class="line">    theShapeContainer.AddShape( <span class="keyword">new</span> Cylinder(theDirectX) );</span><br><span class="line">    theShapeContainer.AddShape( <span class="keyword">new</span> Sphere(theDirectX) );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>接下来，如果想要将容器内所有的形状都绘制出来，就要增加形状容器类的方法：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 绘出</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">DrawAllShape</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">foreach</span>(IShape theShape <span class="keyword">in</span> m_Shapes)</span><br><span class="line">        theShape.Draw();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>到当前为止，形状容器类新增的方法DrawAllShape符合定义中的前半段：“定义一个能够在一个对象结构中对于所有元素执行的操作”，DrawAllShape方法遍历了所有容器内的元素：IShape类对象，并执行了Draw方法。</p>
+<p>但是，这个方法并不符合后半段的定义：“不必更改到被操作元素的类接口”，虽然定义指的是不更改IShape的接口，但我们要将其扩大引申为“同时也不能更改到管理容器类”。因为如果按当前的实现方式，那么所有新增在IShape类中的方法，一定会连带更改ShapeContainer形状容器类，或者要存取IShape方法就一定得通过ShapeContainer形状容器类。例如，现在要追加实现计算所有形状使用的顶点数：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 形状容器</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ShapeContainer</span> </span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment">// 获取所有顶点数</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">GetAllVectorCount</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">int</span> Count = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">foreach</span> (IShape theShape <span class="keyword">in</span> m_Shapes)</span><br><span class="line">            Count += theShape.GetVectorCount();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> Count;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这样一来，又更改了ShapeContainer形状容器类的接口。而随着后续项目的更新或功能强化，将会不断增加ShapeContainer类的方法，这并不是很好的方式。运用访问者模式是比较好的选择，修正的步骤大致如下：</p>
+<ul>
+<li>1.在ShapeContainer形状容器类中增加一个共享方法，这个方法专门用来遍历所有容器内的形状。</li>
+<li>2.调用这个共享方法时，要带入一个继承自Visitor访问者接口的对象，而Visitor访问者接口内会提供不同的方法，这些方法会被不同的元素调用。</li>
+<li>3.在IShape中新增一个RunVisitor抽象方法，让子类实现。而调用这个方法时，会将一个Visitor访问者接口对象传入，让IShape的子类，可以按情况调用Visitor类中特定的方法。</li>
+<li>4.ShapeContainer新增的共享方法中，会遍历每一个IShape对象，并调用IShape新增的RunVisitor方法，并将Visitor访问者当成参数传入。</li>
+</ul>
+<h2 id="访问者模式的说明"><a href="#访问者模式的说明" class="headerlink" title="访问者模式的说明"></a><span style="color:#00ACC1;">访问者模式的说明</span></h2><p>在经过上述4个步骤的修改后，类结构会如图4所示。</p>
+<blockquote>
+<p>图4 绘制形状类在运用访问者模式修改后的类结构图</p>
+</blockquote>
+
+<p>参与者的说明如下：</p>
+<ul>
+<li>IShape（形状接口）<ul>
+<li>定义形状的接口操作。</li>
+<li>包含了RunVisitor方法，来执行IShapeVisitor访问者中的方法。</li>
+</ul>
+</li>
+<li>Sphere、Cylinder、Cube（各种形状）<ul>
+<li>3个实现形状接口的子类。</li>
+<li>重新实现RunVisitor的方法，并根据不同的子类来调用IShapeVisitor访问者中的特定方法。</li>
+</ul>
+</li>
+<li>ShapeContainer（形状容器）<ul>
+<li>包含所有产生的IShape对象。</li>
+</ul>
+</li>
+<li>IShapeVisitor（形状访问者）<ul>
+<li>定义形状访问者的操作接口。</li>
+<li>定义让每个不同形状可调用的方法。</li>
+</ul>
+</li>
+<li>DrawVisitor、VectorCountVisitor、SphereVolumeVisitor（多个访问者）<ul>
+<li>实现IShapeVisitor形状访问者接口的子类。</li>
+<li>实现与形状类功能有关的地方。</li>
+<li>可以只重新实现特定的方法，建立只针对某个形状子类的操作功能。</li>
+</ul>
+</li>
+</ul>
+<h2 id="访问者模式的实现范例"><a href="#访问者模式的实现范例" class="headerlink" title="访问者模式的实现范例"></a><span style="color:#00ACC1;">访问者模式的实现范例</span></h2><p>首先，定义形状访问者（IShapeVisitor）接口：</p>
+<blockquote>
+<p>Listing9 定义访问者接口（ShapeVisitor.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">IShapeVisitor</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 由Sphere类来调用</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">VisitSphere</span> (<span class="params">Sphere theSphere</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 由Cube类来调用</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">VisitCube</span> (<span class="params">Cube theCube</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 由Cylinder类来调用</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">VisitCylinder</span> (<span class="params">Cylinder theCylinder</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接口中针对现有的3个形状子类，定义了对应调用的方法。但比较特别的是，在这里都定义为虚函数（virtual funciton）而不是抽象函数（abstract function），原因在于，这样可以让每一个子类决定要重新实现的方法，让每一个子类可以更精确地实现该类所负责的功能。</p>
+<p>将原本在形状容器（ShapeContainer）类定义的操作删除，然后增加一个可接受形状访问者（IShapeVisitor）对象的方法。</p>
+<blockquote>
+<p>Listing10 形状容器（ShapeVisitor.cs））</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ShapeContainer</span></span><br><span class="line">&#123;</span><br><span class="line">    List&lt;IShape&gt; m_Shapes = <span class="keyword">new</span> List&lt;IShape&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ShapeContainer</span>(<span class="params"></span>)</span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 新增</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">AddShape</span> (<span class="params">IShape theShape</span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_Shapes.Add (theShape );</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 共享的访问者接口</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">RunVisitor</span>(<span class="params">IShapeVisitor theVisitor</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">foreach</span> (IShape theShape <span class="keyword">in</span> m_Shapes)</span><br><span class="line">        &#123;</span><br><span class="line">            theShape.RunVisitor( theVisitor );</span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在RunVisitor方法中，遍历了每一个List容器内的IShape对象，并调用每一个对象的RunVisitor方法，该方法定义在IShape类接口中：</p>
+<blockquote>
+<p>Listing11 形状的定义（ShapeVisitor.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">IShape</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">protected</span> RenderEngine m_RenderEngine = <span class="literal">null</span>; <span class="comment">// 使用的绘图引擎</span></span><br><span class="line">    <span class="keyword">protected</span> Vector3 m_Position = Vector3.zero; <span class="comment">// 显示位置</span></span><br><span class="line">    <span class="keyword">protected</span> Vector3 m_Scale = Vector3.zero;<span class="comment">// 大小（缩放）</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">SetRenderEngine</span>(<span class="params"> RenderEngine theRenderEngine </span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_RenderEngine = theRenderEngine;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Vector3 <span class="title">GetPosition</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> m_Position;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Vector3 <span class="title">GetScale</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> m_Scale;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span>    <span class="title">Draw</span>(<span class="params"></span>)</span>;      <span class="comment">// 绘出</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">float</span>   <span class="title">GetVolume</span>(<span class="params"></span>)</span>; <span class="comment">// 获取体积</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">int</span>     <span class="title">GetVectorCount</span>(<span class="params"></span>)</span>; <span class="comment">// 获取顶点数</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span>    <span class="title">RunVisitor</span>(<span class="params">IShapeVisitor theVisitor</span>)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>IShape类接口中的RunVisitor是个抽象函数（abstract function），必须由各个子类重新实现：</p>
+<blockquote>
+<p>Listing12 各形状的重新实现（ShapeVisitor.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 球体</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Sphere</span> : <span class="title">IShape</span></span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">RunVisitor</span>(<span class="params">IShapeVisitor theVisitor</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        theVisitor.VisitSphere(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 立方体</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Cube</span> : <span class="title">IShape</span></span><br><span class="line">&#123;   </span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">RunVisitor</span>(<span class="params">IShapeVisitor theVisitor</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        theVisitor.VisitCube(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 圆柱体</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Cylinder</span> : <span class="title">IShape</span></span><br><span class="line">&#123;   </span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">RunVisitor</span>(<span class="params">IShapeVisitor theVisitor</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        theVisitor.VisitCylinder(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>每一个形状子类在重新实现的RunVisitor方法中，直接调用由参数传入的IShapeVisitor（形状访问者）对象的方法，调用的方法分别对应了自己所属的子类，并将自己对象（this）的引用传入调用的方法中。</p>
+<p>经过上列的修改后，形状容器（ShapeContainer）类算是完成了访问者模式。而定义中的前半段：“定义一个能够在一个对象结构中对于所有元素执行的操作”，是由ShapeContainer类的RunVistor方法和IShape类中的方法来实现的，而定义的后半段：“访问者让你可以定义一个新的操作，而不必更改到被操伴元素的类接口”，则可以通过接下来的范例来进行说明。</p>
+<p>同样是利用修改好的ShapeContainer类，如果想要让容器内所有的IShape对象执行绘图功能，只要定义一个继承IShapeVisitor的子类DrawVisitor，并且重新实现所有的方法，在这些方法中调用每一个传入对象的Draw函数就可以实现：</p>
+<blockquote>
+<p>Listing13 绘图功能的Visitor（ShapeVisitor.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">DrawVisitor</span> : <span class="title">IShapeVisitor</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 由Sphere类来调用</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">VisitSphere</span>(<span class="params">Sphere theSphere</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        theSphere.Draw();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 由Cube类来调用</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">VisitCube</span>(<span class="params">Cube theCube</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        theCube.Draw();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 由Cylinder类来调用</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">VisitCylinder</span>(<span class="params">Cylinder theCylinder</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        theCylinder.Draw();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>只增加一个类来负责实现调用每一个传入对象的Draw方法就可以实现目标，完全不必再更改到其他的类接口。通过下面的测试范例，可以完整地看到使用的流程：</p>
+<blockquote>
+<p>Listing14 测试绘图功能的Visitor（ShapeVisitorTest.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">UnitTest</span> (<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    DirectX theDirectX = <span class="keyword">new</span> DirectX();</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 加入形状</span></span><br><span class="line">    ShapeContainer theShapeContainer = <span class="keyword">new</span> ShapeContainer();</span><br><span class="line">    theShapeContainer.AddShape( <span class="keyword">new</span> Cube(theDirectX) );</span><br><span class="line">    theShapeContainer.AddShape( <span class="keyword">new</span> Cylinder(theDirectX) );</span><br><span class="line">    theShapeContainer.AddShape( <span class="keyword">new</span> Sphere(theDirectX) );</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 绘图</span></span><br><span class="line">    theShapeContainer.RunVisitor(<span class="keyword">new</span> DrawVisitor());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>再继续实现原来范例中要求的“计算顶点数”功能，这项功能由新的IShapeVisitor子类VectorCountVisitor来完成：</p>
+<blockquote>
+<p>Listing15 计数顶点数的Visitor（ShapeVisitor.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">VectorCountVisitor</span> : <span class="title">IShapeVisitor</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> Count = <span class="number">0</span>;</span><br><span class="line">    <span class="comment">// 由Sphere类来调用</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">VisitSphere</span>(<span class="params">Sphere theSphere</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Count += theSphere.GetVectorCount();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 由Cube类来调用</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">VisitCube</span>(<span class="params">Cube theCube</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Count += theCube.GetVectorCount();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 由Cylinder类来调用</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">VisitCylinder</span>(<span class="params">Cylinder theCylinder</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Count += theCylinder.GetVectorCount();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>类中定义了一个成员，用来计算当前累计的顶点数，执行时与绘图功能的范例一样，不需要改动到其他的类接口就可以完成要求的功能：</p>
+<blockquote>
+<p>Listing16 测试计算顶点数的Visitor（ShapeVisitorTest.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">UnitTest</span> (<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    DirectX theDirectX = <span class="keyword">new</span> DirectX();</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 加入形状</span></span><br><span class="line">    ShapeContainer theShapeContainer = <span class="keyword">new</span> ShapeContainer();</span><br><span class="line">    theShapeContainer.AddShape( <span class="keyword">new</span> Cube(theDirectX) );</span><br><span class="line">    theShapeContainer.AddShape( <span class="keyword">new</span> Cylinder(theDirectX) );</span><br><span class="line">    theShapeContainer.AddShape( <span class="keyword">new</span> Sphere(theDirectX) );</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 绘图</span></span><br><span class="line">    theShapeContainer.RunVisitor(<span class="keyword">new</span> DrawVisitor());</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 顶点数</span></span><br><span class="line">    VectorCountVisitor theVectorCount = <span class="keyword">new</span> VectorCountVisitor();</span><br><span class="line">    theShapeContainer.RunVisitor( theVectorCount );</span><br><span class="line">    Debug.Log(<span class="string">"顶点数:"</span>+ theVectorCount.Count );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>最后，实现一个只针对球体（Sphere）计算的体积并加总的功能：</p>
+<blockquote>
+<p>Listing17 计算球体体积的Visitor（ShapeVisitor.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">SphereVolumeVisitor</span> : <span class="title">IShapeVisitor</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> Volume;</span><br><span class="line">    <span class="comment">// 由Sphere类调用</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">VisitSphere</span>(<span class="params">Sphere theSphere</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Volume += theSphere.GetVolume();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>因为只针对球体（Sphere），所以类中只重新实现了VisitSphere方法来进行加总操作：</p>
+<blockquote>
+<p>Listing18 测试计算球体体积的Visitor（ShapeVisitorTest.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">UnitTest</span> (<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    DirectX theDirectX = <span class="keyword">new</span> DirectX();</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 加入形状</span></span><br><span class="line">    ShapeContainer theShapeContainer = <span class="keyword">new</span> ShapeContainer();</span><br><span class="line">    theShapeContainer.AddShape( <span class="keyword">new</span> Cube(theDirectX) );</span><br><span class="line">    theShapeContainer.AddShape( <span class="keyword">new</span> Cylinder(theDirectX) );</span><br><span class="line">    theShapeContainer.AddShape( <span class="keyword">new</span> Sphere(theDirectX) );</span><br><span class="line">    </span><br><span class="line">    ...</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 球体体积</span></span><br><span class="line">    SphereVolumeVisitor theSphereVolume = <span class="keyword">new</span> SphereVolumeVisitor();</span><br><span class="line">    theShapeContainer.RunVisitor( theSphereVolume );</span><br><span class="line">    Debug.Log(<span class="string">"球体体积:"</span>+ theSphereVolume.Volume );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>与执行计算顶点的访问者一样，先产生SphereVolumeVisitor对象，再调用形状容器（ShapeContainer）的RunVisitor访问者方法，最后输出计算结果。</p>
+<p>上面三项功能实现时，只新增了负责实现的类，并未更改到原有的类接口，符合了访问者模式定义后半段的要求：“访问者让你可以定义一个新的操作，而不必更改到被操作元素的类接口”。</p>
+<p><strong><font size="3">执行绘图访问者的流程图</font></strong></p>
+<p>执行绘图访问者时的流程图如图5所示，每一个形状子类都先通过调用访问者中的对应方法，再来执行每一个类中被重新实现后的方法。</p>
+<blockquote>
+<p>图5 执行绘图访问者时的流程图</p>
+</blockquote>
+
+<h1 id="使用访问者模式实现角色信息查询"><a href="#使用访问者模式实现角色信息查询" class="headerlink" title="使用访问者模式实现角色信息查询"></a><span style="color:#339AFF;">使用访问者模式实现角色信息查询</span></h1><p>笔者在每一款游戏的实现中，都会出现管理某一类对象的需求，除了基本的新增、删除、读取等操作之外，遍历容器并执行功能是另一个经常要做的事。也就是因为常常需要遍历管理容器，所以程序代码中常常看到foreach遍历某个管理容器的程序代码，而在每个功能的实现上，差别仅在于会影响到多少的现有类而已。</p>
+<p>所以，在还没使用访问者模式之前，项目就会很像本章最前面的范例那样，必须连续更改好几个类才能获取新增的功能，或者是在管理容器类中加入单例模式（Singleton），让客户端能快速获取，并立即使用新增的功能。但若善用访问者模式则可以让项目更具有稳定性，尤其是在新增功能且不想影响现有功能实现的情况时，特别方便。</p>
+<h2 id="角色信息查询的实现设计"><a href="#角色信息查询的实现设计" class="headerlink" title="角色信息查询的实现设计"></a><span style="color:#00ACC1;">角色信息查询的实现设计</span></h2><p>回到《P级阵地》中，分析“双方角色数量的统计”这个需求。如果只考虑单项功能的实现，那么原来的方式就已经完成了。但为了后续开发过程可能会增加的查询需求，我们将《P级阵地》运用访问者模式，让后续针对遍历所有角色并执行特定功能的需求，都能通过同一个接口方法来完成。</p>
+<p>按照前一节提示的修改步骤，《P级阵地》的角色系统（CharacterSystem）在运用访问者模式后，其结构如图6所示。</p>
+<blockquote>
+<p>图6 角色系统在运用访问者模式后的类结构图</p>
+</blockquote>
+
+<p>参与者的说明如下：</p>
+<ul>
+<li>ICharacterVisitor：角色访问者接口，针对《P级阵地》的双方阵营角色类，声明了对应的调用方法。</li>
+<li>UnitCountVisitor：统计双方阵营角色数量的访问者。</li>
+<li>CharacterSystem：角色系统，定义了一个共享的方法RunVisitor来执行角色访问者。</li>
+<li>ICharacter：角色类，增加了一个让角色访问者（ICharacterVisitor）可以执行的方法：RunVisitor。该方法是抽象函数（abstract function），必须由子类重新实现。</li>
+<li>ISoldier、SoldierCaption、…、IEnemy、EnemyElf、…：双方阵营的角色类，其中都会重新实现RunVisitor方法，并按照类本身的特色，调用角色访问者（ICharacterVisitor）中对应的方法。</li>
+<li>PBaseDefenseGame：因为角色系统（CharacterSystem）是游戏的子系统，需通过PBaseDefenseGame的方法RunCharacterVisitor来传递信息。</li>
+<li>Client：《P级阵地》中，所有需要执行角色遍历功能的地方。</li>
+</ul>
+<h2 id="实现说明"><a href="#实现说明" class="headerlink" title="实现说明"></a><span style="color:#00ACC1;">实现说明</span></h2><p>先定义角色访问者的接口：</p>
+<blockquote>
+<p>Listing19 定义角色Visitor接口（ICharacterVisitor.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">ICharacterVisitor</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">VisitCharacter</span>(<span class="params">ICharacter Character</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">VisitSoldier</span>(<span class="params">ISoldier Soldier</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        VisitCharacter( Soldier );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">VisitSoldierRookie</span>(<span class="params">SoldierRookie Rookie</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        VisitSoldier( Rookie );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">VisitSoldierSergeant</span>(<span class="params">SoldierSergeant Sergeant</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        VisitSoldier( Sergeant );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">VisitSoldierCaptain</span>(<span class="params">SoldierCaptain Captain</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        VisitSoldier( Captain );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">VisitSoldierCaptive</span>(<span class="params">SoldierCaptive Captive</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        VisitSoldier( Captive );</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">VisitEnemy</span>(<span class="params">IEnemy Enemy</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        VisitCharacter( Enemy );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">VisitEnemyElf</span>(<span class="params">EnemyElf Elf</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        VisitEnemy( Elf );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">VisitEnemyTroll</span>(<span class="params">EnemyTroll Troll</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        VisitEnemy( Troll );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">VisitEnemyOgre</span>(<span class="params">EnemyOgre Ogre</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        VisitEnemy( Ogre );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>类中针对《P级阵地》的每一个角色类（ICharacter）都定义了一个对应的虚函数（Virtual Function），比较特别的是，在每一个方法之中，都会调用父类的方法，会这样实现的原因是：可以让每一个最底层的子类角色对象被遍历时，也都可以一并执行到父类的访问方法，让每一层的类都可以被遍历到。</p>
+<p>在角色接口（ICharacter）增加让角色访问者（ICharacterVisitor）可以执行的方法：</p>
+<blockquote>
+<p>Listing20 角色接口（ICharacter.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">ICharacter</span></span><br><span class="line">&#123;</span><br><span class="line">    ... </span><br><span class="line">    <span class="comment">// 执行Visitor</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">RunVisitor</span> (<span class="params">ICharacterVisitor Visitor</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Visitor.VisitCharacter(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在角色系统（CharacterSystem）中，删除原有角色数量统计的方法，然后加上一个能让所有战场上的角色来执行的角色访问者（ICharacterVisitor）方法：</p>
+<blockquote>
+<p>Listing21 管理产生出来的角色（CharacterSystem.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">CharacterSystem</span> : <span class="title">IGameSystem</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> List&lt;ICharacter&gt; m_Soldiers = <span class="keyword">new</span> List&lt;ICharacter&gt;();</span><br><span class="line">    <span class="keyword">private</span> List&lt;ICharacter&gt; m_Enemys = <span class="keyword">new</span> List&lt;ICharacter&gt;();</span><br><span class="line"></span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 执行Visitor</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">RunVisitor</span>(<span class="params">ICharacterVisitor Visitor</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">foreach</span>( ICharacter Character <span class="keyword">in</span> m_Soldiers)</span><br><span class="line">            Character.RunVisitor( Visitor);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">foreach</span>( ICharacter Character <span class="keyword">in</span> m_Enemys)</span><br><span class="line">            Character.RunVisitor( Visitor);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>因为角色系统（CharacterSystem）属于游戏子系统（IGameSystem），所以必须通过PBaseDefenseGame作为沟通的渠道。因此，在PBaseDefenseGame类中也增加执行角色系统访问者的方法，并一并删除之前角色数量统计所使用的方法：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">PBaseDefenseGame</span></span><br><span class="line">&#123;</span><br><span class="line">    ... </span><br><span class="line">    <span class="comment">// 游戏系统</span></span><br><span class="line">    <span class="keyword">private</span> CharacterSystem m_CharacterSystem = <span class="literal">null</span>; <span class="comment">//角色管理系统</span></span><br><span class="line">    ...</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 执行角色系统的Visitor</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">RunCharacterVisitor</span> (<span class="params">ICharacterVisitor Visitor</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_CharacterSystem.RunVisitor( Visitor);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>新增了相关角色访问者（ICharacterVisitor）所需执行的方法后，就可以开始实现角色计数功能的访问者了：</p>
+<blockquote>
+<p>Listing22 各单位计数访问者（UnitCountVisitor.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">UnitCountVisitor</span> : <span class="title">ICharacterVisitor</span> </span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 所有单位的计数器</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> CharacterCount = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> SoldierCount = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> SoldierRookieCount = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> SoldierSergeantCount = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> SoldierCaptainCount = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> SoldierCaptiveCount = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> EnemyCount = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> EnemyElfCount = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> EnemyTrollCount = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> EnemyOgreCount = <span class="number">0</span>;</span><br><span class="line">        </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">VisitCharacter</span> (<span class="params">ICharacter Character</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">base</span>.VisitCharacter(Character);</span><br><span class="line">        CharacterCount++;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">VisitSoldier</span> (<span class="params">ISoldier Soldier</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">base</span>.VisitSoldier(Soldier);</span><br><span class="line">        SoldierCount++;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">VisitSoldierRookie</span> (<span class="params">SoldierRookie Rookie</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">base</span>.VisitSoldierRookie(Rookie);</span><br><span class="line">        SoldierRookieCount++;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">VisitSoldierSergeant</span>(<span class="params">SoldierSergeant Sergeant</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">base</span>.VisitSoldierSergeant(Sergeant);</span><br><span class="line">        SoldierSergeantCount++;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">VisitSoldierCaptain</span> (<span class="params">SoldierCaptain Captain</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">base</span>.VisitSoldierCaptain(Captain);</span><br><span class="line">        SoldierCaptainCount++;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">VisitSoldierCaptive</span> (<span class="params">SoldierCaptive Captive</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">base</span>.VisitSoldierCaptive(Captive);</span><br><span class="line">        SoldierCaptiveCount++;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">VisitEnemy</span> (<span class="params">IEnemy Enemy</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">base</span>.VisitEnemy(Enemy);</span><br><span class="line">        EnemyCount++;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">VisitEnemyElf</span> (<span class="params">EnemyElf Elf</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">base</span>.VisitEnemyElf(Elf);</span><br><span class="line">        EnemyElfCount++;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">VisitEnemyTroll</span>(<span class="params">EnemyTroll Troll</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">base</span>.VisitEnemyTroll(Troll);</span><br><span class="line">        EnemyTrollCount++;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">VisitEnemyOgre</span>(<span class="params">EnemyOgre Ogre</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">base</span>.VisitEnemyOgre(Ogre);</span><br><span class="line">        EnemyOgreCount++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Reset</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        CharacterCount = <span class="number">0</span>;</span><br><span class="line">        SoldierCount = <span class="number">0</span>;</span><br><span class="line">        SoldierRookieCount = <span class="number">0</span>;</span><br><span class="line">        SoldierSergeantCount = <span class="number">0</span>;</span><br><span class="line">        SoldierCaptainCount = <span class="number">0</span>;</span><br><span class="line">        SoldierCaptiveCount = <span class="number">0</span>;</span><br><span class="line">        EnemyCount = <span class="number">0</span>;</span><br><span class="line">        EnemyElfCount = <span class="number">0</span>;</span><br><span class="line">        EnemyTrollCount = <span class="number">0</span>;</span><br><span class="line">        EnemyOgreCount = <span class="number">0</span>; </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取Solder兵种的数量</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">GetUnitCount</span>(<span class="params"> ENUM_Soldier emSoldier</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">switch</span>( emSoldier)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">case</span> ENUM_Soldier.Null:</span><br><span class="line">                <span class="keyword">return</span> SoldierCount;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">case</span> ENUM_Soldier.Rookie:</span><br><span class="line">                <span class="keyword">return</span> SoldierRookieCount;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">case</span> ENUM_Soldier.Sergeant:</span><br><span class="line">                <span class="keyword">return</span> SoldierSergeantCount;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">case</span> ENUM_Soldier.Captain:</span><br><span class="line">                <span class="keyword">return</span> SoldierCaptainCount;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">case</span> ENUM_Soldier.Captive:</span><br><span class="line">                <span class="keyword">return</span> SoldierCaptiveCount;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">default</span>: </span><br><span class="line">                Debug.LogWarning(<span class="string">"GetUnitCount:没有["</span>+emSoldier+<span class="string">"]可以对应的计算方式"</span>);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 获取Enemy兵种的数量</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">GetUnitCount</span>(<span class="params"> ENUM_Enemy emEnemy</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">switch</span>( emEnemy)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">case</span> ENUM_Enemy.Null:</span><br><span class="line">                <span class="keyword">return</span> EnemyCount;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">case</span> ENUM_Enemy.Elf:</span><br><span class="line">                <span class="keyword">return</span> EnemyElfCount;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">case</span> ENUM_Enemy.Troll:</span><br><span class="line">                <span class="keyword">return</span> EnemyTrollCount;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">case</span> ENUM_Enemy.Ogre:</span><br><span class="line">                <span class="keyword">return</span> EnemyOgreCount;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">default</span>: </span><br><span class="line">                Debug.LogWarning(<span class="string">"GetUnitCount:没有["</span>+emEnemy+<span class="string">"]可以对应的计算方式"</span>);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>角色单位计数访问者（UnitCountVisitor）重新实现了每一个虚函数，每一个函数在被调用时，都会增加该单位的计数器。因为之前的设计会调用父类的方法，所以包含父类层级ICharacter、ISoldier、IEnemy也都可以借助对应的成员，来获取当前场地内所有类角色的数量以及双方阵营单位的存活数量。最后，提供了方便的访问方法GetUnitCount，使得可按参数返回指定类的计数器属性。</p>
+<p>在游戏状态信息界面（GameStateInfoUI）中显示出双方阵营角色的数量：</p>
+<blockquote>
+<p>Listing23 游戏状态信息（GameStateInfoUI.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">GameStateInfoUI</span> : <span class="title">IUserInterface</span></span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment">// 双方角色计数</span></span><br><span class="line">    <span class="keyword">private</span> UnitCountVisitor m_UnitCountVisitor = <span class="keyword">new</span> UnitCountVisitor(); </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Update</span> (<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">base</span>.Update ();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 执行角色计算Visitor</span></span><br><span class="line">        m_UnitCountVisitor.Reset();</span><br><span class="line">        m_PBDGame.RunCharacterVisitor(m_UnitCountVisitor);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 双方数量</span></span><br><span class="line">        m_SoldierCountText.text = <span class="keyword">string</span>.Format(<span class="string">"我方单位数:&#123;0&#125;"</span>, m_UnitCountVisitor.GetUnitCount( ENUM_Soldier.Null ));</span><br><span class="line">        m_EnemyCountText.text = <span class="keyword">string</span>.Format(<span class="string">"敌方单位数:&#123;0&#125;"</span>, m_UnitCountVisitor.GetUnitCount( ENUM_Enemy.Null ));</span><br><span class="line">        ...</span><br><span class="line">    &#125;   </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>实现上，只需要产生角色访问者的对象，然后通过PBaseDefenseGame定义的接口，就能让角色系统（CharacterSystem）所管理的所有角色对象都能够被传送到角色计数访问者（UnitCountVisitor）中，进行角色数量的加总计数。</p>
+<p>另外，还有一个要使用到计数功能的则是兵营界面（CampInfoUI）：</p>
+<blockquote>
+<p>Listing24 兵营界面（CampInfoUI.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">CampInfoUI</span> : <span class="title">IUserInterface</span></span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">private</span> UnitCountVisitor m_UnitCountVisitor = <span class="keyword">new</span> UnitCountVisitor(); <span class="comment">// 存活单位计数</span></span><br><span class="line">    ...</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 训练中的信息</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">ShowOnTrainInfo</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        ...</span><br><span class="line">        <span class="comment">// 存活单位</span></span><br><span class="line">        m_UnitCountVisitor.Reset();</span><br><span class="line">        m_PBDGame.RunCharacterVisitor( m_UnitCountVisitor );</span><br><span class="line">        <span class="keyword">int</span> UnitCount = m_UnitCountVisitor.GetUnitCount( m_Camp.GetSoldierType());</span><br><span class="line">        m_AliveCountTxt.text = <span class="keyword">string</span>.Format( <span class="string">"存活单位:&#123;0&#125;"</span>,UnitCount );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>同样地，我们可以利用如图7所示的流程图来了解各个对象之间互动的情形。</p>
+<blockquote>
+<p>图7 各个对象之间互动的流程图</p>
+</blockquote>
+
+<h2 id="使用访问者模式的优点"><a href="#使用访问者模式的优点" class="headerlink" title="使用访问者模式的优点"></a><span style="color:#00ACC1;">使用访问者模式的优点</span></h2><p>使用的角色访问者（ICharacterVisitor）让遍历每一个角色对象并执行特定功能变得容易了许多。在不必更改任何类接口的情况下，新增的功能只需要实现新的角色访问者子类即可，大幅增加了系统的稳定性，也减少了对类接口不必要的修改。</p>
+<h2 id="实现访问者模式时的注意事项"><a href="#实现访问者模式时的注意事项" class="headerlink" title="实现访问者模式时的注意事项"></a><span style="color:#00ACC1;">实现访问者模式时的注意事项</span></h2><p>访问者模式的优点正如上面所讲的，但在实现访问者模式时，还有一些需要注意的地方。</p>
+<p><strong><font size="3">当增加了新的角色类时</font></strong></p>
+<p>访问者模式的缺点之一是，当角色类（ICharacter）群组增加子类时，那么角色访问者（ICharacterVistor）必须新增一个对应调用的方法，而这个新增的操作会引起所有子类进行相同的改动，并且需要对每一个子类进行检查，以确定是否需要重新实现新增的方法。</p>
+<p><strong><font size="3">被访问类的封装性变差</font></strong></p>
+<p>在《P级阵地》中，被访问的类就是角色类群组。在运用访问者模式的情况下，被访问的类必须尽可能提供所有可能的操作和信息，这样才能在实现新的访问者时，不会因为缺少需要的方法，而连带修改角色类接口。但是过度地开放角色类的方法和信息，不仅会破坏类的封装性，也会增加其他系统与角色类的依赖度（或耦合度）。</p>
+<h1 id="访问者模式面对变化时"><a href="#访问者模式面对变化时" class="headerlink" title="访问者模式面对变化时"></a><span style="color:#339AFF;">访问者模式面对变化时</span></h1><p>在《P级阵地》的某次项目会议上，有人提议到……</p>
+<p>测试：“大家有没有觉得，如果在玩家每次过关时，系统能给予奖励的话，是不是能成为玩家想过关的诱因。”<br>企划：“你是说什么样的奖励？”<br>测试：“类似以前街机的射击游戏，过了一关，就会补满大炸弹，我们可以考虑要不要增加类似的过关奖励，或是给予存活单位增加什么功能，作为过关时的奖励，既可强化守护优势，又可增加玩家游戏时的策略选择。”<br>企划：“嗯…是个不错的构想，可以试试给予存活角色增加一个勋章的方式，就像获得特殊荣誉那样，存活的越多次累计越多，而勋章累计数可以对应到一个角色的加成属性，用来强化攻守能力。至于属性的设置，就交给我们企划来烦恼，不过是否能实现出来，以及所需要的时间，还是请小程评估一下。”<br>小程：“应该不难实现…”</p>
+<p>小程脑子里转了一下，想了想当前项目的架构：</p>
+<ul>
+<li>第一：应该是更改一下ISoldier的接口，让它增加一些与勋章有关的方法。</li>
+<li>第二：增加勋章的触发点可以加在新关卡产生的时刻，可利用已经运用观察者模式（Observer）的游戏事件系统（GameEventSystem），新增一个过关主题（NewStageSubject）的观察者，就可以办到。</li>
+<li>第三：至于怎么让存活在战场上的ISoldier都可以增加勋章，应该是让角色系统（CharacterSystem）遍历所有在战场上的ISoldier对象，通知他们都可以增加一个勋章数，这恰好可以利用最近完成的访问者模式来实现。</li>
+</ul>
+<p>小程：“以当前的项目构架要实现没有太大问题，可以很容易串联相关功能。不过，玩家角色获得勋章可对应到一个角色加成属性，然后用来强化攻守能力，这一部分，我们系统还没有加入这样的机制，这一部分是不是…”<br>企划：“是的是的，这一部分我们企划还在规划中，等完成后，会再加入游戏需求中。可以先将流程都串接好，等属性加成的功能都设计好了，再加上去，好吗？”<br>程序：“好的”</p>
+<p>于是小程在之后的实现中，先完成了ISoldier接口的修正，增加与勋章有关的成员和方法：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Soldier角色接口</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">ISoldier</span> : <span class="title">ICharacter</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">int</span> m_MedalCount = <span class="number">0</span>; <span class="comment">// 勋章数量</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">const</span> <span class="keyword">int</span> MAX_MEDAL = <span class="number">3</span>; <span class="comment">// 最多勋章数量</span></span><br><span class="line">   </span><br><span class="line">    ...</span><br><span class="line">    <span class="comment">// 增加勋章</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">AddMedal</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span>( m_MedalCount &gt;= MAX_MEDAL)</span><br><span class="line">            <span class="keyword">return</span> ;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 增加勋章</span></span><br><span class="line">        m_MedalCount++;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 获取对应的勋章加成值</span></span><br><span class="line">        <span class="comment">// <span class="doctag">TODO:</span> 等待企划完成规划</span></span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125; <span class="comment">// ISoldier.cs</span></span><br></pre></td></tr></table></figure></p>
+<p>然后，增加了一个ISoldier角色勋章的访问者：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 增加Solder勋章</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">SoldierAddMedalVisitor</span> : <span class="title">ICharacterVisitor</span> </span><br><span class="line">&#123;</span><br><span class="line">    PBaseDefenseGame m_PBDGame = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">SoldierAddMedalVisitor</span>(<span class="params"> PBaseDefenseGame PBDGame</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_PBDGame = PBDGame;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">VisitSoldier</span>(<span class="params">ISoldier Soldier</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">base</span>.VisitSoldier( Soldier);</span><br><span class="line">        Soldier.AddMedal();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 游戏事件</span></span><br><span class="line">        m_PBDGame.NotifyGameEvent( ENUM_GameEvent.SoldierUpgate, Soldier); </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>新增的访问者类只重新实现了VisiSoldier方法，这是因为只有ISoldier类的对象才会进行增加勋章的操作，最后也通知了游戏事件系统（GameEventSystem），有玩家阵营单位要升级。</p>
+<p>之后再新增一个过关主题（NewStageSubject）的观察者，用来串接“过关事件”与“ISoldien角色增加勋章”的关联：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 订阅新关卡-增加Solder勋章</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">NewStageObserverSoldierAddMedal</span> : <span class="title">IGameEventObserver</span> </span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> NewStageSubject m_Subject = <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">private</span> PBaseDefenseGame m_PBDGame = <span class="literal">null</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">NewStageObserverSoldierAddMedal</span>(<span class="params">PBaseDefenseGame  PBDGame</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_PBDGame = PBDGame;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 设置观察的主题</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">SetSubject</span>(<span class="params"> IGameEventSubject Subject </span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_Subject = Subject <span class="keyword">as</span> NewStageSubject;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 通知Subject被更新</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 增加勋章</span></span><br><span class="line">        SoldierAddMedalVisitor theAddMedalVisitor = <span class="keyword">new</span> SoldierAddMedalVisitor(m_PBDGame); </span><br><span class="line">        m_PBDGame.RunCharacterVisitor( theAddMedalVisitor );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;<span class="comment">// NewStageObserverSoldierAddMedal.cs</span></span><br></pre></td></tr></table></figure></p>
+<p>当收到过关通知（Update）时，产生ISoldier角色勋章访问者的对象，然后通过PBaseDefenseGame的方法，让角色系统（CharacterSystem）访问者遍历所有的角色对象。</p>
+<p>最后，在角色系统（CharacterSystem）中，向游戏事件系统注册新的观察者，完成串接：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">CharacterSystem</span> : <span class="title">IGameSystem</span></span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">CharacterSystem</span>(<span class="params">PBaseDefenseGame PBDGame</span>) : <span class="title">base</span>(<span class="params">PBDGame</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Initialize();</span><br><span class="line">        <span class="comment">// 注册事件</span></span><br><span class="line">        m_PBDGame.RegisterGameEvent(ENUM_GameEvent.NewStage, <span class="keyword">new</span> NewStageObserverSoldierAddMedal(m_PBDGame));</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125; <span class="comment">// CharacterSystem.cs</span></span><br></pre></td></tr></table></figure></p>
+<p>通过小程这次对新增需求的实现过程，我们可以了解到，除了因为原本需求没有勋章功能所做的更改外，后续针对新增功能的部分，都是使用新增类的方式来完成的：</p>
+<ul>
+<li>配合<a href="/2019/08/18/成就系统-观察者模式/" title="成就系统-观察者模式">成就系统-观察者模式</a>已运用观察者模式（Observer）来实现的游戏事件系统（GameEventSystem），利用新增观察者类的方式，就可以让特定游戏事件发生后串接新功能。</li>
+<li>加上本章所说明的访问者模式（Visitor），利用新增访问者类的方式，就可以完成遍历所有角色对象并执行特定功能的实现需求。</li>
+</ul>
+<p>至于应对“注册游戏事件”而更改的角色系统（CharacterSystem）则是必须更改的，但并不会影响系统的稳定性，必要时，更可独立出一个静态类，专门用来集中处理所有的注册事件。</p>
+<h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a><span style="color:#339AFF;">结论</span></h1><p>运用访问者模式后的系统，可以利用新增访问者类的方式，来遍历所有对象并执行特定功能的操作，过程中不需要更改任何其他的类。但是新增被访问者类时，会造成系统大量的修改，这是必须注意的，而被访问者对象需要开放足够的操作方法和信息则是访问者模式的另一个缺点。</p>
+<p><strong><font size="3">其他应用方式</font></strong></p>
+<p>在一般的游戏中，除了角色系统之外，其他系统也常需要使用“遍历所有对象”的功能，如角色的道具包、当前已收集的卡片、可以使用的宠物等，针对装载这些对象的“管理容器”类，经常会需要更改类接口来满足游戏新增的需求，此时就可以选择使用访问者模式来减少“管理容器”类的更改。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/设计模式与游戏完美开发/" rel="tag"># 设计模式与游戏完美开发</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/08/19/存盘功能-备忘录模式/" rel="next" title="存盘功能--备忘录模式">
+                <i class="fa fa-chevron-left"></i> 存盘功能--备忘录模式
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/08/19/前缀字尾-装饰模式/" rel="prev" title="前缀字尾--装饰模式">
+                前缀字尾--装饰模式 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">354</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">55</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2020/02/16/游戏设计快乐之道（第2版）/" title="游戏设计快乐之道（第2版）" target="_blank">游戏设计快乐之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/14/游戏剧本怎么写/" title="游戏剧本怎么写" target="_blank">游戏剧本怎么写</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/04/通关！游戏设计之道（第2版）/" title="通关！游戏设计之道（第2版）" target="_blank">通关！游戏设计之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/26/游戏设计艺术（第2版）/" title="游戏设计艺术（第2版）" target="_blank">游戏设计艺术（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/22/大师谈游戏设计创意与节奏/" title="大师谈游戏设计创意与节奏" target="_blank">大师谈游戏设计创意与节奏</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#角色信息的提供"><span class="nav-number">1.</span> <span class="nav-text">角色信息的提供</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#访问者模式"><span class="nav-number">2.</span> <span class="nav-text">访问者模式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#访问者模式的定义"><span class="nav-number">2.1.</span> <span class="nav-text">访问者模式的定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#访问者模式的说明"><span class="nav-number">2.2.</span> <span class="nav-text">访问者模式的说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#访问者模式的实现范例"><span class="nav-number">2.3.</span> <span class="nav-text">访问者模式的实现范例</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用访问者模式实现角色信息查询"><span class="nav-number">3.</span> <span class="nav-text">使用访问者模式实现角色信息查询</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#角色信息查询的实现设计"><span class="nav-number">3.1.</span> <span class="nav-text">角色信息查询的实现设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现说明"><span class="nav-number">3.2.</span> <span class="nav-text">实现说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用访问者模式的优点"><span class="nav-number">3.3.</span> <span class="nav-text">使用访问者模式的优点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现访问者模式时的注意事项"><span class="nav-number">3.4.</span> <span class="nav-text">实现访问者模式时的注意事项</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#访问者模式面对变化时"><span class="nav-number">4.</span> <span class="nav-text">访问者模式面对变化时</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#结论"><span class="nav-number">5.</span> <span class="nav-text">结论</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">3.7m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">56:23</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

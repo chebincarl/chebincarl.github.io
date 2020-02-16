@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="思考并回答以下问题：  Mediators speak to the rest of the app。怎么理解？">
+<meta name="keywords" content="Unity框架">
+<meta property="og:type" content="article">
+<meta property="og:title" content="StrangeIOC官方案例">
+<meta property="og:url" content="http://chebincarl.github.io/2019/10/14/StrangeIOC官方案例/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="思考并回答以下问题：  Mediators speak to the rest of the app。怎么理解？">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://chebincarl.github.io/2019/10/14/StrangeIOC官方案例/1.png">
+<meta property="og:updated_time" content="2019-10-27T08:26:20.178Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="StrangeIOC官方案例">
+<meta name="twitter:description" content="思考并回答以下问题：  Mediators speak to the rest of the app。怎么理解？">
+<meta name="twitter:image" content="http://chebincarl.github.io/2019/10/14/StrangeIOC官方案例/1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/10/14/StrangeIOC官方案例/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>StrangeIOC官方案例 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">专注，重复10遍</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/10/14/StrangeIOC官方案例/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">StrangeIOC官方案例
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-10-14 14:53:39" itemprop="dateCreated datePublished" datetime="2019-10-14T14:53:39+08:00">2019-10-14</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-10-27 16:26:20" itemprop="dateModified" datetime="2019-10-27T16:26:20+08:00">2019-10-27</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Unity/" itemprop="url" rel="index"><span itemprop="name">Unity</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">21k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">20 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>思考并回答以下问题：</p>
+<ul>
+<li>Mediators speak to the rest of the app。怎么理解？</li>
+</ul>
+<a id="more"></a>
+<h1 id="StangeIOC"><a href="#StangeIOC" class="headerlink" title="StangeIOC"></a>StangeIOC</h1><p>Strange attractors create predictable patterns, often in chaotic systems.</p>
+<p>Strange is a super-lightweight and highly extensible Inversion-of-Control (IoC) framework, written specifically for C# and Unity. We’ve validated Strange on web, standalone, and iOS, and Android.</p>
+<p>It contains the following features, most of which are optional:</p>
+<ul>
+<li>A core binding framework that pretty much lets you bind one or more of anything to one or more of anything else.</li>
+<li>Dependency Injection<ul>
+<li>Map as singleton, value or factory (get a new instance each time you need one)</li>
+<li>Name injections and/or supply specific implementations to specific consumer classes</li>
+<li>Perform constructor or setter injection</li>
+<li>Tag your preferred constructor</li>
+<li>Tag a method to fire after construction</li>
+<li>Inject into MonoBehaviours</li>
+<li>Bind polymorphically (bind any or all of your interfaces to a single concrete class)</li>
+</ul>
+</li>
+<li>Reflection binding dramatically reduces overhead of employing reflectivity</li>
+<li>Two shared event bus systems, EventDispatcher and Signals. Both allow you to:<ul>
+<li>Dispatch events to any point in your application</li>
+<li>Map local events for local communication</li>
+<li>Map events to Commands classes to separate business logic</li>
+<li>EventDispatcher transmits data payloads as primitives or ValueObjects</li>
+<li>Signals transmits data in bindable, type-safe parameters</li>
+</ul>
+</li>
+<li>MonoBehaviour mediation<ul>
+<li>Facilitate separation of a view from the application using it</li>
+<li>Keep Unity-specific code isolated from the rest of the app</li>
+</ul>
+</li>
+<li>Optional MVCS (Model/View/Controller/Service) structure</li>
+<li>Multiple contexts<ul>
+<li>Allow subcomponents (separate Scenes) to function on their own, or in the context of larger apps.</li>
+<li>Allow communication between contexts.</li>
+</ul>
+</li>
+<li>Promises<ul>
+<li>Similar to Javascript Q-Promises, these help control flow and error handling</li>
+<li>Promises also fit some common signal use cases much more cleanly!</li>
+</ul>
+</li>
+<li>Annotated ‘Implicit’ Bindings</li>
+<li>Reduce boiler plate code written in your Context and Mediators!</li>
+<li>JSON-driven bindings</li>
+<li>Dynamically load your bindings at runtime!</li>
+<li>Don’t see what you need? The core binding framework is simple to extend. Build new Binders like:<ul>
+<li>A different type of dispatcher, like AS3-Signals &lt;- WAIT A MOMENT! WE DID EXACTLY THAT!!!</li>
+<li>An entity framework</li>
+<li>A multi-loader</li>
+</ul>
+</li>
+</ul>
+<p>In addition to organizing your project into a sensible structure, Strange offers the following benefits:</p>
+<ul>
+<li>Designed to play well with Unity3D. Also designed to play well without it.</li>
+<li>Separate UnityEngine code from the rest of your app.<ul>
+<li>Improves portability</li>
+<li>Improves unit testability</li>
+</ul>
+</li>
+<li>A common event bus makes information flow easy and highly decoupled. (Note: Unity’s SendMessage method does this, of course, but it’s dangerous as all get-out. I may write a whole article on just this topic at some point.)</li>
+<li>The extensible binder really is amazing (a friend used to tell me “it’s good to like your own cookin’”). The number of things you can accomplish with the tiny core framework would justify Strange all on its own.</li>
+<li>Multiple contexts allow you to “bootstrap” subcomponents so they operate fine either on their own or as an integrated part. This can hugely speed up your development process and allow developers to work in isolation, then integrate in later stages of development.</li>
+<li>Get rid of platform-specific #IF…#ELSE constructs in your code. IoC allows you to write whole concrete implementations correctly, then bind the ones you want to use at compile time or at run time. (As with other forms of binding, #IF…#ELSE clauses can be isolated into a single class and away from the rest of your code.)</li>
+</ul>
+<h1 id="最简单的案例"><a href="#最简单的案例" class="headerlink" title="最简单的案例"></a>最简单的案例</h1><p>The MyFirstProject example is a great place to start learning.</p>
+<p>Inside is everything you need to create a very simple strange app which demonstrates the Root (MyFirstProjectRoot, start here), the Context (ExampleContext), which is where your bindings go,<br>a Command (StartCommand), a View (ExampleView) and a Mediator (ExampleMediator).</p>
+<h2 id="文件目录"><a href="#文件目录" class="headerlink" title="文件目录"></a>文件目录</h2><img src="/2019/10/14/StrangeIOC官方案例/1.png">
+<h2 id="初始化与客户端"><a href="#初始化与客户端" class="headerlink" title="初始化与客户端"></a>初始化与客户端</h2><blockquote>
+<p>MyFirstProjectRoot.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> The Root is the entry point to a strange-enabled Unity3D app.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> ===============</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> </span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Attach this MonoBehaviour to a GameObject at the top of your Main scene.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> </span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> It is considered a best practice to create ONE GameObject at the top of your </span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> app and attach everything to it. (Note that you can create multiple Roots which </span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> will result in multiple Contexts.  This can be desirable, but it's an advanced use case.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Recommend you stick to a single Context until you're confident you know what you're doing.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> </span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> The GameObject to which this MonoBehaviour is attached to called the 'ContextView'</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> and is injectable anywhere in the application. This is especially</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> useful in commands, where you can access the ContextView to attach further GameObjects </span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> or MonoBehaviours.</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> strange.extensions.context.impl;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">strange.examples.myfirstproject</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">MyFirstProjectRoot</span> : <span class="title">ContextView</span></span><br><span class="line">    &#123;</span><br><span class="line">    </span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">Awake</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="comment">//Instantiate the context, passing it this instance.</span></span><br><span class="line">            context = <span class="keyword">new</span> MyFirstContext(<span class="keyword">this</span>);</span><br><span class="line"></span><br><span class="line">            <span class="comment">//This is the most basic of startup choices, and probably the most common.</span></span><br><span class="line">            <span class="comment">//You can also opt to pass in ContextStartFlag options, such as:</span></span><br><span class="line">            <span class="comment">//</span></span><br><span class="line">            <span class="comment">//context = new MyFirstContext(this, ContextStartupFlags.MANUAL_MAPPING);</span></span><br><span class="line">            <span class="comment">//context = new MyFirstContext(this, ContextStartupFlags.MANUAL_MAPPING | ContextStartupFlags.MANUAL_LAUNCH);</span></span><br><span class="line">            <span class="comment">//</span></span><br><span class="line">            <span class="comment">//These flags allow you, when necessary, to interrupt the startup sequence.</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>MyFirstContext.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> The Context is where all the magic really happens.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> ===========</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Other than copying the constructors, all you really need to do when you create</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> your context is override Context or one of its subclasses, then set up</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> your list of mappings.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> </span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> In an MVCSContext, like the one we're using, there are three types of</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> available mappings:</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> 1. Dependency Injection - Bind your dependencies to injectionBinder.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> 2. View/Mediator Binding - Bind MonoBehaviours on your GameObjects to Mediators that speak to the rest of the app</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> 3. Event Binding - Bind Events to any/all of the following:</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span>         - Event/Method Binding -    Firing the event will trigger the method(s).</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span>         - Event/Command Binding -   Firing the event will instantiate the Command(s) and run its Execute() method.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span>         - Event/Sequence Binding -  Firing the event will instantiate a Command(s), run its Execute() method, and,</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span>                                     unless the sequence is interrupted, fire each subsequent Command until the</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span>                                     sequence is complete.</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> strange.extensions.context.api;</span><br><span class="line"><span class="keyword">using</span> strange.extensions.context.impl;</span><br><span class="line"><span class="keyword">using</span> strange.extensions.dispatcher.eventdispatcher.api;</span><br><span class="line"><span class="keyword">using</span> strange.extensions.dispatcher.eventdispatcher.impl;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">strange.examples.myfirstproject</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">MyFirstContext</span> : <span class="title">MVCSContext</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">MyFirstContext</span> (<span class="params">MonoBehaviour view</span>) : <span class="title">base</span>(<span class="params">view</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">MyFirstContext</span> (<span class="params">MonoBehaviour view, ContextStartupFlags flags</span>) : <span class="title">base</span>(<span class="params">view, flags</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">mapBindings</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="comment">//Injection binding.</span></span><br><span class="line">            <span class="comment">//Map a mock model and a mock service, both as Singletons</span></span><br><span class="line">            injectionBinder.Bind&lt;IExampleModel&gt;().To&lt;ExampleModel&gt;().ToSingleton();</span><br><span class="line">            injectionBinder.Bind&lt;IExampleService&gt;().To&lt;ExampleService&gt;().ToSingleton();</span><br><span class="line"></span><br><span class="line">            <span class="comment">//View/Mediator binding</span></span><br><span class="line">            <span class="comment">//This Binding instantiates a new ExampleMediator whenever as ExampleView</span></span><br><span class="line">            <span class="comment">//Fires its Awake method. The Mediator communicates to/from the View</span></span><br><span class="line">            <span class="comment">//and to/from the App. This keeps dependencies between the view and the app</span></span><br><span class="line">            <span class="comment">//separated.</span></span><br><span class="line">            mediationBinder.Bind&lt;ExampleView&gt;().To&lt;ExampleMediator&gt;();</span><br><span class="line">            </span><br><span class="line">            <span class="comment">//Event/Command binding</span></span><br><span class="line">            commandBinder.Bind(ExampleEvent.REQUEST_WEB_SERVICE).To&lt;CallWebServiceCommand&gt;();</span><br><span class="line">            <span class="comment">//The START event is fired as soon as mappings are complete.</span></span><br><span class="line">            <span class="comment">//Note how we've bound it "Once". This means that the mapping goes away as soon as the command fires.</span></span><br><span class="line">            commandBinder.Bind(ContextEvent.START).To&lt;StartCommand&gt;().Once();</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="View"><a href="#View" class="headerlink" title="View"></a>View</h2><blockquote>
+<p>ExampleView.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> An example view</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> ==========================</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> The view is where you program and configure the particulars of an item</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> in a scene. For example, if you have a GameObject with buttons and a</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> test readout, wire all that into this class.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> </span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> By default, Views do not have access to the common Event bus. While you</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> could inject it, we STRONGLY recommend against doing this. Views are by</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> nature volatile, possibly the piece of your app most likely to change.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Mediation mapping allows you to automatically attach a 'Mediator' class</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> whose responsibility it is to connect the View to the rest of the app.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> </span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Building a view in code here. Ordinarily, you'd do this in the scene.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> You could argue that this code is kind of messy...not ideal for a demo...</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> but that's kind of the point. View code is often highly volatile and</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> reactive. It gets messy. Let your view be what it needs to be while</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> insulating the rest of your app from this chaos.</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> strange.extensions.dispatcher.eventdispatcher.api;</span><br><span class="line"><span class="keyword">using</span> strange.extensions.mediation.impl;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">strange.examples.myfirstproject</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ExampleView</span> : <span class="title">View</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">internal</span> <span class="keyword">const</span> <span class="keyword">string</span> CLICK_EVENT = <span class="string">"CLICK_EVENT"</span>;</span><br><span class="line">        </span><br><span class="line">        [<span class="meta">Inject</span>]</span><br><span class="line">        <span class="keyword">public</span> IEventDispatcher dispatcher&#123;<span class="keyword">get</span>;<span class="keyword">set</span>;&#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">float</span> theta = <span class="number">20f</span>;</span><br><span class="line">        <span class="keyword">private</span> Vector3 basePosition;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">//Publicly settable from Unity3D</span></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">float</span> edx_WobbleSize = <span class="number">1f</span>;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">float</span> edx_WobbleDampen = <span class="number">.9</span>f;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">float</span> edx_WobbleMin = <span class="number">.001</span>f;</span><br><span class="line">        </span><br><span class="line">        <span class="function"><span class="keyword">internal</span> <span class="keyword">void</span> <span class="title">init</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            GameObject go = Instantiate(Resources.Load(<span class="string">"Textfield"</span>)) <span class="keyword">as</span> GameObject;</span><br><span class="line">            </span><br><span class="line">            TextMesh textMesh = go.GetComponent&lt;TextMesh&gt;();</span><br><span class="line">            textMesh.text = <span class="string">"http://www.thirdmotion.com"</span>;</span><br><span class="line">            textMesh.font.material.color = Color.red;</span><br><span class="line">            </span><br><span class="line">            Vector3 localPosition = go.transform.localPosition;</span><br><span class="line">            localPosition.x -= go.GetComponent&lt;Renderer&gt;().bounds.extents.x;</span><br><span class="line">            localPosition.y += go.GetComponent&lt;Renderer&gt;().bounds.extents.y;</span><br><span class="line">            go.transform.localPosition = localPosition;</span><br><span class="line">            </span><br><span class="line">            Vector3 extents = Vector3.zero;</span><br><span class="line">            extents.x = go.GetComponent&lt;Renderer&gt;().bounds.size.x;</span><br><span class="line">            extents.y = go.GetComponent&lt;Renderer&gt;().bounds.size.y;</span><br><span class="line">            extents.z = go.GetComponent&lt;Renderer&gt;().bounds.size.z;</span><br><span class="line">            (go.GetComponent&lt;Collider&gt;() <span class="keyword">as</span> BoxCollider).size = extents;</span><br><span class="line">            (go.GetComponent&lt;Collider&gt;() <span class="keyword">as</span> BoxCollider).center = -localPosition;</span><br><span class="line">            </span><br><span class="line">            go.transform.parent = gameObject.transform;</span><br><span class="line">            </span><br><span class="line">            go.AddComponent&lt;ClickDetector&gt;();</span><br><span class="line">            ClickDetector clicker = go.GetComponent&lt;ClickDetector&gt;() <span class="keyword">as</span> ClickDetector;</span><br><span class="line">            clicker.dispatcher.AddListener(ClickDetector.CLICK, onClick);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="function"><span class="keyword">internal</span> <span class="keyword">void</span> <span class="title">updateScore</span>(<span class="params"><span class="keyword">string</span> score</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            GameObject go = Instantiate(Resources.Load(<span class="string">"Textfield"</span>)) <span class="keyword">as</span> GameObject;</span><br><span class="line">            TextMesh textMesh = go.GetComponent&lt;TextMesh&gt;();</span><br><span class="line">            textMesh.font.material.color = Color.white;</span><br><span class="line">            go.transform.parent = transform;</span><br><span class="line"></span><br><span class="line">            textMesh.text = score.ToString();</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            transform.Rotate(Vector3.up * Time.deltaTime * theta, Space.Self);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">onClick</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            dispatcher.Dispatch(CLICK_EVENT);</span><br><span class="line">            startWobble();</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">startWobble</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            StartCoroutine(wobble (edx_WobbleSize));</span><br><span class="line">            basePosition = Vector3.zero;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="function"><span class="keyword">private</span> IEnumerator <span class="title">wobble</span>(<span class="params"><span class="keyword">float</span> size</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">while</span>(size &gt; edx_WobbleMin)</span><br><span class="line">            &#123;</span><br><span class="line">                size *= edx_WobbleDampen;</span><br><span class="line">                Vector3 newPosition = basePosition;</span><br><span class="line">                newPosition.x += UnityEngine.Random.Range(-size, size);</span><br><span class="line">                newPosition.y += UnityEngine.Random.Range(-size, size);</span><br><span class="line">                newPosition.z += UnityEngine.Random.Range(-size, size);</span><br><span class="line">                gameObject.transform.localPosition = newPosition;</span><br><span class="line">                <span class="keyword">yield</span> <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            gameObject.transform.localPosition = basePosition;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>ClickDetector.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> Just a simple MonoBehaviour Click Detector</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> strange.extensions.mediation.impl;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">strange.examples.myfirstproject</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ClickDetector</span> : <span class="title">EventView</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">const</span> <span class="keyword">string</span> CLICK = <span class="string">"CLICK"</span>;</span><br><span class="line">        </span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">OnMouseDown</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            dispatcher.Dispatch(CLICK);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>ExampleMediator.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> Example mediator</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> =====================</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Make your Mediator as thin as possible. Its function is to mediate</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> between view and app. Don't load it up with behavior that belongs in</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> the View (listening to/controlling interface), Commands (business logic),</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Models (maintaining state) or Services (reaching out for data).</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> strange.extensions.dispatcher.eventdispatcher.api;</span><br><span class="line"><span class="keyword">using</span> strange.extensions.mediation.impl;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">strange.examples.myfirstproject</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ExampleMediator</span> : <span class="title">EventMediator</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//This is how your Mediator knows about your View.</span></span><br><span class="line">        [<span class="meta">Inject</span>]</span><br><span class="line">        <span class="keyword">public</span> ExampleView view&#123; <span class="keyword">get</span>; <span class="keyword">set</span>;&#125;</span><br><span class="line">        </span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">OnRegister</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            </span><br><span class="line">            <span class="comment">//Listen to the view for an event</span></span><br><span class="line">            view.dispatcher.AddListener(ExampleView.CLICK_EVENT, onViewClicked);</span><br><span class="line">            </span><br><span class="line">            <span class="comment">//Listen to the global event bus for events</span></span><br><span class="line">            dispatcher.AddListener(ExampleEvent.SCORE_CHANGE, onScoreChange);</span><br><span class="line">            </span><br><span class="line">            view.init ();</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">OnRemove</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="comment">//Clean up listeners when the view is about to be destroyed</span></span><br><span class="line">            view.dispatcher.RemoveListener(ExampleView.CLICK_EVENT, onViewClicked);</span><br><span class="line">            dispatcher.RemoveListener(ExampleEvent.SCORE_CHANGE, onScoreChange);</span><br><span class="line">            Debug.Log(<span class="string">"Mediator OnRemove"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">onViewClicked</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            Debug.Log(<span class="string">"View click detected"</span>);</span><br><span class="line">            dispatcher.Dispatch(ExampleEvent.REQUEST_WEB_SERVICE);</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">onScoreChange</span>(<span class="params">IEvent evt</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="comment">//float score = (float)evt.data;</span></span><br><span class="line">            <span class="keyword">string</span> score = (<span class="keyword">string</span>)evt.data;</span><br><span class="line">            view.updateScore(score);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Model"><a href="#Model" class="headerlink" title="Model"></a>Model</h2><blockquote>
+<p>IExampleModel.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">strange.examples.myfirstproject</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">interface</span> <span class="title">IExampleModel</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">string</span> data&#123;<span class="keyword">get</span>;<span class="keyword">set</span>;&#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>ExampleModel.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> Example Model</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> ======================</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Nothing to see here. Just your typical place to store some data.</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">strange.examples.myfirstproject</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ExampleModel</span> : <span class="title">IExampleModel</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">string</span> data &#123;<span class="keyword">get</span>;<span class="keyword">set</span>;&#125;</span><br><span class="line">        </span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">ExampleModel</span> (<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Service"><a href="#Service" class="headerlink" title="Service"></a>Service</h2><blockquote>
+<p>IExampleService.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> strange.extensions.dispatcher.eventdispatcher.api;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">strange.examples.myfirstproject</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">interface</span> <span class="title">IExampleService</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">Request</span>(<span class="params"><span class="keyword">string</span> url</span>)</span>;</span><br><span class="line">        IEventDispatcher dispatcher&#123;<span class="keyword">get</span>;<span class="keyword">set</span>;&#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>ExampleService.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> Example Service</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> ======================</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Nothing to see here. Just your typical place to store some data.</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> strange.extensions.context.api;</span><br><span class="line"><span class="keyword">using</span> strange.extensions.dispatcher.eventdispatcher.api;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">strange.examples.myfirstproject</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ExampleService</span> : <span class="title">IExampleService</span></span><br><span class="line">    &#123;</span><br><span class="line">        [<span class="meta">Inject(ContextKeys.CONTEXT_VIEW)</span>]</span><br><span class="line">        <span class="keyword">public</span> GameObject contextView&#123;<span class="keyword">get</span>;<span class="keyword">set</span>;&#125;</span><br><span class="line">        </span><br><span class="line">        [<span class="meta">Inject</span>]</span><br><span class="line">        <span class="keyword">public</span> IEventDispatcher dispatcher&#123;<span class="keyword">get</span>;<span class="keyword">set</span>;&#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">string</span> url;</span><br><span class="line">        </span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">ExampleService</span> (<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Request</span>(<span class="params"><span class="keyword">string</span> url</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">this</span>.url = url;</span><br><span class="line">            </span><br><span class="line">            <span class="comment">//For now, we'll spoof a web service by running a coroutine for 1 second...</span></span><br><span class="line">            MonoBehaviour root = contextView.GetComponent&lt;MyFirstProjectRoot&gt;();</span><br><span class="line">            root.StartCoroutine(waitASecond());</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="function"><span class="keyword">private</span> IEnumerator <span class="title">waitASecond</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="function"><span class="keyword">yield</span> return new <span class="title">WaitForSeconds</span>(<span class="params"><span class="number">1f</span></span>)</span>;</span><br><span class="line">            </span><br><span class="line">            <span class="comment">//...then pass back some fake data</span></span><br><span class="line">            dispatcher.Dispatch(ExampleEvent.FULFILL_SERVICE_REQUEST, url);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Controller"><a href="#Controller" class="headerlink" title="Controller"></a>Controller</h2><blockquote>
+<p>StartCommand.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> An example Command</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> ============================</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> This Command puts a new ExampleView into the scene.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> Note how the ContextView (i.e., the GameObject our Root was attached to)</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> is injected for use.</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> </span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> All Commands must override the Execute method. The Command is automatically</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> cleaned up when Execute has completed, unless Retain is called (more on that</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> in the OpenWebPageCommand).</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> strange.extensions.context.api;</span><br><span class="line"><span class="keyword">using</span> strange.extensions.command.impl;</span><br><span class="line"><span class="keyword">using</span> strange.extensions.dispatcher.eventdispatcher.impl;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">strange.examples.myfirstproject</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">StartCommand</span> : <span class="title">EventCommand</span></span><br><span class="line">    &#123;</span><br><span class="line">        </span><br><span class="line">        [<span class="meta">Inject(ContextKeys.CONTEXT_VIEW)</span>]</span><br><span class="line">        <span class="keyword">public</span> GameObject contextView&#123;<span class="keyword">get</span>;<span class="keyword">set</span>;&#125;</span><br><span class="line">        </span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Execute</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            GameObject go = <span class="keyword">new</span> GameObject();</span><br><span class="line">            go.name = <span class="string">"ExampleView"</span>;</span><br><span class="line">            go.AddComponent&lt;ExampleView&gt;();</span><br><span class="line">            go.transform.parent = contextView.transform;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>ExampleEvent.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">strange.examples.myfirstproject</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ExampleEvent</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">const</span> <span class="keyword">string</span> SCORE_CHANGE = <span class="string">"SCORE_CHANGE"</span>;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">const</span> <span class="keyword">string</span> REQUEST_WEB_SERVICE = <span class="string">"REQUEST_WEB_SERVICE"</span>;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">const</span> <span class="keyword">string</span> FULFILL_SERVICE_REQUEST = <span class="string">"FULFILL_SERVICE_REQUEST"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>CallWebServiceCommand.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> An Asynchronous Command</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> ============================</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> This demonstrates how to use a Command to perform an asynchronous action;</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> for example, if you need to call a web service. The two most important lines</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> are the Retain() and Release() calls.</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> strange.extensions.context.api;</span><br><span class="line"><span class="keyword">using</span> strange.extensions.command.impl;</span><br><span class="line"><span class="keyword">using</span> strange.extensions.dispatcher.eventdispatcher.api;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">strange.examples.myfirstproject</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">CallWebServiceCommand</span> : <span class="title">EventCommand</span></span><br><span class="line">    &#123;</span><br><span class="line">        </span><br><span class="line">        [<span class="meta">Inject</span>]</span><br><span class="line">        <span class="keyword">public</span> IExampleModel model&#123;<span class="keyword">get</span>;<span class="keyword">set</span>;&#125;</span><br><span class="line">        </span><br><span class="line">        [<span class="meta">Inject</span>]</span><br><span class="line">        <span class="keyword">public</span> IExampleService service&#123;<span class="keyword">get</span>;<span class="keyword">set</span>;&#125;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">static</span> <span class="keyword">int</span> counter = <span class="number">0</span>;</span><br><span class="line">        </span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">CallWebServiceCommand</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            ++counter;  <span class="comment">//This counter is here to demonstrate that a new Command is created each time.</span></span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Execute</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="comment">//Retain marks the Command as requiring time to execute.</span></span><br><span class="line">            <span class="comment">//If you call Retain, you MUST have corresponding Release()</span></span><br><span class="line">            <span class="comment">//calls, or you will get memory leaks.</span></span><br><span class="line">            Retain ();</span><br><span class="line">            </span><br><span class="line">            <span class="comment">//Call the service. Listen for a response</span></span><br><span class="line">            service.dispatcher.AddListener(ExampleEvent.FULFILL_SERVICE_REQUEST, onComplete);</span><br><span class="line">            service.Request(<span class="string">"http://www.thirdmotion.com/ ::: "</span> + counter.ToString());</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">//The payload is in the form of a IEvent</span></span><br><span class="line">        <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">onComplete</span>(<span class="params">IEvent evt</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="comment">//Remember to clean up. Remove the listener.</span></span><br><span class="line">            service.dispatcher.RemoveListener(ExampleEvent.FULFILL_SERVICE_REQUEST, onComplete);</span><br><span class="line">            </span><br><span class="line">            model.data = evt.data <span class="keyword">as</span> <span class="keyword">string</span>;</span><br><span class="line">            dispatcher.Dispatch(ExampleEvent.SCORE_CHANGE, evt.data);</span><br><span class="line">            </span><br><span class="line">            <span class="comment">//Remember to call release when done.</span></span><br><span class="line">            Release ();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Unity框架/" rel="tag"># Unity框架</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/10/14/观察者模式-2/" rel="next" title="观察者模式">
+                <i class="fa fa-chevron-left"></i> 观察者模式
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/10/15/使用Unity制作游戏AI/" rel="prev" title="使用Unity制作游戏AI">
+                使用Unity制作游戏AI <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">354</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">55</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2020/02/16/游戏设计快乐之道（第2版）/" title="游戏设计快乐之道（第2版）" target="_blank">游戏设计快乐之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/14/游戏剧本怎么写/" title="游戏剧本怎么写" target="_blank">游戏剧本怎么写</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/04/通关！游戏设计之道（第2版）/" title="通关！游戏设计之道（第2版）" target="_blank">通关！游戏设计之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/26/游戏设计艺术（第2版）/" title="游戏设计艺术（第2版）" target="_blank">游戏设计艺术（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/22/大师谈游戏设计创意与节奏/" title="大师谈游戏设计创意与节奏" target="_blank">大师谈游戏设计创意与节奏</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#StangeIOC"><span class="nav-number">1.</span> <span class="nav-text">StangeIOC</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#最简单的案例"><span class="nav-number">2.</span> <span class="nav-text">最简单的案例</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#文件目录"><span class="nav-number">2.1.</span> <span class="nav-text">文件目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#初始化与客户端"><span class="nav-number">2.2.</span> <span class="nav-text">初始化与客户端</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#View"><span class="nav-number">2.3.</span> <span class="nav-text">View</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Model"><span class="nav-number">2.4.</span> <span class="nav-text">Model</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Service"><span class="nav-number">2.5.</span> <span class="nav-text">Service</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Controller"><span class="nav-number">2.6.</span> <span class="nav-text">Controller</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">3.7m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">56:23</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

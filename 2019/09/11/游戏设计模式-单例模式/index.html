@@ -1,0 +1,1553 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="思考并回答以下问题：">
+<meta name="keywords" content="游戏设计模式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="游戏设计模式--单例模式">
+<meta property="og:url" content="http://chebincarl.github.io/2019/09/11/游戏设计模式-单例模式/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="思考并回答以下问题：">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-09-11T13:17:09.051Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="游戏设计模式--单例模式">
+<meta name="twitter:description" content="思考并回答以下问题：">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/09/11/游戏设计模式-单例模式/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>游戏设计模式--单例模式 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">专注，重复10遍</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/09/11/游戏设计模式-单例模式/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">游戏设计模式--单例模式
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-09-11 11:12:12 / 修改时间：21:17:09" itemprop="dateCreated datePublished" datetime="2019-09-11T11:12:12+08:00">2019-09-11</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Unity/" itemprop="url" rel="index"><span itemprop="name">Unity</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">12k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">11 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>思考并回答以下问题：</p>
+<a id="more"></a>
+<p>本章涵盖：</p>
+<p>这个章节不同寻常。其他章节展示如何使用某个设计模式。这个章节展示如何<strong>避免</strong>使用某个设计模式。</p>
+<p>尽管它的意图是好的，GoF描述的单例模式通常弊大于利。他们强调应该谨慎使用这个模式，但在游戏业界的口口相传中，这一提示经常被无视了。</p>
+<p>就像其他模式一样，在不合适的地方使用单例模式就好像用夹板处理子弹伤口。 由于它被滥用得太严重了，这章的大部分都在讲如何<strong>回避</strong>单例模式，但首先，让我们看看模式本身。</p>
+<blockquote>
+<p>当业界从C语言迁移到面向对象的语言，他们遇到的首个问题是“如何访问实例？”他们知道有要调用的方法，但是找不到实例提供这个方法。单例（换言之，全局化）是一条简单的解决方案。</p>
+</blockquote>
+<h1 id="单例模式"><a href="#单例模式" class="headerlink" title="单例模式"></a><span style="color:#339AFF;">单例模式</span></h1><p>设计模式像这样描述单例模式：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">保证一个类只有一个实例，并且提供了访问该实例的全局访问点。</span><br></pre></td></tr></table></figure></p>
+<p>我们从“并且”那里将句子分为两部分，分别进行考虑。</p>
+<h2 id="保证一个类只有一个实例"><a href="#保证一个类只有一个实例" class="headerlink" title="保证一个类只有一个实例"></a>保证一个类只有一个实例</h2><p>有时候，如果类存在多个实例就不能正确的运行。通常发生在类与保存全局状态的外部系统互动时。</p>
+<p>考虑封装文件系统的API类。因为文件操作需要一段时间完成，所以类使用异步操作。这就意味着可以同时运行多个操作，必须让它们相互协调。如果一个操作创建文件，另一个操作删除同一文件，封装器类需要同时考虑，保证它们没有相互妨碍。</p>
+<p>为了实现这点，对我们封装器类的调用必须接触之前的每个操作。如果用户可以自由地创建类的实例，这个实例就无法知道另一实例之前的操作。而单例模式提供的构建类的方式，在编译时保证类只有单一实例。</p>
+<h2 id="提供了访问该实例的全局访问点"><a href="#提供了访问该实例的全局访问点" class="headerlink" title="提供了访问该实例的全局访问点"></a>提供了访问该实例的全局访问点</h2><p>游戏中的不同系统都会使用文件系统封装类：日志，内容加载，游戏状态保存，等等。如果这些系统不能创建文件系统封装类的实例，它们如何访问该实例呢？</p>
+<p>单例为这点也提供了解决方案。除了创建单一实例以外，它也提供了一种获得它的全局方法。使用这种范式，无论何处何人都可以访问实例。综合起来，经典的实现方案如下：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FileSystem</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	<span class="keyword">public</span>:</span><br><span class="line">    	<span class="function"><span class="keyword">static</span> FileSystem&amp; <span class="title">instance</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    	</span>&#123;</span><br><span class="line">    		<span class="comment">// 惰性初始化</span></span><br><span class="line">    		<span class="keyword">if</span> (instance_ == <span class="literal">NULL</span>) </span><br><span class="line">    			instance_ = <span class="keyword">new</span> FileSystem();</span><br><span class="line"></span><br><span class="line">    		<span class="keyword">return</span> *instance_;</span><br><span class="line">  		&#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">private</span>:</span><br><span class="line">  		FileSystem() &#123;&#125;</span><br><span class="line"></span><br><span class="line">  		<span class="keyword">static</span> FileSystem* instance_;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>静态的<span style="color:blue">instance_</span>成员保存了一个类的实例，私有的构造器保证了它是<strong>唯一</strong>的。公开的静态方法<span style="color:blue">instance()</span>让任何地方的代码都能访问实例。在首次被请求时，它同样负责惰性实例化该单例。</p>
+<p>现代的实现方案看起来是这样的：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FileSystem</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	<span class="keyword">public</span>:</span><br><span class="line">		<span class="function"><span class="keyword">static</span> FileSystem&amp; <span class="title">instance</span><span class="params">()</span></span></span><br><span class="line"><span class="function">	  	</span>&#123;</span><br><span class="line">	    	<span class="keyword">static</span> FileSystem *instance = <span class="keyword">new</span> FileSystem();</span><br><span class="line">	    	<span class="keyword">return</span> *instance;</span><br><span class="line">	    &#125;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">private</span>:</span><br><span class="line">  		FileSystem() &#123;&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>哪怕是在多线程情况下，C++11标准也保证了本地静态变量只会初始化一次，因此，假设你有一个现代C++编译器，这段代码是线程安全的，而前面的那个例子不是。</p>
+<blockquote>
+<p>当然，单例类本身的线程安全是个不同的问题！这里只保证了它的<strong>初始化</strong>没问题。</p>
+</blockquote>
+<h1 id="为什么我们使用它"><a href="#为什么我们使用它" class="headerlink" title="为什么我们使用它"></a>为什么我们使用它</h1><p>看起来已有成效。文件系统封装类在任何需要的地方都可用，而无需笨重地到处传递。类本身巧妙地保证了我们不会实例化多个实例而搞砸。它还具有很多其他的优良性质：</p>
+<ul>
+<li><u><strong>如果没人用，就不必创建实例。</strong></u>节约内存和CPU循环总是好的。由于单例只在第一次被请求时实例化，如果游戏永远不请求，那么它不会被实例化。</li>
+<li><u><strong>它在运行时实例化。</strong></u>通常的替代方案是使用含有静态成员变量的类。我喜欢简单的解决方案，因此我尽可能使用静态类而不是单例，但是静态成员有个限制：自动初始化。编译器在main()运行前初始化静态变量。这就意味着不能使用在程序加载时才获取的信息（举个例子，从文件加载的配置）。这也意味着它们的相互依赖是不可靠的——编译器可不保证以什么样的顺序初始化静态变量。</li>
+</ul>
+<p>惰性初始化解决了以上两个问题。单例会尽可能晚地初始化，所以那时它需要的所有信息都应该可用了。只要没有环状依赖，一个单例在初始化它自己的时甚至可以引用另一个单例。</p>
+<ul>
+<li><u><strong>可继承单例。</strong></u>这是个很有用但通常被忽视的能力。假设我们需要跨平台的文件系统封装类。为了达到这一点，我们需要它变成文件系统抽象出来的接口，而子类为每个平台实现接口。这是基类：<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FileSystem</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	<span class="keyword">public</span>:</span><br><span class="line">		<span class="keyword">virtual</span> ~FileSystem() &#123;&#125;</span><br><span class="line">		<span class="function"><span class="keyword">virtual</span> <span class="keyword">char</span>* <span class="title">readFile</span><span class="params">(<span class="keyword">char</span>* path)</span> </span>= <span class="number">0</span>;</span><br><span class="line">		<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span>  <span class="title">writeFile</span><span class="params">(<span class="keyword">char</span>* path, <span class="keyword">char</span>* contents)</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>然后为一堆平台定义子类：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">PS3FileSystem</span> :</span> <span class="keyword">public</span> FileSystem</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">public</span>:</span><br><span class="line">	  	<span class="function"><span class="keyword">virtual</span> <span class="keyword">char</span>* <span class="title">readFile</span><span class="params">(<span class="keyword">char</span>* path)</span></span></span><br><span class="line"><span class="function">	  	</span>&#123;</span><br><span class="line">	    	<span class="comment">// 使用索尼的文件读写API……</span></span><br><span class="line">	  	&#125;</span><br><span class="line"></span><br><span class="line">	  	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">writeFile</span><span class="params">(<span class="keyword">char</span>* path, <span class="keyword">char</span>* contents)</span></span></span><br><span class="line"><span class="function">	  	</span>&#123;</span><br><span class="line">	    	<span class="comment">// 使用索尼的文件读写API……</span></span><br><span class="line">	  	&#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WiiFileSystem</span> :</span> <span class="keyword">public</span> FileSystem</span><br><span class="line">&#123;</span><br><span class="line">	<span class="keyword">public</span>:</span><br><span class="line">	  	<span class="function"><span class="keyword">virtual</span> <span class="keyword">char</span>* <span class="title">readFile</span><span class="params">(<span class="keyword">char</span>* path)</span></span></span><br><span class="line"><span class="function">	  	</span>&#123;</span><br><span class="line">	    	<span class="comment">// 使用任天堂的文件读写API……</span></span><br><span class="line">	  	&#125;</span><br><span class="line"></span><br><span class="line">	  	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">writeFile</span><span class="params">(<span class="keyword">char</span>* path, <span class="keyword">char</span>* contents)</span></span></span><br><span class="line"><span class="function">	  	</span>&#123;</span><br><span class="line">	    	<span class="comment">// 使用任天堂的文件读写API……</span></span><br><span class="line">	  	&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>下一步，我们把<strong>FileSystem</strong>变成单例：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FileSystem</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">	<span class="keyword">public</span>:</span><br><span class="line">	  	<span class="function"><span class="keyword">static</span> FileSystem&amp; <span class="title">instance</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line">	  	<span class="keyword">virtual</span> ~FileSystem() &#123;&#125;</span><br><span class="line">	  	<span class="function"><span class="keyword">virtual</span> <span class="keyword">char</span>* <span class="title">readFile</span><span class="params">(<span class="keyword">char</span>* path)</span> </span>= <span class="number">0</span>;</span><br><span class="line">	  	<span class="function"><span class="keyword">virtual</span> <span class="keyword">void</span>  <span class="title">writeFile</span><span class="params">(<span class="keyword">char</span>* path, <span class="keyword">char</span>* contents)</span> </span>= <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">	<span class="keyword">protected</span>:</span><br><span class="line">	  	FileSystem() &#123;&#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>灵巧之处在于如何创建实例：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">FileSystem&amp; FileSystem::instance()</span><br><span class="line">&#123;</span><br><span class="line">	<span class="meta">#<span class="meta-keyword">if</span> PLATFORM == PLAYSTATION3</span></span><br><span class="line">		<span class="keyword">static</span> FileSystem *instance = <span class="keyword">new</span> PS3FileSystem();</span><br><span class="line">	<span class="meta">#<span class="meta-keyword">elif</span> PLATFORM == WII</span></span><br><span class="line">		<span class="keyword">static</span> FileSystem *instance = <span class="keyword">new</span> WiiFileSystem();</span><br><span class="line">	<span class="meta">#<span class="meta-keyword">endif</span></span></span><br><span class="line"></span><br><span class="line">	<span class="keyword">return</span> *instance;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>通过一个简单的编译器转换，我们把文件系统包装类绑定到合适的具体类型上。整个代码库都可以使用<span style="color:blue">FileSystem::instance()</span>接触到文件系统，而无需和任何平台相关的代码耦合。耦合发生在为特定平台写的FileSystem类实现文件中。</p>
+<p>大多数人解决问题到这个程度就已经够了。我们得到了一个文件系统封装类。它工作可靠，它全局有效，只要请求就能获取。是时候提交代码，开怀畅饮了。</p>
+<h1 id="为什么我们后悔使用它"><a href="#为什么我们后悔使用它" class="headerlink" title="为什么我们后悔使用它"></a>为什么我们后悔使用它</h1><p>短期来看，单例模式是相对良性的。就像其他设计决策一样，我们需要从长期考虑。这里是一旦我们将一些不必要的单例写进代码，会给自己带来的麻烦：</p>
+<h2 id="它是一个全局变量"><a href="#它是一个全局变量" class="headerlink" title="它是一个全局变量"></a>它是一个全局变量</h2><p>当游戏还是由几个家伙在车库中完成时，榨干硬件性能比象牙塔里的软件工程原则更重要。C语言和汇编程序员前辈能毫无问题地使用全局变量和静态变量，发布好游戏。但随着游戏变得越来越大，越来越复杂，架构和管理开始变成瓶颈，阻碍我们发布游戏的，除了硬件限制，还有<strong>生产力</strong>限制。</p>
+<p>所以我们迁移到了像C++这样的语言，开始将一些从软件工程师前辈那里学到的智慧应用于实际。其中一课是全局变量有害的诸多原因：</p>
+<ul>
+<li><u><strong>理解代码更加困难。</strong></u>假设我们在查找其他人所写函数中的漏洞。如果函数没有碰到任何全局状态，脑子只需围着函数转，只需搞懂函数和传给函数的变量。</li>
+</ul>
+<blockquote>
+<p>计算机科学家称不接触不修改全局状态的函数为“纯”函数。纯函数易于理解，易于编译器优化，易于完成优雅的任务，比如记住缓存的情况并继续上次调用。<br>完全使用纯函数是有难度的，但其好处足以引诱科学家创造像Haskell这样只使用纯函数的语言。</p>
+</blockquote>
+<p>现在考虑函数中间是个对<span style="color:blue">SomeClass::getSomeGlobalData()</span>的调用。为了查明发生了什么，得追踪整个代码库来看看什么修改了全局变量。你真的不需要讨厌全局变量，直到你在凌晨三点使用grep搜索数百万行代码，搞清楚哪一个错误的调用将一个静态变量设为了错误的值。</p>
+<ul>
+<li><u><strong>促进了耦合的发生。</strong></u>新加入团队的程序员也许不熟悉你们完美、可维护、松散耦合的游戏架构，但还是刚刚获得了第一个任务：在岩石撞击地面时播放声音。你我都知道这不需要将物理和音频代码耦合，但是他只想着把任务完成。不幸的是，我们的<span style="color:blue">AudioPlayer</span>是全局可见的。所以之后一个小小的<span style="color:blue">#include</span>，新队员就打乱了整个精心设计的架构。</li>
+</ul>
+<p>如果不用全局实例实现音频播放器，那么哪怕他<strong>确实</strong>用#include包含了头文件，他还是啥也做不了。这种阻碍给他发送了一个明确的信号，这两个模块不该接触，他需要另辟蹊径。<strong>通过控制对实例的访问，你控制了耦合。</strong></p>
+<ul>
+<li><u><strong>对并行不友好。</strong></u>那些在单核CPU上运行游戏的日子已经远去。哪怕完全不需要并行的优势，现代的代码至少也应考虑在<strong>多线程</strong>环境下工作。当我们将某些东西转为全局变量时，我们创建了一块每个线程都能看到并访问的内存，却不知道其他线程是否正在使用那块内存。这种方式带来了死锁，竞争状态，以及其他很难解决的线程同步问题。</li>
+</ul>
+<p>像这样的问题足够吓阻我们声明全局变量了，同理单例模式也是一样，但是那还没有告诉我们应该如何设计游戏。怎样不使用全局变量构建游戏？</p>
+<p>有几个对这个问题的答案（这本书的大部分都是由答案构成），但是它们并非显而易见。与此同时，我们得发布游戏。单例模式看起来是万能药。它被写进了一本关于面向对象设计模式的书中，因此它肯定是个好的设计模式，对吧？况且我们已经借助它做了很多年软件设计了。</p>
+<p>不幸的是，它不是解药，它是安慰剂。如果浏览全局变量造成的问题列表，你会注意到单例模式解决不了其中任何一个。因为单例<strong>确实</strong>是全局状态——它只是被封装在一个类中。</p>
+<h2 id="它能在你只有一个问题的时候解决两个"><a href="#它能在你只有一个问题的时候解决两个" class="headerlink" title="它能在你只有一个问题的时候解决两个"></a>它能在你只有一个问题的时候解决两个</h2><p>在GoF对单例模式的描述中，“并且”这个词有点奇怪。这个模式解决了一个问题还是两个问题呢？如果我们只有其中一个问题呢？保证实例是唯一存在的是很有用的，但是谁告诉我们要让每个人都能接触到它？同样，全局接触很方便，但是必须禁止存在多个实例吗？</p>
+<p>这两个问题中的后者，便利的访问，几乎是使用单例模式的全部原因。想想日志类。大部分模块都能从记录诊断日志中获益。但是，如果将<span style="color:blue">Log</span>类的实例传给每个需要这个方法的函数，那就混杂了产生的数据，模糊了代码的意图。</p>
+<p>明显的解决方案是让Log类成为单例。每个函数都能从类那里获得一个实例。但当我们这样做时，我们无意地制造了一个奇怪的小约束。突然之间，我们不再能创建多个日志记录者了。</p>
+<p>起初，这不是一个问题。我们记录单独的日志文件，所以只需要一个实例。然后，随着开发周期的逐次循环，我们遇到了麻烦。每个团队的成员都使用日志记录各自的诊断信息，大量的日志倾泻在文件里。程序员需要翻过很多页代码来找到他关心的记录。</p>
+<p>我们想将日志分散到多个文件中来解决这点。为了达到这点，我们得为游戏的不同领域创造单独的日志记录者：网络，UI，声音，游戏，玩法。但是我们做不到。<span style="color:blue">Log</span>类不再允许我们创建多个实例，而且调用的方式也保证了这一点：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Log::instance().write(<span class="string">"Some event."</span>);</span><br></pre></td></tr></table></figure></p>
+<p>为了让<span style="color:blue">Log</span>类支持多个实例（就像它原来的那样），我们需要修改类和提及它的每一行代码。之前便利的访问就不再那么便利了。</p>
+<blockquote>
+<p>这可能更糟。想象一下你的Log类是在多个游戏间共享的库中。现在，为了改变设计，需要在多组人之间协调改变，他们中的大多数既没有时间，也没有动机修复它。</p>
+</blockquote>
+<h2 id="惰性初始化从你那里剥夺了控制权"><a href="#惰性初始化从你那里剥夺了控制权" class="headerlink" title="惰性初始化从你那里剥夺了控制权"></a>惰性初始化从你那里剥夺了控制权</h2><p>在拥有虚拟内存和软性性能需求的PC里，惰性初始化是一个小技巧。 游戏则是另一种状况。初始化系统需要消耗时间：分配内存，加载资源，等等。 如果初始化音频系统消耗了几百个毫秒，我们需要控制它何时发生。 如果在第一次声音播放时惰性初始化它自己，这可能发生在游戏的高潮部分，导致可见的掉帧和断续的游戏体验。</p>
+<p>同样，游戏通常需要严格管理在堆上分配的内存来避免碎片。 如果音频系统在初始化时分配到了堆上，我们需要知道初始化在何时发生， 这样我们可以控制内存待在堆的哪里。</p>
+<p>对象池模式一节中有内存碎片的其他细节。</p>
+<p>因为这两个原因，我见到的大多数游戏都不使用惰性初始化。 相反，它们像这样实现单例模式：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FileSystem</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  <span class="function"><span class="keyword">static</span> FileSystem&amp; <span class="title">instance</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> instance_; &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">  FileSystem() &#123;&#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">static</span> FileSystem instance_;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>这解决了惰性初始化问题，但是损失了几个单例确实比原生的全局变量优良的特性。 静态实例中，我们不能使用多态，在静态初始化时，类也必须是可构建的。 我们也不能在不需要这个实例的时候，释放实例所占的内存。</p>
+<p>与创建一个单例不同，这里实际上是一个简单的静态类。 这并非坏事，但是如果你需要的是静态类，为什么不完全摆脱instance()方法， 直接使用静态函数呢？调用Foo::bar()比Foo::instance().bar()更简单， 也更明确地表明你在处理静态内存。</p>
+<p>通常使用单例而不是静态类的理由是， 如果你后来决定将静态类改为非静态的，你需要修改每一个调用点。 理论上，用单例就不必那么做，因为你可以将实例传来传去，像普通的实例方法一样使用。</p>
+<p>实践中，我从未见过这种情况。 每个人都在使用Foo::instance().bar()。 如果我们将Foo改成非单例，我们还是得修改每一个调用点。 鉴于此，我更喜欢简单的类和简单的调用语法。</p>
+<p>那该如何是好<br>如果我现在达到了目标，你在下次遇到问题使用单例模式之前就会三思而后行。 但是你还是有问题需要解决。你应该使用什么工具呢？ 这取决于你试图做什么，我有一些你可以考虑的选项，但是首先……</p>
+<p>看看你是不是真正地需要类<br>我在游戏中看到的很多单例类都是“管理器”——那些类存在的意义就是照顾其他对象。 我曾看到一些代码库中，几乎所有类都有管理器： 怪物，怪物管理器，粒子，粒子管理器，声音，声音管理器，管理管理器的管理器。 有时候，它们被叫做“系统”或“引擎”，但是思路还是一样的。</p>
+<p>管理器类有时是有用的，但通常它们只是反映出作者对OOP的不熟悉。思考这两个特制的类：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Bullet</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  <span class="function"><span class="keyword">int</span> <span class="title">getX</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> x_; &#125;</span><br><span class="line">  <span class="function"><span class="keyword">int</span> <span class="title">getY</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> y_; &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">setX</span><span class="params">(<span class="keyword">int</span> x)</span> </span>&#123; x_ = x; &#125;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">setY</span><span class="params">(<span class="keyword">int</span> y)</span> </span>&#123; y_ = y; &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">  <span class="keyword">int</span> x_, y_;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BulletManager</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  <span class="function">Bullet* <span class="title">create</span><span class="params">(<span class="keyword">int</span> x, <span class="keyword">int</span> y)</span></span></span><br><span class="line"><span class="function">  </span>&#123;</span><br><span class="line">    Bullet* bullet = <span class="keyword">new</span> Bullet();</span><br><span class="line">    bullet-&gt;setX(x);</span><br><span class="line">    bullet-&gt;setY(y);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> bullet;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">bool</span> <span class="title">isOnScreen</span><span class="params">(Bullet&amp; bullet)</span></span></span><br><span class="line"><span class="function">  </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> bullet.getX() &gt;= <span class="number">0</span> &amp;&amp;</span><br><span class="line">           bullet.getX() &lt; SCREEN_WIDTH &amp;&amp;</span><br><span class="line">           bullet.getY() &gt;= <span class="number">0</span> &amp;&amp;</span><br><span class="line">           bullet.getY() &lt; SCREEN_HEIGHT;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">move</span><span class="params">(Bullet&amp; bullet)</span></span></span><br><span class="line"><span class="function">  </span>&#123;</span><br><span class="line">    bullet.setX(bullet.getX() + <span class="number">5</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>也许这个例子有些蠢，但是我见过很多代码，在剥离了外部的细节后是一样的设计。 如果你看看这个代码，BulletManager很自然应是一个单例。 无论如何，任何有Bullet的对象都需要管理，而你又需要多少个BulletManager实例呢？</p>
+<p>事实上，这里的答案是零。 这里是我们如何为管理类解决“单例”问题：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Bullet</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  Bullet(<span class="keyword">int</span> x, <span class="keyword">int</span> y) : x_(x), y_(y) &#123;&#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">bool</span> <span class="title">isOnScreen</span><span class="params">()</span></span></span><br><span class="line"><span class="function">  </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> x_ &gt;= <span class="number">0</span> &amp;&amp; x_ &lt; SCREEN_WIDTH &amp;&amp;</span><br><span class="line">           y_ &gt;= <span class="number">0</span> &amp;&amp; y_ &lt; SCREEN_HEIGHT;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">move</span><span class="params">()</span> </span>&#123; x_ += <span class="number">5</span>; &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">  <span class="keyword">int</span> x_, y_;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>好了。没有管理器，也没有问题。 糟糕设计的单例通常会“帮助”另一个类增加代码。 如果可以，把所有的行为都移到单例帮助的类中。 毕竟，OOP就是让对象管理好自己。</p>
+<p>但是在管理器之外，还有其他问题我们需要寻求单例模式帮助。 对于每种问题，都有一些后续方案可供参考。</p>
+<p>将类限制为单一的实例<br>这是单例模式帮你解决的一个问题。 就像在文件系统的例子中那样，保证类只有一个实例是很重要的。 但是，这不意味着我们需要提供对实例的公众，全局访问。 我们想要减少某部分代码的公众部分，甚至让它在类中是私有的。 在这些情况下，提供一个全局接触点消弱了整体架构。</p>
+<p>举个例子，我们也许想把文件系统包在另一层抽象中。</p>
+<p>我们希望有种方式能保证同事只有一个实例而无需提供全局接触点。 有好几种方法能做到。这是其中之一：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FileSystem</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  FileSystem()</span><br><span class="line">  &#123;</span><br><span class="line">    assert(!instantiated_);</span><br><span class="line">    instantiated_ = <span class="literal">true</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  ~FileSystem() &#123; instantiated_ = <span class="literal">false</span>; &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">  <span class="keyword">static</span> <span class="keyword">bool</span> instantiated_;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">bool</span> FileSystem::instantiated_ = <span class="literal">false</span>;</span><br></pre></td></tr></table></figure>
+<p>这个类允许任何人构建它，如果你试图构建超过一个实例，它会断言并失败。 只要正确的代码首先创建了实例，那么就保证了没有其他代码可以接触实例或者创建自己的实例。 这个类保证满足了它关注的单一实例，但是它没有指定类该如何被使用。</p>
+<p>断言 函数是一种向你的代码中添加限制的方法。 当assert()被调用时，它计算传入的表达式。 如果结果为true，那么什么都不做，游戏继续。 如果结果为false，它立刻停止游戏。 在debug build时，这通常会启动调试器，或至少打印失败断言所在的文件和行号。</p>
+<p>assert()表示， “我断言这个总该是真的。如果不是，那就是漏洞，我想立刻停止并处理它。” 这使得你可以在代码区域之间定义约束。 如果函数断言它的某个参数不能为NULL，那就是说，“我和调用者定下了协议：传入的参数不会NULL。”</p>
+<p>断言帮助我们在游戏发生预期以外的事时立刻追踪漏洞， 而不是等到错误最终显现在用户可见的某些事物上。 它们是代码中的栅栏，围住漏洞，这样漏洞就不能从制造它的代码边逃开。</p>
+<p>这个实现的缺点是只在运行时检查并阻止多重实例化。 单例模式正相反，通过类的自然结构，在编译时就能确定实例是单一的。</p>
+<p>为了给实例提供方便的访问方法<br>便利的访问是我们使用单例的一个主要原因。 这让我们在不同地方获取需要的对象更加容易。 这种便利是需要付出代价的——在我们不想要对象的地方，也能轻易地使用。</p>
+<p>通用原则是在能完成工作的同时，将变量写得尽可能局部。 对象影响的范围越小，在处理它时，我们需要放在脑子里的东西就越少。 在我们拿起有全局范围影响的单例对象前，先考虑考虑代码中其他获取对象的方式：</p>
+<p>传进来。 最简单的解决办法，通常也是最好的，把你需要的对象简单地作为参数传给需要它的函数。 在用其他更加繁杂的方法前，考虑一下这个解决方案。</p>
+<p>有些人使用术语“依赖注入”来指代它。不是代码出来调用某些全局量来确认依赖， 而是依赖通过参数被传进到需要它的代码中去。 其他人将“依赖注入”保留为对代码提供更复杂依赖的方法。</p>
+<p>考虑渲染对象的函数。为了渲染，它需要接触一个代表图形设备的对象，管理渲染状态。 将其传给所有渲染函数是很自然的，通常是用一个名字像context之类的参数。</p>
+<p>另一方面，有些对象不该在方法的参数列表中出现。 举个例子，处理AI的函数可能也需要写日志文件，但是日志不是它的核心关注点。 看到Log出现在它的参数列表中是很奇怪的事情，像这样的情况，我们需要考虑其他的选项。</p>
+<p>像日志这样散布在代码库各处的是“横切关注点”(cross-cutting concern)。 小心地处理横切关注点是架构中的持久挑战，特别是在静态类型语言中。</p>
+<p>面向切面编程被设计出来应对它们。</p>
+<p>从基类中获得。 很多游戏架构有浅层但是宽泛的继承层次，通常只有一层深。 举个例子，你也许有GameObject基类，每个游戏中的敌人或者对象都继承它。 使用这样的架构，很大一部分游戏代码会存在于这些“子”推导类中。 这就意味着这些类已经有了对同样事物的相同获取方法：它们的GameObject基类。 我们可以利用这点：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GameObject</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">protected</span>:</span><br><span class="line">  <span class="function">Log&amp; <span class="title">getLog</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> log_; &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">  <span class="keyword">static</span> Log&amp; log_;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Enemy</span> :</span> <span class="keyword">public</span> GameObject</span><br><span class="line">&#123;</span><br><span class="line">  <span class="function"><span class="keyword">void</span> <span class="title">doSomething</span><span class="params">()</span></span></span><br><span class="line"><span class="function">  </span>&#123;</span><br><span class="line">    getLog().write(<span class="string">"I can log!"</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>这保证任何GameObject之外的代码都不能接触Log对象，但是每个派生的实体都确实能使用getLog()。 这种使用protected函数，让派生对象使用的模式， 被涵盖在子类沙箱这章中。</p>
+<p>这也引出了一个新问题，“GameObject是怎样获得Log实例的？”一个简单的方案是，让基类创建并拥有静态实例。</p>
+<p>如果你不想要基类承担这些，你可以提供一个初始化函数传入Log实例， 或使用服务定位器模式找到它。</p>
+<p>从已经是全局的东西中获取。 移除所有全局状态的目标令人钦佩，但并不实际。 大多数代码库仍有一些全局可用对象，比如一个代表了整个游戏状态的Game或World对象。</p>
+<p>我们可以让现有的全局对象捎带需要的东西，来减少全局变量类的数目。 不让Log，FileSystem和AudioPlayer都变成单例，而是这样做：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Game</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line"><span class="keyword">public</span>:</span><br><span class="line">  <span class="function"><span class="keyword">static</span> Game&amp; <span class="title">instance</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> instance_; &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 设置log_, et. al. ……</span></span><br><span class="line"></span><br><span class="line">  <span class="function">Log&amp;         <span class="title">getLog</span><span class="params">()</span>         </span>&#123; <span class="keyword">return</span> *log_; &#125;</span><br><span class="line">  <span class="function">FileSystem&amp;  <span class="title">getFileSystem</span><span class="params">()</span>  </span>&#123; <span class="keyword">return</span> *fileSystem_; &#125;</span><br><span class="line">  <span class="function">AudioPlayer&amp; <span class="title">getAudioPlayer</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> *audioPlayer_; &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">private</span>:</span><br><span class="line">  <span class="keyword">static</span> Game instance_;</span><br><span class="line"></span><br><span class="line">  Log         *log_;</span><br><span class="line">  FileSystem  *fileSystem_;</span><br><span class="line">  AudioPlayer *audioPlayer_;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>这样，只有Game是全局可见的。 函数可以通过它访问其他系统。</p>
+<p>Game::instance().getAudioPlayer().play(VERY_LOUD_BANG);<br>纯粹主义者会声称这违反了Demeter法则。我则声称这比一大坨单例要好。</p>
+<p>如果，稍后，架构被改为支持多个Game实例（可能是为了流处理或者测试）， Log，FileSystem，和AudioPlayer都不会被影响到——它们甚至不知道有什么区别。 缺陷是，当然，更多的代码耦合到了Game中。 如果一个类简单地需要播放声音，为了访问音频播放器，上例中仍然需要它知道游戏世界。</p>
+<p>我们通过混合方案解决这点。 知道Game的代码可以直接从它那里访问AudioPlayer。 而不知道的代码，我们用上面描述的其他选项来提供AudioPlayer。</p>
+<p>从服务定位器中获得。 目前为止，我们假设全局类是具体的类，比如Game。 另一种选项是定义一个类，存在的唯一目标就是为对象提供全局访问。 这种常见的模式被称为服务定位器模式，有单独讲它的章节。</p>
+<p>单例中还剩下什么<br>剩下的问题，何处我们应该使用真实的单例模式？ 说实话，我从来没有在游戏中使用全部的GoF模式。 为了保证实例是单一的，我通常简单地使用静态类。 如果这无效，我使用静态标识位，在运行时检测是不是只有一个实例被创建了。</p>
+<p>书中还有一些其他章节也许能有所帮助。 子类沙箱模式通过分享状态， 给实例以类的访问权限而无需让其全局可用。 服务定位器模式确实让一个对象全局可用， 但它给了你如何设置对象的灵活性。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/游戏设计模式/" rel="tag"># 游戏设计模式</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/09/11/游戏设计模式-架构，性能和游戏/" rel="next" title="游戏设计模式--架构，性能和游戏">
+                <i class="fa fa-chevron-left"></i> 游戏设计模式--架构，性能和游戏
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/09/11/游戏设计模式-原型模式/" rel="prev" title="游戏设计模式--原型模式">
+                游戏设计模式--原型模式 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">354</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">55</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2020/02/16/游戏设计快乐之道（第2版）/" title="游戏设计快乐之道（第2版）" target="_blank">游戏设计快乐之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/14/游戏剧本怎么写/" title="游戏剧本怎么写" target="_blank">游戏剧本怎么写</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/04/通关！游戏设计之道（第2版）/" title="通关！游戏设计之道（第2版）" target="_blank">通关！游戏设计之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/26/游戏设计艺术（第2版）/" title="游戏设计艺术（第2版）" target="_blank">游戏设计艺术（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/22/大师谈游戏设计创意与节奏/" title="大师谈游戏设计创意与节奏" target="_blank">大师谈游戏设计创意与节奏</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#单例模式"><span class="nav-number">1.</span> <span class="nav-text">单例模式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#保证一个类只有一个实例"><span class="nav-number">1.1.</span> <span class="nav-text">保证一个类只有一个实例</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#提供了访问该实例的全局访问点"><span class="nav-number">1.2.</span> <span class="nav-text">提供了访问该实例的全局访问点</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#为什么我们使用它"><span class="nav-number">2.</span> <span class="nav-text">为什么我们使用它</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#为什么我们后悔使用它"><span class="nav-number">3.</span> <span class="nav-text">为什么我们后悔使用它</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#它是一个全局变量"><span class="nav-number">3.1.</span> <span class="nav-text">它是一个全局变量</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#它能在你只有一个问题的时候解决两个"><span class="nav-number">3.2.</span> <span class="nav-text">它能在你只有一个问题的时候解决两个</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#惰性初始化从你那里剥夺了控制权"><span class="nav-number">3.3.</span> <span class="nav-text">惰性初始化从你那里剥夺了控制权</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">3.7m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">56:23</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

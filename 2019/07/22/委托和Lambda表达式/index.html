@@ -1,0 +1,1528 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="思考并回答以下问题：  不需要每次传递一个方法时都定义新接口怎么理解？ 静态类有什么特性？为什么要让一个类为静态？ switch怎么改成委托？ 为什么要使用Lambda表达式？ Action\怎么理解？Func代表什么委托？">
+<meta name="keywords" content="C#本质论">
+<meta property="og:type" content="article">
+<meta property="og:title" content="委托和Lambda表达式">
+<meta property="og:url" content="http://chebincarl.github.io/2019/07/22/委托和Lambda表达式/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="思考并回答以下问题：  不需要每次传递一个方法时都定义新接口怎么理解？ 静态类有什么特性？为什么要让一个类为静态？ switch怎么改成委托？ 为什么要使用Lambda表达式？ Action\怎么理解？Func代表什么委托？">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-11-14T10:45:21.505Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="委托和Lambda表达式">
+<meta name="twitter:description" content="思考并回答以下问题：  不需要每次传递一个方法时都定义新接口怎么理解？ 静态类有什么特性？为什么要让一个类为静态？ switch怎么改成委托？ 为什么要使用Lambda表达式？ Action\怎么理解？Func代表什么委托？">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/07/22/委托和Lambda表达式/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>委托和Lambda表达式 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">专注，重复10遍</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/07/22/委托和Lambda表达式/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">委托和Lambda表达式
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-07-22 18:58:22" itemprop="dateCreated datePublished" datetime="2019-07-22T18:58:22+08:00">2019-07-22</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-11-14 18:45:21" itemprop="dateModified" datetime="2019-11-14T18:45:21+08:00">2019-11-14</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C#</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">9.8k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">9 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>思考并回答以下问题：</p>
+<ul>
+<li>不需要每次传递一个方法时都定义新接口怎么理解？</li>
+<li>静态类有什么特性？为什么要让一个类为静态？</li>
+<li>switch怎么改成委托？</li>
+<li>为什么要使用Lambda表达式？</li>
+<li>Action\<float\>怎么理解？Func代表什么委托？</float\></li>
+</ul>
+<a id="more"></a>
+<p>本章涵盖：</p>
+<p>可以创建类来封装数据以及对数据操作。随着<strong>创建的类越来越多</strong>，你会发现类和类的关系存在着一些常见的模式。一种常见的模式是<strong>向方法传递对象，该方法再调用对象的一个方法</strong>。例如，向方法传递一个IComparer\<int\>引用，被调用的方法本身可以在提供的对象上调用Compare()方法。在这种情况下，接口的作用只是向最终被调用的方法传递一个引用。所以，似乎不需要每次传递一个方法时都定义新接口。在本章中，我们讲述如何创建和使用被称为委托（delegate）的特殊类，它允许像处理其他任何数据那样处理对方法的引用。然后，我们展示如何使用Lambda表达式快速和简单地创建自定义委托。</int\></p>
+<p>Lambda表达式是从C#3.0开始加入的。C#2.0支持用匿名方法（anonymous method）这样一种不太优雅的语法来创建自定义委托。C#2.0之后的每个C#版本都支持匿名方法以保持向后兼容，但新写的代码应该弃用它，代之以Lambda表达式。本章将通过“高级主题”来描述如何使用匿名方法。只有要使用遗留的C#2.0代码时才需要了解这些主题，否则完全可以忽略这些补充内容。</p>
+<h1 id="委托概述"><a href="#委托概述" class="headerlink" title="委托概述"></a>委托概述</h1><p>长期以来，经验丰富的C和C++程序员利用“函数指针”将对方法的引用作为实参传给另一个方法。C#使用委托提供相同的功能。委托允许捕捉对方法的引用，并像传递其他对象那样传递这个引用，像调用其他方法那样调用这个被捕捉的方法。来看看下面的例子。</p>
+<h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>虽然效率不高，但冒泡排序或许是最简单的排序例程了。代码清单1展示了Bubblesort()方法。</p>
+<blockquote>
+<p>代码清单1 Bubblesort()方法</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> System.Linq;</span><br><span class="line"><span class="keyword">using</span> System.Text;</span><br><span class="line"><span class="keyword">using</span> System.Threading.Tasks;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">sort</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="keyword">string</span>[] args</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">int</span>[] items = &#123; <span class="number">67</span>, <span class="number">34</span>, <span class="number">6</span>, <span class="number">134</span>, <span class="number">349</span>, <span class="number">230</span>, <span class="number">56</span> &#125;;</span><br><span class="line">            SimpleSort1.BubbleSort(items);        </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//静态类的主要特性:</span></span><br><span class="line">    <span class="comment">//1、仅包含静态成员</span></span><br><span class="line">    <span class="comment">//2、无法实例化</span></span><br><span class="line">    <span class="comment">//3、是密封的</span></span><br><span class="line">    <span class="comment">//4、不能包含实例构造函数。</span></span><br><span class="line">    <span class="comment">//5、工具类适合作为静态类，像Math类</span></span><br><span class="line">    <span class="keyword">static</span> <span class="keyword">class</span> <span class="title">SimpleSort1</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">BubbleSort</span>(<span class="params"><span class="keyword">int</span>[] items</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">int</span> i;</span><br><span class="line">            <span class="keyword">int</span> j;</span><br><span class="line">            <span class="keyword">int</span> temp;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span>(items == <span class="literal">null</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">for</span> (i=items.Length<span class="number">-1</span>; i&gt;= <span class="number">0</span>; i--)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">for</span> (j=<span class="number">1</span>; j&lt;=i; j++)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">if</span> (items[j<span class="number">-1</span>] &gt; items[j])</span><br><span class="line">                    &#123;</span><br><span class="line">                        temp = items[j<span class="number">-1</span>];</span><br><span class="line">                        items[j<span class="number">-1</span>] = items[j];</span><br><span class="line">                        items[j] = temp;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> x = <span class="number">0</span>; x &lt; items.Length; x++)</span><br><span class="line">            &#123;</span><br><span class="line">                Console.WriteLine(items[x]);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            Console.ReadKey();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>该方法对整数数组执行升序排序。</p>
+<p>为了能选择升级或降序来排序整数，有两个方案可选：一是复制上述代码，然后将大于操作符替换成小于操作符。但是复制这么多代码只是改变了一个操作符，这似乎不是一个好主意；二是传递一个附加参数，指出如何排序，如代码清单2所示。</p>
+<blockquote>
+<p>代码清单2 Bubblesort()方法，升序或降序</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> System.Linq;</span><br><span class="line"><span class="keyword">using</span> System.Text;</span><br><span class="line"><span class="keyword">using</span> System.Threading.Tasks;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">sort</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="keyword">string</span>[] args</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">int</span>[] items = &#123; <span class="number">67</span>, <span class="number">34</span>, <span class="number">6</span>, <span class="number">134</span>, <span class="number">349</span>, <span class="number">230</span>, <span class="number">56</span> &#125;;</span><br><span class="line">            Simplesort2.BubbleSort(items, Simplesort2.SortType.Descending);        </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">class</span> <span class="title">Simplesort2</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">enum</span> SortType</span><br><span class="line">        &#123;</span><br><span class="line">            Ascending,</span><br><span class="line">            Descending</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">BubbleSort</span>(<span class="params"><span class="keyword">int</span>[] items, SortType sortOrder</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">int</span> i;</span><br><span class="line">            <span class="keyword">int</span> j;</span><br><span class="line">            <span class="keyword">int</span> temp;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (items == <span class="literal">null</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">for</span> (i = items.Length - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">for</span> (j = <span class="number">1</span>; j &lt;= i; j++)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">bool</span> swap = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">switch</span> (sortOrder)</span><br><span class="line">                    &#123;</span><br><span class="line">                        <span class="keyword">case</span> SortType.Ascending:</span><br><span class="line">                            swap = items[j - <span class="number">1</span>] &gt; items[j];</span><br><span class="line">                            <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">                        <span class="keyword">case</span> SortType.Descending:</span><br><span class="line">                            swap = items[j - <span class="number">1</span>] &lt; items[j];</span><br><span class="line">                            <span class="keyword">break</span>;</span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">if</span> (swap)</span><br><span class="line">                    &#123;</span><br><span class="line">                        temp = items[j - <span class="number">1</span>];</span><br><span class="line">                        items[j - <span class="number">1</span>] = items[j];</span><br><span class="line">                        items[j] = temp;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> x = <span class="number">0</span>; x &lt; items.Length; x++)</span><br><span class="line">            &#123;</span><br><span class="line">                Console.WriteLine(items[x]);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            Console.ReadKey();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然而，上述代码只是照顾到了两种可能的排序方式。假如想按字典顺序排序（即1, 10, 11, 12, 2, 20, …），或者按其他方式排序，sortType值以及对应的swich分支的数量很快就会变得非常“恐怖”。</p>
+<h2 id="委托数据类型"><a href="#委托数据类型" class="headerlink" title="委托数据类型"></a>委托数据类型</h2><p>为了增强灵活性和减少重复代码，可以将比较方法作为参数传给Bubblesort()方法。为了能将方法作为参数传递，必须要有一个能够表示方法的数据类型。这个数据类型就是委托，因为它“委托”调用对象所引用的方法。代码清单3对Bubblesort()方法进行了修改，它现在能获取一个委托参数。在本例中，委托数据类型是ComparisonHandler。</p>
+<blockquote>
+<p>代码清单3 带有委托参数的Bubblesort()方法</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">DelegateSample</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">BubbleSort</span>(<span class="params"><span class="keyword">int</span>[] items, ComparisonHandler comparisonMethod</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">int</span> i;</span><br><span class="line">        <span class="keyword">int</span> j;</span><br><span class="line">        <span class="keyword">int</span> temp;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(comparisonMethod == <span class="literal">null</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> ArgumentNullException(<span class="string">"comparisonMethod"</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(items == <span class="literal">null</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span>(i = items.Length<span class="number">-1</span>; i&gt;=<span class="number">0</span>; i--)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">for</span> (j=<span class="number">1</span>; j &lt;=i; j++)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span> (comparisonMethod(items[j<span class="number">-1</span>], items[j]))</span><br><span class="line">                &#123;</span><br><span class="line">                    temp = items[j<span class="number">-1</span>];</span><br><span class="line">                    items[j<span class="number">-1</span>] = items[j];</span><br><span class="line">                    items[j] = temp;</span><br><span class="line">                &#125; </span><br><span class="line">            &#125;    </span><br><span class="line">        &#125;    </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>ComparisonHandler是委托类型，代表对两个整数进行比较的方法。在Bubblesort()方法中，可以使用comparisonMethod参数所引用的ComparisonHandler的实例来判断哪个整数更大。由于comparisonMethod代表一个方法，所以调用它的语法与直接调用方法的语法完全一致。在这个例子中，comparisonMethod委托获取两个整数参数，返回一个布尔值来指出第一个整数是否大于第二个。传方法进来要注意的是，ComparisonHandler委托是强类型的，它代表返回一个bool值，而且正好接受两个整数参数的方法。和其他方法调用一样，对委托的调用是强类型的。假如数据类型不匹配，C#编译器会报错。</p>
+<h2 id="委托类型的声明"><a href="#委托类型的声明" class="headerlink" title="委托类型的声明"></a>委托类型的声明</h2><p>前面描述了如何定义使用委托的方法，并介绍了如何将委托变量当作方法，从而简单地发出对委托的调用。然而，还必须学习如何声明委托类型。为了声明委托类型，要使用<span style="color:red"><strong>delegate</strong></span>关键字，后面跟着像是方法声明的东西。这个方法的签名是委托所引用的方法的签名。正常方法声明中方法名称的位置要替换成委托类型的名称。代码清单4展示了如何声明ComparisonHandler委托类型来要求两个整数并返回一个布尔值。</p>
+<blockquote>
+<p>代码清单4 声明一个委托类型</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">delegate</span> <span class="keyword">bool</span> <span class="title">ComparisonHandler</span>(<span class="params"><span class="keyword">int</span> first, <span class="keyword">int</span> second</span>)</span>;</span><br></pre></td></tr></table></figure>
+<p>就像类能嵌套在其他类中一样，<span style="color:red">委托也能嵌套在类中</span>。假如委托声明出现在另一个类的内部，委托类型就会成为嵌套类型，如代码清单5所示。</p>
+<blockquote>
+<p>代码清单5 声明嵌套的委托数据类型</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">DelegateSample</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">delegate</span> <span class="keyword">bool</span> <span class="title">ComparisonHandler</span>(<span class="params"><span class="keyword">int</span> first, <span class="keyword">int</span> second</span>)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在这个例子中，声明的委托数据类型是DelegateSample.ComparisonHandler，因为它被定义成DelegateSample中的嵌套类型。</p>
+<h2 id="委托的实例化"><a href="#委托的实例化" class="headerlink" title="委托的实例化"></a>委托的实例化</h2><p>在使用委托来实现Bubblesort()方法的最后一步中,你将学习如何调用方法并传递委托实例-具体地说,传递ComparisonHandler类型的实例。为了实例化委托,需要一个和委托类型自身的签名匹配的方法。对于ComparisonHandler,这个方法应获取两个整数,并返回boo1值。方法名称无关紧要,但是方法的签名的剩余部分(参数和返回值)必须兼容委托的签名。代码清单12-6展示了与委托类型兼容的GreaterThan()方法。</p>
+<blockquote>
+<p>代码清单12-6声明与ComparisonHandler兼容的方法</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">delegate</span> <span class="keyword">bool</span> <span class="title">ComparisonHandler</span> (<span class="params"><span class="keyword">int</span> first, <span class="keyword">int</span> second</span>)</span>;</span><br><span class="line"><span class="keyword">class</span> <span class="title">DelegateSample</span></span><br><span class="line"><span class="title">t</span></span><br><span class="line">public static void Bubblesort(</span><br><span class="line"><span class="keyword">int</span>[] items, ComparisonHandler comparisonMethoa)委托作为参数</span><br><span class="line">/..</span><br></pre></td></tr></table></figure>
+<p>原来用的是一个方法,现在是多个方法<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">bool</span> <span class="title">GreaterThan</span>(<span class="params"><span class="keyword">int</span> first, <span class="keyword">int</span> second</span>)।</span></span><br><span class="line"><span class="function">return first &gt; second</span>;</span><br></pre></td></tr></table></figure></p>
+<p>定义好方法之后,就可以调用Bubblesort(),并提供由委托捕捉到的方法的名称作为实参,如代码清单12-7所示。</p>
+<blockquote>
+<p>代码清单12-7 使用方法名作为实参</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">delegate</span> <span class="keyword">bool</span> <span class="title">ComparisonHandler</span> (<span class="params"><span class="keyword">int</span> first, <span class="keyword">int</span> second</span>).</span></span><br><span class="line"><span class="function">class Delegatesampletblic <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Bubblesort</span>(<span class="params"></span></span></span><br></pre></td></tr></table></figure>
+<p>注意, ComparisonHandler委托是引用类型,但不必用new实例化它。从C# 2.0开始,从方法组(为方法命名的表达式)向委托类型的转换会自动创建一个新的委托对象。</p>
+<p>高级主题: C#1.0中的委托实例化</p>
+<p>在代码清单12-7中,调用Bubblesort()时传递所需方法的名称(GreaterThan )作为一个实参就可以实例化委托。C#的第一个版本要求使用如代码清单12-8所示的较复杂的语法来实例化委托。</p>
+<blockquote>
+<p>代码清单8 C#1.0中将委托作为参数传递</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Bubblesort(items</span><br><span class="line"><span class="keyword">new</span> ComparisonHandler (GreaterThan)).</span><br></pre></td></tr></table></figure>
+<p>以后的版本支持上述两种语法。本书剩余的部分只使用更现代的、简洁的语法。高级主题:委托的内部机制</p>
+<p>1委托实际是特殊的类]虽然C#标准没有确切规定类的层次结构应该是怎样的,但委托必须直接或间接地派生自System. Delegate。事实上, .NET中的委托类型总是 生自System.MulticastDelegate,后者又从System.Delegate派生,如图12-1所示。</p>
+<p>反射图12-1 委托类型的对象模型</p>
+<p>第一个属性属于(System.Reflection. MethodInfo)类型,它是第17章要讨论的主题。Methodinfo描述了特定方法的签名,包括方法名称、参数和返回类型除了Methodinfo,委托还需要一个对象实例,其中包含了要调用的方法。这正是第二个属性Target的作用。|在静态方法的情况下, Target对应于类型自身1至于MulticastDelegate类的作用,将在下一章详细描述。  target字段</p>
+<p>注意,所有委托都是不可变的。委托一旦创建好就无法更改。如果变量包含了委托的引用,还想引用其他不同的方法,那就必须创建一个新委托,并把它指派给这个变量。虽然所有委托数据类型都是间接地从System. Delegate派生的,但C#编译器不允许声明直接或间接从System.Delegate或者System.MulticastDelegate派生的类。代码清单12-9的代码是无效的。</p>
+<p>代码清单12-9 System.Delegate不能显式地作为基类<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">V ERROR: <span class="string">'ComparisonHandLer. cannot</span></span><br><span class="line"><span class="string">// innerit from special class '</span>System. Delegate<span class="string">"// public class ComparisonHandLer: System. DeLegate</span></span><br><span class="line"><span class="string">//..</span></span><br></pre></td></tr></table></figure></p>
+<p>通过传递委托来指定排序方式显然要比本章开头的方式灵活得多。例如,为了改为按字母排序,只需添加一个附加的委托,在比较过程中将整数转换为字符串。代码清单12-10提供了实现按字母排序的完整代码,输出12-1展示了结果。</p>
+<p>代码清单12-10使用其他与ComparisonHandler兼容的方法<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">class</span> <span class="title">DelegateSample</span></span><br><span class="line">public delegate bool comparisonHandler(int first, int second);public static void Bubblesorto</span><br><span class="line"><span class="keyword">int</span>[] items, ComparisonHandler comparisonMethod)</span><br><span class="line"><span class="keyword">int</span> i;<span class="keyword">int</span> j;<span class="keyword">int</span> temp;</span><br><span class="line"><span class="keyword">for</span> (<span class="number">1</span> = items.Length <span class="number">-1</span>; <span class="number">1</span> &gt;= <span class="number">0</span>; <span class="number">1</span>--).</span><br><span class="line"><span class="keyword">for</span> (j=<span class="number">1</span>;j&lt;=i; j++)t</span><br><span class="line"><span class="keyword">if</span> (comparisonMethod(items [j<span class="number">-1</span>], items [j)</span><br><span class="line">temp = items[i<span class="number">-11</span>;items[j<span class="number">-1</span>] - items [<span class="number">3</span>];items[i] = temp;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">bool</span> <span class="title">GreaterThan</span>(<span class="params"><span class="keyword">int</span> first, <span class="keyword">int</span> second</span>)</span></span><br><span class="line"><span class="function">return first  second</span>;</span><br></pre></td></tr></table></figure></p>
+<p>有新的排序方式时,就再添加方法<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">bool</span> <span class="title">AlphabeticalGreaterThan</span>(<span class="params"><span class="keyword">int</span> first, <span class="keyword">int</span> second</span>)</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> comparison</span>;</span><br><span class="line">comparison(first.Tostring().CompareTor</span><br><span class="line">    second. Tostring());</span><br><span class="line"><span class="keyword">return</span> comparison &gt;;</span><br><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="keyword">string</span>[] args</span>)</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> i</span>;</span><br><span class="line"><span class="keyword">int</span>[] items = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">5</span>].</span><br><span class="line"><span class="keyword">for</span> (i-e; icitems.Length; it+)</span><br><span class="line">Console.write(<span class="string">"Enter an integer: "</span>);</span><br><span class="line">items[i] - <span class="keyword">int</span>.Parse(Console, ReadLine());</span><br><span class="line">Bubblesort(items, AlphabeticalGreaterThan); |这儿其实就是赋值了<span class="keyword">for</span> (i = <span class="number">8</span>: i  items. Length; i++)  comparisonMethod =tconsole.WriteLine(items[<span class="number">41</span>);  AlphabeticalGreaterThan;</span><br></pre></td></tr></table></figure></p>
+<p>按字母排序与按数值排序的结果不同。可以看到,和本章开头描述的方式相比,现在添加一个附加的排序机制是多么简单!</p>
+<p>要想按字母排序,唯一要做的就是添加A1phabeticalGreaterThan方法,然后在调用Bubblesort()的时候传递该方法。</p>
+<h1 id="通用的委托：System-Func和System-Action"><a href="#通用的委托：System-Func和System-Action" class="headerlink" title="通用的委托：System.Func和System.Action"></a>通用的委托：System.Func和System.Action</h1><p>为了减少自定义委托类型的必要，.NET3.5“运行时”库（对应C#3.0）包含了一组通用的委托，其中大多数都是泛型。<span style="color:red">System.Func系列委托代表有返回值的方法，而System.Action系列委托代表返回void的方法</span>。下面展示了这些委托的签名。</p>
+<blockquote>
+<p>Func和Action委托声明<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">delegate</span> <span class="keyword">void</span> <span class="title">Action</span>(<span class="params"></span>)</span>;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">delegate</span> <span class="keyword">void</span> Action&lt;<span class="keyword">in</span> T&gt;(T arg);</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">delegate</span> <span class="keyword">void</span> Action&lt;<span class="keyword">in</span> T1, <span class="keyword">in</span> T2&gt;(T1 arg1, T2 arg2);</span><br><span class="line">...</span><br><span class="line"><span class="comment">// 一直到16个参数</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">delegate</span> TResult Func&lt;<span class="keyword">out</span> TResult&gt;();</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">delegate</span> TResult Func&lt;<span class="keyword">in</span> T, <span class="keyword">out</span> TResult&gt;(T arg);</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">delegate</span> TResult Func&lt;<span class="keyword">in</span> T1, <span class="keyword">in</span> T2, <span class="keyword">out</span> TResult&gt;(T1 arg1, T2 arg2);</span><br><span class="line">...</span><br><span class="line"><span class="comment">// 一直到16个参数</span></span><br></pre></td></tr></table></figure></p>
+</blockquote>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C-本质论/" rel="tag"># C#本质论</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/07/18/String与StringBuilder/" rel="next" title="String与StringBuilder">
+                <i class="fa fa-chevron-left"></i> String与StringBuilder
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/07/23/第5章-类/" rel="prev" title="第5章-类">
+                第5章-类 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">354</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">55</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2020/02/16/游戏设计快乐之道（第2版）/" title="游戏设计快乐之道（第2版）" target="_blank">游戏设计快乐之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/14/游戏剧本怎么写/" title="游戏剧本怎么写" target="_blank">游戏剧本怎么写</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/04/通关！游戏设计之道（第2版）/" title="通关！游戏设计之道（第2版）" target="_blank">通关！游戏设计之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/26/游戏设计艺术（第2版）/" title="游戏设计艺术（第2版）" target="_blank">游戏设计艺术（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/22/大师谈游戏设计创意与节奏/" title="大师谈游戏设计创意与节奏" target="_blank">大师谈游戏设计创意与节奏</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#委托概述"><span class="nav-number">1.</span> <span class="nav-text">委托概述</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#背景"><span class="nav-number">1.1.</span> <span class="nav-text">背景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#委托数据类型"><span class="nav-number">1.2.</span> <span class="nav-text">委托数据类型</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#委托类型的声明"><span class="nav-number">1.3.</span> <span class="nav-text">委托类型的声明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#委托的实例化"><span class="nav-number">1.4.</span> <span class="nav-text">委托的实例化</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#通用的委托：System-Func和System-Action"><span class="nav-number">2.</span> <span class="nav-text">通用的委托：System.Func和System.Action</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">3.7m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">56:23</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

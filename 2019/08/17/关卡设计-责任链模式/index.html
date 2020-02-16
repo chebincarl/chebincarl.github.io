@@ -1,0 +1,1680 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="思考并回答以下问题：  责任链模式的官方定义是什么？ 责任链模式属于什么类型的模式？应用场景有哪些？">
+<meta name="keywords" content="设计模式与游戏完美开发">
+<meta property="og:type" content="article">
+<meta property="og:title" content="关卡设计--责任链模式">
+<meta property="og:url" content="http://chebincarl.github.io/2019/08/17/关卡设计-责任链模式/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="思考并回答以下问题：  责任链模式的官方定义是什么？ 责任链模式属于什么类型的模式？应用场景有哪些？">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/17/关卡设计-责任链模式/1.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/17/关卡设计-责任链模式/2.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/17/关卡设计-责任链模式/3.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/17/关卡设计-责任链模式/4.png">
+<meta property="og:updated_time" content="2020-01-23T02:09:01.950Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="关卡设计--责任链模式">
+<meta name="twitter:description" content="思考并回答以下问题：  责任链模式的官方定义是什么？ 责任链模式属于什么类型的模式？应用场景有哪些？">
+<meta name="twitter:image" content="http://chebincarl.github.io/2019/08/17/关卡设计-责任链模式/1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/08/17/关卡设计-责任链模式/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>关卡设计--责任链模式 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">专注，重复10遍</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/08/17/关卡设计-责任链模式/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">关卡设计--责任链模式
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-08-17 10:00:08" itemprop="dateCreated datePublished" datetime="2019-08-17T10:00:08+08:00">2019-08-17</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2020-01-23 10:09:01" itemprop="dateModified" datetime="2020-01-23T10:09:01+08:00">2020-01-23</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Unity/" itemprop="url" rel="index"><span itemprop="name">Unity</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">31k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">29 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>思考并回答以下问题：</p>
+<ul>
+<li>责任链模式的官方定义是什么？</li>
+<li>责任链模式属于什么类型的模式？应用场景有哪些？</li>
+</ul>
+<a id="more"></a>
+<p>本章涵盖：</p>
+<ul>
+<li>关卡设计</li>
+<li>责任链模式<ul>
+<li>责任链模式的定义</li>
+<li>责任链模式的说明</li>
+<li>责任链模式的实现范例</li>
+</ul>
+</li>
+<li>使用责任链模式实现关卡系统<ul>
+<li>关卡系统的设计</li>
+<li>实现说明</li>
+<li>使用责任链模式的优点</li>
+<li>实现责任链模式时的注意事项</li>
+</ul>
+</li>
+<li>责任链模式面对变化时</li>
+<li>结论</li>
+</ul>
+<h1 id="关卡设计"><a href="#关卡设计" class="headerlink" title="关卡设计"></a><span style="color:#339AFF;">关卡设计</span></h1><p>经过<a href="/2019/08/16/兵营训练单位-命令模式/" title="兵营训练单位-命令模式">兵营训练单位-命令模式</a>一章的功能实现后，现在可以通过兵营界面（CampInfoUI）来产生玩家角色，并迎战来袭的敌方角色。在<a href="/2019/08/12/游戏角色的产生-工厂方法模式/" title="游戏角色的产生-工厂方法模式">游戏角色的产生-工厂方法模式</a>时曾介绍，敌方角色也是从角色工厂（ICharacterFactory）中产生的，但是，玩家角色是由玩家自行决定产生的时间，而那些要占领玩家阵地的敌方角色，又是由谁负责下达产生的命令呢？在《P级阵地》中，是由关卡系统（StageSystem）负责这些工作。</p>
+<p>《P级阵地》对于关卡功能的需求是这样的：</p>
+<ul>
+<li>(1)每次关卡开始时，会同时出现n个敌方角色，这n个角色会不断地往玩家阵地移动。</li>
+<li>(2)敌方角色到达阵地中心3次以上时，游戏结束，而玩家的最高闯关记录为当前这一个关卡。</li>
+<li>(3)在兵营训练的玩家角色会守护阵地，如果将敌方角色全部被击杀，代表通过这一关，游戏进入下一关。</li>
+<li>(4)每一个关卡都设有通关分数，若未达关卡设置的分数，则重复这一关。</li>
+<li>(5)重复1-4的流程，直到玩家无法成功守护阵地（即满足2的规则）为止。</li>
+</ul>
+<p>分析上述功能需求后，《P级阵地》的关卡系统（StageSystem）需要完成下列相关实现：</p>
+<ul>
+<li>(1)指定每一关出现敌方阵营角色的数量和等级。</li>
+<li>(2)每一关需设置通关条件，条件满足后即开启下一关。</li>
+<li>(3)每一关也必须知道要开启的下一关。</li>
+<li>(4)如果阵地中央被占领次数超过3次，游戏结束。</li>
+</ul>
+<p>关卡系统（StageSystem）实现时，将它列为游戏系统（IGameSystem ）之一，因此和其他子系统一样继承IGameSystem接口并实现。另外，也在PBaseDefenseGame类中产生对象，作为类成员之一：</p>
+<blockquote>
+<p>Listing1 关卡控制系统（StageSystem.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">StageSystem</span> : <span class="title">IGameSystem</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">const</span> <span class="keyword">int</span> MAX_HEART = <span class="number">3</span>; <span class="comment">// 最大生命</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> m_NowHeart = MAX_HEART; <span class="comment">// 当前玩家阵地情况</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span>  m_NowStageLv = <span class="number">1</span>;   <span class="comment">// 当前的关卡</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> m_EnemyKilledCount = <span class="number">0</span>; <span class="comment">// 当前敌方单位阵亡数</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">StageSystem</span>(<span class="params">PBaseDefenseGame PBDGame</span>) : <span class="title">base</span>(<span class="params">PBDGame</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Initialize();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 初始化</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Initialize</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 设置关卡</span></span><br><span class="line">        InitializeStageData();</span><br><span class="line">        <span class="comment">// 指定第一个关卡</span></span><br><span class="line">        m_NowStageLv = <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 释放</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Release</span> (<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">base</span>.Release ();</span><br><span class="line">        m_SpawnPosition.Clear();</span><br><span class="line">        m_SpawnPosition = <span class="literal">null</span>;</span><br><span class="line">        m_NowHeart = MAX_HEART;</span><br><span class="line">        m_EnemyKilledCount = <span class="number">0</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 更新</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">       ...</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 通知损失</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">LoseHeart</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_NowHeart --;</span><br><span class="line">        m_PBDGame.ShowHeart( m_NowHeart );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 增加当前击杀数</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">AddEnemyKilledCount</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_EnemyKilledCount++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置当前击杀数</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">SetEnemyKilledCount</span>(<span class="params"> <span class="keyword">int</span> KilledCount</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// Debug.Log("StageSysem.SetEnemyKilledCount:"+KilledCount);</span></span><br><span class="line">        m_EnemyKilledCount = KilledCount;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取当前击杀数</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">GetEnemyKilledCount</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> m_EnemyKilledCount;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>关卡系统（StageSystem）成员包含了当前玩家阵营被攻击的情况（m_NowHeart）、当前击杀敌方阵营的角色数量（m_EnemyKilledCount）及当前进行的关卡（m_NowStageLv），并且提供相关的方法来操作相关成员。</p>
+<p>如果在关卡系统（StageSystem）的定期更新（Update）方法中，以成员m_NowStageLv作为关卡前进的依据，那么可能会以下面的方式来实现：</p>
+<blockquote>
+<p>Listing2 关卡控制系统</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">StageSystem</span> : <span class="title">IGameSystem</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> m_NowStageLv = <span class="number">1</span>; <span class="comment">// 当前的关卡</span></span><br><span class="line">    <span class="keyword">private</span> List&lt;Vector3&gt; m_SpawnPosition = <span class="literal">null</span>; <span class="comment">// 出生点</span></span><br><span class="line">    <span class="keyword">private</span> Vector3 m_AttackPos = Vector3.zero; <span class="comment">// 攻击点</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">bool</span> m_bCreateStage = <span class="literal">false</span>; <span class="comment">// 是否需要产生关卡</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 定期更新</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 是否要开启新关卡</span></span><br><span class="line">        <span class="keyword">if</span>(m_bCreateStage)</span><br><span class="line">        &#123;</span><br><span class="line">            CreateStage();</span><br><span class="line">            m_bCreateStage = <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 是否要切换下一个关卡</span></span><br><span class="line">        <span class="keyword">if</span>(m_PBDGame.GetEnemyCount() ==  <span class="number">0</span> )</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>( CheckNextStage() )</span><br><span class="line">                m_NowStageLv++ ;</span><br><span class="line">            m_bCreateStage = <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 产生关卡</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">CreateStage</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 一次产生一个单位</span></span><br><span class="line">        ICharacterFactory Factory = PBDFactory.GetCharacterFactory();           </span><br><span class="line">        Vector3 AttackPosition = GetAttackPosition();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">switch</span>( m_NowStageLv)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="number">1</span>:</span><br><span class="line">                Debug.Log(<span class="string">"产生第1关"</span>);</span><br><span class="line">                Factory.CreateEnemy( ENUM_Enemy.Elf, ENUM_Weapon.Gun, GetSpawnPosition(), AttackPosition);</span><br><span class="line">                Factory.CreateEnemy( ENUM_Enemy.Elf, ENUM_Weapon.Gun, GetSpawnPosition(), AttackPosition);</span><br><span class="line">                Factory.CreateEnemy( ENUM_Enemy.Elf, ENUM_Weapon.Gun, GetSpawnPosition(), AttackPosition);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">case</span> <span class="number">2</span>:</span><br><span class="line">                Debug.Log(<span class="string">"产生第2关"</span>);</span><br><span class="line">                Factory.CreateEnemy( ENUM_Enemy.Elf, ENUM_Weapon.Gun, GetSpawnPosition(), AttackPosition);</span><br><span class="line">                Factory.CreateEnemy( ENUM_Enemy.Elf, ENUM_Weapon.Rifle, GetSpawnPosition(), AttackPosition);</span><br><span class="line">                Factory.CreateEnemy( ENUM_Enemy.Troll, ENUM_Weapon.Gun, GetSpawnPosition(), AttackPosition);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">case</span> <span class="number">3</span>:</span><br><span class="line">                Debug.Log(<span class="string">"产生第3关"</span>);</span><br><span class="line">                Factory.CreateEnemy( ENUM_Enemy.Elf, ENUM_Weapon.Gun, GetSpawnPosition(), AttackPosition);</span><br><span class="line">                Factory.CreateEnemy( ENUM_Enemy.Troll, ENUM_Weapon.Gun, GetSpawnPosition(), AttackPosition);</span><br><span class="line">                Factory.CreateEnemy( ENUM_Enemy.Troll, ENUM_Weapon.Rifle, GetSpawnPosition(), AttackPosition);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;   </span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 确认是否要切换到下一个关卡</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">bool</span> <span class="title">CheckNextStage</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">switch</span>( m_NowStageLv)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="number">1</span>:</span><br><span class="line">                <span class="keyword">if</span>( GetEnemyKilledCount() &gt;= <span class="number">3</span>)</span><br><span class="line">                    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">case</span> <span class="number">2</span>:</span><br><span class="line">                <span class="keyword">if</span>( GetEnemyKilledCount() &gt;= <span class="number">6</span>)</span><br><span class="line">                    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">case</span> <span class="number">3</span>:</span><br><span class="line">                <span class="keyword">if</span>( GetEnemyKilledCount() &gt;= <span class="number">9</span>)</span><br><span class="line">                    <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;   </span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取出生点</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> Vector3 <span class="title">GetSpawnPosition</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span>( m_SpawnPosition == <span class="literal">null</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            m_SpawnPosition = <span class="keyword">new</span> List&lt;Vector3&gt;();</span><br><span class="line"></span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">1</span>; i&lt;=<span class="number">3</span>; ++i)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">string</span> name = <span class="keyword">string</span>.Format(<span class="string">"EnemySpawnPosition&#123;0&#125;"</span>, i);</span><br><span class="line">                GameObject tempObj = UnityTool.FindGameObject( name );</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span>( tempObj==<span class="literal">null</span>)</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line"></span><br><span class="line">                tempObj.SetActive(<span class="literal">false</span>);</span><br><span class="line">                m_SpawnPosition.Add( tempObj.transform.position );</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 随机返回</span></span><br><span class="line">        <span class="keyword">int</span> index  = UnityEngine.Random.Range(<span class="number">0</span>, m_SpawnPosition.Count <span class="number">-1</span> );</span><br><span class="line">        <span class="keyword">return</span> m_SpawnPosition[index];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取攻击点</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> Vector3 <span class="title">GetAttackPosition</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span>( m_AttackPos == Vector3.zero)</span><br><span class="line">        &#123;</span><br><span class="line">            GameObject tempObj = UnityTool.FindGameObject(<span class="string">"EnemyAttackPosition"</span>);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span>( tempObj==<span class="literal">null</span>)</span><br><span class="line">                <span class="keyword">return</span> Vector3.zero;</span><br><span class="line"></span><br><span class="line">            tempObj.SetActive(<span class="literal">false</span>);</span><br><span class="line">            m_AttackPos = tempObj.transform.position;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> m_AttackPos;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>定期更新Update方法中，判断当前是否需要产生新的关卡，如果需要，则先调用产生关卡CreateStage方法。而关卡是否结束，则是直接判断当前敌方阵营的角色数量，如果为0，代表关卡结束可以进入下一个关卡。确认开始下一个关卡CheckNextStage方法中，会先判断当前得分来判断是否可以进入下一个关卡。</p>
+<p>仔细分析两个与关卡产生有关的方法：CreateStage、CheckNextStage，其中都按照当前关卡（m_NowStageLv）的值，来决定接下来要产生哪些敌方角色以及是否切换到下一个关卡。上述的程序代码只产生了3个关卡而已，但《P级阵地》的目标是希望能设置数十个以上的关卡让玩家挑战，所以若以上述的写法来设计的话，程序代码将变得非常冗长，而且弹性不足，无法让策划人员快速设置和调整，所以我们需要使用新的设计来重新编写程序。</p>
+<p>重构的目标是，希望能将关卡数据使用类加以封装。而封装的信息包含：要出场的敌方角色的设置、通关条件、下一关的记录等。<span style="color:red">也就是让每一关都是一个对象并加以管理。</span>而关卡系统则是在这群对象中寻找“条件符合”的关卡，让玩家进入挑战。等到关卡完成后，再进入到下一个条件符合的关卡。</p>
+<p>试着寻找GoF设计模式中可以使用的模式，责任链模式可以提供重构时的依据。</p>
+<h1 id="责任链模式"><a href="#责任链模式" class="headerlink" title="责任链模式"></a><span style="color:#339AFF;">责任链模式</span></h1><p>当有问题需要解决，而且可以解决问题的人还不止一个时，就有很多方式可以得到想要的答案。例如可以将问题同时交给可以解决问题的人，请他们都回答，但这个方式比较浪费资源，也会造成重复，也有可能回答的人有等级之分，不适合太简单和太复杂的问题。另一个方式就是将可以回答问题的人，按照等级或专业一个个串接起来。<span style="color:red">责任链模式就是提供了一个可以将这些回答问题的人，一个个链接起来的设计方法。</span></p>
+<h2 id="责任链模式的定义"><a href="#责任链模式的定义" class="headerlink" title="责任链模式的定义"></a><span style="color:#00ACC1;">责任链模式的定义</span></h2><p>GoF对责任链模式（Chain of Responsibility）的定义是：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">让一群对象都有机会来处理一项请求，以减少请求发送者与接收者之间的耦合度（即依赖度），将所有的接收者对象串接起来，让请求沿着串接传递，直到有一个对象可以处理为止。</span><br></pre></td></tr></table></figure></p>
+<p>以下，笔者先以现实生活的亲身经历，来说明责任链模式在非软件设计领域中的呈现实例：</p>
+<p>有家非常大的电信公司，拥有非常多的部门，每个部门都负责不同的业务，也是由于每个部门的业务都过于繁多，所以每个部门都有自己的客服部门。有一天，笔者一款上市运营中的游戏，接到玩家的反馈说，游戏出现无法正常连线的问题。经查明之后发现，这些玩家的计算机无法将游戏使用的域名（Domain Name）转换成IP地址（IP Address），恰好，这个问题也发生在笔者家中使用的计算机上。所以我先使用指令，确认游戏域名转换成IP地址时的情况，检查之后发现，转换后的IP地址会不定时地在两个IP之间切换，而我当时计算机的DNS服务器（DNS： Domain Name Server，即域名服务器）是设置为那一家电信公司提供的DNS。但当时服务公司的IT部门人员都已下班，无法获取公司DNS更新的情况，又着急要解决问题，所以当下的反应就是想直接打电话给电信公司询问：“为什么由你们DNS返回的网址，会不定时在两个IP之间切换？”</p>
+<p>那么我该询问哪个部门呢？当下我也不是很清楚，所以就直接拿起电话拨打该电信公司的“通用客服专线”。接通后，我将遇到的问题很清楚地说明了一次。但很不幸，那位客服人员不好意思地说了声抱歉，因为他们负责的是“电信业务”不是“网络业务”，所以“电信业务的客服”就将我的电话转给了“网络业务的容服”。</p>
+<p>“网络业务的客服”人员接通后，我一样将问题重新说明了一次（所以很明显地，他们的客服间为了快速转换服务，不会将客户遇到的问题一起移动，当然也可能是因为问题太复杂），而网络业务的客服人员，似乎是第一次遇到这样的问题，于是让我挂线等了一下。当网络业务的客服人员重新接回时却表示，他们部门也无法解决，所以再将我的电话转换到“网络机房的客服”。</p>
+<p>同样地，在与“网络机房的客服”人员接通后，我再将问题重新说明了一次。而这次的客服人员，总算可以了解我的问题，并且再询问几个问题之后，留下我的联络方式并说明，待他们查明后会通知我。我在隔天早上收到了邮件通知，了解了问题发生的真正原因，进而解决了玩家无法正常连线的问题。</p>
+<p>若运用责任链模式来说明的话，可以这样模拟：“为什么由你们的DNS返回的网址，会不定时在两个IP之间切换”是这次事件中的“请求”，客户（也就是我）就是“请求的发送者”，而那家电信公司的电信业务的客服、网络业务的客服、网络机房的客服，都是“接收者对象”，他们之间使用电话分机的方式彼此串联。当客户的“请求”无法在第一个部门（电信业务的容服）被解决时，客户的“请求”就通过他们内部串联（分机）的方式，转到下一个可能可以解决问题的部门，第二个部门无法解决时再转往下一个，直到“网络机房的客服”解决了问题为止，如图1所示。</p>
+<blockquote>
+<p>图1 责任链模式的电信客服示意图</p>
+</blockquote>
+<img src="/2019/08/17/关卡设计-责任链模式/1.png">
+<p>对于客户而言，当时对应的只有一个所谓的“客服人员”角色，而这个“客服人员”是属于电信公司的哪一个部门并不重要，客户（也就是我）还是使用与一般“客服人员”的对话方式，而对方也使用标准“客服流程”来应答。而这也是定义中所说的：“减少请求发送者与接收者之间的耦合度”，“客服人员”都使用一般的应答方式（电话沟通），不需要因为不同的部门，而有不同的沟通工具或互动方式。</p>
+<p>所以，从上述举例中可以了解到，责任链模式描述的就是，<span style="color:red">将一群能够解决问题的部门（对象），使用电话分机通话后，一同来解决客户（请求发送者）问题的模式。而其中还要让客户（请求发送者）减少接口转换的负担（减少耦合度即依赖度），也就是都是使用电话沟通，不必中途转换去使用计算机或其他沟通工具</span>。</p>
+<p>因此，让我们从现实的个案回到软件的开发上，在运用责任链模式解决问题时，只要将下列的几个重点列出来分别实现，即可满足模式的基本要求：</p>
+<ul>
+<li><span style="color:blue">可以解决请求的接收者对象</span>：这些类对象能够了解“请求”信息的内容，并判断本身能否解决。</li>
+<li><span style="color:blue">接收者对象间的串接</span>：利用一个串接机制，将每一个可能可以解决问题的接收者对象给串接起来。对于被串接的接收者对象来说，当本身无法解决这个问题时，就利用这个串接机制，让请求能不断地传递下去；或使用其他管理方式，让接收者对象得以链接。</li>
+<li><span style="color:blue">请求自动转移传递</span>：发出请求后，请求会自动往下转移传递，过程之中，发送者不需特别转换接口。</li>
+</ul>
+<h2 id="责任链模式的说明"><a href="#责任链模式的说明" class="headerlink" title="责任链模式的说明"></a><span style="color:#00ACC1;">责任链模式的说明</span></h2><p>将责任链模式的各项重点结构化后，可用图2来表示。</p>
+<blockquote>
+<p>图2 将责任链模式的各项重点结构化的结构图</p>
+</blockquote>
+<img src="/2019/08/17/关卡设计-责任链模式/2.png">
+<p>GoF参与者的说明如下：</p>
+<ul>
+<li>Handler（请求接收者接口）<ul>
+<li>定义可以处理客户端请求事项的接口；</li>
+<li>可包含“可链接下一个同样能处理请求”的对象引用。</li>
+</ul>
+</li>
+<li>ConcreteHandler1、ConcreteHandler2（实现请求接收者接口）<ul>
+<li>实现请求处理接口，并判断对象本身是否能处理这次的请求；</li>
+<li>不能完成请求的话，交由后继者（下一个）来处理。</li>
+</ul>
+</li>
+<li>Client（请求发送者）<ul>
+<li>将请求发送给第一个接收者对象，并等待请求的回复。</li>
+</ul>
+</li>
+</ul>
+<h2 id="责任链模式的实现范例-lt-span-gt"><a href="#责任链模式的实现范例-lt-span-gt" class="headerlink" title="责任链模式的实现范例&lt;/span&gt;"></a><span style="color:#00ACC1;"><span id="jump">责任链模式的实现范例</span>&lt;/span&gt;</span></h2><p>从GoF定义的基本架构实现来看，我们首先必须定义Handler（请求接收者接口）：</p>
+<blockquote>
+<p>Listing3 处理信息的接口（ChainofResponsibility.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">Handler</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">protected</span> Handler m_NextHandler = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Handler</span>(<span class="params">Handler theNextHandler</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_NextHandler = theNextHandler;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">HandleRequest</span>(<span class="params"><span class="keyword">int</span> Cost</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span>(m_NextHandler != <span class="literal">null</span>)</span><br><span class="line">            m_NextHandler.HandleRequest(Cost);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>类的构造方法说明了，当对象被产生时，就要提供一个可以链接到下一个请求接收者（Handler）的对象引用。而处理请求方法（HandleRequest）被声明为虚函数，让是否传递给后继者的任务交由子类重新定义，父类不针对传入的参数作判断，只是直接传给下一个对象。</p>
+<p>接下来，定义3个子类来实现Handler接口，分别用来处理传入参数（Cost）所需要的判断：</p>
+<blockquote>
+<p>Listing4 实现信息处理类（ChainofResponsibility.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 处理所负责的信息1</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ConcreteHandler1</span> : <span class="title">Handler</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> m_CostCheck = <span class="number">10</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ConcreteHandler1</span>(<span class="params"> Handler theNextHandler </span>) : <span class="title">base</span>(<span class="params"> theNextHandler </span>)</span></span><br><span class="line"><span class="function"></span>    &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">HandleRequest</span>(<span class="params"><span class="keyword">int</span> Cost</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span>( Cost &lt;= m_CostCheck)</span><br><span class="line">            Debug.Log(<span class="string">"ConcreteHandler1.HandleRequest核准"</span>);</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            <span class="keyword">base</span>.HandleRequest(Cost);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 处理所负责的信息2</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ConcreteHandler2</span> : <span class="title">Handler</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> m_CostCheck = <span class="number">20</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ConcreteHandler2</span>(<span class="params"> Handler theNextHandler </span>) : <span class="title">base</span>(<span class="params"> theNextHandler </span>)</span></span><br><span class="line"><span class="function"></span>    &#123;&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">HandleRequest</span>(<span class="params"><span class="keyword">int</span> Cost</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span>( Cost &lt;= m_CostCheck)</span><br><span class="line">            Debug.Log(<span class="string">"ConcreteHandler2.HandleRequest核准"</span>);</span><br><span class="line">        <span class="keyword">else</span></span><br><span class="line">            <span class="keyword">base</span>.HandleRequest(Cost);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 处理所负责的信息3</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ConcreteHandler3</span> : <span class="title">Handler</span></span><br><span class="line">&#123;           </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ConcreteHandler3</span>(<span class="params"> Handler theNextHandler </span>) : <span class="title">base</span>(<span class="params"> theNextHandler </span>)</span></span><br><span class="line"><span class="function"></span>    &#123;&#125;  </span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">HandleRequest</span>(<span class="params"><span class="keyword">int</span> Cost</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Debug.Log(<span class="string">"ConcreteHandler3.HandleRequest核准"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个范例所要呈现的是，对于传入参数Cost的“核准权限”确认，而这3个类就是“可以解决请求的接收者对象”，使用父类中的成员m_NextHandler将它们串接起来。每一个类负责一定金额的核准权限，如果传入的Cost超过自己能够核准的权限，就将请求传给下一个对象，请下一个对象来核准，直到有某个对象完成核准为止。</p>
+<p>在测试程序中，先将3个子类对象分别产生并串接，所以测试程序担任的就是Client端，最后再将不同的Cost参数带入：</p>
+<blockquote>
+<p>Listing5 测试责任链模式（ChainofResponsibilityTest.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">UnitTest</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// 产生Cost验证的链接方式</span></span><br><span class="line">    ConcreteHandler3 theHandle3 = <span class="keyword">new</span> ConcreteHandler3(<span class="literal">null</span>);</span><br><span class="line">    ConcreteHandler2 theHandle2 = <span class="keyword">new</span> ConcreteHandler2(theHandle3);</span><br><span class="line">    ConcreteHandler1 theHandle1 = <span class="keyword">new</span> ConcreteHandler1(theHandle2);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 确认</span></span><br><span class="line">    theHandle1.HandleRequest(<span class="number">10</span>);</span><br><span class="line">    theHandle1.HandleRequest(<span class="number">15</span>);</span><br><span class="line">    theHandle1.HandleRequest(<span class="number">20</span>);</span><br><span class="line">    theHandle1.HandleRequest(<span class="number">30</span>);</span><br><span class="line">    theHandle1.HandleRequest(<span class="number">100</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>执行结果1显示出每一种金额负责核准的对象信息<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ConcreteHandler1.HandleRequest核准</span><br><span class="line">ConcreteHandler2.HandleRequest核准</span><br><span class="line">ConcreteHandler2.HandleRequest核准</span><br><span class="line">ConcreteHandler3.HandleRequest核准</span><br><span class="line">ConcreteHandler3.HandleRequest核准</span><br></pre></td></tr></table></figure></p>
+<h1 id="使用责任链模式实现关卡系统"><a href="#使用责任链模式实现关卡系统" class="headerlink" title="使用责任链模式实现关卡系统"></a><span style="color:#339AFF;">使用责任链模式实现关卡系统</span></h1><p>游戏中的关卡都是一关关的串接，完成了这一关之后就进入下一关，所以在实现上使用责任链模式来串接每一个关卡是非常合适的。但是对于每一个关卡的通关判断规则，则要按照各个游戏的需求来设计，可能就不是如同前一节的范例那样，可以使用一个属性来作为开启下一个关卡的条件。</p>
+<h2 id="关卡系统的设计"><a href="#关卡系统的设计" class="headerlink" title="关卡系统的设计"></a><span style="color:#00ACC1;">关卡系统的设计</span></h2><p>对于《P级阵地》关卡系统（StageSystem）的修改需求上，关卡可能需要的信息包含要出场的敌方角色设置、通关条件及连接下一关卡对象的引用，封装成一个“接收者类”，并增加能够判断通关与否的方法，作为是否前进到下一关的判断依据。关卡串接的图解如图3所示。</p>
+<blockquote>
+<p>图3 关卡串接的图解</p>
+</blockquote>
+<img src="/2019/08/17/关卡设计-责任链模式/3.png">
+<p>每个关卡对象都会判断“当前的游戏状态”是否符合关卡的“通关条件”：</p>
+<ul>
+<li>如果符合通关条件，则将关卡通关与否的判断交由下一个关卡对象判断，直到有一个关卡对象负责接下来的“关卡开启”工作。</li>
+<li>如果不符合，则将“当前关卡”维持在这一个关卡对象上，继续让现在的关卡对象负责“关卡开启”工作。</li>
+</ul>
+<p>运用责任链模式后的关卡系统结构如图4所示。</p>
+<blockquote>
+<p>图4 运用责任链模式后的关卡系统结构</p>
+</blockquote>
+<img src="/2019/08/17/关卡设计-责任链模式/4.png">
+<p>参与者的说明如下：</p>
+<ul>
+<li>IStageHandler：定义可以处理“过关判断”和“关卡开启”的接口，也包含指向下一个关卡对象的引用。</li>
+<li>NormalStageHandler：实现关卡接口，负责“常规”关卡的开启和过关条件判断。</li>
+<li>IStageScore：定义判断通关与否的操作接口。</li>
+<li>StageScoreEnemyKilledCount：使用当前的“击杀敌方角色数”，作为通关与否的判断。</li>
+<li>IStageData：定义关卡内容的操作接口，在《P级阵地》中，关卡内容指的是：<ul>
+<li>这一关会出现攻击玩家阵营的敌方角色数据之设置；</li>
+<li>关卡开启；</li>
+<li>关卡是否结束的判断。</li>
+</ul>
+</li>
+<li>NormalStageData：实现“常规”关卡内容，实际将产生的敌方角色放入战场上攻击玩家阵营，以及实现判断关卡是否结束的方法。</li>
+</ul>
+<p>此外，IStageScore和IStageData这两个类也是应用策略模式（Strategy）的类，让关卡系统在“过关判断”和“产生敌方单位”这两个设计需求上，能更具备灵活性，不限制只有一种玩法。</p>
+<h2 id="实现说明"><a href="#实现说明" class="headerlink" title="实现说明"></a><span style="color:#00ACC1;">实现说明</span></h2><p>关卡接口IStageHandler中定义了关卡操作的方法：</p>
+<blockquote>
+<p>Listing6 关卡接口（IStageHandler.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 关卡接口</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">IStageHandler</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">protected</span> IStageData    m_StageData  = <span class="literal">null</span>; <span class="comment">// 关卡的内容（敌方角色）</span></span><br><span class="line">    <span class="keyword">protected</span> IStageScore   m_StageScore  = <span class="literal">null</span>; <span class="comment">// 关卡的分数（通关条件）</span></span><br><span class="line">    <span class="keyword">protected</span> IStageHandler m_NextHandler = <span class="literal">null</span>; <span class="comment">// 下一个关卡</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置下一个关卡</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IStageHandler <span class="title">SetNextHandler</span>(<span class="params">IStageHandler NextHandler</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_NextHandler = NextHandler;</span><br><span class="line">        <span class="keyword">return</span> m_NextHandler;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> IStageHandler <span class="title">CheckStage</span>(<span class="params"></span>)</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">Reset</span>(<span class="params"></span>)</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">bool</span> <span class="title">IsFinished</span>(<span class="params"></span>)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中，CheckStage用来判断当前游戏所处的关卡是哪一个，所以会返回一个IStageHandler引用给关卡系统（StageSystem），当前《P级阵地》先实现了“常规关卡”的功能：</p>
+<blockquote>
+<p>Listing7 常规关卡（NormalStageHandler.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">NormalStageHandler</span> : <span class="title">IStageHandler</span> </span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 设置分数和关卡数据</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">NormalStageHandler</span>(<span class="params">IStageScore StateScore, IStageData StageData </span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_StageScore  = StateScore;</span><br><span class="line">        m_StageData  = StageData;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置下一个关卡</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IStageHandler <span class="title">SetNextHandler</span>(<span class="params">IStageHandler NextHandler</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_NextHandler = NextHandler;</span><br><span class="line">        <span class="keyword">return</span> m_NextHandler;</span><br><span class="line">    &#125;</span><br><span class="line">        </span><br><span class="line">    <span class="comment">// 确认关卡</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> IStageHandler <span class="title">CheckStage</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 分数是否足够</span></span><br><span class="line">        <span class="keyword">if</span>( m_StageScore.CheckScore()==<span class="literal">false</span>)</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 已经是最后一关了</span></span><br><span class="line">        <span class="keyword">if</span>(m_NextHandler==<span class="literal">null</span>)</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">this</span>;        </span><br><span class="line"></span><br><span class="line">        <span class="comment">// 确认下一个关卡</span></span><br><span class="line">        <span class="keyword">return</span> m_NextHandler.CheckStage();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_StageScore.Update();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Reset</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_StageScore.Reset();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">bool</span> <span class="title">IsFinished</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> m_StageScore.IsFinished();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在关卡初始化时（NormalStageHandler），会将关卡所使用的“过关条件”和“关卡内容”设置给关卡对象，并且利用SetNextHandler来设置连接的下一个关卡。在确认关卡CheckStage方法中，判断当前游戏状态是否符合关卡过关的条件判断。如果已满足，代表可前往下一个关卡，该方法最后会返回游戏当前可使用的关卡对象给关卡系统。</p>
+<p>当前的关卡判定，是以“击杀敌方角色数”为通关的条件判断：</p>
+<blockquote>
+<p>Listing8 关卡分数确认（IStageScore.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">IStageScore</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">bool</span> <span class="title">CheckScore</span>(<span class="params"></span>)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Listing9 关卡分数确认：敌人阵亡数（StageScoreEnemyKilledCount）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">StageScoreEnemyKilledCount</span> : <span class="title">IStageScore</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> m_EnemyKilledCount = <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">private</span> StageSystem m_StageSystem = <span class="literal">null</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">StageScoreEnemyKilledCount</span>(<span class="params"> <span class="keyword">int</span> KilledCount, StageSystem theStageSystem</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_EnemyKilledCount = KilledCount;</span><br><span class="line">        m_StageSystem = theStageSystem;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 确认关卡分数是否达到</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">bool</span> <span class="title">CheckScore</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> ( m_StageSystem.GetEnemyKilledCount() &gt;=  m_EnemyKilledCount);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>此外，在常规关卡（NormalStageHandler）类中，有个“关卡内容”对象需要被定期更新：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">NormalStageHandler</span> : <span class="title">IStageHandler</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">protected</span> IStageData m_StageData = <span class="literal">null</span>; <span class="comment">// 关卡的内容（敌方角色）</span></span><br><span class="line">    ...</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_StageData.Update();</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>至于关卡内容（IStageData）类主要负责的则是将关卡的“内容”呈现给玩家：</p>
+<blockquote>
+<p>Listing10 关卡内容接口（IStageData.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">IStageData</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">bool</span> <span class="title">IsFinished</span>(<span class="params"></span>)</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">Reset</span>(<span class="params"></span>)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>“关卡内容”一般指的就是玩家要挑战的项目，这些项目可能是出现3个敌方角色，让玩家击退；也可能是出现3个道具让玩家可以去搜索获取；或是设计特殊任务关卡让玩家去完成。而这些设置内容都会放进IStageData的子类中，并且通过Game Loop更新机制，让关卡内容可以顺利产生给玩家挑战。以下是当前实现的常规关卡内容（NormalStageData）：</p>
+<blockquote>
+<p>Listing11 常规关卡内容（NormalStageData.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">NormalStageData</span> : <span class="title">IStageData</span> </span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">float</span> m_CoolDown = <span class="number">0</span>;  <span class="comment">// 产生角色的间隔时间</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">float</span> m_MaxCoolDown = <span class="number">0</span>;  </span><br><span class="line">    <span class="keyword">private</span> Vector3 m_SpawnPosition = Vector3.zero; <span class="comment">// 出生点</span></span><br><span class="line">    <span class="keyword">private</span> Vector3 m_AttackPosition = Vector3.zero;<span class="comment">// 攻击目标</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">bool</span>    m_AllEnemyBorn = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 关卡内要产生的敌人单位</span></span><br><span class="line">    <span class="keyword">private</span> List&lt;StageData&gt; m_StageData = <span class="keyword">new</span> List&lt;StageData&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 常规关卡要产生的敌人单位</span></span><br><span class="line">    <span class="keyword">class</span> <span class="title">StageData</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">public</span> ENUM_Enemy emEnemy = ENUM_Enemy.Null;</span><br><span class="line">        <span class="keyword">public</span> ENUM_Weapon emWeapon = ENUM_Weapon.Null;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">bool</span> bBorn = <span class="literal">false</span>;</span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">StageData</span>(<span class="params"> ENUM_Enemy emEnemy, ENUM_Weapon emWeapon </span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">this</span>.emEnemy = emEnemy;</span><br><span class="line">            <span class="keyword">this</span>.emWeapon= emWeapon;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; </span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 设置多久产生一个敌方单位</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">NormalStageData</span>(<span class="params"><span class="keyword">float</span> CoolDown ,Vector3 SpawnPosition, Vector3 AttackPosition</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_MaxCoolDown = CoolDown;</span><br><span class="line">        m_CoolDown = m_MaxCoolDown;</span><br><span class="line">        m_SpawnPosition = SpawnPosition;</span><br><span class="line">        m_AttackPosition = AttackPosition;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 增加关卡的敌方单位</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">AddStageData</span>(<span class="params"> ENUM_Enemy emEnemy, ENUM_Weapon emWeapon,<span class="keyword">int</span> Count</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;Count;++i)</span><br><span class="line">            m_StageData.Add ( <span class="keyword">new</span> StageData(emEnemy, emWeapon));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 重置</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Reset</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">foreach</span>( StageData pData <span class="keyword">in</span> m_StageData)</span><br><span class="line">            pData.bBorn = <span class="literal">false</span>;        </span><br><span class="line">        m_AllEnemyBorn = <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 更新</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span>( m_StageData.Count == <span class="number">0</span>)</span><br><span class="line">            <span class="keyword">return</span> ;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 是否可以产生</span></span><br><span class="line">        m_CoolDown -= Time.deltaTime;</span><br><span class="line">        <span class="keyword">if</span>( m_CoolDown &gt; <span class="number">0</span>)</span><br><span class="line">            <span class="keyword">return</span> ;</span><br><span class="line">        m_CoolDown = m_MaxCoolDown;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 获取上场的角色</span></span><br><span class="line">        StageData theNewEnemy = GetEnemy();</span><br><span class="line">        <span class="keyword">if</span>(theNewEnemy == <span class="literal">null</span>)</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 一次产生一个单位</span></span><br><span class="line">        ICharacterFactory Factory = PBDFactory.GetCharacterFactory();</span><br><span class="line">        Factory.CreateEnemy( theNewEnemy.emEnemy, theNewEnemy.emWeapon, m_SpawnPosition, m_AttackPosition);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取还没产生的关卡</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> StageData <span class="title">GetEnemy</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">foreach</span>( StageData pData <span class="keyword">in</span> m_StageData)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(pData.bBorn == <span class="literal">false</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                pData.bBorn = <span class="literal">true</span>;</span><br><span class="line">                <span class="keyword">return</span> pData;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        m_AllEnemyBorn = <span class="literal">true</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 是否完成</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">bool</span> <span class="title">IsFinished</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> m_AllEnemyBorn;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>以当前实现的常规关卡内容（NormalStageData）来看，类内定义了数个与派送敌方角色上场有关的设置参数：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">float</span> m_CoolDown = <span class="number">0</span>;  <span class="comment">// 产生角色的间隔时间</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">float</span> m_MaxCoolDown = <span class="number">0</span>;</span><br><span class="line"><span class="keyword">private</span> Vector3 m_SpawnPosition = Vector3.zero; <span class="comment">// 出生点</span></span><br><span class="line"><span class="keyword">private</span> Vector3 m_AttackPosition = Vector3.zero; <span class="comment">// 攻击目标</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">bool</span> m_AllEnemyBorn = <span class="literal">false</span>; </span><br><span class="line"></span><br><span class="line"><span class="comment">// 关卡内要产生的敌人单位</span></span><br><span class="line"><span class="keyword">private</span> List&lt;StageData&gt; m_StageData = <span class="keyword">new</span> List&lt;StageData&gt;();</span><br></pre></td></tr></table></figure></p>
+<p>而要上场的角色数据，则是利用AddStageData方法来设置。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 增加关卡的故方单位</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">AddStageData</span> (<span class="params">ENUM_Enemy emEnemy,</span></span></span><br><span class="line"><span class="function"><span class="params">                        ENUM_Weapon emWeapon, </span></span></span><br><span class="line"><span class="function"><span class="params">                        <span class="keyword">int</span> count</span>) </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i= <span class="number">0</span>; i&lt;Count; ++i)</span><br><span class="line">        m_StageData.Add ( <span class="keyword">new</span> StageData (emEnemy, emWeapon));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>此外，还有一些其他信息会在更新方法（Update）中被使用到：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 更新</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>( m_StageData.Count == <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span> ;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 是否可以产生</span></span><br><span class="line">    m_CoolDown -= Time.deltaTime;</span><br><span class="line">    <span class="keyword">if</span>( m_CoolDown &gt; <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">return</span> ;</span><br><span class="line">    m_CoolDown = m_MaxCoolDown;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取上场的角色</span></span><br><span class="line">    StageData theNewEnemy = GetEnemy();</span><br><span class="line">    <span class="keyword">if</span>(theNewEnemy == <span class="literal">null</span>)</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 一次产生一个单位</span></span><br><span class="line">    ICharacterFactory Factory = PBDFactory.GetCharacterFactory();</span><br><span class="line">    Factory.CreateEnemy( theNewEnemy.emEnemy, theNewEnemy.emWeapon, m_SpawnPosition, m_AttackPosition);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>当敌方角色可以产生时，就通过调用角色工厂（CharacterFactory）的方法，将对象产出并放入战场中。</p>
+<p>关卡系统（StageSystem）也配合新的关卡类进行修正：</p>
+<blockquote>
+<p>Listing12 关卡控制系统（StageSystem.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">StageSystem</span> : <span class="title">IGameSystem</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">const</span> <span class="keyword">int</span> MAX_HEART = <span class="number">3</span>; </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> m_NowHeart = MAX_HEART; <span class="comment">// 当前玩家阵地情況</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> m_EnemyKilledCount = <span class="number">0</span>; <span class="comment">// 当前敌方单位阵亡数</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> m_NowStageLv   = <span class="number">1</span>;   <span class="comment">// 当前的关卡</span></span><br><span class="line">    <span class="keyword">private</span> IStageHandler m_NowStageHandler = <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">private</span> IStageHandler m_RootStageHandler = <span class="literal">null</span>;    </span><br><span class="line">    <span class="keyword">private</span> List&lt;Vector3&gt; m_SpawnPosition = <span class="literal">null</span>;  <span class="comment">// 出生点</span></span><br><span class="line">    <span class="keyword">private</span> Vector3 m_AttackPos = Vector3.zero;  <span class="comment">// 攻击点</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">bool</span> m_bCreateStage = <span class="literal">false</span>; <span class="comment">// 是否需要产生关卡</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">StageSystem</span>(<span class="params">PBaseDefenseGame PBDGame</span>):<span class="title">base</span>(<span class="params">PBDGame</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Initialize();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Initialize</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 设置关卡</span></span><br><span class="line">        InitializeStageData();</span><br><span class="line">        <span class="comment">// 指定第一个关卡</span></span><br><span class="line">        m_NowStageHandler = m_RootStageHandler; </span><br><span class="line">        m_NowStageLv = <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Release</span> (<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">base</span>.Release ();</span><br><span class="line">        m_SpawnPosition.Clear();</span><br><span class="line">        m_SpawnPosition = <span class="literal">null</span>;</span><br><span class="line">        m_NowHeart = MAX_HEART;</span><br><span class="line">        m_EnemyKilledCount = <span class="number">0</span>;</span><br><span class="line">        m_AttackPos = Vector3.zero;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 更新</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 更新当前的关卡</span></span><br><span class="line">        m_NowStageHandler.Update();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 是否要切换下一个关卡</span></span><br><span class="line">        <span class="keyword">if</span>(m_PBDGame.GetEnemyCount() ==  <span class="number">0</span> )</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// 是否结束</span></span><br><span class="line">            <span class="keyword">if</span>( m_NowStageHandler.IsFinished()==<span class="literal">false</span>)</span><br><span class="line">                <span class="keyword">return</span> ;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 获取下一关</span></span><br><span class="line">            IStageHandler NewStageData = m_NowStageHandler.CheckStage();</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 是否为旧的关卡</span></span><br><span class="line">            <span class="keyword">if</span>( m_NowStageHandler == NewStageData)</span><br><span class="line">                m_NowStageHandler.Reset();</span><br><span class="line">            <span class="keyword">else</span>            </span><br><span class="line">                m_NowStageHandler = NewStageData;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 通知进入下一关</span></span><br><span class="line">            NotiyfNewStage();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 通知损失</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">LoseHeart</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_NowHeart --;</span><br><span class="line">        m_PBDGame.ShowHeart( m_NowHeart );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 增加当前击杀数</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">AddEnemyKilledCount</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_EnemyKilledCount++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置当前击杀数</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">SetEnemyKilledCount</span>(<span class="params"> <span class="keyword">int</span> KilledCount</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_EnemyKilledCount = KilledCount;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取当前击杀数</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">GetEnemyKilledCount</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> m_EnemyKilledCount;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 通知新的关卡</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">NotiyfNewStage</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_PBDGame.ShowGameMsg(<span class="string">"新的关卡"</span>);</span><br><span class="line">        m_NowStageLv++;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 显示</span></span><br><span class="line">        m_PBDGame.ShowNowStageLv(m_NowStageLv);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 通知Soldier升级</span></span><br><span class="line">        m_PBDGame.UpgradeSoldier();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 事件</span></span><br><span class="line">        m_PBDGame.NotifyGameEvent( ENUM_GameEvent.NewStage , <span class="literal">null</span> );</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 初始化所有关卡</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">InitializeStageData</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span>( m_RootStageHandler!=<span class="literal">null</span>)</span><br><span class="line">            <span class="keyword">return</span> ;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 引用点</span></span><br><span class="line">        Vector3 AttackPosition = GetAttackPosition();</span><br><span class="line"></span><br><span class="line">        NormalStageData StageData = <span class="literal">null</span>; <span class="comment">// 关卡要产生的Enemy</span></span><br><span class="line">        IStageScore StageScore = <span class="literal">null</span>; <span class="comment">// 关卡过关信息</span></span><br><span class="line">        IStageHandler NewStage = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 第1关</span></span><br><span class="line">        StageData   = <span class="keyword">new</span> NormalStageData(<span class="number">3f</span>, GetSpawnPosition(), AttackPosition );</span><br><span class="line">        StageData.AddStageData( ENUM_Enemy.Elf, ENUM_Weapon.Gun, <span class="number">3</span>); </span><br><span class="line">        StageScore  = <span class="keyword">new</span> StageScoreEnemyKilledCount(<span class="number">3</span>, <span class="keyword">this</span>);</span><br><span class="line">        NewStage = <span class="keyword">new</span> NormalStageHandler(StageScore, StageData );</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 设置为起始关卡</span></span><br><span class="line">        m_RootStageHandler = NewStage;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 第2关</span></span><br><span class="line">        StageData   = <span class="keyword">new</span> NormalStageData(<span class="number">3f</span>, GetSpawnPosition(), AttackPosition);</span><br><span class="line">        StageData.AddStageData( ENUM_Enemy.Elf, ENUM_Weapon.Rifle,<span class="number">3</span>); </span><br><span class="line">        StageScore  = <span class="keyword">new</span> StageScoreEnemyKilledCount(<span class="number">6</span>, <span class="keyword">this</span>);</span><br><span class="line">        NewStage = NewStage.SetNextHandler( <span class="keyword">new</span> NormalStageHandler( StageScore, StageData) );</span><br><span class="line"></span><br><span class="line">        ...</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 第10关</span></span><br><span class="line">        StageData   = <span class="keyword">new</span> NormalStageData(<span class="number">3f</span>, GetSpawnPosition(), AttackPosition);</span><br><span class="line">        StageData.AddStageData( ENUM_Enemy.Elf, ENUM_Weapon.Rocket,<span class="number">3</span>); </span><br><span class="line">        StageData.AddStageData( ENUM_Enemy.Troll, ENUM_Weapon.Rocket,<span class="number">3</span>); </span><br><span class="line">        StageData.AddStageData( ENUM_Enemy.Ogre, ENUM_Weapon.Rocket,<span class="number">3</span>); </span><br><span class="line">        StageScore  = <span class="keyword">new</span> StageScoreEnemyKilledCount(<span class="number">30</span>, <span class="keyword">this</span>);</span><br><span class="line">        NewStage = NewStage.SetNextHandler( <span class="keyword">new</span> NormalStageHandler( StageScore, StageData) );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取出生点</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> Vector3 <span class="title">GetSpawnPosition</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span>( m_SpawnPosition == <span class="literal">null</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            m_SpawnPosition = <span class="keyword">new</span> List&lt;Vector3&gt;();</span><br><span class="line"></span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">int</span> i=<span class="number">1</span>;i&lt;=<span class="number">3</span>;++i)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">string</span> name = <span class="keyword">string</span>.Format(<span class="string">"EnemySpawnPosition&#123;0&#125;"</span>,i);</span><br><span class="line">                GameObject tempObj = UnityTool.FindGameObject( name );</span><br><span class="line">                <span class="keyword">if</span>( tempObj==<span class="literal">null</span>)</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                tempObj.SetActive(<span class="literal">false</span>);</span><br><span class="line">                m_SpawnPosition.Add( tempObj.transform.position );</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 随机返回</span></span><br><span class="line">        <span class="keyword">int</span> index  = UnityEngine.Random.Range(<span class="number">0</span>, m_SpawnPosition.Count <span class="number">-1</span> );</span><br><span class="line">        <span class="keyword">return</span> m_SpawnPosition[index];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取攻击点</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> Vector3 <span class="title">GetAttackPosition</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span>( m_AttackPos == Vector3.zero)</span><br><span class="line">        &#123;</span><br><span class="line">            GameObject tempObj = UnityTool.FindGameObject(<span class="string">"EnemyAttackPosition"</span>);</span><br><span class="line">            <span class="keyword">if</span>( tempObj==<span class="literal">null</span>)</span><br><span class="line">                <span class="keyword">return</span> Vector3.zero;</span><br><span class="line">            tempObj.SetActive(<span class="literal">false</span>);</span><br><span class="line">            m_AttackPos = tempObj.transform.position;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> m_AttackPos;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong><font size="3">修正的关键点在于</font></strong></p>
+<p>1、定期更新（Update）方法中，将切换关卡的判断交给一群关卡对象串接起来的链表来负责，所以需要切换关卡时，询问关卡对象链表，就可以获取当前可以进行的关卡：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"> <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// 更新当前的关卡</span></span><br><span class="line">    m_NowStageHandler.Update();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 是否要切换下一个关卡</span></span><br><span class="line">    <span class="keyword">if</span>(m_PBDGame.GetEnemyCount() ==  <span class="number">0</span> )</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 是否结束</span></span><br><span class="line">        <span class="keyword">if</span>( m_NowStageHandler.IsFinished()==<span class="literal">false</span>)</span><br><span class="line">            <span class="keyword">return</span> ;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 获取下一关</span></span><br><span class="line">        IStageHandler NewStageData = m_NowStageHandler.CheckStage();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 是否为旧的关卡</span></span><br><span class="line">        <span class="keyword">if</span>( m_NowStageHandler == NewStageData)</span><br><span class="line">            m_NowStageHandler.Reset();</span><br><span class="line">        <span class="keyword">else</span>            </span><br><span class="line">            m_NowStageHandler = NewStageData;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 通知进入下一关</span></span><br><span class="line">        NotiyfNewStage();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>2、在初始化关卡系统时，将所有关卡的数据一次设置完成，包含关卡要出现的敌方角色等级、数量、武器等级、过关的判断分数及连接的下一关：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">InitializeStageData</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>( m_RootStageHandler!=<span class="literal">null</span>)</span><br><span class="line">        <span class="keyword">return</span> ;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 引用点</span></span><br><span class="line">    Vector3 AttackPosition = GetAttackPosition();</span><br><span class="line"></span><br><span class="line">    NormalStageData StageData = <span class="literal">null</span>; <span class="comment">// 关卡要产生的Enemy</span></span><br><span class="line">    IStageScore StageScore = <span class="literal">null</span>; <span class="comment">// 关卡过关信息</span></span><br><span class="line">    IStageHandler NewStage = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 第1关</span></span><br><span class="line">    StageData   = <span class="keyword">new</span> NormalStageData(<span class="number">3f</span>, GetSpawnPosition(), AttackPosition );</span><br><span class="line">    StageData.AddStageData( ENUM_Enemy.Elf, ENUM_Weapon.Gun, <span class="number">3</span>); </span><br><span class="line">    StageScore  = <span class="keyword">new</span> StageScoreEnemyKilledCount(<span class="number">3</span>, <span class="keyword">this</span>);</span><br><span class="line">    NewStage = <span class="keyword">new</span> NormalStageHandler(StageScore, StageData );</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置为起始关卡</span></span><br><span class="line">    m_RootStageHandler = NewStage;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 第2关</span></span><br><span class="line">    StageData   = <span class="keyword">new</span> NormalStageData(<span class="number">3f</span>, GetSpawnPosition(), AttackPosition);</span><br><span class="line">    StageData.AddStageData( ENUM_Enemy.Elf, ENUM_Weapon.Rifle,<span class="number">3</span>); </span><br><span class="line">    StageScore  = <span class="keyword">new</span> StageScoreEnemyKilledCount(<span class="number">6</span>, <span class="keyword">this</span>);</span><br><span class="line">    NewStage = NewStage.SetNextHandler( <span class="keyword">new</span> NormalStageHandler( StageScore, StageData) );</span><br><span class="line"></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>正如同在<a href="/2019/08/12/游戏属性管理功能-享元模式/" title="游戏属性管理功能-享元模式">游戏属性管理功能-享元模式</a>提到的，将属性集中在角色属性工厂（IAttrFactory）中，有助于策划进行设置和调整。不过，更好的方式则是使用“策划设置工具”，让策划人员在使用工具程序设置后，输出成设置文件，再由关卡系统（StageSystem）读入。</p>
+<h2 id="使用责任链模式的优点"><a href="#使用责任链模式的优点" class="headerlink" title="使用责任链模式的优点"></a><span style="color:#00ACC1;">使用责任链模式的优点</span></h2><p>将旧方法中的CreateStage、CheckNextStage两个方法的内容，使用关卡对象来替代，这样一来，原本可能出现的冗长式写法就获得了改善。并且将关卡内容（IStageData）、过关条件（IStageScore）类化，可使得《P级阵地》中关卡的类型有多种形式的组合。而关卡设计的数据将来也可以搭配“策划工具”来设置，增加关卡设计人员的调整灵活度。</p>
+<h2 id="实现责任链模式时的注意事项"><a href="#实现责任链模式时的注意事项" class="headerlink" title="实现责任链模式时的注意事项"></a><span style="color:#00ACC1;">实现责任链模式时的注意事项</span></h2><p>实现责任链模式并非一成不变的，在具体实现中，常常可按照实际的需求来微调实现方式：</p>
+<p><strong><font size="3">不用从头判断</font></strong></p>
+<p>在<a href="#jump">责任链模式的实现范例</a>节的范例中，针对每一次的Score进行判断时，测试程序代码都要求从接收者链表中的第一个对象开始判断。但《P级阵地》在每次判断关卡推进时，并没有从第一个关卡开始，而是从当前的关卡对象（m_NowStageHandle）开始往下判断。存在这种实现上的差异，其原因在于设计需求上的不同，因为《P级阵地》的设计需求是一关一关往下推进的，并不会发生回头的情况，所以在判断上，可以直接从当前的关卡对象继续往下，不必再从第一关开始判断。但如果游戏的关卡设计存在“退回上一关卡”的需求时，那么就必须改写成“从第1关卡开始判断”的实现方式。</p>
+<p><strong><font size="3">使用泛型容器来管理关卡对象</font></strong></p>
+<p>在责任链模式中的Handle类，通常都会定义一个引用指向下一个可以接收的对象。但如果接收对象间的关系如《P级阵地》中的关卡对象，那么还可以有另一种设计方式——也就是将所有关卡对象以泛型容器来管理，例如：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 关卡控制系统</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">StageSystem</span> : <span class="title">IGameSystem</span></span><br><span class="line">&#123;   </span><br><span class="line">    <span class="keyword">private</span> List&lt;IStageHandler&gt; m_StageHandlers;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> m_NowStageLv = <span class="number">1</span>; <span class="comment">// 当前的关卡</span></span><br><span class="line"></span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>因为关卡的顺序是一关接着一关，没有其他树状分支的情况，所以在转换为下一个关卡时，只要获取List\<istagehandler\>中的下一个成员即可。</istagehandler\></p>
+<h1 id="责任链模式面对变化时"><a href="#责任链模式面对变化时" class="headerlink" title="责任链模式面对变化时"></a><span style="color:#339AFF;">责任链模式面对变化时</span></h1><p>当《P级阵地》运用责任链模式并将关卡相关的“数据”及“操作方法”类化之后，只要通过继承类的方式就可以使关卡类型多样化。例如：某天的项目会议…</p>
+<p>策划：“测试了这一阵子后，我发现玩家对于相同内容的关卡类型，可能会觉得无聊，不知大家有没有什么好意见？”<br>美术：“我认为可以增加Boss关卡，Boss关卡可能与其他关卡不一样，关卡内只会出现一个大Boss，虽然Boss的移动速度较慢，但攻击力强、生命力高，而且只要一攻击成功，玩家就会立即结束游戏。”<br>策划：“这个提案不错，小程你那边好调整吗？”</p>
+<p>小程这时想了一下，已经运用了责任链模式的关卡系统中各类的实现情况…</p>
+<p>小程：“我可以试着以增加关卡类型及扣除阵营生命力的方式来调整看看，给我一些时间试试。”<br>策划：“好的，如果没有问题的话，通知一下我们，然后就列入工作事项，美术那边也会给出Boss角色的需求。”</p>
+<p>小程回到计算机前，开启项目研究了一下，发现需要将先前判定敌方角色占领玩家阵地成功后，原本要扣除的固定生命值1，改由关卡组件来决定要扣除多少生命力，所以关卡接口中要新增一个获取损失生命力的方法：</p>
+<blockquote>
+<p>Listing13 关卡接口</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 关卡接口</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">IStageHandler</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">protected</span> IStageHandler m_NextHandler = <span class="literal">null</span>; <span class="comment">// 下一個关卡</span></span><br><span class="line">    <span class="keyword">protected</span> IStageData    m_StageData  = <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">protected</span> IStageScore   m_StageScore  = <span class="literal">null</span>; <span class="comment">// 关卡的分数</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置下一个关卡</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IStageHandler <span class="title">SetNextHandler</span>(<span class="params">IStageHandler NextHandler</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_NextHandler = NextHandler;</span><br><span class="line">        <span class="keyword">return</span> m_NextHandler;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> IStageHandler <span class="title">CheckStage</span>(<span class="params"></span>)</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">Reset</span>(<span class="params"></span>)</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">bool</span> <span class="title">IsFinished</span>(<span class="params"></span>)</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">int</span>  <span class="title">LoseHeart</span>(<span class="params"></span>)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后，在原有常规关卡类（NormalStageHandler）的类设置中重新实现新增的方法：</p>
+<blockquote>
+<p>Listing14 常规关卡</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">NormalStageHandler</span> : <span class="title">IStageHandler</span></span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment">// 损失的生命值</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">int</span> <span class="title">LoseHeart</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在原本的关卡系统（StageSystem）中，扣除阵营生命力的地方，也需要修正为：</p>
+<blockquote>
+<p>Listing15 关卡控制系统</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">StageSystem</span> : <span class="title">IGameSystem</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 通知损失</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">LoseHeart</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_NowHeart -= m_NowStageHandler.LoseHeart();</span><br><span class="line">        m_PBDGame.ShowHeart( m_NowHeart);</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>将这些都修正好后，就可以着手进行Boss关卡的实现。因为Boss关卡与常规关卡的差异在于：在Boss关卡中，只要有敌方角色占领到玩家阵营之后，就会损失所有的阵营生命力，所以只要让Boss关卡在获取“损失的生命值”时，返回最大阵营生命力（MAX_HEART）就可以了。那么只要新增一个BossStageHandler类，其他的设置和操作就与常规关卡无异，因此让它继承常规关卡（NormalStageHandler），再重新实现LoseHeart()方法即可：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Boss关卡</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">BossStageHandler</span> : <span class="title">NormalStageHandler</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">BossStageHandler</span>(<span class="params">IStageScore StageScore, IStageData StageData</span>) : <span class="title">base</span>(<span class="params">StageScore, StageData</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 损失的生命值</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">int</span> <span class="title">LoseHeart</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> StageSystem.MAX_HEART;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>最后，在关卡设置时，将Boss关卡安插在常规关卡之间就可以了：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 第5关</span></span><br><span class="line">StageData = <span class="keyword">new</span> NormalStageData(<span class="number">3f</span>, GetSpawnPosition(), AttackPosition);</span><br><span class="line">StageData.AddStageData(ENUM_Enemy.Ogre, ENUM_Weapon.Rocket, <span class="number">3</span>);</span><br><span class="line"></span><br><span class="line">StageScore = <span class="keyword">new</span> StageScoreEnemyKilledCount(<span class="number">13</span>, <span class="keyword">this</span>);</span><br><span class="line">NewStage = NewStage.SetNextHandler(<span class="keyword">new</span> BossStageHandler(StageScore, StageData));</span><br></pre></td></tr></table></figure></p>
+<h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a><span style="color:#339AFF;">结论</span></h1><p>责任链模式让一群信息接收者能够一起被串联起来管理，让信息判断上能有一致的操作接口，不必因为不同的接收者而必须执行“类转换操作”，并且让所有的信息接收者都有机会可以判断是否提供服务或将需求移往下一个信息接收者，在后续的系统维护上，也可以轻易地增加接收者类。</p>
+<p><strong><font size="3">与其他模式的合作</font></strong></p>
+<p>在通关判断上，可以配合策略模式（Strategy），让通关的规则具有其他的变化形式，而不只是单纯地击退所有进攻的敌方角色。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/设计模式与游戏完美开发/" rel="tag"># 设计模式与游戏完美开发</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/08/16/兵营训练单位-命令模式/" rel="next" title="兵营训练单位--命令模式">
+                <i class="fa fa-chevron-left"></i> 兵营训练单位--命令模式
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/08/18/成就系统-观察者模式/" rel="prev" title="成就系统--观察者模式">
+                成就系统--观察者模式 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">354</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">55</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2020/02/16/游戏设计快乐之道（第2版）/" title="游戏设计快乐之道（第2版）" target="_blank">游戏设计快乐之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/14/游戏剧本怎么写/" title="游戏剧本怎么写" target="_blank">游戏剧本怎么写</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/04/通关！游戏设计之道（第2版）/" title="通关！游戏设计之道（第2版）" target="_blank">通关！游戏设计之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/26/游戏设计艺术（第2版）/" title="游戏设计艺术（第2版）" target="_blank">游戏设计艺术（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/22/大师谈游戏设计创意与节奏/" title="大师谈游戏设计创意与节奏" target="_blank">大师谈游戏设计创意与节奏</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#关卡设计"><span class="nav-number">1.</span> <span class="nav-text">关卡设计</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#责任链模式"><span class="nav-number">2.</span> <span class="nav-text">责任链模式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#责任链模式的定义"><span class="nav-number">2.1.</span> <span class="nav-text">责任链模式的定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#责任链模式的说明"><span class="nav-number">2.2.</span> <span class="nav-text">责任链模式的说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#责任链模式的实现范例-lt-span-gt"><span class="nav-number">2.3.</span> <span class="nav-text">责任链模式的实现范例&lt;/span&gt;</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用责任链模式实现关卡系统"><span class="nav-number">3.</span> <span class="nav-text">使用责任链模式实现关卡系统</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#关卡系统的设计"><span class="nav-number">3.1.</span> <span class="nav-text">关卡系统的设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现说明"><span class="nav-number">3.2.</span> <span class="nav-text">实现说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用责任链模式的优点"><span class="nav-number">3.3.</span> <span class="nav-text">使用责任链模式的优点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现责任链模式时的注意事项"><span class="nav-number">3.4.</span> <span class="nav-text">实现责任链模式时的注意事项</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#责任链模式面对变化时"><span class="nav-number">4.</span> <span class="nav-text">责任链模式面对变化时</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#结论"><span class="nav-number">5.</span> <span class="nav-text">结论</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">3.7m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">56:23</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

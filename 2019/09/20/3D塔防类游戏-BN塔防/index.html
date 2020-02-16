@@ -1,0 +1,1436 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="思考并回答以下问题：  类的static成员在堆中只有一份，所有实例共享这个成员。怎么理解？">
+<meta name="keywords" content="Unity案例开发大全（第2版）">
+<meta property="og:type" content="article">
+<meta property="og:title" content="3D塔防类游戏--BN塔防">
+<meta property="og:url" content="http://chebincarl.github.io/2019/09/20/3D塔防类游戏-BN塔防/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="思考并回答以下问题：  类的static成员在堆中只有一份，所有实例共享这个成员。怎么理解？">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-09-20T14:00:22.121Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="3D塔防类游戏--BN塔防">
+<meta name="twitter:description" content="思考并回答以下问题：  类的static成员在堆中只有一份，所有实例共享这个成员。怎么理解？">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/09/20/3D塔防类游戏-BN塔防/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>3D塔防类游戏--BN塔防 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">专注，重复10遍</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/09/20/3D塔防类游戏-BN塔防/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">3D塔防类游戏--BN塔防
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-09-20 14:01:41 / 修改时间：22:00:22" itemprop="dateCreated datePublished" datetime="2019-09-20T14:01:41+08:00">2019-09-20</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Unity/" itemprop="url" rel="index"><span itemprop="name">Unity</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">28k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">26 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>思考并回答以下问题：</p>
+<ul>
+<li>类的static成员在堆中只有一份，所有实例共享这个成员。怎么理解？</li>
+</ul>
+<a id="more"></a>
+<blockquote>
+<p>Scripts/UI/Welcome.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br><span class="line">227</span><br><span class="line">228</span><br><span class="line">229</span><br><span class="line">230</span><br><span class="line">231</span><br><span class="line">232</span><br><span class="line">233</span><br><span class="line">234</span><br><span class="line">235</span><br><span class="line">236</span><br><span class="line">237</span><br><span class="line">238</span><br><span class="line">239</span><br><span class="line">240</span><br><span class="line">241</span><br><span class="line">242</span><br><span class="line">243</span><br><span class="line">244</span><br><span class="line">245</span><br><span class="line">246</span><br><span class="line">247</span><br><span class="line">248</span><br><span class="line">249</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"><span class="keyword">using</span> UnityEngine.UI;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Welcome</span> : <span class="title">MonoBehaviour</span> </span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">bool</span> isExitAudio = <span class="literal">false</span>; <span class="comment">//  静态变量避免多次克隆声音控制预制件</span></span><br><span class="line">    <span class="keyword">public</span> Sprite[] doing_texture; <span class="comment">//  摇骰子的模糊过程图</span></span><br><span class="line">    <span class="keyword">public</span> Sprite[] done_texture; <span class="comment">//  摇骰子的结束图</span></span><br><span class="line">    <span class="keyword">public</span> GameObject aduioPrefab; <span class="comment">//  声音控制的预制件</span></span><br><span class="line">    <span class="keyword">private</span> GameObject a_clone; <span class="comment">//  声音缓存</span></span><br><span class="line">    <span class="keyword">public</span> Toggle[] head; <span class="comment">//  头像管理</span></span><br><span class="line">    <span class="keyword">public</span> Toggle[] hard; <span class="comment">//  游戏难度</span></span><br><span class="line">    <span class="keyword">public</span> Toggle[] <span class="keyword">select</span>;   <span class="comment">//  项目选择</span></span><br><span class="line">    <span class="keyword">public</span> GameObject[] select_appear;</span><br><span class="line">    <span class="keyword">public</span> InputField inputname;     <span class="comment">//  玩家昵称显示区域，可自行输入</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span>[] Names; <span class="comment">//  索引值用来控制人物昵称</span></span><br><span class="line">    <span class="keyword">public</span> Button random;     <span class="comment">//  玩家昵称自选按钮</span></span><br><span class="line">    <span class="keyword">public</span> Button startgame; <span class="comment">//  开始游戏按钮</span></span><br><span class="line">    <span class="keyword">public</span> Button exit; <span class="comment">//  退出游戏按钮</span></span><br><span class="line">    <span class="keyword">int</span> i_select = <span class="number">-1</span>; <span class="comment">//  以下整数值，均是为防止多次赋值</span></span><br><span class="line">    <span class="keyword">int</span> headindex = <span class="number">0</span>; <span class="comment">//  头像索引</span></span><br><span class="line">    <span class="keyword">int</span> hardindex = <span class="number">0</span>; <span class="comment">//  难度索引</span></span><br><span class="line">    <span class="keyword">bool</span> b_select = <span class="literal">false</span>; <span class="comment">//  内容选中状态标志位</span></span><br><span class="line">    <span class="keyword">bool</span> head_select = <span class="literal">false</span>; <span class="comment">//  头像选中状态标志位</span></span><br><span class="line">    <span class="keyword">int</span> playername = <span class="number">-1</span>; <span class="comment">//  玩家昵称改变次数</span></span><br><span class="line">    <span class="keyword">bool</span> isEndShake = <span class="literal">true</span>; <span class="comment">//  是否开始摇骰子的标志位</span></span><br><span class="line">    <span class="keyword">int</span> frameindex = <span class="number">0</span>; <span class="comment">//  色子摇动时索引，控制换图</span></span><br><span class="line">    <span class="keyword">int</span> len = <span class="number">0</span>; <span class="comment">//  色子摇动图片数组的长度</span></span><br><span class="line">    <span class="keyword">int</span> gamebackgroundmusic_i = <span class="number">-1</span>; <span class="comment">//  游戏背景音乐开启或者关闭索引值</span></span><br><span class="line">    <span class="keyword">int</span> gameeffectmusic_i = <span class="number">-1</span>; <span class="comment">//  游戏音效开启或者关闭索引值</span></span><br><span class="line">    <span class="keyword">int</span> gamehelp_i = <span class="number">-1</span>; <span class="comment">//  游戏帮助开启或者关闭索引值</span></span><br><span class="line">    <span class="keyword">int</span> gametip_i = <span class="number">-1</span>; <span class="comment">//  游戏提示开启或者关闭索引值</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Awake</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        CheckExit(); <span class="comment">//  检测初始状态，读取之前游戏存档信息</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        SetPlayer(); <span class="comment">//  设置当前场景信息</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (!isExitAudio) <span class="comment">//  如果不存在声音源文件，就创建一个，并且切换场景不销毁此对象</span></span><br><span class="line">        &#123;</span><br><span class="line">            a_clone = Instantiate(aduioPrefab) <span class="keyword">as</span> GameObject; <span class="comment">//  实例化一个声音控制器</span></span><br><span class="line">            DontDestroyOnLoad(a_clone); <span class="comment">//  切换场景不予销毁</span></span><br><span class="line">            isExitAudio = <span class="literal">true</span>; <span class="comment">//  存在声音源的标志位置真</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        isEndShake = <span class="literal">true</span>; <span class="comment">//  初始状态色子不摇动</span></span><br><span class="line">        len = doing_texture.Length; <span class="comment">//  获取执行模糊切换骰子图长度</span></span><br><span class="line">        playername = <span class="number">-1</span>; <span class="comment">//  避免第一次色子发出声</span></span><br><span class="line">        headindex = UIData.player_texture_int; <span class="comment">//  头像索引</span></span><br><span class="line">        hardindex = UIData.gamehard_int; <span class="comment">//  难度索引</span></span><br><span class="line">        random.GetComponent&lt;Image&gt;().sprite = done_texture[UIData.player_name_int]; <span class="comment">//  图片初始化</span></span><br><span class="line">        inputname.text = UIData.player_name; <span class="comment">//  昵称初始化</span></span><br><span class="line">        startgame.onClick.AddListener(StartMain); <span class="comment">//  监听进入游戏按钮</span></span><br><span class="line">        exit.onClick.AddListener(ExitGame); <span class="comment">//  监听退出游戏按钮</span></span><br><span class="line">        random.onClick.AddListener(ChangeName); <span class="comment">//  监听摇色子按钮</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">CheckExit</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123; <span class="comment">//  初始检测状态，读取之前游戏存档信息</span></span><br><span class="line">        UIData.player_texture_int = PlayerPrefs.GetInt(<span class="string">"playerTextureIntOut"</span>, <span class="number">0</span>); <span class="comment">//  图片索引</span></span><br><span class="line">        UIData.player_name_int = PlayerPrefs.GetInt(<span class="string">"playerNameIntOut"</span>, <span class="number">0</span>); <span class="comment">//  将外部昵称索引赋予游戏静态昵称索引，如果不存在就赋值为1</span></span><br><span class="line">        UIData.gamehard_int = PlayerPrefs.GetInt(<span class="string">"gameHardIntOut"</span>, <span class="number">0</span>); <span class="comment">//  游戏难度索引  </span></span><br><span class="line">        UIData.player_name = PlayerPrefs.GetString(<span class="string">"playerNameOut"</span>, Names[UIData.player_name_int]);</span><br><span class="line">         <span class="comment">//  获取外部信息</span></span><br><span class="line">        gamebackgroundmusic_i = PlayerPrefs.GetInt(<span class="string">"gameBackGroudMusic"</span>, <span class="number">1</span>); <span class="comment">//  获取背景音乐开闭索引值</span></span><br><span class="line">        gameeffectmusic_i = PlayerPrefs.GetInt(<span class="string">"gameEffectMusic"</span>, <span class="number">1</span>); <span class="comment">//  获取游戏音效开闭索引值</span></span><br><span class="line">        gamehelp_i = PlayerPrefs.GetInt(<span class="string">"gamehelp"</span>, <span class="number">1</span>); <span class="comment">//  获取游戏帮助索引值</span></span><br><span class="line">        gametip_i = PlayerPrefs.GetInt(<span class="string">"gametip"</span>, <span class="number">1</span>); <span class="comment">//  获取游戏提示索引值</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (gamebackgroundmusic_i == <span class="number">1</span>) UIData.game_backmusic_bool = <span class="literal">true</span>; <span class="comment">//  如果背景音乐索引值为1，游戏音乐布尔值为真</span></span><br><span class="line">        <span class="keyword">else</span> UIData.game_backmusic_bool = <span class="literal">false</span>; <span class="comment">//  否则为假</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (gameeffectmusic_i == <span class="number">1</span>) UIData.game_effectmusic_bool = <span class="literal">true</span>; <span class="comment">//  如果游戏音效索引值为1，游戏音乐布尔值为真</span></span><br><span class="line">        <span class="keyword">else</span> UIData.game_effectmusic_bool = <span class="literal">false</span>; <span class="comment">//  否则为假</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (gamehelp_i == <span class="number">1</span>) UIData.game_help = <span class="literal">true</span>; <span class="comment">//  如果游戏帮助索引值为1，游戏音乐布尔值为真</span></span><br><span class="line">        <span class="keyword">else</span> UIData.game_help = <span class="literal">false</span>; <span class="comment">//  否则为假</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (gametip_i == <span class="number">1</span>) UIData.game_tip = <span class="literal">true</span>; <span class="comment">//  如果游戏提示索引值为1，游戏音乐布尔值为真</span></span><br><span class="line">        <span class="keyword">else</span> UIData.game_tip = <span class="literal">false</span>; <span class="comment">//  否则为假</span></span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//   Update is called once per frame</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        CheakSelect(); <span class="comment">//  检测选中项目，每有切换直接更换内容，包括玩家昵称，玩家头像，游戏难度</span></span><br><span class="line">        JudgeHead(); <span class="comment">//  判断选中的头像</span></span><br><span class="line">        JudgeHard(); <span class="comment">//  判断选中的游戏难度</span></span><br><span class="line">        StartShake(); <span class="comment">//  摇色子的效果</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">StartMain</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123; <span class="comment">//  进入游戏按钮</span></span><br><span class="line">        AudioManager.PlayAudio(<span class="number">0</span>); <span class="comment">//  播放按钮声效</span></span><br><span class="line">        GetComponent&lt;Loading&gt;().LoadScene(<span class="number">3</span>); <span class="comment">//  切换到游戏功能场景</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">ExitGame</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123; <span class="comment">//  退出游戏，记录游戏状态</span></span><br><span class="line">        AudioManager.PlayAudio(<span class="number">0</span>); <span class="comment">//   播放按钮音效</span></span><br><span class="line">        UIData.player_name = inputname.text; <span class="comment">//  全局玩家昵称赋值</span></span><br><span class="line">         <span class="comment">//  退出之前记录当前游戏设置</span></span><br><span class="line">        PlayerPrefs.SetString(<span class="string">"playerNameOut"</span>, UIData.player_name); <span class="comment">//  记录昵称</span></span><br><span class="line">        PlayerPrefs.SetInt(<span class="string">"playerTextureIntOut"</span>, UIData.player_texture_int); <span class="comment">//  记录头像索引</span></span><br><span class="line">        PlayerPrefs.SetInt(<span class="string">"playerNameIntOut"</span>, UIData.player_name_int); <span class="comment">//  记录昵称索引</span></span><br><span class="line">        PlayerPrefs.SetInt(<span class="string">"gameHardIntOut"</span>, UIData.gamehard_int); <span class="comment">//  记录游戏难度索引</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (UIData.game_backmusic_bool) gamebackgroundmusic_i = <span class="number">1</span>; <span class="comment">//  如果游戏背景音乐开，相应索引值为1</span></span><br><span class="line">        <span class="keyword">else</span> gamebackgroundmusic_i = <span class="number">0</span>; <span class="comment">//  如果游戏背景音乐关，相应索引值为0</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (UIData.game_effectmusic_bool) gameeffectmusic_i = <span class="number">1</span>; <span class="comment">//  如果游戏音效开，相应索引值为1</span></span><br><span class="line">        <span class="keyword">else</span> gameeffectmusic_i = <span class="number">0</span>; <span class="comment">//  如果游戏音效关，相应索引值为0</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (UIData.game_help) gamehelp_i = <span class="number">1</span>; <span class="comment">//  如果游戏帮助开，相应索引值为1</span></span><br><span class="line">        <span class="keyword">else</span> gamehelp_i = <span class="number">0</span>; <span class="comment">//  如果游戏帮助关，相应索引值为0</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (UIData.game_tip) gametip_i = <span class="number">1</span>; <span class="comment">//  如果游戏提示开，相应索引值为1</span></span><br><span class="line">        <span class="keyword">else</span> gametip_i = <span class="number">0</span>; <span class="comment">//  如果游戏提示开，相应索引值为0</span></span><br><span class="line"></span><br><span class="line">        PlayerPrefs.SetInt(<span class="string">"gameBackGroudMusic"</span>, gamebackgroundmusic_i); <span class="comment">//  记录背景音乐开闭索引</span></span><br><span class="line">        PlayerPrefs.SetInt(<span class="string">"gameEffectMusic"</span>, gameeffectmusic_i); <span class="comment">//  记录游戏音效开闭索引</span></span><br><span class="line">        PlayerPrefs.SetInt(<span class="string">"gamehelp"</span>, gamehelp_i); <span class="comment">//  记录游戏帮助开闭索引</span></span><br><span class="line">        PlayerPrefs.SetInt(<span class="string">"gametip"</span>, gametip_i); <span class="comment">//  记录游戏提示开闭索引</span></span><br><span class="line">        Application.Quit(); <span class="comment">//  退出游戏</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">CheakSelect</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123; <span class="comment">//  改变内容选中状态</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>;i &lt; <span class="keyword">select</span>.Length;i++) </span><br><span class="line">        &#123; <span class="comment">//  遍历内容复选框组</span></span><br><span class="line">            b_select = <span class="keyword">select</span>[i].isOn; <span class="comment">//  获取复选框状态</span></span><br><span class="line">            <span class="keyword">if</span> (b_select &amp;&amp; i_select != i) </span><br><span class="line">            &#123; <span class="comment">//  复选框被选中，并且不是第一次被选中</span></span><br><span class="line">                <span class="keyword">if</span> (i_select != <span class="number">-1</span>) </span><br><span class="line">                &#123; <span class="comment">//  如果不是第一次赋值</span></span><br><span class="line">                    AudioManager.PlayAudio(<span class="number">14</span>); <span class="comment">//  播放选中声效</span></span><br><span class="line">                &#125;</span><br><span class="line">                i_select = i; <span class="comment">//  对内容复选框索引赋值</span></span><br><span class="line">                select_appear[i].SetActive(<span class="literal">true</span>); <span class="comment">//  相应界面出现</span></span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> j = <span class="number">0</span>;j &lt; <span class="keyword">select</span>.Length;j++) </span><br><span class="line">                &#123; <span class="comment">//  遍历所有页面</span></span><br><span class="line">                    <span class="keyword">if</span> (j == i) <span class="keyword">continue</span>; <span class="comment">//  如果与复选框索引值相等，跳过当前循环</span></span><br><span class="line">                    select_appear[j].SetActive(<span class="literal">false</span>); <span class="comment">//  页面被关闭</span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">ChangeName</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123; <span class="comment">//  改变玩家昵称</span></span><br><span class="line">        <span class="comment">//  控制播放声音</span></span><br><span class="line">        <span class="keyword">if</span> (playername != <span class="number">-1</span>) </span><br><span class="line">        &#123;</span><br><span class="line">            AudioManager.PlayAudio(<span class="number">16</span>); <span class="comment">//  播放摇骰子音效</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        playername++; <span class="comment">//  游戏昵称索引增加</span></span><br><span class="line">        isEndShake = <span class="literal">false</span>; <span class="comment">//  开始摇动色子</span></span><br><span class="line">        StartCoroutine(EndShake()); <span class="comment">//  开启结束摇动协程</span></span><br><span class="line">        StopCoroutine(EndShake()); <span class="comment">//  关闭结束摇动协程</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">IEnumerator <span class="title">EndShake</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123; <span class="comment">//  结束摇动协程</span></span><br><span class="line">        <span class="function"><span class="keyword">yield</span> return new <span class="title">WaitForSeconds</span>(<span class="params"><span class="number">1f</span></span>)</span>; <span class="comment">//  摇动时间为1秒</span></span><br><span class="line">        <span class="keyword">int</span> index = (<span class="keyword">int</span>)(Random.Range(<span class="number">0</span>, <span class="number">5</span>)); <span class="comment">//  随机获取0-5的整数</span></span><br><span class="line">        isEndShake = <span class="literal">true</span>; <span class="comment">//  停止摇动</span></span><br><span class="line">        random.GetComponent&lt;Image&gt;().sprite = done_texture[index]; <span class="comment">//  切换最后的色子图片</span></span><br><span class="line">        UIData.player_name_int = index; <span class="comment">//  全局玩家昵称索引赋值</span></span><br><span class="line">        inputname.text = Names[index]; <span class="comment">//  显示名字</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">JudgeHead</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123; <span class="comment">//  切换头像播放改变全局值的方法</span></span><br><span class="line">        <span class="keyword">if</span> (head[<span class="number">0</span>].isOn &amp;&amp; headindex != <span class="number">0</span>) </span><br><span class="line">        &#123; <span class="comment">//  头像1被选中，并且不是第一次被选中</span></span><br><span class="line">            AudioManager.PlayAudio(<span class="number">17</span>); <span class="comment">//  播放选中声效</span></span><br><span class="line">            headindex = <span class="number">0</span>; <span class="comment">//  头像索引赋值</span></span><br><span class="line">            UIData.player_texture_int = headindex; <span class="comment">//  全局头像索引赋值</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (head[<span class="number">1</span>].isOn &amp;&amp; headindex != <span class="number">1</span>) <span class="comment">//  头像1被选中，并且不是第一次被选中</span></span><br><span class="line">        &#123;</span><br><span class="line">            AudioManager.PlayAudio(<span class="number">17</span>); <span class="comment">//  播放选中声效</span></span><br><span class="line">            headindex = <span class="number">1</span>; <span class="comment">//  头像索引赋值</span></span><br><span class="line">            UIData.player_texture_int = headindex; <span class="comment">//  全局头像索引赋值</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">JudgeHard</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123; <span class="comment">//  切换完成直接改变游戏难度索引值的方法</span></span><br><span class="line">        <span class="keyword">if</span> (hard[<span class="number">0</span>].isOn &amp;&amp; hardindex != <span class="number">0</span>) <span class="comment">//  普通难度被选中，并且不是初始状态赋值</span></span><br><span class="line">        &#123;</span><br><span class="line">            AudioManager.PlayAudio(<span class="number">17</span>); <span class="comment">//  播放选中声效</span></span><br><span class="line">            hardindex = <span class="number">0</span>; <span class="comment">//  难度索引赋值</span></span><br><span class="line">            UIData.gamehard_int = hardindex; <span class="comment">//  全局难度索引赋值</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (hard[<span class="number">1</span>].isOn &amp;&amp; hardindex != <span class="number">1</span>) <span class="comment">//  地狱难度被选中，并且不是初始状态赋值</span></span><br><span class="line">        &#123;</span><br><span class="line">            AudioManager.PlayAudio(<span class="number">17</span>); <span class="comment">//  播放选中声效</span></span><br><span class="line">            hardindex = <span class="number">1</span>; <span class="comment">//  难度索引赋值</span></span><br><span class="line">            UIData.gamehard_int = hardindex; <span class="comment">//  全局难度索引赋值</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">StartShake</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123; <span class="comment">//  实现摇骰子功能</span></span><br><span class="line">        <span class="keyword">if</span> (isEndShake) <span class="keyword">return</span>; <span class="comment">//  如果停止切换就返回</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (Time.frameCount % <span class="number">8</span> == <span class="number">0</span>) </span><br><span class="line">        &#123; <span class="comment">//  开始切换</span></span><br><span class="line">            Sprite cur_texture = doing_texture[frameindex]; <span class="comment">//  获取骰子摇动中的图</span></span><br><span class="line">            random.GetComponent&lt;Image&gt;().sprite = cur_texture; <span class="comment">//  换图</span></span><br><span class="line">            frameindex++; <span class="comment">//  帧率增加</span></span><br><span class="line">            frameindex %= len; <span class="comment">//  获取骰子摇动索引</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">SetPlayer</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123; <span class="comment">//  当前场景初始状态设置</span></span><br><span class="line">        <span class="keyword">if</span> (UIData.player_texture_int == <span class="number">0</span>) </span><br><span class="line">        &#123; <span class="comment">//  如果玩家头像索引为0</span></span><br><span class="line">            head[<span class="number">0</span>].isOn = <span class="literal">true</span>; <span class="comment">//  头像1被选中</span></span><br><span class="line">            head[<span class="number">1</span>].isOn = <span class="literal">false</span>; <span class="comment">//  头像2未选中</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> </span><br><span class="line">        &#123;</span><br><span class="line">            head[<span class="number">0</span>].isOn = <span class="literal">false</span>; <span class="comment">//  头像1未选中</span></span><br><span class="line">            head[<span class="number">1</span>].isOn = <span class="literal">true</span>; <span class="comment">//  头像2被选中</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        inputname.text = UIData.player_name; <span class="comment">//  玩家昵称初始设定</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (UIData.gamehard_int == <span class="number">0</span>) </span><br><span class="line">        &#123; <span class="comment">//  如果游戏难度索引为0</span></span><br><span class="line">            hard[<span class="number">0</span>].isOn = <span class="literal">true</span>; <span class="comment">//  普通难度被选中</span></span><br><span class="line">            hard[<span class="number">1</span>].isOn = <span class="literal">false</span>; <span class="comment">//  地狱难度未选中</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> </span><br><span class="line">        &#123;</span><br><span class="line">            hard[<span class="number">0</span>].isOn = <span class="literal">false</span>; <span class="comment">//  普通难度未选中</span></span><br><span class="line">            hard[<span class="number">1</span>].isOn = <span class="literal">true</span>; <span class="comment">//  地狱难度被选中</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Scripts/Loading.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"><span class="keyword">using</span> UnityEngine.UI;<span class="comment">//引用系统包</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Loading</span> : <span class="title">MonoBehaviour</span> </span><br><span class="line">&#123;<span class="comment">//声明类名</span></span><br><span class="line">    <span class="keyword">public</span> Sprite[] loadingTextures;<span class="comment">//异步加载时实现帧动画的图片组</span></span><br><span class="line">    <span class="keyword">public</span> Image loadingImage;<span class="comment">//切换场景时图片载体</span></span><br><span class="line">    <span class="keyword">public</span> Image curtain;<span class="comment">//黑色背景图</span></span><br><span class="line">    <span class="keyword">public</span> Text progess;<span class="comment">//显示加载进度的文本框</span></span><br><span class="line"></span><br><span class="line">    AsyncOperation asyn;<span class="comment">//跟踪异步操作的生存期变量</span></span><br><span class="line">    <span class="keyword">bool</span> isStart = <span class="literal">true</span>;<span class="comment">//是否开始显示</span></span><br><span class="line"></span><br><span class="line">    [<span class="meta">HideInInspector</span>]<span class="comment">//公有变量在Inspector面板中不显示</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">bool</span> isAsyn = <span class="literal">false</span>;<span class="comment">//是否开始异步加载</span></span><br><span class="line"></span><br><span class="line">    [<span class="meta">HideInInspector</span>]</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> scene_index = <span class="number">-1</span>;<span class="comment">//当前场景索引</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">string</span>[] sceneName = &#123; <span class="string">"scene1"</span>, <span class="string">"scene2"</span>, <span class="string">"scene3"</span>, <span class="string">"main"</span>, <span class="string">"attribute"</span>, <span class="string">"selectscene"</span>, <span class="string">"welcome"</span> &#125;;<span class="comment">//场景名称数组</span></span><br><span class="line">    <span class="keyword">float</span> alpha = <span class="number">1</span>;<span class="comment">//背景图片透明度</span></span><br><span class="line">    <span class="keyword">float</span> curTexture = <span class="number">0</span>;<span class="comment">//用于帧动画的图片</span></span><br><span class="line">    <span class="keyword">int</span> curIndex = <span class="number">0</span>;<span class="comment">//当前索引值</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;<span class="comment">//进入游戏是调用的方法</span></span><br><span class="line">        scene_index = <span class="number">-1</span>;<span class="comment">//场景索引值为-1</span></span><br><span class="line">        isStart = <span class="literal">true</span>;<span class="comment">//开始场景</span></span><br><span class="line">        alpha = <span class="number">1</span>;<span class="comment">//设置背景图片为不透明</span></span><br><span class="line">        isAsyn = <span class="literal">false</span>;<span class="comment">//不开始异步加载</span></span><br><span class="line">        loadingImage.gameObject.SetActive(<span class="literal">false</span>);<span class="comment">//场景切换时的帧动画图片不显示</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;<span class="comment">//每帧调用的方法</span></span><br><span class="line">        <span class="keyword">if</span> (isStart) </span><br><span class="line">        &#123;<span class="comment">//进入场景</span></span><br><span class="line">            StartScene();<span class="comment">//开始场景的方法</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        ChangeTexture();<span class="comment">//改变帧动画图片的方法</span></span><br><span class="line">        <span class="keyword">if</span> (isAsyn) </span><br><span class="line">        &#123;<span class="comment">//开始异步加载</span></span><br><span class="line">            ChangeScene();<span class="comment">//切换场景的方法</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (alpha &gt;= <span class="number">1</span>) </span><br><span class="line">        &#123;<span class="comment">//如果背景图片的透明度大于1</span></span><br><span class="line">            <span class="keyword">if</span> (asyn == <span class="literal">null</span>) <span class="keyword">return</span>;<span class="comment">//如果跟踪异步操作的生存期不存在，返回</span></span><br><span class="line">            loadingImage.gameObject.SetActive(<span class="literal">true</span>);<span class="comment">//显示帧动画</span></span><br><span class="line">            progess.text = (<span class="keyword">int</span>)(asyn.progress * <span class="number">100</span>) + <span class="string">""</span> + <span class="string">"%"</span>;<span class="comment">//显示加载进度</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">LoadScene</span>(<span class="params"><span class="keyword">int</span> index</span>) </span></span><br><span class="line"><span class="function"></span>    &#123;<span class="comment">//外部调用的方法，传进来要切换场景的索引值</span></span><br><span class="line">        isAsyn = <span class="literal">true</span>;<span class="comment">//开始异步加载的标志</span></span><br><span class="line">        scene_index = index;<span class="comment">//要切换到的场景的索引</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">StartScene</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;<span class="comment">//开始场景的方法</span></span><br><span class="line">        alpha -= <span class="number">0.08f</span>;<span class="comment">//透明度依次递减，黑色背景图片，由有到无</span></span><br><span class="line">        curtain.gameObject.GetComponent&lt;CanvasRenderer&gt;().SetAlpha(alpha);<span class="comment">//改变背景图片的透明度</span></span><br><span class="line">        <span class="keyword">if</span> (alpha &lt;= <span class="number">0</span>)</span><br><span class="line">        &#123;<span class="comment">//如果透明度的值小于0</span></span><br><span class="line">            isStart = <span class="literal">false</span>;<span class="comment">//进入场景结束</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">ChangeScene</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;<span class="comment">//切换场景的方法</span></span><br><span class="line">        alpha += <span class="number">0.08f</span>;<span class="comment">//索引值由0开始增加</span></span><br><span class="line">        curtain.gameObject.GetComponent&lt;CanvasRenderer&gt;().SetAlpha(alpha);<span class="comment">//改变背景图片的透明度</span></span><br><span class="line">        <span class="keyword">if</span> (alpha &gt;= <span class="number">1</span>) </span><br><span class="line">        &#123;<span class="comment">//如果透明度的值大于1</span></span><br><span class="line">            <span class="keyword">if</span> (scene_index == <span class="number">-1</span>) <span class="keyword">return</span>;<span class="comment">// 如果没有进行场景的切换，则返回</span></span><br><span class="line">            StartCoroutine(LoadingScene());<span class="comment">//开启协程方法，实现场景的异步加载</span></span><br><span class="line">            isAsyn = <span class="literal">false</span>;<span class="comment">//协程方法执行完毕，异步加载结束</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">IEnumerator <span class="title">LoadingScene</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;<span class="comment">//协程方法，用来实现场景的异步加载</span></span><br><span class="line">        asyn = Application.LoadLevelAsync(sceneName[scene_index]);<span class="comment">//对跟踪异步操作的生存期变量赋值</span></span><br><span class="line">        <span class="keyword">yield</span> <span class="keyword">return</span> asyn;<span class="comment">//返回此变量到方法中</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">ChangeTexture</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;<span class="comment">//切换场景帧动画的实现</span></span><br><span class="line">        <span class="keyword">if</span> (!loadingImage.gameObject.activeInHierarchy) <span class="keyword">return</span>;<span class="comment">//如果当前的图片载体没有被禁用</span></span><br><span class="line">        curTexture += Time.deltaTime * <span class="number">8</span>;<span class="comment">//当前图片浮点型索引值增加</span></span><br><span class="line">        curIndex = (<span class="keyword">int</span>)curTexture;<span class="comment">//当前图片索引值</span></span><br><span class="line">        loadingImage.sprite = loadingTextures[curIndex % <span class="number">5</span>];<span class="comment">//切换图片</span></span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Scripts/UI/Main.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"><span class="keyword">using</span> UnityEngine.UI;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Main</span> : <span class="title">MonoBehaviour</span> </span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> GameObject[] icon;<span class="comment">//各个图标对象</span></span><br><span class="line">    <span class="keyword">public</span> Toggle isBackGroundMusic;<span class="comment">//检测背景音乐开闭</span></span><br><span class="line">    <span class="keyword">public</span> Toggle isEffectMusic;<span class="comment">//检测声效开闭</span></span><br><span class="line">    <span class="keyword">public</span> Toggle isHelp;<span class="comment">//检测帮助是否开始</span></span><br><span class="line">    <span class="keyword">public</span> Toggle isTip;<span class="comment">//游戏提示</span></span><br><span class="line">    <span class="keyword">public</span> GameObject aduioPrefab;<span class="comment">//声音控制的预制件</span></span><br><span class="line">    <span class="keyword">private</span> GameObject a_clone;<span class="comment">//声音控制器的缓存</span></span><br><span class="line">    <span class="keyword">public</span> Image playerTexture;<span class="comment">//玩家头像</span></span><br><span class="line">    <span class="keyword">public</span> Button selectScene;<span class="comment">//选关按钮</span></span><br><span class="line">    <span class="keyword">public</span> Button setb;<span class="comment">//设置按钮</span></span><br><span class="line">    <span class="keyword">public</span> Button attributeb;<span class="comment">//属性介绍按钮</span></span><br><span class="line">    <span class="keyword">public</span> Button helpb;<span class="comment">//游戏简介按钮</span></span><br><span class="line">    <span class="keyword">public</span> Button relatedb;<span class="comment">//关于按钮</span></span><br><span class="line">    <span class="keyword">public</span> Button exitb;<span class="comment">//退出游戏按钮</span></span><br><span class="line">    <span class="keyword">public</span> Button exit_setb;<span class="comment">//退出设置界面按钮</span></span><br><span class="line">    <span class="keyword">public</span> Button exit_relatedb;<span class="comment">//退出关于界面按钮</span></span><br><span class="line">    <span class="keyword">public</span> Button exit_helpb;<span class="comment">//退出游戏简介按钮</span></span><br><span class="line">    <span class="keyword">public</span> GameObject plane_set;<span class="comment">//设置界面的引用</span></span><br><span class="line">    <span class="keyword">public</span> GameObject plane_related;<span class="comment">//关于界面的引用</span></span><br><span class="line">    <span class="keyword">public</span> GameObject plane_help;<span class="comment">//游戏简介界面的引用</span></span><br><span class="line">    <span class="keyword">public</span> Sprite[] player_texture;<span class="comment">//存储玩家头像的数组</span></span><br><span class="line">    <span class="keyword">int</span> gamebackgroundmusic_i = <span class="number">-1</span>;<span class="comment">//记录当期背景音乐是否播放的索引值</span></span><br><span class="line">    <span class="keyword">int</span> gameeffectmusic_i = <span class="number">-1</span>;<span class="comment">//记录当前背景音效是否播放的索引值</span></span><br><span class="line">    <span class="keyword">int</span> gamehelp_i = <span class="number">-1</span>;<span class="comment">//记录游戏帮助是否开启的索引值</span></span><br><span class="line">    <span class="keyword">int</span> gametip_i = <span class="number">-1</span>;<span class="comment">//记录游戏提示是否开启的索引值</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// Use this for initialization</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Awake</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;<span class="comment">//游戏进入是调用的方法啊，在Start()方法前调用</span></span><br><span class="line">        <span class="keyword">if</span> (UIData.game_backmusic_bool) isBackGroundMusic.isOn = <span class="literal">true</span>;<span class="comment">//如果背景音乐开启，背景音乐复选框为选中状态</span></span><br><span class="line">        <span class="keyword">else</span> isBackGroundMusic.isOn = <span class="literal">false</span>;<span class="comment">//如果背景音乐关闭，背景音乐复选框为未选中状态</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (UIData.game_effectmusic_bool) isEffectMusic.isOn = <span class="literal">true</span>;<span class="comment">//如果背景音效开启，背景音效复选框为选中状态</span></span><br><span class="line">        <span class="keyword">else</span> isEffectMusic.isOn = <span class="literal">false</span>;<span class="comment">//如果背景音效关闭，背景音效复选框为未选中状态</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (UIData.game_help) isHelp.isOn = <span class="literal">true</span>;<span class="comment">//如果游戏帮助开启，游戏帮助复选框为选中状态</span></span><br><span class="line">        <span class="keyword">else</span> isHelp.isOn = <span class="literal">false</span>;<span class="comment">//如果游戏帮助关闭，游戏帮助复选框为未选中状态</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">if</span> (UIData.game_tip) isTip.isOn = <span class="literal">true</span>;<span class="comment">//如果游戏提示开启，游戏提示复选框为选中状态</span></span><br><span class="line">        <span class="keyword">else</span> isTip.isOn = <span class="literal">false</span>;<span class="comment">//如果游戏提示关闭，游戏提示复选框为未选中状态</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;<span class="comment">//游戏开始时调用</span></span><br><span class="line">        <span class="keyword">if</span> (!welcome.isExitAudio) </span><br><span class="line">        &#123;<span class="comment">//如果当前场景背景音乐不存在</span></span><br><span class="line">            a_clone = Instantiate(aduioPrefab) <span class="keyword">as</span> GameObject;<span class="comment">//实例化一个音乐播放器</span></span><br><span class="line">            DontDestroyOnLoad(a_clone);<span class="comment">//切换场景是不销毁该对象</span></span><br><span class="line">            welcome.isExitAudio = <span class="literal">true</span>;<span class="comment">//记录音乐播放器是否存在全局变量设为真</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        playerTexture.sprite = player_texture[UIData.player_texture_int];<span class="comment">//显示玩家头像</span></span><br><span class="line">        selectScene.onClick.AddListener(LoadSelectScene);<span class="comment">//对选关按钮注册监听</span></span><br><span class="line">        setb.onClick.AddListener(Set);<span class="comment">//对设置按钮注册监听</span></span><br><span class="line">        attributeb.onClick.AddListener(Attribute);<span class="comment">//对属性介绍按钮注册监听</span></span><br><span class="line">        helpb.onClick.AddListener(Help);<span class="comment">//对游戏关于按钮注册简体</span></span><br><span class="line">        relatedb.onClick.AddListener(Related);<span class="comment">//对游戏帮助按钮注册监听</span></span><br><span class="line">        exitb.onClick.AddListener(BackScene);<span class="comment">//对退出当期场景按钮注册监听</span></span><br><span class="line">        exit_setb.onClick.AddListener(ExitSet);<span class="comment">//对退出设置界面按钮注册监听</span></span><br><span class="line">        exit_relatedb.onClick.AddListener(ExitRelated);<span class="comment">//对退出关于界面按钮注册监听</span></span><br><span class="line">        exit_helpb.onClick.AddListener(ExitHelp);<span class="comment">//对退出游戏简介按钮注册监听</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Update is called once per frame</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;<span class="comment">//每帧调用的方法</span></span><br><span class="line">        ChangeBackGroundMusic();<span class="comment">//检测是否关闭或者打开背景音乐的方法</span></span><br><span class="line">        ChangeEffectMusic();<span class="comment">//检测是否关闭或者打开游戏音效的方法</span></span><br><span class="line">        ChangeHelp();<span class="comment">//检测是否关闭或者开启游戏帮助的方法</span></span><br><span class="line">        ChaneTip();<span class="comment">//简则是否关闭或者开启游戏提示的方法</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">HideIcon</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;<span class="comment">//隐藏图标的方法</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>;i &lt; icon.Length;i++) </span><br><span class="line">        &#123;<span class="comment">//遍历图标对象数组</span></span><br><span class="line">            icon[i].SetActive(<span class="literal">false</span>);<span class="comment">//禁用图标对象</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">DisplayIcon</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;<span class="comment">//显示图标的方法</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>;i &lt; icon.Length;i++) &#123;<span class="comment">//遍历图标对象数组</span></span><br><span class="line">            icon[i].SetActive(<span class="literal">true</span>);<span class="comment">//显示图标对象</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">LoadSelectScene</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;<span class="comment">//切换到选关场景的方法</span></span><br><span class="line">        AudioManager.PlayAudio(<span class="number">0</span>);<span class="comment">//播放点击按钮声效</span></span><br><span class="line">        GetComponent&lt;Loading&gt;().LoadScene(<span class="number">5</span>);<span class="comment">//切换场景</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Set</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;<span class="comment">//进行游戏设置的方法</span></span><br><span class="line">        AudioManager.PlayAudio(<span class="number">0</span>);<span class="comment">//播放点击按钮声效</span></span><br><span class="line">        plane_set.SetActive(<span class="literal">true</span>);<span class="comment">//显示设置界面</span></span><br><span class="line">        HideIcon();<span class="comment">//隐藏原界面图标</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">ExitSet</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123; <span class="comment">//退出设置界面的方法</span></span><br><span class="line">        AudioManager.PlayAudio(<span class="number">0</span>);<span class="comment">//播放点击按钮声效</span></span><br><span class="line">        plane_set.SetActive(<span class="literal">false</span>);<span class="comment">//隐藏设置界面</span></span><br><span class="line">        DisplayIcon();<span class="comment">//还原界面图标</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Attribute</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;<span class="comment">//进入属性介绍场景的方法</span></span><br><span class="line">        AudioManager.PlayAudio(<span class="number">0</span>);<span class="comment">//播放点击按钮声效</span></span><br><span class="line">        GetComponent&lt;Loading&gt;().LoadScene(<span class="number">4</span>);<span class="comment">//切换场景</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Help</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;<span class="comment">//进入游戏简介的方法</span></span><br><span class="line">        AudioManager.PlayAudio(<span class="number">0</span>);<span class="comment">//播放点击按钮声效</span></span><br><span class="line">        plane_help.SetActive(<span class="literal">true</span>);<span class="comment">//游戏简介界面出现</span></span><br><span class="line">        HideIcon();<span class="comment">//隐藏图标</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Related</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;<span class="comment">//进入关于界面的方法</span></span><br><span class="line">        AudioManager.PlayAudio(<span class="number">0</span>);<span class="comment">//播放点击按钮声效</span></span><br><span class="line">        plane_related.SetActive(<span class="literal">true</span>);<span class="comment">//游戏关于界面出现</span></span><br><span class="line">        HideIcon();<span class="comment">//隐藏图标</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">ExitRelated</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;<span class="comment">//退出关于界面的方法</span></span><br><span class="line">        AudioManager.PlayAudio(<span class="number">0</span>);<span class="comment">//播放点击按钮声效</span></span><br><span class="line">        plane_related.SetActive(<span class="literal">false</span>);<span class="comment">//游戏关于界面隐藏</span></span><br><span class="line">        DisplayIcon();<span class="comment">//显示图标</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">ExitHelp</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;<span class="comment">//退出游戏简介界面的方法</span></span><br><span class="line">        AudioManager.PlayAudio(<span class="number">0</span>);<span class="comment">//播放点击按钮声效</span></span><br><span class="line">        plane_help.SetActive(<span class="literal">false</span>);<span class="comment">//游戏简介界面隐藏</span></span><br><span class="line">        DisplayIcon();<span class="comment">//隐藏图标</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">BackScene</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123; <span class="comment">//回到欢迎场景的方法</span></span><br><span class="line">        AudioManager.PlayAudio(<span class="number">0</span>);<span class="comment">//播放点击按钮声效</span></span><br><span class="line">        <span class="comment"><span class="doctag">///</span>/保存信息</span></span><br><span class="line">        <span class="comment">//if (UIData.game_backmusic_bool) gamebackgroundmusic_i = 1;//如果已经对游戏背景音乐进行了修改，开启为1，关闭为0</span></span><br><span class="line">        <span class="comment">//else gamebackgroundmusic_i = 0;</span></span><br><span class="line">        <span class="comment">//if (UIData.game_effectmusic_bool) gameeffectmusic_i = 1;//如果已经对游戏音效进行了修改，开启为1，关闭为0</span></span><br><span class="line">        <span class="comment">//else gameeffectmusic_i = 0;</span></span><br><span class="line">        <span class="comment">//if (UIData.game_help) gamehelp_i = 1;//如果已经对游戏帮助进行了修改，开启为1，关闭为0</span></span><br><span class="line">        <span class="comment">//else gamehelp_i = 0;</span></span><br><span class="line">        <span class="comment">//if (UIData.game_tip) gametip_i = 1;//如果已经对游戏提示进行了修改，开启为1，关闭为0</span></span><br><span class="line">        <span class="comment">//else gametip_i = 0;</span></span><br><span class="line">        <span class="comment">//PlayerPrefs.SetInt("gameBackGroudMusic", gamebackgroundmusic_i);//记录背景音乐是否开闭的数据，下次进入游戏按照此设置执行</span></span><br><span class="line">        <span class="comment">//PlayerPrefs.SetInt("gameEffectMusic", gameeffectmusic_i);//记录游戏音效是否开闭的数据，下次进入游戏按照此设置执行</span></span><br><span class="line">        <span class="comment">//PlayerPrefs.SetInt("gamehelp", gamehelp_i);//记录游戏帮助是否开闭的数据，下次进入游戏按照此设置执行</span></span><br><span class="line">        <span class="comment">//PlayerPrefs.SetInt("gametip", gametip_i);//记录游戏提示是否开闭的数据，下次进入游戏按照此设置执行</span></span><br><span class="line">        GetComponent&lt;Loading&gt;().LoadScene(<span class="number">6</span>);<span class="comment">//切换到玩家设置场景</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">ChangeBackGroundMusic</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;<span class="comment">//检测是否关闭或者打开背景音乐的方法</span></span><br><span class="line">        <span class="keyword">if</span> (isBackGroundMusic.isOn &amp;&amp; !UIData.game_backmusic_bool) &#123;</span><br><span class="line">            UIData.game_backmusic_bool = <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (!isBackGroundMusic.isOn &amp;&amp; UIData.game_backmusic_bool) &#123;</span><br><span class="line">            UIData.game_backmusic_bool = <span class="literal">false</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">ChangeEffectMusic</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;<span class="comment">//检测是否关闭或者打开游戏音效的方法</span></span><br><span class="line">        <span class="keyword">if</span> (isEffectMusic.isOn &amp;&amp; !UIData.game_effectmusic_bool) UIData.game_effectmusic_bool = <span class="literal">true</span>;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (!isEffectMusic.isOn &amp;&amp; UIData.game_effectmusic_bool) UIData.game_effectmusic_bool = <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">ChangeHelp</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;<span class="comment">//检测是否关闭或者开启游戏帮助的方法</span></span><br><span class="line">        <span class="keyword">if</span> (isHelp.isOn &amp;&amp; !UIData.game_help) UIData.game_help = <span class="literal">true</span>;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (!isHelp.isOn &amp;&amp; UIData.game_help) UIData.game_help = <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">ChaneTip</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;<span class="comment">//检测是否关闭或者开启游戏提示的方法</span></span><br><span class="line">        <span class="keyword">if</span> (isTip.isOn &amp;&amp; !UIData.game_tip) UIData.game_tip = <span class="literal">true</span>;</span><br><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (!isTip.isOn &amp;&amp; UIData.game_tip) UIData.game_tip = <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Enemy.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Enemy</span> : <span class="title">MonoBehaviour</span> </span><br><span class="line">&#123;</span><br><span class="line">    [<span class="meta">HideInInspector</span>]</span><br><span class="line">    <span class="keyword">public</span> Path path;    <span class="comment">//敌人行进路径</span></span><br><span class="line">    <span class="keyword">private</span> List&lt;Vector3&gt; waypoints;    <span class="comment">//路经点的集合</span></span><br><span class="line">    <span class="keyword">private</span> Vector3 target;    <span class="comment">//每一次朝向的目标点</span></span><br><span class="line">    [<span class="meta">HideInInspector</span>]</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> moveSpeed;    <span class="comment">//移动速度  </span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">float</span> rotateSpeed = <span class="number">4f</span>;    <span class="comment">//转体速度</span></span><br><span class="line">    [<span class="meta">HideInInspector</span>]</span><br><span class="line">    <span class="keyword">public</span> Texture2D blood_red;    <span class="comment">//血条图片的引用，红色为上层</span></span><br><span class="line">    [<span class="meta">HideInInspector</span>]</span><br><span class="line">    <span class="keyword">public</span> Texture2D blood_black;  <span class="comment">//黑色为下层</span></span><br><span class="line">    [<span class="meta">HideInInspector</span>]</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> healthPoint;    <span class="comment">//生命值，会有统一分配</span></span><br><span class="line">    [<span class="meta">HideInInspector</span>]</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> attackDamage;    <span class="comment">//小兵的攻击力</span></span><br><span class="line">    <span class="keyword">int</span> HealthPoint;    <span class="comment">//记录生命值</span></span><br><span class="line">    [<span class="meta">HideInInspector</span>]</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">bool</span> isDead = <span class="literal">false</span>;    <span class="comment">//是否死掉了</span></span><br><span class="line">    [<span class="meta">HideInInspector</span>]</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> deadPrice;    <span class="comment">//声明被消灭以后获得的钱数</span></span><br><span class="line">    [<span class="meta">HideInInspector</span>]</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> attackSpeed;<span class="comment">//攻击速度</span></span><br><span class="line">    <span class="keyword">float</span> m_timer;<span class="comment">//攻击速度缓存</span></span><br><span class="line">    <span class="keyword">private</span> Transform thisT;    <span class="comment">//缓存当前位置</span></span><br><span class="line">    GameObject hero_cur;    <span class="comment">//获取攻击英雄的引用</span></span><br><span class="line">    <span class="keyword">bool</span> isBeAttack = <span class="literal">false</span>;<span class="comment">//是否被攻击,控制移动</span></span><br><span class="line">    <span class="keyword">int</span> huoDamage = <span class="number">0</span>;<span class="comment">//火炮台的伤害值</span></span><br><span class="line">    <span class="keyword">bool</span> isBeAttack_Other = <span class="literal">false</span>;<span class="comment">//是否被第三方攻击，控制血条显示</span></span><br><span class="line">    <span class="keyword">float</span> Scale = <span class="number">0.5f</span>;    <span class="comment">//定义血条缩放比</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        isBeAttack_Other = <span class="literal">false</span>;<span class="comment">//没有被第三方攻击，血条不显示</span></span><br><span class="line">        thisT = <span class="keyword">this</span>.transform;        <span class="comment">//第一次调用脚本，缓存当前的位置</span></span><br><span class="line">        HealthPoint = healthPoint;        <span class="comment">//记录初始血量，用于以后进度条的更新</span></span><br><span class="line">        m_timer = attackSpeed;        <span class="comment">//初始攻击速度</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">init</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;<span class="comment">//路径点初始化</span></span><br><span class="line">        waypoints = <span class="keyword">new</span> List&lt;Vector3&gt;();        <span class="comment">//声明路径点的集合</span></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>;i &lt; path.waypoints.Length;i++) </span><br><span class="line">        &#123;<span class="comment">//遍历路径点集合  </span></span><br><span class="line">            waypoints.Add(path.waypoints[i].position); <span class="comment">//将path中的路径点添加到waypoints集合中</span></span><br><span class="line">        &#125;</span><br><span class="line">        GetNextPoint();        <span class="comment">//获取下一个路径点</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">GetNextPoint</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span> (waypoints.Count &gt; <span class="number">0</span>) </span><br><span class="line">        &#123;<span class="comment">//如果集合中有路径点</span></span><br><span class="line">            target = waypoints[<span class="number">0</span>];<span class="comment">//取集合中的第一个点作为下一个目标点</span></span><br><span class="line">            waypoints.RemoveAt(<span class="number">0</span>);<span class="comment">//获取成为target对象，之后移除</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">else</span> </span><br><span class="line">        &#123;</span><br><span class="line">            StartCoroutine(endComplete());<span class="comment">//如果小兵已经到达基地，调用到达基地的协程</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Update is called once per frame</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span> (isDead) <span class="keyword">return</span>;<span class="comment">//如果小兵已经死亡，返回</span></span><br><span class="line">        <span class="keyword">if</span> (healthPoint &lt;= <span class="number">0</span>) die();<span class="comment">//如果生命值小于0，调用死亡的方法</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (!isDead) </span><br><span class="line">        &#123; <span class="comment">//如果生成的敌人没有死</span></span><br><span class="line">          <span class="keyword">if</span> (!isBeAttack) </span><br><span class="line">          &#123;<span class="comment">//如果正在被英雄攻击</span></span><br><span class="line">            <span class="keyword">float</span> dis = ReturnDistance(thisT.position, target);      <span class="comment">//获取当前点与目标点的距离的方法</span></span><br><span class="line">            <span class="keyword">if</span> (dis &lt; <span class="number">0.15f</span>) GetNextPoint();                <span class="comment">//判断是否移动到下个点，如果可以，继续移动</span></span><br><span class="line">            Enemy_Rotate_Move(target);<span class="comment">//转向并且移动到目标点的方法</span></span><br><span class="line">          &#125;</span><br><span class="line">          <span class="keyword">else</span> </span><br><span class="line">          &#123;</span><br><span class="line">            <span class="keyword">if</span> (hero_cur.GetComponent&lt;Hero&gt;().isDead) </span><br><span class="line">            &#123;<span class="comment">//如果英雄已经死亡</span></span><br><span class="line">              isBeAttack = <span class="literal">false</span>;<span class="comment">//不被英雄攻击</span></span><br><span class="line">              <span class="keyword">return</span>;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">float</span> dis = ReturnDistance(thisT.position, hero_cur.transform.position);                <span class="comment">//获取当前点与英雄的距离</span></span><br><span class="line">            <span class="keyword">if</span> (dis &gt;= <span class="number">2.5f</span>) &#123; isBeAttack = <span class="literal">false</span>; hero_cur.GetComponent&lt;Hero&gt;().FoundEnemy = <span class="literal">null</span>; <span class="keyword">return</span>; &#125;<span class="comment">//距离不够，小兵不被攻击，要攻击的英雄不存在</span></span><br><span class="line">            <span class="keyword">if</span> (dis &gt; <span class="number">1f</span>) </span><br><span class="line">            &#123; <span class="comment">//判断是否移动到下个点，如果可以，继续移动</span></span><br><span class="line">              Enemy_Rotate_Move(hero_cur.transform.position);    <span class="comment">//敌人转向和行进的方法</span></span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            PlayAnimation(<span class="number">3</span>);<span class="comment">//播放攻击动画</span></span><br><span class="line">            m_timer -= Time.deltaTime;<span class="comment">//间断性攻击</span></span><br><span class="line">            <span class="keyword">if</span> (m_timer &gt; <span class="number">0</span>) <span class="keyword">return</span>;</span><br><span class="line">            m_timer = attackSpeed;</span><br><span class="line">            <span class="comment">//0按钮点击 1绿塔攻击；2红塔攻击；3箭塔攻击；4范围塔攻击 5-8技能攻击 9英雄攻击 10小兵攻击 11种塔 12卖塔 13出兵 14各种切换 15选中英雄 16摇色子 17选中 18切换上下</span></span><br><span class="line">            <span class="comment">//AudioManager.PlayAudio(10);</span></span><br><span class="line">            hero_cur.GetComponent&lt;Hero&gt;().AttackHero(attackDamage);                <span class="comment">//每隔一定时间对英雄进行攻击</span></span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Enemy_Rotate_Move</span>(<span class="params">Vector3 point</span>) </span></span><br><span class="line"><span class="function"></span>    &#123;  <span class="comment">//敌人转向和行进的方法</span></span><br><span class="line">        Quaternion wantedRotate = Quaternion.LookRotation(point - thisT.position);<span class="comment">//获取转动变量</span></span><br><span class="line">        thisT.rotation = Quaternion.Slerp(thisT.rotation, wantedRotate, rotateSpeed * Time.deltaTime);<span class="comment">// 敌人转身动作的实现</span></span><br><span class="line">        Vector3 d_range = point - thisT.position;<span class="comment">//获取方向距离</span></span><br><span class="line">        Vector3 dir = d_range.normalized;        <span class="comment">//敌人移动到目标点单位化</span></span><br><span class="line">        PlayAnimation(<span class="number">1</span>);<span class="comment">//播放移动动画</span></span><br><span class="line">        thisT.Translate(dir * moveSpeed * Time.deltaTime, Space.World);<span class="comment">//移动</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">OnGUI</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;  <span class="comment">//绘制血条的方法</span></span><br><span class="line">        <span class="keyword">if</span> (!isBeAttack_Other) <span class="keyword">return</span>;<span class="comment">//如果小兵没有受到攻击，不显示血条</span></span><br><span class="line">        <span class="keyword">if</span> (thisT == <span class="literal">null</span>) <span class="keyword">return</span>;        <span class="comment">//如果当前小兵的位置不存在，则不进行绘制</span></span><br><span class="line">        <span class="keyword">if</span> (Camera.main == <span class="literal">null</span> || isDead) <span class="keyword">return</span>;    <span class="comment">//如果主摄像机不存在或者小兵已经死亡，不进行绘制</span></span><br><span class="line">        Vector3 worldPosition = <span class="keyword">new</span> Vector3(thisT.position.x, thisT.position.y + <span class="number">1f</span>, thisT.position.z);        <span class="comment">//默认NPC坐标点在脚底下，所以这里加上npcHeight它模型的高度即可</span></span><br><span class="line">        Vector2 position = Camera.main.WorldToScreenPoint(worldPosition);        <span class="comment">//根据NPC头顶的3D坐标换算成它在2D屏幕中的坐标</span></span><br><span class="line">        position = <span class="keyword">new</span> Vector2(position.x, Screen.height - position.y);        <span class="comment">//得到真实NPC头顶的2D坐标</span></span><br><span class="line">        Vector2 bloodSize = GUI.skin.label.CalcSize(<span class="keyword">new</span> GUIContent(blood_red));        <span class="comment">//计算出血条的宽高</span></span><br><span class="line">        <span class="keyword">float</span> blood_width = bloodSize.x * healthPoint / HealthPoint;        <span class="comment">//通过血值计算红色血条显示区域</span></span><br><span class="line">        <span class="keyword">if</span> (blood_width &lt; <span class="number">0</span>) &#123;  <span class="comment">//如果小兵的生命值低于零</span></span><br><span class="line">          blood_width = <span class="number">0</span>;<span class="comment">//让其的血条显示为0</span></span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">//先绘制黑色血条</span></span><br><span class="line">        GUI.DrawTexture(<span class="keyword">new</span> Rect(position.x - (bloodSize.x / <span class="number">4</span> * Scale), position.y - bloodSize.y * Scale * <span class="number">0.3f</span>, bloodSize.x * Scale, bloodSize.y * Scale * <span class="number">0.3f</span>), blood_black);</span><br><span class="line">        <span class="comment">//在绘制红色血条</span></span><br><span class="line">        GUI.DrawTexture(<span class="keyword">new</span> Rect(position.x - (bloodSize.x / <span class="number">4</span> * Scale), position.y - bloodSize.y * Scale * <span class="number">0.3f</span>, blood_width * Scale, bloodSize.y * Scale * <span class="number">0.3f</span>), blood_red);</span><br><span class="line">        StartCoroutine(StopUI());  <span class="comment">//停止显示血条</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="function">IEnumerator <span class="title">StopUI</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;<span class="comment">//停止显示血条</span></span><br><span class="line">        <span class="function"><span class="keyword">yield</span> return new <span class="title">WaitForSeconds</span>(<span class="params"><span class="number">15f</span></span>)</span>;<span class="comment">//等待十五秒</span></span><br><span class="line">        isBeAttack_Other = <span class="literal">false</span>;<span class="comment">//不被攻击</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">die</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;  <span class="comment">//敌人死亡，并播放动画</span></span><br><span class="line">        isDead = <span class="literal">true</span>;        <span class="comment">//是否已经死亡的标志位</span></span><br><span class="line">        UIManager.remainMonney += deadPrice;<span class="comment">//游戏金钱增加</span></span><br><span class="line">        UIManager.kill++;<span class="comment">//记录杀敌数增加</span></span><br><span class="line">        PlayAnimation(<span class="number">2</span>);        <span class="comment">//播放小兵死亡的动画</span></span><br><span class="line">        GameManager.game.EnemyList.Remove(<span class="keyword">this</span>.gameObject);         <span class="comment">//将小兵集合中的当前小兵去掉</span></span><br><span class="line">        StartCoroutine(dieComplete());        <span class="comment">//调用彻底死亡的方法</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">IEnumerator <span class="title">dieComplete</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123; <span class="comment">//协程用法，敌人死后尸体存在三秒自动消失</span></span><br><span class="line">        <span class="function"><span class="keyword">yield</span> return new <span class="title">WaitForSeconds</span>(<span class="params"><span class="number">1.4f</span></span>)</span>;<span class="comment">//等待1.4秒</span></span><br><span class="line">        Destroy(<span class="keyword">this</span>.gameObject);<span class="comment">//敌人消失</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function">IEnumerator <span class="title">endComplete</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;<span class="comment">//到达基地</span></span><br><span class="line">        isDead = <span class="literal">true</span>;        <span class="comment">//到达终点小兵死亡的标志位</span></span><br><span class="line">        <span class="function"><span class="keyword">yield</span> return new <span class="title">WaitForSeconds</span>(<span class="params"><span class="number">0.05f</span></span>)</span>;<span class="comment">//等待0.05秒</span></span><br><span class="line">        GameManager.game.EnemyList.Remove(<span class="keyword">this</span>.gameObject);        <span class="comment">//从列表中移除当前小兵</span></span><br><span class="line">        Destroy(<span class="keyword">this</span>.gameObject);        <span class="comment">//销毁当前物体</span></span><br><span class="line">        UIManager.remainLife--;<span class="comment">//游戏生命值减少</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">float</span> <span class="title">ReturnDistance</span>(<span class="params">Vector3 v1, Vector3 v2</span>) </span></span><br><span class="line"><span class="function"></span>    &#123; <span class="comment">//返回距离的方法</span></span><br><span class="line">        <span class="keyword">return</span> Mathf.Sqrt((v1.x - v2.x) * (v1.x - v2.x) + (v1.z - v2.z) * (v1.z - v2.z));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Be_Attack</span>(<span class="params"><span class="keyword">int</span> attackDamage</span>) </span></span><br><span class="line"><span class="function"></span>    &#123; <span class="comment">//受到塔攻击或者技能攻击的方法</span></span><br><span class="line">        isBeAttack_Other = <span class="literal">true</span>;<span class="comment">//正在被攻击标志位</span></span><br><span class="line">        UIManager.damage += attackDamage;<span class="comment">//伤害总值增加</span></span><br><span class="line">        healthPoint -= attackDamage;        <span class="comment">//对小兵生命值的递减</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Be_Attack_Huo</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;<span class="comment">//受到火攻击的方法</span></span><br><span class="line">        isBeAttack_Other = <span class="literal">true</span>;<span class="comment">//正在受到攻击标志位</span></span><br><span class="line">        healthPoint -= huoDamage;<span class="comment">//小兵生命值减少</span></span><br><span class="line">        UIManager.damage += huoDamage;<span class="comment">//伤害总值增加</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Be_Attack_Hero</span>(<span class="params"><span class="keyword">int</span> heroattack, GameObject hero</span>) </span></span><br><span class="line"><span class="function"></span>    &#123;<span class="comment">//被英雄攻击的方法</span></span><br><span class="line">        isBeAttack = <span class="literal">true</span>;  <span class="comment">//小兵受到攻击，不移动</span></span><br><span class="line">        isBeAttack_Other = <span class="literal">true</span>;<span class="comment">//正在受到攻击标志位，血条显示</span></span><br><span class="line">        UIManager.damage += heroattack;<span class="comment">//伤害总值增加</span></span><br><span class="line">        healthPoint -= heroattack;<span class="comment">//小兵生命值减少</span></span><br><span class="line">        hero_cur = hero;<span class="comment">//英雄引用</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">OnParticleCollision</span>(<span class="params">GameObject other</span>) </span></span><br><span class="line"><span class="function"></span>    &#123;<span class="comment">//粒子碰撞检测</span></span><br><span class="line">        huoDamage = other.GetComponentInParent&lt;ShootObject&gt;().attackDamage;<span class="comment">//获取火的伤害值引用</span></span><br><span class="line">        Be_Attack_Huo();<span class="comment">//受到火攻击</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">PlayAnimation</span>(<span class="params"><span class="keyword">int</span> index</span>) </span></span><br><span class="line"><span class="function"></span>    &#123;<span class="comment">//播放动画的方法，1跑动；2死亡；3攻击</span></span><br><span class="line">        <span class="keyword">switch</span> (index) </span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="number">1</span>: GetComponent&lt;Animation&gt;().Play(<span class="string">"Run"</span>); <span class="keyword">break</span>;<span class="comment">//跑动</span></span><br><span class="line">            <span class="keyword">case</span> <span class="number">2</span>: GetComponent&lt;Animation&gt;().Play(<span class="string">"Dead"</span>); <span class="keyword">break</span>;<span class="comment">//死亡</span></span><br><span class="line">            <span class="keyword">case</span> <span class="number">3</span>: GetComponent&lt;Animation&gt;().Play(<span class="string">"Attack"</span>); <span class="keyword">break</span>;<span class="comment">//攻击</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Unity案例开发大全（第2版）/" rel="tag"># Unity案例开发大全（第2版）</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/09/20/Unity中用有限状态机来实现一个AI/" rel="next" title="Unity中用有限状态机来实现一个AI">
+                <i class="fa fa-chevron-left"></i> Unity中用有限状态机来实现一个AI
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/09/20/外观模式-2/" rel="prev" title="外观模式">
+                外观模式 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+
+      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">354</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">55</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2020/02/16/游戏设计快乐之道（第2版）/" title="游戏设计快乐之道（第2版）" target="_blank">游戏设计快乐之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/14/游戏剧本怎么写/" title="游戏剧本怎么写" target="_blank">游戏剧本怎么写</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/04/通关！游戏设计之道（第2版）/" title="通关！游戏设计之道（第2版）" target="_blank">通关！游戏设计之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/26/游戏设计艺术（第2版）/" title="游戏设计艺术（第2版）" target="_blank">游戏设计艺术（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/22/大师谈游戏设计创意与节奏/" title="大师谈游戏设计创意与节奏" target="_blank">大师谈游戏设计创意与节奏</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">3.7m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">56:23</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

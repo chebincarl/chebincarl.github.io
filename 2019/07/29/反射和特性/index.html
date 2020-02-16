@@ -1,0 +1,1753 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="思考并回答以下问题：  什么是元数据？meta这个词翻译成汉语是什么意思？保存在哪？.meta文件在Unity里是干嘛用的？ 反射是什么？有什么作用？ 使用反射需要哪个命名空间？ Type类型的对象是干嘛用的？有哪两种方法可以获取Type对象？ 可以使用特性来给类型添加元数据怎么理解？ 对于程序中用到的每一个类型，CLR都会创建一个包含这个类型信息的Type类型的对象。这个过程是自动的吗？ 不管创">
+<meta name="keywords" content="C#图解教程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="反射和特性">
+<meta property="og:url" content="http://chebincarl.github.io/2019/07/29/反射和特性/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="思考并回答以下问题：  什么是元数据？meta这个词翻译成汉语是什么意思？保存在哪？.meta文件在Unity里是干嘛用的？ 反射是什么？有什么作用？ 使用反射需要哪个命名空间？ Type类型的对象是干嘛用的？有哪两种方法可以获取Type对象？ 可以使用特性来给类型添加元数据怎么理解？ 对于程序中用到的每一个类型，CLR都会创建一个包含这个类型信息的Type类型的对象。这个过程是自动的吗？ 不管创">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://chebincarl.github.io/2019/07/29/反射和特性/a.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/07/29/反射和特性/b.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/07/29/反射和特性/1.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/07/29/反射和特性/3.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/07/29/反射和特性/4.png">
+<meta property="og:updated_time" content="2019-11-01T23:25:22.924Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="反射和特性">
+<meta name="twitter:description" content="思考并回答以下问题：  什么是元数据？meta这个词翻译成汉语是什么意思？保存在哪？.meta文件在Unity里是干嘛用的？ 反射是什么？有什么作用？ 使用反射需要哪个命名空间？ Type类型的对象是干嘛用的？有哪两种方法可以获取Type对象？ 可以使用特性来给类型添加元数据怎么理解？ 对于程序中用到的每一个类型，CLR都会创建一个包含这个类型信息的Type类型的对象。这个过程是自动的吗？ 不管创">
+<meta name="twitter:image" content="http://chebincarl.github.io/2019/07/29/反射和特性/a.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/07/29/反射和特性/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>反射和特性 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">专注，重复10遍</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/07/29/反射和特性/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">反射和特性
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-07-29 11:06:51" itemprop="dateCreated datePublished" datetime="2019-07-29T11:06:51+08:00">2019-07-29</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-11-02 07:25:22" itemprop="dateModified" datetime="2019-11-02T07:25:22+08:00">2019-11-02</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C#</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">12k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">11 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>思考并回答以下问题：</p>
+<ul>
+<li>什么是元数据？meta这个词翻译成汉语是什么意思？保存在哪？.meta文件在Unity里是干嘛用的？</li>
+<li>反射是什么？有什么作用？</li>
+<li>使用反射需要哪个命名空间？</li>
+<li>Type类型的对象是干嘛用的？有哪两种方法可以获取Type对象？</li>
+<li>可以使用特性来给类型添加元数据怎么理解？</li>
+<li>对于程序中用到的每一个类型，CLR都会创建一个包含这个类型信息的Type类型的对象。这个过程是自动的吗？</li>
+<li>不管创建的类型有多少个实例，只有一个Type对象会关联到所有这些实例吗？</li>
+<li>特性只是某个特殊类型的类。特殊在哪里？</li>
+<li>安全起见，通常建议你声明一个sealed的特性类。为什么sealed更安全？</li>
+<li>如果你不声明构造函数，编译器会为我们产生一个隐式、公共且无参的构造函数。编译器为什么这么做？</li>
+</ul>
+<a id="more"></a>
+<p>本章涵盖：</p>
+<ul>
+<li>元数据和反射</li>
+<li>Type类</li>
+<li>获取Type对象</li>
+<li>什么是特性</li>
+<li>应用特性</li>
+<li>有关应用特性的更多内容</li>
+<li>自定义特性</li>
+<li>访问特性</li>
+</ul>
+<h1 id="元数据和反射"><a href="#元数据和反射" class="headerlink" title="元数据和反射"></a><span style="color:#339AFF;">元数据和反射</span></h1><p>大多数程序都要处理数据，包括读、写、操作和显示数据。（图形也是一种数据的形式。）然而，对于某些程序来说，它们操作的数据不是数字、文本或图形，而是程序和程序类型<span style="color:red">本身的信息</span>。</p>
+<ul>
+<li><span style="color:red">有关程序及其类型的数据被称为元数据（metadata），它们保存在程序的程序集中。</span></li>
+<li>程序在运行时，可以查看其他程序集或其本身的元数据。<span style="color:red">一个运行的程序查看本身的元数据或其他程序的元数据的行为叫做反射（reflection）。</span></li>
+</ul>
+<p>对象浏览器是显示元数据的程序的一个示例。它可以读取程序集，然后显示所包含的类型以及类型的所有特性和成员。</p>
+<img src="/2019/07/29/反射和特性/a.png">
+<img src="/2019/07/29/反射和特性/b.png">
+<p>本章将介绍程序如何使用Type类来反射数据，以及程序员如何<span style="color:red">使用特性来给类型添加元数据</span>。</p>
+<p><strong>说明</strong></p>
+<p>要使用反射，我们必须使用System.Reflection命名空间。</p>
+<h1 id="Type类"><a href="#Type类" class="headerlink" title="Type类"></a><span style="color:#339AFF;">Type类</span></h1><p>之前已经介绍了如何声明和使用C#中的类型。包括预定义类型（int、long和string等），BCL中的类型（Console、IEnumerable等）以及用户自定义类型（MyClass、MyDel等）。每一种类型都有自己的成员和特性。</p>
+<p>BCL声明了一个叫做Type的抽象类，它被设计用来包含类型的特性。使用这个类的对象能让我们获取程序使用的类型的信息。</p>
+<p>由于Type是抽象类，因此它不能有实例。而是在运行时，CLR创建从Type（RuntimeType）派生的类的实例，Type包含了类型信息。当我们要访问这些实例时，CLR不会返回派生类的引用而是Type基类的引用。但是，为了简单起见，在本章剩余的篇幅中，我会把引用所指向的对象称为Type类型的对象（虽然从技术角度来说是一个BCL内部的派生类型的对象）。</p>
+<p>需要了解的有关Type的重要事项如下。</p>
+<ul>
+<li>对于程序中用到的每一个类型，CLR都会创建一个包含这个类型信息的Type类型的对象。</li>
+<li>程序中用到的每一个类型都会关联到独立的Type类的对象。</li>
+<li>不管创建的类型有多少个实例，只有一个Type对象会关联到所有这些实例。</li>
+</ul>
+<p>图1显示了一个运行的程序，它有两个MyClass对象和一个OtherClass对象。注意，尽管有两个MyClass的实例，只会有一个Type对象来表示它。</p>
+<blockquote>
+<p>图1 对于程序中使用的每一个类型CLR都会实例化Type类型的对象<br><img src="/2019/07/29/反射和特性/1.png"></p>
+</blockquote>
+<p><span style="color:red">我们可以从Type对象中获取需要了解的有关类型的几乎所有信息</span>。表1列出了类中更有用的成员。</p>
+<blockquote>
+<p>表1 System.Type类部分成员</p>
+</blockquote>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:left"><center>**成员**</center></th>
+<th style="text-align:left"><center>**成员类型**</center></th>
+<th style="text-align:left"><center>**描述**</center></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Name</td>
+<td style="text-align:left">属性</td>
+<td style="text-align:left">返回类型的名字</td>
+</tr>
+<tr>
+<td style="text-align:left">Namespace</td>
+<td style="text-align:left">属性</td>
+<td style="text-align:left">返回包含类型声明的命名空间</td>
+</tr>
+<tr>
+<td style="text-align:left">Assembly</td>
+<td style="text-align:left">属性</td>
+<td style="text-align:left">返回声明类型的程序集。如果类型是泛型的，返回定义这个类型的程序集</td>
+</tr>
+<tr>
+<td style="text-align:left">GetFields</td>
+<td style="text-align:left">方法</td>
+<td style="text-align:left">返回类型的字段列表</td>
+</tr>
+<tr>
+<td style="text-align:left">GetProperties</td>
+<td style="text-align:left">方法</td>
+<td style="text-align:left">返回类型的属性列表</td>
+</tr>
+<tr>
+<td style="text-align:left">GetMethods</td>
+<td style="text-align:left">方法</td>
+<td style="text-align:left">返回类型的方法列表</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h1 id="获取Type对象"><a href="#获取Type对象" class="headerlink" title="获取Type对象"></a><span style="color:#339AFF;">获取Type对象</span></h1><p>本节学习<span style="color:red">使用GetType方法和typeof运算符来获取Type对象</span>。object类型包含了一个叫做GetType的方法，它返回对实例的Type对象的引用。由于每一个类型最终都是从object继承的，所以我们可以在任何类型对象上使用GetType方法来获取它的Type对象，如下所示:<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Type t = myInstance.GetType();</span><br></pre></td></tr></table></figure></p>
+<p>下面的代码演示了如何声明一个基类以及从它派生的子类。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Reflection; <span class="comment">// 必须使用该命名空间</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">BaseClass</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> BaseField = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">DerivedClass</span> : <span class="title">BaseClass</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> DerivedField = <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">var</span> bc = <span class="keyword">new</span> BaseClass();</span><br><span class="line">        <span class="keyword">var</span> dc = <span class="keyword">new</span> DerivedClass();</span><br><span class="line"></span><br><span class="line">        BaseClass[] bca = <span class="keyword">new</span> BaseClass[] &#123;bc, dc&#125;;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">foreach</span>(<span class="keyword">var</span> v <span class="keyword">in</span> bca)</span><br><span class="line">        &#123;</span><br><span class="line">            Type t = v.GetType(); <span class="comment">// 获取类型</span></span><br><span class="line"></span><br><span class="line">            Console.WriteLine(<span class="string">"Object type: &#123;0&#125;"</span>, t.Name);</span><br><span class="line"></span><br><span class="line">            FieldInfo[] fi = t.GetFields(); <span class="comment">// 获取字段信息</span></span><br><span class="line"></span><br><span class="line">            <span class="keyword">foreach</span> (<span class="keyword">var</span> f <span class="keyword">in</span> fi)</span><br><span class="line">            &#123;</span><br><span class="line">                Console.WriteLine(<span class="string">"    Field: &#123;0&#125;"</span>, f.Name);</span><br><span class="line">            &#125;</span><br><span class="line">            Console.WriteLine();</span><br><span class="line">        &#125;</span><br><span class="line">        Console.ReadKey();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这段代码产生了如下的输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Object type: BaseClass</span><br><span class="line">    Field: BaseField</span><br><span class="line"></span><br><span class="line">Object type: DerivedClass</span><br><span class="line">    Field: DerivedField</span><br><span class="line">    Field: BaseField</span><br></pre></td></tr></table></figure>
+<p>Main方法创建了每一个类的实例并且把这些引用放在了一个叫做bca的数组中以方便使用。在外层的foreach循环中，代码得到了Type对象并且输出类的名字，然后获取类的字段并输出。图2演示了内存中的对象。</p>
+<blockquote>
+<p>图2 基类和派生类对象以及它们的Type对象<br><img src="/2019/07/29/反射和特性/3.png"></p>
+</blockquote>
+<p>我们还可以使用typeof运算符来获取Type对象。只需要提供类型名作为操作数，它就会返回Type对象的引用，如下所示:<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Type t = <span class="keyword">typeof</span>( DerivedClass );</span><br><span class="line"><span class="comment">//         ↑ 运算符   ↑ 希望的Type对象的类型</span></span><br></pre></td></tr></table></figure></p>
+<p>下面的代码给出了一个使用typeof运算符的简单示例：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Reflection; <span class="comment">// 必须使用该命名空间</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">SimpleReflection</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title">BaseClass</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">int</span> MyFieldBase;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">class</span> <span class="title">DerivedClass</span> : <span class="title">BaseClass</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">int</span> MyFieldDerived;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            Type tbc = <span class="keyword">typeof</span>(DerivedClass); <span class="comment">// 获取类型</span></span><br><span class="line">            Console.WriteLine(<span class="string">"Result is &#123;0&#125;."</span>, tbc.Name);</span><br><span class="line"></span><br><span class="line">            Console.WriteLine(<span class="string">"It has the following fields:"</span>); <span class="comment">// 使用类型</span></span><br><span class="line"></span><br><span class="line">            FieldInfo[] fi = tbc.GetFields(); <span class="comment">// 获取字段信息</span></span><br><span class="line"></span><br><span class="line">            <span class="keyword">foreach</span> (<span class="keyword">var</span> f <span class="keyword">in</span> fi)</span><br><span class="line">                Console.WriteLine(<span class="string">"    &#123;0&#125;"</span>, f.Name);</span><br><span class="line"></span><br><span class="line">            Console.ReadKey();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这段代码产生了如下的输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Result is DerivedClass.</span><br><span class="line">It has the following fields:</span><br><span class="line">    MyFieldDerived</span><br><span class="line">    MyFieldBase</span><br></pre></td></tr></table></figure>
+<h1 id="什么是特性"><a href="#什么是特性" class="headerlink" title="什么是特性"></a><span style="color:#339AFF;">什么是特性</span></h1><p><strong>特性（attribute）是一种允许我们向程序的程序集增加元数据的语言结构。</strong>它是用于保存程序结构信息的某种特殊类型的类。</p>
+<ul>
+<li>将应用了特性的程序结构（program construct）叫做目标（target）。</li>
+<li>设计用来获取和使用元数据的程序（比如对象浏览器）叫做特性的消费者（consumer）。</li>
+<li>.NET预定了很多特性，我们也可以声明自定义特性。</li>
+</ul>
+<p>图3是使用特性中相关组件的概览，并且也演示了如下有关特性的要点。</p>
+<ul>
+<li>我们在源代码中将特性应用于程序结构。</li>
+<li>编译器获取源代码并且从特性产生元数据，然后把元数据放到程序集中。</li>
+<li>消费者程序可以获取特性的元数据以及程序中其他组件的元数据。注意，编译器同时生产和消费特性。</li>
+</ul>
+<blockquote>
+<p>图3 创建和使用特性的相关组件</p>
+</blockquote>
+<img src="/2019/07/29/反射和特性/4.png">
+<p>根据惯例，特性名使用Pascal命名法并且以Attribute后缀结尾。当为目标应用特性时，我们可以不使用后缀。例如，对于SerializableAttribute和MyAttributeAttribute这两个特性，我们在把它们应用到结构时可以使用Serializable和MyAttribute短名称。</p>
+<h1 id="应用特性"><a href="#应用特性" class="headerlink" title="应用特性"></a><span style="color:#339AFF;">应用特性</span></h1><p>我们先不讲解如何创建特性，而是看看如何使用已定义的特性。这样，你会对它们的使用情况有个大致了解。</p>
+<p>特性的目的是告诉编译器把程序结构的某组元数据嵌入程序集。我们可以通过把特性应用到结构来实现。</p>
+<ul>
+<li>在结构前放置<strong>特性片段</strong>来应用特性。</li>
+<li><strong>特性片段</strong>被方括号包围，其中是特性名和特性的参数列表。</li>
+</ul>
+<p>例如，下面的代码演示了两个类的开始部分。最初的几行代码演示了把一个叫做Serializable的特性应用到MyClass。注意，Serializable没有参数列表。第二个类的声明有一个叫做MyAttribute的特性，它有一个带有两个string参数的参数列表。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure></p>
+<p>有关特性需要了解的重要事项如下:</p>
+<ul>
+<li>大多数特性只针对直接跟随在一个或多个特性片段后的结构；</li>
+<li>应用了特性的结构称为被特性装饰（decorated或adorned，两者都应用得很普遍）。</li>
+</ul>
+<h1 id="预定义特性"><a href="#预定义特性" class="headerlink" title="预定义特性"></a><span style="color:#339AFF;">预定义特性</span></h1><div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:left"><center>**特 性** </center></th>
+<th style="text-align:left"><center>**意 义** </center></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Serializable</td>
+<td style="text-align:left">声明结构可以被序列化</td>
+</tr>
+<tr>
+<td style="text-align:left">NonSerialized</td>
+<td style="text-align:left">声明结构不能被序列化</td>
+</tr>
+<tr>
+<td style="text-align:left">DllImport</td>
+<td style="text-align:left">声明是非托管代码实现的</td>
+</tr>
+<tr>
+<td style="text-align:left">AttributeUsage</td>
+<td style="text-align:left">声明特性能应用到什么类型的程序结构。将这个特性应用到特性声明上</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h1 id="自定义特性"><a href="#自定义特性" class="headerlink" title="自定义特性"></a><span style="color:#339AFF;">自定义特性</span></h1><p>你或许已经注意到了，应用特性的语法和之前见过的其他语法很不相同。你可能会觉得特性是和结构完全不同的类型，其实不是，<span style="color:red">特性只是某个特殊类型的类</span>。</p>
+<p>有关特性类的一些要点如下。</p>
+<ul>
+<li>用户自定义的特性类叫做自定义特性。</li>
+<li><span style="color:red">所有特性类都派生自System.Attribute。</span></li>
+</ul>
+<h2 id="声明自定义特性"><a href="#声明自定义特性" class="headerlink" title="声明自定义特性"></a><span style="color:#00ACC1;">声明自定义特性</span></h2><p>总体来说，声明一个特性类和声明其他类一样。然而，有一些事项值得注意，如下所示。</p>
+<ul>
+<li>要声明一个自定义特性，需要做如下工作。<ul>
+<li>声明一个派生自System.Attribute的类。</li>
+<li>给它起一个以后缀Attribute结尾的名字。</li>
+</ul>
+</li>
+<li>安全起见，通常建议你声明一个sealed的特性类。</li>
+</ul>
+<p>例如，下面的代码显示了MyAttributeAttribute特性的声明的开始部分:<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// MyAttributeAttribute是特性名</span></span><br><span class="line"><span class="comment">// MyAttributeAttribute后面的Attribute是后缀</span></span><br><span class="line"><span class="comment">// System.Attribute是基类</span></span><br><span class="line">public sealed class MyAttributeAttribute : System.Attribute</span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>由于特性持有目标的信息，所有特性类的公共成员只能是:</p>
+<ul>
+<li>字段</li>
+<li>属性</li>
+<li>构造函数</li>
+</ul>
+<h2 id="使用特性的构造函数"><a href="#使用特性的构造函数" class="headerlink" title="使用特性的构造函数"></a><span style="color:#00ACC1;">使用特性的构造函数</span></h2><p>特性和其他类一样，都有构造函数。每一个特性至少必须有一个公共构造函数。</p>
+<ul>
+<li><span style="color:red">和其他类一样，如果你不声明构造函数，编译器会为我们产生一个隐式、公共且无参的构造函数。</span></li>
+<li>特性的构造函数和其他构造函数一样，可以被重载。</li>
+<li>声明构造函数时必须使用类全名，包括后缀。我们<strong>只可以在应用特性时使用短名称。</strong><br>例如，如果有如下的构造函数（名字没有包含后缀），编译器会产生一个错误消息:<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//                 后缀</span></span><br><span class="line"><span class="comment">//                   ↓</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">MyAttributeAttribute</span> (<span class="params"><span class="keyword">string</span> desc, <span class="keyword">string</span> ver</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Description = desc;</span><br><span class="line">    VersionNumber = ver;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="指定构造函数"><a href="#指定构造函数" class="headerlink" title="指定构造函数"></a><span style="color:#00ACC1;">指定构造函数</span></h2><p>当我们为目标应用特性时，其实是在指定应该使用哪个构造函数来创建特性的实例。列在特性应用中的参数其实就是构造函数的参数。</p>
+<p>例如，在下面的代码中，MyAttribute被应用到一个字段和一个方法上。对于字段，声明指定了使用单个字符串的构造函数。对于方法，声明指定了使用两个字符串的构造函数。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[<span class="meta">MyAttribute(<span class="meta-string">"Holds a value"</span>)</span>]  <span class="comment">// 使用一个字符串的构造函数</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">int</span> MyField;</span><br><span class="line"></span><br><span class="line">[<span class="meta">MyAttribute(<span class="meta-string">"Version 1.3"</span>, <span class="meta-string">"Sal Martin"</span>)</span>] <span class="comment">// 使用两个字符串的构造函数</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">MyMethod</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>其他有关特性构造函数的要点如下。</p>
+<ul>
+<li>在应用特性时，构造函数的实参必须是在编译期能确定值的常量表达式。</li>
+<li>如果应用的特性构造函数没有参数，可以省略圆括号。例如，如下代码的两个类都使用MyAttr特性的无参构造函数。两种形式的意义是相同的。<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">[<span class="meta">MyAttr</span>]</span><br><span class="line">class SomeClass ...</span><br><span class="line"></span><br><span class="line">[<span class="meta">MyAttr</span>]</span><br><span class="line">class OtherClass ...</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="使用构造函数"><a href="#使用构造函数" class="headerlink" title="使用构造函数"></a><span style="color:#00ACC1;">使用构造函数</span></h2><p>和其他类一样，我们不能显式调用构造函数。特性的实例创建后，只有特性的消费者访问特性时才能调用构造函数。这一点与其他类的实例很不相同，这些实例都创建在使用对象创建表达式的位置。应用一个特性是一条声明语句，它不会决定什么时候构造特性类的对象。</p>
+<p>图4比较了普通类构造函数的使用和特性的构造函数的使用。</p>
+<ul>
+<li>命令语句的实际意义是：“在这里创建新的类。”</li>
+<li>声明语句的意义是：“这个特性和这个目标相关联，如果需要构造特性，使用这个构造函数。”</li>
+</ul>
+<h2 id="构造函数中的位置参数和命名参数"><a href="#构造函数中的位置参数和命名参数" class="headerlink" title="构造函数中的位置参数和命名参数"></a><span style="color:#00ACC1;">构造函数中的位置参数和命名参数</span></h2><p>和普通类的方法与构造方法相似,特性的构造方法同样可以使用位置参数和命名参数。如下代码显示了使用一个位置参数和两个命名参数来应用一个特性:</p>
+<p>下面的代码演示了特性类的声明以及为MyClass类应用特性。注意，构造函数的声明只列出了一个形参，但我们可通过命名参数给构造函数3个实参。两个命名参数设置了字段Ver和Reviewer的值。</p>
+<p><strong>说明</strong></p>
+<p>构造函数需要的任何位置参数都必须放在命名参数之前。</p>
+<h2 id="限制特性的使用"><a href="#限制特性的使用" class="headerlink" title="限制特性的使用"></a><span style="color:#00ACC1;">限制特性的使用</span></h2><p>我们已经看到了可以为类应用特性。而特性本身就是类，有一个很重要的预定义特性可以用来应用到自定义特性上，那就是AttributeUsage特性。我们可以使用它来限制特性使用在某个目标类型上。</p>
+<p>例如，如果我们希望自定义特性MyAttribute只能应用到方法上，那么可以以如下形式使用AttributeUsage：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 只针对方法</span></span><br><span class="line">[<span class="meta">AttributeUsage(AttributeTarget.Method)</span>]</span><br><span class="line">public sealed class MyAttributeAttribute : System.Attribute</span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>AttributeUsage有三个重要的公共属性，如表4所示。表中显示了属性名和属性的含义。对于后两个属性，还显示了它们的默认值。</p>
+<blockquote>
+<p>表4 AttributeUsage的公共属性</p>
+</blockquote>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:left"><center>**名 字** </center></th>
+<th style="text-align:left"><center>**意 义** </center></th>
+<th style="text-align:left"><center>**默认值** </center></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">ValidOn</td>
+<td style="text-align:left">保存特性能应用到的目标类型的列表。构造函数的第一个参数必须是AttributeTarget类型的枚举值</td>
+<td style="text-align:left">true</td>
+</tr>
+<tr>
+<td style="text-align:left">Inherited</td>
+<td style="text-align:left">一个布尔值，它指示特性是否会被装饰类型的派生类所继承</td>
+<td style="text-align:left"></td>
+</tr>
+<tr>
+<td style="text-align:left">AllowMutiple</td>
+<td style="text-align:left">一个指示目标是否被应用多个特性的实例的布尔值</td>
+<td style="text-align:left">false</td>
+</tr>
+</tbody>
+</table>
+</div>
+<font size="3">**AttributeUsage的构造函数**</font>
+
+<p>AttributeUsage的构造函数接受单个位置参数，该参数指定了特性允许的目标类型。它用这个参数来设置ValidOn属性，可接受目标类型是AttributeTarget枚举的成员。Attributerarget枚举的完整成员列表如表5所示。</p>
+<p>我们可以通过使用按位或运算符来组合使用类型。例如，在下面的代码中，被装饰的特性只能应用到方法和构造函数上。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 目标</span></span><br><span class="line">[<span class="meta">AttributeUsage( AttributeTarget.Method | AttributeTarget.Constructor )</span></span><br><span class="line"><span class="meta">public sealed class MyAttributeAttribute : System.Attribute</span></span><br><span class="line"><span class="meta">&#123;</span></span><br><span class="line"><span class="meta">    ...</span></span><br><span class="line"><span class="meta">&#125;</span></span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>表5 AttributeTarget枚举的成员</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">All Delegate GenericParameter Parameter</span><br><span class="line">Assembly Enum Interface Property</span><br><span class="line">Class Event Method ReturnValue</span><br><span class="line">Constructor Field Module Struct</span><br></pre></td></tr></table></figure>
+<p>当我们为特性声明应用AttributeUsage时，构造函数至少需要一个参数，参数包含的目标类型会保存在ValidOn中。我们还可以通过使用命名参数有选择性地设置Inherited和AllowMultiple属性。如果我们不设置，它们会保持如表4所示的默认值。作为示例，下面一段代码指定了MyAttribute的如下方面。</p>
+<ul>
+<li>MyAttribute能且只能应用到类上。</li>
+<li>MyAttribute不会被应用它的派生类所继承。</li>
+<li>不能有MyAttribute的多个实例应用到同一个目标上。</li>
+</ul>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">[<span class="meta">AttributeUsage( AttributeTarget.Class, // 必需的，位置参数  </span></span><br><span class="line"><span class="meta">                    Inherited = false,  // 可选的，命名参数</span></span><br><span class="line"><span class="meta">                AllowMultiple = false )</span>] <span class="comment">// 可选的，命名参数</span></span><br><span class="line"></span><br><span class="line">public sealed class MyAttributeAttribute : System.Attribute</span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="自定义特性的最佳实践"><a href="#自定义特性的最佳实践" class="headerlink" title="自定义特性的最佳实践"></a><span style="color:#00ACC1;">自定义特性的最佳实践</span></h2><p>强烈推荐编写自定义特性时参考如下实践。</p>
+<ul>
+<li>特性类应该表示目标结构的一些状态。</li>
+<li>如果特性需要某些字段,可以通过包含具有位置参数的构造函数来收集数据，可选字段可以采用命名参数按需初始化。</li>
+<li>除了属性之外，不要实现公共方法或其他函数成员。</li>
+<li>为了更安全，把特性类声明为sealed。</li>
+<li>在特性声明中使用AttributeUsage来显式指定特性目标组。</li>
+</ul>
+<p>如下代码演示了这些准则：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[<span class="meta">AttributeUsage(AttributeTargets.Class)</span>]</span><br><span class="line">public sealed class ReviewCommentAttribute : System.Attribute</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span> Description&#123;<span class="keyword">get</span>;<span class="keyword">set</span>;&#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span> VersionNumber &#123;<span class="keyword">get</span>;<span class="keyword">set</span>;&#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span> ReviewerID &#123;<span class="keyword">get</span>;<span class="keyword">set</span>;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ReviewCommentAttribute</span>(<span class="params"><span class="keyword">string</span> desc, <span class="keyword">string</span> ver</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Description = desc;</span><br><span class="line">        VersionNumber = ver;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="访问特性"><a href="#访问特性" class="headerlink" title="访问特性"></a><span style="color:#339AFF;">访问特性</span></h1><p>可以使用Type对象来获取类型信息。对于访问自定义特性来说，也可以这么做。Type的两个方法（IsDefined和GetCustomAttributes）在这里非常有用。</p>
+<h2 id="使用IsDefined方法"><a href="#使用IsDefined方法" class="headerlink" title="使用IsDefined方法"></a><span style="color:#00ACC1;">使用IsDefined方法</span></h2><p>我们可以使用Type对象的IsDefined方法来检测某个特性是否应用到了某个类上。</p>
+<p>例如，以下的代码声明了一个有特性的类MyClass，并且作为自己特性的消费者在程序中访问声明和被应用的特性。代码的开始处是MyAttribute特性和应用特性的MyClass类的声明。这段代码做了下面的事情。</p>
+<ul>
+<li>首先，Main创建了类的一个对象。然后通过使用从object基类继承的GetType方法获取了Type对象的一个引用。</li>
+<li>有了Type对象的引用，就可以调用IsDefined方法来判断ReviewComment特性是否应用到了这个类。<ul>
+<li>第一个参数接受需要检查的<strong>特性</strong>的Type对象。</li>
+<li>第二个参数是bool类型的，它指示是否搜索MyClass的继承树来查找这个特性。</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">[<span class="meta">AttributeUsage(AttributeTargets.Class)</span>]</span><br><span class="line">public sealed class ReviewCommentAttribute : System.Attribute</span><br><span class="line">&#123;...&#125;</span><br><span class="line"></span><br><span class="line">[<span class="meta">ReviewComment(<span class="meta-string">"Check it out"</span>, <span class="meta-string">"2.4"</span>)</span>]</span><br><span class="line"><span class="keyword">class</span> <span class="title">MyClass</span>&#123; &#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        MyClass mc = <span class="keyword">new</span> MyClass(); <span class="comment">// 创建类实例</span></span><br><span class="line">        Type t = mc.GetType(); <span class="comment">// 从实例中获取类型对象</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">bool</span> isDefined = t.IsDefiner(<span class="keyword">typeof</span>(ReviewCommentAttribute), <span class="literal">false</span>); <span class="comment">// 创建特性的类型</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>(isDefined)</span><br><span class="line">            Console.WriteLine(<span class="string">"ReviewComment is applied to type &#123;0&#125;"</span>, t.Name);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这段代码产生了如下的输出：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ReviewComment is applied to type MyClass</span><br></pre></td></tr></table></figure></p>
+<h2 id="使用GetCustomAttributes方法"><a href="#使用GetCustomAttributes方法" class="headerlink" title="使用GetCustomAttributes方法"></a><span style="color:#00ACC1;">使用GetCustomAttributes方法</span></h2><p>GetCustomAttributes方法返回应用到结构的特性的数组。</p>
+<ul>
+<li>实际返回的对象是object的数组，因此我们必须将它强制转换为相应的特性类型。</li>
+<li><p>布尔参数指定是否搜索继承树来查找特性。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">object</span>[] AttArr = t.GetCustomAttributes (<span class="literal">false</span>);</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>调用GetCustomAttributes方法后，每一个与目标相关联的特性的实例就会被创建。</p>
+</li>
+</ul>
+<p>下面的代码使用了前面的示例中相同的特性和类声明。但是，在这种情况下，它不检测特性是否应用到了类，而是获取应用到类的特性的数组，然后遍历它们，输出它们的成员的值。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"></span><br><span class="line">[<span class="meta">AttributeUsage(AttributeTargets.Class)</span>]</span><br><span class="line">public sealed class MyAttributeAttribute : System.Attribute</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span> Description &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span> VersionNumber &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span> ReviewerID &#123; <span class="keyword">get</span>; <span class="keyword">set</span>; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MyAttributeAttribute</span>(<span class="params"> <span class="keyword">string</span> desc, <span class="keyword">string</span> ver</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Description = desc;</span><br><span class="line">        VersionNumber = ver;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">[<span class="meta">MyAttribute(<span class="meta-string">"Check it out"</span>, <span class="meta-string">"2.4"</span>)</span>]</span><br><span class="line"><span class="keyword">class</span> <span class="title">MyClass</span></span><br><span class="line">&#123;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Type t = <span class="keyword">typeof</span>( MyClass );</span><br><span class="line">        <span class="keyword">object</span>[] AttArr = t.GetCustomAttributes(<span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">foreach</span> (Attribute a <span class="keyword">in</span> AttArr)</span><br><span class="line">        &#123;</span><br><span class="line">            MyAttributeAttribute attr = a <span class="keyword">as</span> MyAttributeAttribute;</span><br><span class="line">            <span class="keyword">if</span> (<span class="literal">null</span> != attr)</span><br><span class="line">            &#123;</span><br><span class="line">                Console.WriteLine(<span class="string">"Description : &#123;0&#125;"</span>, attr.Description);</span><br><span class="line">                Console.WriteLine(<span class="string">"Version Number : &#123;0&#125;"</span>, attr.VersionNumber);</span><br><span class="line">                Console.WriteLine(<span class="string">"Reviewer ID : &#123;0&#125;"</span>, attr.ReviewerID);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这段代码产生了如下的输出：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Description : Check it <span class="keyword">out</span></span><br><span class="line">Version Number : <span class="number">2.4</span></span><br><span class="line">Reviewer ID :</span><br></pre></td></tr></table></figure></p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C-图解教程/" rel="tag"># C#图解教程</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/07/29/第10章-异常处理/" rel="next" title="第10章-异常处理">
+                <i class="fa fa-chevron-left"></i> 第10章-异常处理
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/07/29/命名空间和程序集/" rel="prev" title="命名空间和程序集">
+                命名空间和程序集 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">354</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">55</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2020/02/16/游戏设计快乐之道（第2版）/" title="游戏设计快乐之道（第2版）" target="_blank">游戏设计快乐之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/14/游戏剧本怎么写/" title="游戏剧本怎么写" target="_blank">游戏剧本怎么写</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/04/通关！游戏设计之道（第2版）/" title="通关！游戏设计之道（第2版）" target="_blank">通关！游戏设计之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/26/游戏设计艺术（第2版）/" title="游戏设计艺术（第2版）" target="_blank">游戏设计艺术（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/22/大师谈游戏设计创意与节奏/" title="大师谈游戏设计创意与节奏" target="_blank">大师谈游戏设计创意与节奏</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#元数据和反射"><span class="nav-number">1.</span> <span class="nav-text">元数据和反射</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Type类"><span class="nav-number">2.</span> <span class="nav-text">Type类</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#获取Type对象"><span class="nav-number">3.</span> <span class="nav-text">获取Type对象</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#什么是特性"><span class="nav-number">4.</span> <span class="nav-text">什么是特性</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#应用特性"><span class="nav-number">5.</span> <span class="nav-text">应用特性</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#预定义特性"><span class="nav-number">6.</span> <span class="nav-text">预定义特性</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#自定义特性"><span class="nav-number">7.</span> <span class="nav-text">自定义特性</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#声明自定义特性"><span class="nav-number">7.1.</span> <span class="nav-text">声明自定义特性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用特性的构造函数"><span class="nav-number">7.2.</span> <span class="nav-text">使用特性的构造函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#指定构造函数"><span class="nav-number">7.3.</span> <span class="nav-text">指定构造函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用构造函数"><span class="nav-number">7.4.</span> <span class="nav-text">使用构造函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#构造函数中的位置参数和命名参数"><span class="nav-number">7.5.</span> <span class="nav-text">构造函数中的位置参数和命名参数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#限制特性的使用"><span class="nav-number">7.6.</span> <span class="nav-text">限制特性的使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#自定义特性的最佳实践"><span class="nav-number">7.7.</span> <span class="nav-text">自定义特性的最佳实践</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#访问特性"><span class="nav-number">8.</span> <span class="nav-text">访问特性</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#使用IsDefined方法"><span class="nav-number">8.1.</span> <span class="nav-text">使用IsDefined方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用GetCustomAttributes方法"><span class="nav-number">8.2.</span> <span class="nav-text">使用GetCustomAttributes方法</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">3.7m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">56:23</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

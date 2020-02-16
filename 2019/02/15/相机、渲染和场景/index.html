@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="一般地讲，相机可表示为视见点并以此渲染场景，即3D空间内的一点，并以此产生场景视图，根据既定视角和视域，经捕捉后，将以像素形式光栅化至纹理中。此后，结合之前的渲染结果，渲染至屏幕上。">
+<meta name="keywords" content="Unity脚本设计">
+<meta property="og:type" content="article">
+<meta property="og:title" content="相机、渲染和场景">
+<meta property="og:url" content="http://chebincarl.github.io/2019/02/15/相机、渲染和场景/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="一般地讲，相机可表示为视见点并以此渲染场景，即3D空间内的一点，并以此产生场景视图，根据既定视角和视域，经捕捉后，将以像素形式光栅化至纹理中。此后，结合之前的渲染结果，渲染至屏幕上。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://chebincarl.github.io/2019/02/15/相机、渲染和场景/1.png">
+<meta property="og:updated_time" content="2019-07-17T14:44:49.124Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="相机、渲染和场景">
+<meta name="twitter:description" content="一般地讲，相机可表示为视见点并以此渲染场景，即3D空间内的一点，并以此产生场景视图，根据既定视角和视域，经捕捉后，将以像素形式光栅化至纹理中。此后，结合之前的渲染结果，渲染至屏幕上。">
+<meta name="twitter:image" content="http://chebincarl.github.io/2019/02/15/相机、渲染和场景/1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/02/15/相机、渲染和场景/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>相机、渲染和场景 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">专注，重复10遍</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/02/15/相机、渲染和场景/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">相机、渲染和场景
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-02-15 21:37:49" itemprop="dateCreated datePublished" datetime="2019-02-15T21:37:49+08:00">2019-02-15</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-07-17 22:44:49" itemprop="dateModified" datetime="2019-07-17T22:44:49+08:00">2019-07-17</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Unity/" itemprop="url" rel="index"><span itemprop="name">Unity</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">22k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">20 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>一般地讲，相机可表示为视见点并以此渲染场景，即3D空间内的一点，并以此产生场景视图，根据既定视角和视域，经捕捉后，将以像素形式光栅化至纹理中。此后，结合之前的渲染结果，渲染至屏幕上。</p>
+<a id="more"></a>
+<h1 id="相机Gizmo"><a href="#相机Gizmo" class="headerlink" title="相机Gizmo"></a>相机Gizmo</h1><p>当相机在Scene选项卡中被选取，且开启Gizmo显示时，将根据某些属性，例如视域，显示视锥Gizmo。其中，可查看相机在场景中的位置，以及基于当前视图的相机视见内容。</p>
+<p>Gizmo对于所选相机的定位十分重要，并可据此获得最佳的场景视图。但是，会想要在未被选择的相机中定位对象。此时用户需要在相机的视锥体内移动特定对象，并确保对象相对于该相机可见。默认条件下，当相机处于未选取状态时，通常并不会显示其视锥Gizmo。这意味着，当移动对象时，需要持续选取相机，以检测移动对象是否真正位于相机视锥体内，并在必要时调整其位置。需要提供稳定的视锥体Gizmo查看机制，即使当前相机未被选中。将以下代码作为相机的组件。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"> </span><br><span class="line">[<span class="meta">ExecuteInEditMode</span>]</span><br><span class="line">[<span class="meta">RequireComponent(typeof(Camera))</span>]</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">DrawFrustumRefined</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> Camera Cam = <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">bool</span> ShowCamGizmo = <span class="literal">true</span>;</span><br><span class="line">   </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Awake</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Cam = GetComponent&lt;Camera&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">OnDrawGizmos</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">//Should we show qizmo?</span></span><br><span class="line">        <span class="keyword">if</span> (!ShowCamGizmo) <span class="keyword">return</span>;</span><br><span class="line"> </span><br><span class="line">        <span class="comment">//Get size (dimensions) of Game Tab</span></span><br><span class="line">        Vector2 v = DrawFrustumRefined.GetGameViewSize();</span><br><span class="line"> </span><br><span class="line">        <span class="keyword">float</span> GameAspect = v.x / v.y; <span class="comment">//Calculate tab aspect ratio</span></span><br><span class="line">        <span class="keyword">float</span> FinalAspect = GameAspect / Cam.aspect;</span><br><span class="line"> </span><br><span class="line">        Matrix4x4 LocalToWorld = transform.localToWorldMatrix;</span><br><span class="line">        Matrix4x4 ScaleMatrix = Matrix4x4.Scale(<span class="keyword">new</span></span><br><span class="line">        Vector3(Cam.aspect * (Cam.rect.width / Cam.rect.height)， FinalAspect， <span class="number">1</span>));</span><br><span class="line"> </span><br><span class="line">        Gizmos.matrix = LocalToWorld * ScaleMatrix;</span><br><span class="line">        Gizmos.DrawFrustum(transform.position， Cam.fieldOfView，</span><br><span class="line">        Cam.nearClipPlane， Cam.farClipPlane， FinalAspect);</span><br><span class="line">        Gizmos.matrix = Matrix4x4.identity; <span class="comment">//Reset gizmo matrix</span></span><br><span class="line">    &#125;</span><br><span class="line"> </span><br><span class="line">    <span class="comment">//Function to get dimensions of game tab</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Vector2 <span class="title">GetGameViewSize</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        System.Type T = System.Type.GetType(<span class="string">"UnityEditor.GameView， UnityEditor"</span>);</span><br><span class="line">        System.Reflection.MethodInfo GetSizeOfMainGameView =</span><br><span class="line">        T.GetMethod(<span class="string">"GetSizeOfMainGameView"</span>， System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);</span><br><span class="line">        <span class="keyword">return</span> (Vector2)GetSizeOfMainGameView.Invoke(<span class="literal">null</span>， <span class="literal">null</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li><p>Gizmos.DrawFrustum()函数接收世界场景空间内的参数（而非局部空间），例如位置和旋转状态，即全部位置参数须首先通过某一矩阵从局部空间转换至世界空间，并可通过Transform类的localToWorldMatrix成员予以实现。除此之外，还需进一步计算实际视口高度和宽度，以及游戏窗口宽度和高度之间的宽高比参数。  </p>
+</li>
+<li><p>GetGameViewSize()函数返回2D向量，并以此表示Game选项卡视图的实际像素尺寸。该函数通过非正式发布的编辑器特性接收此类数据值。这里，请注意函数调用的“非正式”特性，代码的有效性很容易受到某些特性，甚至是维护性版本的影响。</p>
+</li>
+</ul>
+<p>下图显示了视锥体效果。</p>
+<img src="/2019/02/15/相机、渲染和场景/1.png">
+<h1 id="可见性"><a href="#可见性" class="headerlink" title="可见性"></a>可见性</h1><p>对象X是否相对于相机Y可见？对象X是否相对于任意相机均可见？或者，针对特定相机或任意相机，对象何时处于可见状态或不可见状态？如果相机Y移至位置Z，则对象X是否可见？需要根据全部的相机位置，并针对当前帧考察对象的可见性。了解对象（例如敌方角色）相对于相机的可见性有助于定义其运动行为和AI：当对象处于不可见状态时，某些行为和计算则无须进一步执行，进而可节省处理的载荷量。进一步讲，若知晓相机移动过程中对象的可见性，则可预测对象在下一帧中的可见性，进而提前进行准备。下面先讨论狭长场景中对象的可见性。</p>
+<p>关于对象的可见性，存在两种主要概念，即视锥体和遮挡行为。具体而言，各种透视相机均包含了视锥体，该视锥体表示为梯形空间体，从相机镜头处向外扩展，并包含了视域定义的对应区域，以及剪裁面距离属性。实际上，视锥体从数学角度定义了相机的视野，即相机可潜在观察到的场景区域。这里，术语“潜在”是指，即使处于活动状态的可见对象位于相机视锥体内，但并不意味着相对于相机可见，其原因可解释为：某些视锥体内的对象可遮挡其中的其他对象，较近的对象可全部或部分遮挡或掩盖其后的对象。因此，实际的可见性测试至少涉及了两个处理步骤：首先，需要确定对象是否位于视锥体内；其次，还应进一步确定该对象是否被遮挡。仅当对象通过了上述两个测试，方可归类于相机可见对象中。随后，可见对象将被着色器或其他后处理操作进行渲染。</p>
+<h2 id="检测对象的可见性"><a href="#检测对象的可见性" class="headerlink" title="检测对象的可见性"></a>检测对象的可见性</h2><p>最为简单、直接的对象可见性测试则是判断对象何时相对于相机可见。</p>
+<p>针对包含渲染器组件的任意对象，两个伴随事件OnBecameVisible和OnBecamelnvisible将自动被调用，包括MeshRenderer和SkinnedMeshRenderer。</p>
+<p>当然，空游戏对象并不会被调用，即使此类对象位于相机的视见范围内。从技术上讲，这一类对象并未包含任何可见成分，尽管其中的全部内容均实现了空间定位。此类事件的处理过程如示例代码所示。</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System. Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ViewTester</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">OnBecameVisible</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Debug.Log(<span class="string">"Became visible"</span>)；</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">OnBecameInvisible</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Debug.Log(<span class="string">"Became Invisible"</span>)；</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>此处，需要注意OnBecameVisible和OnBecameInvisible事件。首先，这里所讨论的可见性仅表示对象位于相机视锥体内，可被其他较近的对象所遮挡，因而实际不一定可见。其次，事件应用于全部相机，而非某一特定相机。OnBecameVisible事件调用一次后表明，之前的不可见对象进入了相机（至少一部相机）的视锥体。类似地，OnBecamelnvisible事件调用一次后表明，之前的可见对象当前离开全部相机的视锥体。最后，此类函数还涵盖了场景相机的可见性。这也说明，如果用户利用Scene选项卡测试游戏，且对象在该选项卡中可见，则该对象即处于可见状态。简而言之，仅当用户行为依赖于场景中的全部可见性（或不可见）时， OnBecameVisible和OnBecamelnvisible方法将十分有用。其中，可见性仅对应于视锥体的呈现效果。换而言之，此类事件可用于对相关行为进行切换，例如与可见性相关的AI行为、NPC的恐慌行为，以及其他NPC的交互类型。</p>
+<h2 id="关于对象可见性的其他问题"><a href="#关于对象可见性的其他问题" class="headerlink" title="关于对象可见性的其他问题"></a>关于对象可见性的其他问题</h2><p>除了测试对象何时进入/离开相机的可见性范围之外，另一项重要的检测则是对象与特定相机间的可见性。与OnBecame Visible和OnBecamelnvisible不同（当对象进入或驶离视锥体时，执行单次调用），该测试类型关注对象的当前状态，并假设对其之前的情况并不了解。对此，可采用OnWillRenderObject事件。该事件持续在某一对象上被调用，针对各可见相机每帧调用一次。这里，可见性是指“位于相机视锥体内部”。再次强调，其中并未涉及遮挡测试。在如下示例代码中，需要注意的是，该事件内部的Camera.current成员可用于获取指向（对象可见）相机的引用，同时也包括场景视见相机。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">OnWillRenderObject</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Debug.Log(Camera.current.name)； </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="视锥体测试-渲染器"><a href="#视锥体测试-渲染器" class="headerlink" title="视锥体测试-渲染器"></a>视锥体测试-渲染器</h2><p>用户可能会简单地测试某一相机是否可看到渲染器；可见对象是否处于不可见状态；相机是否可查看到空间内的特定点：如果相机移至新位置，相机是否可观察到特定对象。此类内容均可视为不同环境下的重要可见性测试，且需要执行某种程度上的手动测试。</p>
+<p>相关函数经过适当整合后将作为静态函数定义于CamUtility类中。下面首先创建一个函数，并测试特定渲染器是否位于特定Camera对象的视锥体内，如示例代码所示。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">CamUtility</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//Function to determine whether a renderer is within frustum of a specified camera</span></span><br><span class="line">    <span class="comment">//Returns true if renderer is within frustum, else false</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">bool</span> <span class="title">IsRendererInFrustum</span>(<span class="params">Renderer Renderable, Camera Cam</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">//Construct frustum planes from camera</span></span><br><span class="line">        <span class="comment">//Each plane represents one wall of frustrum</span></span><br><span class="line">        Plane[] planes = GeometryUtility.CalculateFrustumPlanes(Cam);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//Test whether renderable is within frustum planes</span></span><br><span class="line">        <span class="keyword">return</span> GeometryUtility.TestPlanesAABB(planes, Renderable.bounds);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//Function to determine whether a point in the scene is within frustum of a specified camera</span></span><br><span class="line">    <span class="comment">//Returns true if point is within frustum, else false</span></span><br><span class="line">    <span class="comment">//The out param ViewPortLoc defines the location of the point on screen, if function returns true</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">bool</span> <span class="title">IsPointInFrustum</span>(<span class="params">Vector3 Point, Camera Cam, <span class="keyword">out</span> Vector3 ViewPortLoc</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">//Create new bounds with no size</span></span><br><span class="line">        Bounds B = <span class="keyword">new</span> Bounds(Point, Vector3.zero);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//Construct frustum planes from camera</span></span><br><span class="line">        <span class="comment">//Each plane represents one wall of frustrum</span></span><br><span class="line">        Plane[] planes = GeometryUtility.CalculateFrustumPlanes(Cam);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//Test whether point is within frustum planes</span></span><br><span class="line">        <span class="keyword">bool</span> IsVisible = GeometryUtility.TestPlanesAABB(planes, B);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//Assign viewport location</span></span><br><span class="line">        ViewPortLoc = Vector3.zero;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//If visible then get viewport location of point</span></span><br><span class="line">        <span class="keyword">if</span>(IsVisible)</span><br><span class="line">            ViewPortLoc = Cam.WorldToViewportPoint(Point);</span><br><span class="line">    </span><br><span class="line">        <span class="keyword">return</span> IsVisible;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//Function to determine whether an object is visible (in frustum and has unbroken line to camera)</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">bool</span> <span class="title">IsVisible</span>(<span class="params">Renderer Renderable, Camera Cam</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">//If in frustrum then cast line</span></span><br><span class="line">        <span class="keyword">if</span>(CamUtility.IsRendererInFrustum(Renderable, Cam))</span><br><span class="line">            <span class="keyword">return</span> !Physics.Linecast(Renderable.transform.position, Cam.transform.position); <span class="comment">//Is direct line between camera and object?</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">false</span>; <span class="comment">//No line found or not in frustum</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>GeometryUtility类用来生成平面对象数组，并以此描述相机的视锥体。相应地， 3D空间内的平面对应于2D空间内的直线，并定义了3D空间内的虚构延展表面。此处，视锥体平面表示为6个平面构成的集合，在3D空间内经过适当的旋转和对齐操作，进而表示为完整的梯形相机视锥体。随后，TestPlanesAABB函数、轴对齐包围盒（AABB）均会使用到该数组，并以此判断网格渲染器的碰撞包围体是否位于上述平面所定义的视锥体内部。</p>
+<h2 id="视锥体测试-点"><a href="#视锥体测试-点" class="headerlink" title="视锥体测试-点"></a>视锥体测试-点</h2><p>当然，用户并非总是针对可见性测试渲染器。相反，某些时候需要对点进行测试，其中包含了两个原因。首先，用户需要了解某一对象，例如粒子或射击目标位置，是否真实可见。其次，用户不仅需要知晓一点是否可见，同时还需进一步确定该点在屏幕空间内的具体位置。对应结果通过相机进行渲染。示例代码5-5实现了这一功能，其中，代码测试了某一点是否位于相机视锥体内。若是，则返回该点在规范化视口空间内、屏幕上的渲染位置(位于0-1之间)。</p>
+<h2 id="视锥体测试-遮挡"><a href="#视锥体测试-遮挡" class="headerlink" title="视锥体测试-遮挡"></a>视锥体测试-遮挡</h2><p>如前所述，严格意义上的可见性的处理过程包含了两个阶段。当前，全部可见性测试仅检测了对象在相机视锥体内的呈现结果。通常情况下，该过程已然足够且应用范围广泛。但在视锥体内的诸多对象中，对象间可能存在彼此遮挡这一状况。例如，较远的对象可能会被较近的对象部分或全部遮挡。就自身而言，这并非绝对意义上的问题且时有发生。确定对象可见性的主要目标是，针对一组性能敏感的行为(例如AI行为)，需要知晓相机与其是否足够近。该目标并非是真正意义上的可见性测试，而是一种距离计算。其中，重点内容并非是对象间的遮挡行为，而是对象是否位于视锥体内。尽管如此，某些时候依然需要对遮挡行为予以考虑。例如，当玩家查看特定对象时，将显示GUI元素或消息内容。期间，遮挡行为将变得较为重要-对象的GUI不应在墙外加以显示。某些时候，用户可通过碰撞器、触发器以及准确的对象定位避免此类行为；但在某些场合下，则只能通过遮挡测试剔除视锥体内的对象。视锥体中的对象遮挡测试占用了较大的性能开销，对此，较好的做法是使用相对简单的Physics.LineCast方法调用，并确定相机与目标对象间的虚构直线是否与碰撞器相交。通常，该方法工作良好，但读者也应对其局限性有所了解。首先，该方案假设全部可见对象均具有碰撞器，否则将无法通过LineCast方法进行检测。其次，碰撞器仅近似表达了网格包围体，且并未包含全部网格顶点。若网格包含内部孔洞，则LineCast方法将会失效。最后，包含透明材质的网格(可查看到其后方对象)通常无法正常调用LineCast方法。下面考察示例代码5-6.</p>
+<h2 id="相机前、后视觉"><a href="#相机前、后视觉" class="headerlink" title="相机前、后视觉"></a>相机前、后视觉</h2><p>在某些游戏中，例如RTS游戏或休闲游戏，相机的远剪裁面并不十分重要-相机仅查看其前方事物。此时，当对象位于视锥体外部时，该对象仅在x和y平面中位于外部，而非局部2轴上。也就是说，隐藏对象之所以处于隐藏状态，只因相机未直接对其进行查看。然而，当对相机的方向进行适当调整时，对象的距离将被拉近，其不会超出远剪裁面。其中，可见性测试转化为简单、快速的方向测试。因此，问题从“对象是否位于视锥体内且未被遮挡”变为“对象位于相机的前方还是后方”。相应地，最终答案也有所变化，问题不再是可见性计算，而是方向计算，即相机和目标对象之间的方向关系：目标对象位于相机的前方或是后方。当对此进行测试时，可采用向量的点积计算。这里，点积接收两个向量作为参数，并将其简化为一维数值计算作为输出结果。该值描述了两个输入向量之间的角度关系。在示例代码5-7中， CamFieldView类与相机绑定，并检测相机是否可查看到目标对象，目标对象位于相机前方的既定视域内。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">CamFieldView</span> : <span class="title">MonoBehaviour</span> </span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//Field of view (degrees) in which can see in front of us</span></span><br><span class="line">    <span class="comment">//Measure in degrees from forward vector (left or right)</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> AngleView = <span class="number">30.0f</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">//Target object for seeing</span></span><br><span class="line">    <span class="keyword">public</span> Transform Target = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//Local transform</span></span><br><span class="line">    <span class="keyword">private</span> Transform ThisTransform = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Use this for initialization</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Awake</span> (<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">//Get local transform</span></span><br><span class="line">        ThisTransform = transform;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Update is called once per frame</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span> (<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">//Update view between camera and target</span></span><br><span class="line">        Vector3 Forward = ThisTransform.forward.normalized;</span><br><span class="line">        Vector3 ToObject = (Target.position - ThisTransform.position).normalized;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//Get Dot Product</span></span><br><span class="line">        <span class="keyword">float</span> DotProduct = Vector3.Dot(Forward, ToObject);</span><br><span class="line">        <span class="keyword">float</span> Angle = DotProduct * <span class="number">180f</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//Check within field of view</span></span><br><span class="line">        <span class="keyword">if</span>(Angle &gt;= <span class="number">180f</span>-AngleView)</span><br><span class="line">            Debug.Log (<span class="string">"Object can be seen"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="正交相机"><a href="#正交相机" class="headerlink" title="正交相机"></a>正交相机</h1><p>默认状态下， Unity中新创建的相机对象均设置为透视相机，当然，用户可对此进行调整。这一类相机模型接近于真实相机设备：在3D空间内具有一定的位置，配备了曲面透镜，并通过相关方法将捕捉到的图像转换至2D平面上，例如屏幕。这一类相机的特征主要体现在透视收缩方面，并应用于渲染对象上。特别地，随着距离的增加，渲染对象将随之变小。另外，随着与视见中心之间距离的不断增加，对象的形状和外观也将发生变化。与此同时，全部平行线相交于远处(地平线或辅助线)某一消失点。与透视相机相比，正交相机适合创建真正的2D等轴测游戏，而非等轴测仿制游戏。当采用正交相机时，其镜头展为一个平面且不再具备透视收缩特征，即平行线处于平行状态，对象不再随距离的变化而收缩，即使远离视见中心位置， 2D内容依然保持2D状态，等等。通过Object Inspector中的Projection类型设置，用户可方便地在Perspective和Orthographi之间进行切换，如图5-3所示。</p>
+<p>在将Perspective类型转换为Orthographic之后，相机的视锥体也随之从梯形转换为盒体形状。其中，盒体内的全部内容均处于可见状态，且近距离对象将遮挡远处的对象。除此之外，全部深度信息均将丢失，如图5-4所示，因而此类相机适用于2D游戏。</p>
+<p>当与正交相机协同工作时，核心问题是如何在世界单位(场景)与像素(屏幕)之间生成1：1的关系。在2D游戏和GUI中，正交相机可通过默认的正确尺寸(定义于纹理文件中)将图形显示于屏幕上。相比较而言，在大多数3D游戏中，纹理贴图、透视缩减以及透视关系意味着纹理将产生变形，并投影至3D对象表面上。即使在照片编辑软件中，对应内容也将以透视方式展示。对于2D游戏和精灵对象，情况则有所不同-图形多采用直视方式进行查看。因此，可通过默认尺寸和逐像素方式显示此类图像。这种显示方式称作完美像素，其中，纹理中的各个像素均以不变的方式显示于屏幕或游戏中，实际操作过程中则需要采用特殊的方案。简而言之，将1个世界单位映射为1个像素， Camera选项卡中的Size文本框需要将游戏的垂直分辨率设置为一半。因此，如果游戏在1024x768分辨率下运行，则Size应为364 (768 /2=364) ，如图5-5所示。</p>
+<p>用户可直接在编辑器中设置Size值，但这仅在游戏分辨率不变的情况下有效。如果用户重新调整游戏窗口，并改变了游戏的分辨率，则需要在脚本中更新相机的尺寸，如示例代码5-8所示。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line">[<span class="meta">RequireComponent(typeof(Camera))</span>] <span class="comment">//Requires camera component to work</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">OrthoCam</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//private reference to camera component</span></span><br><span class="line">    <span class="keyword">private</span> Camera Cam = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//Reference to Pixels to World Units Scale</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> PixelsToWorldUnits = <span class="number">200f</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Awake</span> (<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">//Get camera reference</span></span><br><span class="line">        Cam = GetComponent&lt;Camera&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">LateUpdate</span> (<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">//Update orthographic size</span></span><br><span class="line">        Cam.orthographicSize = Screen.height / <span class="number">2f</span> / PixelsToWorldUnits;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>需要注意的是，第13行代码中添加了成员变量PixelsToworldUnits，并根据导入后的精灵对象纹理中的Pixels To Units缩放正交尺寸，如图5-6所示。当在屏幕上显示时，这可确保精灵对象以正确的像素尺寸予以显示。除此之外，全部精灵对象还将通过该值进行缩放，进而将纹理的像素尺寸映射至世界单位。</p>
+<h1 id="相机渲染和后处理"><a href="#相机渲染和后处理" class="headerlink" title="相机渲染和后处理"></a>相机渲染和后处理</h1><p>Unity相机和对象针对场景的渲染方式提供了较大的灵活性，且常见于后处理操作中。特别地，针对常规渲染之外的内容，其中涉及了辅助编辑和修正操作，包括模糊效果、色彩调整、鱼眼效果等。</p>
+<p>将尝试构建一个相机变化系统，相机间呈现为平滑的淡入淡出效果。也就是说，相机间不会直接切换，而是通过渐变方式改变相机的景深。具体地讲，第一部相机的输出内容将以非透明方式逐渐切换，进而显示第二部相机的输出内容。下面将对此展开讨论。</p>
+<p>图5-7所示场景项目包含了两个独立的区域。其中，各区域应绑定独立的相机对象，因而场景中设置了两部相机，且各相机组件应处于禁用状态--这可防止相机对其自身进行自动渲染。此处将通过手动方式渲染相机，进而整合源自各相机的渲染器，以实现二者间的淡入淡出效果。</p>
+<p>各部相机均移除了AudioListener组件，其原因在于，任意时刻， Unity场景仅可包含一个处于活动状态的AudioListener。</p>
+<p>随后，可在场景原点处创建第三部相机（标记为MainCamera)，并设置空剔除遮罩，以确保相机处于活动状态，但不会对任何内容进行渲染。这定义为主场景相机，并整合了源自其他相机的渲染器，如图5-8所示。</p>
+<p>当前场景包含了3部相机，其中，两部独立相机（相机x和相机Y）位于不同位置且处于禁用状态，一部主相机（相机Z）位于场景原点处。在此基础上，相机Z采用了示例代码5-9，并在按空格键时在相机x和相机Y之间实现渐变效果。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//Class to fade from camera 0 to 1, and back from 1 to 0</span></span><br><span class="line"><span class="comment">//This class assumes there are only two scene cameras</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">CameraFader</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">//Reference to cameras (all cameras in the scene to be composited)</span></span><br><span class="line">    <span class="keyword">public</span> Camera[] Cameras;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//Reference to camera color (color to multiply with render)</span></span><br><span class="line">    <span class="keyword">public</span> Color[] CamCols = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//Fade in/out time in seconds (total time for a fade in one direction)</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> FadeTime = <span class="number">2.0f</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//Final material to apply to render (Can be used to apply a shader to final rendered pixels)</span></span><br><span class="line">    <span class="keyword">public</span> Material Mat = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span> (<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">//Assign render textures to each camera</span></span><br><span class="line">        <span class="keyword">foreach</span>(Camera C <span class="keyword">in</span> Cameras)</span><br><span class="line">            C.targetTexture = <span class="keyword">new</span> RenderTexture(Screen.width, Screen.height, <span class="number">24</span>); <span class="comment">//Create texture</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//This function is called once per frame after the camera has </span></span><br><span class="line">    <span class="comment">//finished rendering but before the render is shown</span></span><br><span class="line">    <span class="comment">//It has a companion function OnPreRender (which is called before rendering)</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">OnPostRender</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">//Define screen rect</span></span><br><span class="line">        Rect ScreenRct = <span class="keyword">new</span> Rect(<span class="number">0</span>,<span class="number">0</span>,Screen.width,Screen.height);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//Source Rect</span></span><br><span class="line">        Rect SourceRect = <span class="keyword">new</span> Rect(<span class="number">0</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">-1</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">//Render each camera to their target texture</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i&lt;Cameras.Length; i++)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">//Render camera</span></span><br><span class="line">            Cameras[i].Render();</span><br><span class="line"></span><br><span class="line">            <span class="comment">//Draw camera textures to screen using this camera</span></span><br><span class="line">            GL.PushMatrix();</span><br><span class="line">            GL.LoadPixelMatrix(); <span class="comment">//Get pixel space matrix</span></span><br><span class="line">            Graphics.DrawTexture(ScreenRct, Cameras[i].targetTexture, SourceRect, <span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>,<span class="number">0</span>, CamCols[i]); <span class="comment">//Draws each camera as layer</span></span><br><span class="line">            GL.PopMatrix(); <span class="comment">//Reset matrix</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  </span><br><span class="line">    <span class="comment">//This function is called afer OnPostRender</span></span><br><span class="line">    <span class="comment">//And when final pixels are to be shown on screen</span></span><br><span class="line">    <span class="comment">//src = current render from camera</span></span><br><span class="line">    <span class="comment">//dst = texture to be shown on screen</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">OnRenderImage</span>(<span class="params">RenderTexture src, RenderTexture dst</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">//Frame finished rendering, now push final pixels to screen with Mat applied (can apply custom shader here)</span></span><br><span class="line">        Graphics.Blit(src, dst, Mat);</span><br><span class="line">    &#125;</span><br><span class="line">  </span><br><span class="line">    <span class="comment">//Function to lerp between color From to Color To over period TotalTime</span></span><br><span class="line">    <span class="comment">//This function is used to fade alpha for topmost rendered camera CamCols[1]</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IEnumerator <span class="title">Fade</span>(<span class="params">Color From, Color To, <span class="keyword">float</span> TotalTime</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">float</span> ElapsedTime = <span class="number">0f</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//Loop while total time is not met</span></span><br><span class="line">        <span class="keyword">while</span>(ElapsedTime &lt;= TotalTime)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">//Update color</span></span><br><span class="line">            CamCols[<span class="number">1</span>] = Color.Lerp(From, To, ElapsedTime/TotalTime);</span><br><span class="line"></span><br><span class="line">            <span class="comment">//Wait until next frame</span></span><br><span class="line">            <span class="keyword">yield</span> <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">            <span class="comment">//Update Time</span></span><br><span class="line">            ElapsedTime += Time.deltaTime;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">//Apply final color</span></span><br><span class="line">        CamCols[<span class="number">1</span>] = Color.Lerp(From, To, <span class="number">1f</span>);</span><br><span class="line">    &#125;</span><br><span class="line">  </span><br><span class="line">    <span class="comment">//Sample update function for testing camera functionality</span></span><br><span class="line">    <span class="comment">//Press space bar to fade in and out between cameras</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">//Fade camera in or out when space is pressed</span></span><br><span class="line">        <span class="keyword">if</span>(Input.GetKeyDown(KeyCode.Space))</span><br><span class="line">        &#123;</span><br><span class="line">            StopAllCoroutines();</span><br><span class="line"></span><br><span class="line">            <span class="comment">//Should we fade out or in</span></span><br><span class="line">            <span class="keyword">if</span>(CamCols[<span class="number">1</span>].a &lt;= <span class="number">0f</span>)</span><br><span class="line">                StartCoroutine(Fade(CamCols[<span class="number">1</span>], <span class="keyword">new</span> Color(<span class="number">0.5f</span>,<span class="number">0.5f</span>,<span class="number">0.5f</span>,<span class="number">1f</span>), FadeTime)); <span class="comment">//Fade in</span></span><br><span class="line">            <span class="keyword">else</span></span><br><span class="line">                StartCoroutine(Fade(CamCols[<span class="number">1</span>], <span class="keyword">new</span> Color(<span class="number">0.5f</span>,<span class="number">0.5f</span>,<span class="number">0.5f</span>,<span class="number">0f</span>), FadeTime)); <span class="comment">//Fade out</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>示例代码5-9中的部分解释内容如下所示。<br>口第011-020行代码：CamerFader类负责处理Camera[0]和Camera[1]之间的渐变效果，对此需要定义多个变量。Cameras数组维护一个相机列表，当前示例中包含了两部相机。另外， CamCols数组链接至Cameras上且定义了颜色值，并与相机的渲染器执行乘法运算，其中的Alpha值可使渲染器处于透明状态。变量FadeTime定义了相机某一方向上的淡入淡出时间(以秒计)。最后， Mat变量引用有效的材质并应用于源自主相机的渲染器上。也就是说，完整渲染器中的像素，包括其他相机照的全部内容。</p>
+<p>口第023-038行代码：Start方法针对各个相机创建了RenderTexture，并将纹理赋予其TargetTexture成员中。实际上，各相机将赋予内部纹理，其渲染器于本地对其进行合成。</p>
+<p>口第033-052行代码：针对场景中的活动相机对象， Unity自动调用OnPostRender事件，每帧调用一次，并在相机完成了其常规渲染后进行。此时，对象可在渲染完毕的数据上渲染其他相机或元素。这里， Cameras数组中各相机的Render方法将被调用，并采用手动方式将相机渲染至其渲染器纹理中，而非屏幕上。该纹理渲染结束后， Graphics.DrawTexture函数将各相机的RenderTexture按照数组中的顺序渲染至屏幕上，且依次叠加。需注意的是，各DrawTexture调用将纹理乘以CamCols颜色值，其中也涉及透明度中的Alpha分量。</p>
+<p>口第059-063行代码：类似于OnPostRender事件， Unity也会在活动相机对象上自动调用OnRenderlmage事件，且每帧调用一次，其调用顺序位于OnPostRender之后，相机渲染器呈现于屏幕之前。该事件提供了两个参数，即src和dst，其中， src参数表示为指向渲染器纹理的引用，包含了源自相机的完整的渲染器，并表示为源自OnPostRender的输出结果。参数dst引用则定义了渲染器纹理，当OnRenderImage事件结束后将显示于屏幕上。简单地讲，该函数可通过代码以手动方式或者通过着色器编辑渲染器的像素。此处， Graphics.Blit函数将被调用，并将源数据复制至目标渲染器纹理中，并采用了与材质引用Mat关联的着色器。</p>
+<p>口第067-085行代码： Fade表示为一个协同例程(CoRoutine) ，其中，颜色From在一段时间内(TotalTime)渐变为To颜色。该CoRoutine在0-1之间渐变相机颜色中的Alpha值，即从透明状态转变为不透明状态。<br>图5-9显示了淡入淡出相机效果。</p>
+<h1 id="相机震动"><a href="#相机震动" class="headerlink" title="相机震动"></a>相机震动</h1><h1 id="相机和动画"><a href="#相机和动画" class="headerlink" title="相机和动画"></a>相机和动画</h1><p>在相机漫游动画中，相机处于运动和旋转状态并途经多个特定位置，进而实现某种影视效果，其重要性主要体现于创建过场动画。相机漫游对于第三人称相机以及鸟瞰视野均十分有效。一种预定义方式是使用Unity中的动画编辑器，或者第三方工具，例如Maya、Blender或3ds Max。然而，某些时候，也需要通过编程方式对相机进行控制，进而通过手动方式调整其位置（偏离其平均中心位置），利用平滑的曲线运动方式，途经多个点并跟随特定的预置路径。本节将对此介绍3种实现方案。</p>
+<p>或许，跟随相机是一种较为常见的方式，即相机跟随特定的场景对象，并在二者间保持一定的距离。这对于第三人称相机十分有用，例如RTS游戏中的过肩视角，以及鸟瞰视角。</p>
+<p>对于此类相机，简单的跟随行为通常难以满足要求（例如简单地将相机作为当前对象的父对象）。通常情况下，相机运动应呈现某种平缓或阻尼效果，也就是说，速度衰减使得相机逐渐停止并到达目标处，而非相机全速运动过程中的夏然而止。对此，可使用Quaternion.Slerp和Vector3.SmoothDamp函数。示例代码中的类可与任何相机进行绑定，并实现对象的平滑跟随效果。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">CamFollow</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// Follow target</span></span><br><span class="line">    <span class="keyword">public</span> Transform Target = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Reference to local transform</span></span><br><span class="line">    <span class="keyword">private</span> Transform ThisTransform = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Linear distance to maintain from target (in world units)</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> DistanceFromTarget = <span class="number">10.0f</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Height of camera above target</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> CamHeight = <span class="number">1f</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Damping for rotation</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> RotationDamp = <span class="number">4f</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Damping for position</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> PosDamp = <span class="number">4f</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Awake</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">//Get transform for camera</span></span><br><span class="line">        ThisTransform = GetComponent&lt;Transform&gt;();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">LateUpdate</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// Get output velocity</span></span><br><span class="line">        Vector3 Velocity = Vector3.zero;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Calculate rotation interpolate</span></span><br><span class="line">        ThisTransform.rotation = Quaternion.Slerp(ThisTransform.rotation, Target.rotation, RotationDamp * Time.deltaTime);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Get new position</span></span><br><span class="line">        Vector3 Dest = ThisTransform.position = Vector3.SmoothDamp(ThisTransform.position, Target.position, <span class="keyword">ref</span> Velocity, PosDamp * Time.deltaTime);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Move away from target</span></span><br><span class="line">        ThisTransform.position = Dest - ThisTransform.forward * DistanceFromTarget;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Set height</span></span><br><span class="line">        ThisTransform.position = <span class="keyword">new</span> Vector3(ThisTransform.position.x, CamHeight, ThisTransform.position.z);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Look at dest</span></span><br><span class="line">        ThisTransform.LookAt(Dest);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="相机和曲线"><a href="#相机和曲线" class="headerlink" title="相机和曲线"></a>相机和曲线</h1><p>对于场景切换、菜单背景以及简单的相机漫游效果，相机可采用直线运动方式。当然，在相机运动过程中也允许出现某些曲线运动，以及速度上的起伏。期间，相机以初始速度运动，在该过程中，速度缓慢下降并到达路径的终点。相应地，用户可通过Unity的动画编辑器使用预置脚本动画，或者使用动画曲线，后者提供了较大的灵活性，并可在操作过程中控制对象的转换。</p>
+<p>当创建相机控制脚本并控制对象的速度和运动行为时，包括曲线运动以及平缓的阻尼效果，对应代码如下所示。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">CameraMover</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// Total time for animation</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> TotalTime = <span class="number">5.0f</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Total Distance to move on each axis</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">float</span> TotalDistance = <span class="number">30.0f</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Curves for motion</span></span><br><span class="line">    <span class="keyword">public</span> AnimationCurve XCurve;</span><br><span class="line">    <span class="keyword">public</span> AnimationCurve YCurve;</span><br><span class="line">    <span class="keyword">public</span> AnimationCurve ZCurve;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Transform for this object</span></span><br><span class="line">    <span class="keyword">private</span> Transform ThisTransform = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// Get transform component</span></span><br><span class="line">        ThisTransform = GetComponent&lt;Transform&gt;();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Start animation</span></span><br><span class="line">        StartCoroutine(PlayAnim());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IEnumerator <span class="title">PlayAnim</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// Time that has passed since anim start</span></span><br><span class="line">        <span class="keyword">float</span> TimeElapsed = <span class="number">0.0f</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">while</span>(TimeElapsed &lt; TotalTime)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// Get normalized time</span></span><br><span class="line">            <span class="keyword">float</span> NormalTime= TimeElapsed / TotalTime;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// Sample graph for X Y and Z</span></span><br><span class="line">            Vector3 NewPos = ThisTransform.right.normalized * XCurve.Evaluate(NormalTime) * TotalDistance;</span><br><span class="line"></span><br><span class="line">            NewPos += ThisTransform.up.normalized * YCurve.Evaluate(NormalTime) * TotalDistance;</span><br><span class="line"></span><br><span class="line">            NewPos += ThisTransform.forward.normalized * ZCurve.Evaluate(NormalTime) * TotalDistance;</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// Update position</span></span><br><span class="line">            ThisTransform.position = NewPos;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// Wait until next frame</span></span><br><span class="line">            <span class="keyword">yield</span> <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// Update time</span></span><br><span class="line">            TimeElapsed += Time.deltaTime;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>当使用CameraMover类时，可将脚本绑定至相机上，在Object Inspector中，可单击各个X、Y、Z曲线文本框，并标绘相机的距离和速度数据。通过单击Graph样板，用户可编辑图线，添加点并定义应用于该轴向上的运动行为。需要注意的是，X、Y、Z运动相对于对象的局部轴进行设置（前、上和右向），而非世界轴（x，y，z）。当体现动画数据的相关性时，这可实现运动的相对性，并提供对象的根级控制。</p>
+<p>Unity并未提供可编程运动路径，这可使得GameObject（例如相机对象）通过球面插值平滑地跟随一条路径或样条。其中，路径定义为一系列的连接游戏对象。这一特性在实际应用过程中已有所体现，且相机运动行为可采用预置脚本动画定义，并在Unity的动画编辑器中创建。</p>
+<p>对于相对灵活的运动路径可编程控制行为，路径可采用一系列的路点定义，并可通过代码对其进行调整。该功能十分有用，例如，在太空射击游戏中，敌方飞船的轨迹将遵循平滑的曲线路径，并可根据玩家飞船的位置对该路径进行调整。在Unity中，存在多种方式可实现这一效果，其中较为简洁、方便的方法是使用免费的扩展组件iTween，并可直接从Unity的Asset Store中下载并导入。</p>
+<p>除了默认的iTween包之外，还可免费下载Visual iTween Path Editor。</p>
+<p>待导入iTween包后，下一步则是据此创建路径上的动画对象。当采用漫游相机时，可将脚本iTweenPath拖曳至相机对象上。该脚本可生成独立的路径，其中包含了多个路点。</p>
+<p>当定义路径上的多个路点时，可在Node Count中输入全部路点数量。随后可在Scene视口中选择各节点的Gizmo。需要注意的是，各点所绘制的曲线路径仅大致描述了相机的运动路径。</p>
+<p>随后，可令相机在运行期内跟随该路径，并向相机添加如下代码。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">cam_itween_mover</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        iTween.MoveTo(gameObject, iTween.Hash(<span class="string">"path"</span>, iTweenPath.GetPath(<span class="string">"Camera Fly"</span>), <span class="string">"time"</span>, <span class="number">4f</span>, <span class="string">"easetype"</span>, iTween.EaseType.easeInOutSine));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h1 id="本章小结"><a href="#本章小结" class="headerlink" title="本章小结"></a>本章小结</h1><p>本章主要讨论了与相机相关的多项任务。相机在Unity以及游戏引擎中不可或缺，并体现了场景相对于屏幕的渲染视角。</p>
+<p>本章首先介绍了渲染中的Gizmo--即使在相机未被选择的情况下，也可在场景视口中渲染相机Gizmo。</p>
+<p>随后讨论了对象与相机之间的可见方式，其中涉及了多种重要的测试行为，例如视锥体表达方式以及遮挡测试。</p>
+<p>另外，本章还阐述了正交相机的创建和配置方法，并在无透视偏差的基础上渲染2D元素。</p>
+<p>接下来本章考察了基于渲染器纹理的、相机渲染器的编辑和增强方式，并重新定义了一系列的相机事件，以及源自其他相机的混合渲染器，进而生成相机的淡入淡出效果。</p>
+<p>与此同时，本章还探讨了高级相机运动行为的构建方式，例如相机的震动效果。</p>
+<p>最后，本章考察了相机路径问题。其中，对应路径通过一系列的游戏对象路点加以定义；抑或简单地表示为所跟随的对象。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Unity脚本设计/" rel="tag"># Unity脚本设计</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/01/31/游戏脚本/" rel="next" title="游戏脚本">
+                <i class="fa fa-chevron-left"></i> 游戏脚本
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/02/20/静态对象-1/" rel="prev" title="静态对象-1">
+                静态对象-1 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">354</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">55</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2020/02/16/游戏设计快乐之道（第2版）/" title="游戏设计快乐之道（第2版）" target="_blank">游戏设计快乐之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/14/游戏剧本怎么写/" title="游戏剧本怎么写" target="_blank">游戏剧本怎么写</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/04/通关！游戏设计之道（第2版）/" title="通关！游戏设计之道（第2版）" target="_blank">通关！游戏设计之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/26/游戏设计艺术（第2版）/" title="游戏设计艺术（第2版）" target="_blank">游戏设计艺术（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/22/大师谈游戏设计创意与节奏/" title="大师谈游戏设计创意与节奏" target="_blank">大师谈游戏设计创意与节奏</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#相机Gizmo"><span class="nav-number">1.</span> <span class="nav-text">相机Gizmo</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#可见性"><span class="nav-number">2.</span> <span class="nav-text">可见性</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#检测对象的可见性"><span class="nav-number">2.1.</span> <span class="nav-text">检测对象的可见性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#关于对象可见性的其他问题"><span class="nav-number">2.2.</span> <span class="nav-text">关于对象可见性的其他问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#视锥体测试-渲染器"><span class="nav-number">2.3.</span> <span class="nav-text">视锥体测试-渲染器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#视锥体测试-点"><span class="nav-number">2.4.</span> <span class="nav-text">视锥体测试-点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#视锥体测试-遮挡"><span class="nav-number">2.5.</span> <span class="nav-text">视锥体测试-遮挡</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#相机前、后视觉"><span class="nav-number">2.6.</span> <span class="nav-text">相机前、后视觉</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#正交相机"><span class="nav-number">3.</span> <span class="nav-text">正交相机</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#相机渲染和后处理"><span class="nav-number">4.</span> <span class="nav-text">相机渲染和后处理</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#相机震动"><span class="nav-number">5.</span> <span class="nav-text">相机震动</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#相机和动画"><span class="nav-number">6.</span> <span class="nav-text">相机和动画</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#相机和曲线"><span class="nav-number">7.</span> <span class="nav-text">相机和曲线</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#本章小结"><span class="nav-number">8.</span> <span class="nav-text">本章小结</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">3.7m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">56:23</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

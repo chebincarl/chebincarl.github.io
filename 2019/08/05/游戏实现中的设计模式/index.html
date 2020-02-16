@@ -1,0 +1,1538 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="思考并回答以下问题：  为什么要学习设计模式？开发框架的时候会用到设计模式吗？ 什么是单一职责原则？ 很多设计模式都是基于开闭原则怎么理解？ 什么是里氏替换原则？作为返回值，作为参数，产生对象怎么理解？ 类的组合都是怎么组合？A类作为B类的方法的参数传进返回，然后B类的接口也作为A类的某个方法的参数，两个类及其父类，接口，抽象类互为方法参数传来传去。A类作为B类的属性成员。怎么理解这段话？ 设计模">
+<meta name="keywords" content="设计模式与游戏完美开发">
+<meta property="og:type" content="article">
+<meta property="og:title" content="游戏实现中的设计模式">
+<meta property="og:url" content="http://chebincarl.github.io/2019/08/05/游戏实现中的设计模式/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="思考并回答以下问题：  为什么要学习设计模式？开发框架的时候会用到设计模式吗？ 什么是单一职责原则？ 很多设计模式都是基于开闭原则怎么理解？ 什么是里氏替换原则？作为返回值，作为参数，产生对象怎么理解？ 类的组合都是怎么组合？A类作为B类的方法的参数传进返回，然后B类的接口也作为A类的某个方法的参数，两个类及其父类，接口，抽象类互为方法参数传来传去。A类作为B类的属性成员。怎么理解这段话？ 设计模">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/05/游戏实现中的设计模式/1.jpeg">
+<meta property="og:updated_time" content="2020-01-23T02:09:01.981Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="游戏实现中的设计模式">
+<meta name="twitter:description" content="思考并回答以下问题：  为什么要学习设计模式？开发框架的时候会用到设计模式吗？ 什么是单一职责原则？ 很多设计模式都是基于开闭原则怎么理解？ 什么是里氏替换原则？作为返回值，作为参数，产生对象怎么理解？ 类的组合都是怎么组合？A类作为B类的方法的参数传进返回，然后B类的接口也作为A类的某个方法的参数，两个类及其父类，接口，抽象类互为方法参数传来传去。A类作为B类的属性成员。怎么理解这段话？ 设计模">
+<meta name="twitter:image" content="http://chebincarl.github.io/2019/08/05/游戏实现中的设计模式/1.jpeg">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/08/05/游戏实现中的设计模式/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>游戏实现中的设计模式 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">专注，重复10遍</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/08/05/游戏实现中的设计模式/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">游戏实现中的设计模式
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-08-05 18:41:14" itemprop="dateCreated datePublished" datetime="2019-08-05T18:41:14+08:00">2019-08-05</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2020-01-23 10:09:01" itemprop="dateModified" datetime="2020-01-23T10:09:01+08:00">2020-01-23</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Unity/" itemprop="url" rel="index"><span itemprop="name">Unity</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">7.3k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">7 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>思考并回答以下问题：</p>
+<ul>
+<li>为什么要学习设计模式？开发框架的时候会用到设计模式吗？</li>
+<li>什么是单一职责原则？</li>
+<li>很多设计模式都是基于开闭原则怎么理解？</li>
+<li>什么是里氏替换原则？作为返回值，<strong>作为参数</strong>，产生对象怎么理解？</li>
+<li>类的组合都是怎么组合？A类作为B类的方法的参数传进返回，然后B类的接口也作为A类的某个方法的参数，两个类及其父类，接口，抽象类互为方法参数传来传去。A类作为B类的属性成员。怎么理解这段话？</li>
+<li>设计模式分成哪3大类？每类各举一个设计模式的例子。</li>
+<li>秘诀是不断地进行类重构，封装新类再组合怎么理解？</li>
+<li>开发底层类的首要原则是上线后不能再修改这个类的代码怎么理解？</li>
+<li>汽车与汽车的引擎违反了依赖倒置怎么理解？位于高层的个人计算机中定义了USB接口符合这条原则怎么理解？</li>
+<li>在具体实现上，这个接口可能是以一个<strong>类的变量</strong>或<strong>对象引用</strong>来表示的，怎么理解？</li>
+<li>接口隔离原则怎么理解？如何实现？</li>
+<li>增加这个类被不同项目共享的可能性要怎么做？</li>
+<li>在闹钟的类定义中，声明一个类型为时钟类的“类成员”，那么就可以减少不必要的方法出现在闹钟接口上，这是少用继承多用组合原则，怎么理解？</li>
+</ul>
+<a id="more"></a>
+<h1 id="导读"><a href="#导读" class="headerlink" title="导读"></a><span style="color:#339AFF;">导读</span></h1><p>设计模式非常重要的一点是把类作为方法的参数。例如一个类的构造函数里的参数是另一个类。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">Demo</span></span><br><span class="line">&#123;</span><br><span class="line">    Demo(Test test)</span><br><span class="line">    &#123;</span><br><span class="line">        test.testFunc();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="keyword">string</span>[] args</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Test testInstance = <span class="keyword">new</span> Test();</span><br><span class="line">        Demo demo = <span class="keyword">new</span> Demo(testInstance);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>学习设计模式需要明确每个模式的使用场景。即为什么要使用？什么时候使用？比如简单工厂和工厂，自己总结的就是<span style="color:red">改类名</span>的时候。</p>
+<p>本书游戏范例呈现的是各个游戏系统可以使用设计模式实现的情况。但是，这些系统在开发过程中，是需要不断地通过重构，才能让每一个功能都能朝向心目中想要设定的设计模式前进，而不是一开始就可以达成想要的模式来实现目标。本书各章节大多使用这样的概念进行介绍，从一个最初的实现版本进化到使用设计模式的版本，正如同《Refactoring to Patterns》一书提倡的设计方式，先写个版本，然后再慢慢向某种设计模式来调整。</p>
+<h1 id="设计模式的起源"><a href="#设计模式的起源" class="headerlink" title="设计模式的起源"></a><span style="color:#339AFF;">设计模式的起源</span></h1><p>面向对象设计方法中强调的是，以类、对象、继承、组合来作为软件设计分析的方式（核心是类与对象，不像PHP，还有独立的函数参与其中）。所以，程序设计师在实现的过程中，必须将软件功能<span style="color:red"><strong>拆分</strong></span>成不同的类/组件，之后再将这些不同的类/组件加以<span style="color:red"><strong>组装</strong></span>、堆砌来最终完成软件的开发。</p>
+<h1 id="面向对象设计中常见的设计原则"><a href="#面向对象设计中常见的设计原则" class="headerlink" title="面向对象设计中常见的设计原则"></a><span style="color:#339AFF;">面向对象设计中常见的设计原则</span></h1><p><strong><font size="3">单一职责原则（SRP：Single Responsibility Principle）</font></strong></p>
+<p>这个原则强调的是<span style="color:red">“当设计封装一个类时，该类应该只负责一件事”</span>。当然，这与在类抽象化的过程中，对于该类应该负责哪些功能有关。一个类应该只负责系统中一个单独功能的实现，但是对于功能的切分和归属，通常也是开发过程中最困扰设计者的。程序设计师在一开始时不太容易遵循这个原则，会在项目开发过程中，不断地向同一类上增加功能，最后导致类过于庞大、接口过于复杂后才会发现问题：<span style="color:red">单个类负责太多的功能实现，会导致类难以维护，也不容易了解该类的主要功能，最后可能会让整个项目过度依赖于这个类，使得项目或这个类失去弹性。</span></p>
+<p>但是，只要通过<span style="color:red">不断地进行“类重构”</span>，将类中与实现相关功能的部分抽取出来，另外封装为新的类，之后再利用组合的方式将新增的类加入到原类中，慢慢地就能符合类单一职责化的要求——也就是项目中的每一个类只负责单一功能的实现。</p>
+<p><strong><font size="3">开—闭原则（OCP：Open-Closed Principle）</font></strong></p>
+<p>一个类应该<span style="color:red">“对扩展开放、对修改关闭”</span>。什么是对扩展开放，又如何对修改关闭呢？其实这里提到的类，指的是实现系统某项功能的类。而这个功能的类，除非是修正功能错误，否则，当软件的开发流程进入“完工测试期”或“上市维护期”时，对于已经测试完成或已经上线运行的功能，就应该“关闭对修改的需求”，也就是不能再修改这个类的任何接口或实现内容。</p>
+<p>但是，当增加系统功能的需求发生时，又不能置之不理，所以也必须对“功能的增加保持开放”。为了满足这个原则的要求，系统分析时就要朝向“功能接口化”的方向进行设计，将系统功能的“操作方法”向上提升，抽象化为“接口”，将“功能的实现”向下移到子类中。因此，在面对增加系统功能的需求时，就可以使用“增加子类”的方式来满足。具体的实现方式是：<span style="color:red">重新实现一个新的子类，或者继承旧的实现类，并在新的子类中实现新增的系统功能</span>。这样，对于旧的功能实现就可以保持不变（关闭），同时又能够对功能新增的需求保持开放。</p>
+<p><strong><font size="3">里氏替换原则（LSP： Liskov Substitution Principle）</font></strong></p>
+<p>这个原则指的是<span style="color:red">“子类必须能够替换父类”</span>。如果按照这个设计原则去实现一个有多层继承的类群组，那么其中的父类通常是“接口类”或“可被继承的类”。父类中一定包含了可被子类重新实现的方法，而<span style="color:red">客户端使用的操作接口也是由父类来定义的</span>。客户端在使用的过程中，<span style="color:red">必须不能使用到“对象强制转型为子类”的语句（子类可以强制转换成父类）</span>，客户端也不应该知道，目前使用的对象是哪一个子类实现的。至于使用哪个子类的对象来替代父类对象，则是由类本身的对象产生机制来决定，外界无法得知。里氏替换原则基本上也是对于开—闭原则提供了一个实现的法则，说明如何设计才能保持正确的需求开放。</p>
+<p><strong><font size="3">依赖倒置原则（DIP： Dependence Inversion Principle）</font></strong></p>
+<p>和依赖注入（DI），控制反转（IOC）是两回事。</p>
+<p>这个原则包含了两个主题：</p>
+<ul>
+<li>高层模块不应该依赖于低层模块，两者都应该依赖于抽象概念；</li>
+<li>抽象接口不应该依赖于实现，而实现应该依赖于抽象接口。</li>
+</ul>
+<p>从生活中举例来解释第一个原则主题（高层模块不应该依赖于低层模块，两者都应该依赖于抽象概念），可能会比单纯使用软件设计来解释更为容易，所以下面就以汽车为例进行说明。</p>
+<p>汽车与汽车的引擎就是一个很明显违反这个原则的例子：汽车就是所谓的高层模块，当要组装一台汽车时，需要有不同的低层模块进行配合才能完成，如引擎系统、传动系统、悬吊系统、车身骨架系统、电装系统等，有了这些低层模块的相互配合才能完成一辆汽车。但汽车却很容易被引擎系统给限定，也就是说，装载无铅汽油引擎的汽车不能使用柴油作为燃料；装载柴油引擎的汽车不能使用无铅汽油作为燃料。每当汽车要加油时，都必须按照引擎的种类选择对应的加油车道，这就是“高级模块依赖于低层模块”的例子，这个高级模块现在有了限制——汽车因为引擎而被限制了加油的品项。虽然这是一个很难去改变的例子，但是在软件系统的设计上，反倒有很多方法可以解除这个“高层依赖于低层”的问题，也就是将它们之间的关系反转，<span style="color:red">让低层模块按高层模块所定义的接口去实现</span>。</p>
+<p>以个人计算机（PC）的组成为例，位于高层的个人计算机中定义了USB接口，而这个接口定义了硬件所需的规格及软件驱动程序的编写规则。只要任何低层模块，如存储卡、U盘、读卡器、相机、手机等符合USB接口规范的，都能加入个人计算机的模块中，成为计算机功能的一环共同为用户提供服务。</p>
+<p>上述个人计算机的例子足以说明如何由“高层模块定义接口”再由“低层模块遵循这个接口实现”的过程，这个过程可以让它们之间的依赖关系反转。同时，这个反转的过程也说明了第二项原则主题的含义：“抽象接口不应该依赖于实现，而实现应该依赖于抽象接口”。当高层模块定义了沟通接口之后，与低层模块的沟通就应该只通过接口来进行，<span style="color:red">在具体实现上，这个接口可能是以一个<strong>类的变量</strong>或<strong>对象引用</strong>来表示的</span>。请注意，在使用这个变量或对象引用的过程中，不能做任何的类型转换，因为这样就限定了高层模块只能使用某一个低层模块的特定实现。而且，子类在重新实现时，都要按照接口类所定义的方法进行实现，不应该再新增其他方法，让高层模块有利用类型转换的方式去调用的机会。</p>
+<p><strong><font size="3">接口隔离原则（ISP：Interface Segregation Principle）</font></strong></p>
+<p><span style="color:red">“客户端不应该被迫使用它们用不到的接口方法”</span>，这个问题一般会随着项目开发的进行而越来越明显。当项目中出现了一个负责主要功能的类，而且这个类还必须负责跟其他子系统进行沟通时，针对每一个子系统的需求，主要类就必须增加对应的方式。但是，增加越多的方法就等同于增加类的接口复杂度。因此，每当要使用这个类的方法时，就要小心地从中选择正确的方法，无形之中增加了开发和维护的困难度。通过“功能的切分”和“接口的简化”可以减少这类问题的发生，或者运用设计模式来重新规划类，也可以减少不必要的操作接口出现在类中。</p>
+<p>除了上述5个原则外，还有一些常被使用的设计原则，简介如下：</p>
+<p><strong><font size="3">最少知识原则（LKP： Least Knowledge Principle）</font></strong></p>
+<p><span style="color:red">当设计实现一个类时，这个类应该越少使用到其他类提供的功能越好。</span>意思是，当这个类能够只靠其本身的“知识”去完成功能的话，那么就相对地减少与其他对象“知识”的依赖度。这样的好处是减少了这个类与其他类的耦合度（即依赖度），换个角度来看，就是<span style="color:red">增加了这个类被不同项目共享的可能性</span>，这将会提高类的重用性。</p>
+<p><strong><font size="3">少用继承多用组合原则</font></strong></p>
+<p>当子类继承一个“接口类”后，新的子类就要负责重新实现接口类中所定义的方法，而且不该额外扩充接口，以符合上述多个设计原则的要求。但是，当系统想要扩充或增加某一项功能时，让子类继承原有的实现类，却也是最容易实现的方式之一。新增的子类在继承父类后，在子类内增加想要扩充的“功能方法”并加以实现，客户端之后就能直接利用子类对象进行新增功能的调用。</p>
+<p>但对于客户端或程序设计师而言，当下可能只是需要子类所提供的功能，并不想额外知道父类的功能，因为这样会增加程序设计师挑选方法时的难度。例如，“闹钟类”可以利用继承“时钟类”的方式，取得“时间功能”的实现，只要子类本身再另外加上“定时提醒”的功能，就能实现“闹钟功能”的目标。当客户端使用“闹钟类”时，可能期待的只不过是设定闹钟时间的方法而已，对于取得当前时间的功能并没有迫切的需求。因此，从“时钟父类”继承而来的方法，对于闹钟的用户来说，可能是多余的。</p>
+<p>如果将设计改为在闹钟的类定义中，声明一个类型为时钟类的“类成员”，那么就可以减少不必要的方法出现在闹钟接口上，也可以减少“闹钟类”的客户端对“时钟类”的依赖性。另外，在无法使用多重继承的程序设计语言（如C#、PHP）中，使用组合的方式会比层层继承来得明白及容易维护，并且对于类的封装也有比较好的表现方式。</p>
+<p>在了解了上述几个面向对象设计的原则之后，可以知道，面向对象设计的原则强调的是，在进行软件分析时所必须遵循的指导原则，而设计模式基本上都会秉持着这些原则来进行设计。也可以这样说，“设计模式”是在符合“面向对象设计原则”的前提下，解决软件设计问题的实践成果。</p>
+<h1 id="游戏程序设计与设计模式"><a href="#游戏程序设计与设计模式" class="headerlink" title="游戏程序设计与设计模式"></a><span style="color:#339AFF;">游戏程序设计与设计模式</span></h1><p><strong><font size="3">需求变化</font></strong></p>
+<p>面对市场产品的多样性，要让自己开发的游戏能在市场上获得更多玩家的青睐，就必须保持对市场的敏感度。除了能快速了解玩家的喜好，还必须能立即更改游戏的玩法和内容，让玩家对游戏保持高度的吸引力，这正是当前游戏产业中不变的法则。换句话说就是，<span style="color:red">游戏程序设计师最常面对的挑战就是，不断地增加游戏系统或修改现有的游戏功能来迎合玩家们的想法</span>。所以，“变化”对于程序设计师来说，是最常需要面对的问题。</p>
+<p>要如何让游戏系统能够适应如此高速变化的调整，并且能够在每一次的更改和版本发布之后，维持着稳定度，对游戏开发者来说一直是个很重要的课题，也是个难题。同样身为软件开发者的游戏程序设计师们，除了可以导入新的软件开发流程（敏捷开发）、定期发布、单元测试……之外，强化面向对象设计分析的能力是另一项可以加强的地方。在进行游戏系统的设计分析时，若能掌握每项设计原则背后的道理，并充分利用设计模式去解决经常重复出现的问题，让每一个系统都能保持着<span style="color:red">“对扩展开放、对修改关闭”</span>的特性，那么势必能让游戏系统在身处变化如此频繁的产业中，适应环境并保持稳定度。</p>
+<p><strong><font size="3">众多的应用平台</font></strong></p>
+<p>随着智能手机及移动设备的多样化，现在的游戏或软件开发者，必须开发符合各种平台的游戏与软件，才能增加市场的占有率并满足每一位可能的用户。而游戏开发者除了可以利用如Unity3D这样的开发工具来减少跨平台开发时会遇到的问题外，笔者认为，<span style="color:red">将“游戏核心”功能保持一定的独立性是有其必要性的</span>（GameLoop就是这一思想的体现）。</p>
+<p>这里的“独立性”指的是“游戏核心玩法”与“应用平台或开发工具”之间的关联度必须降到最低，让游戏核心玩法不被任何的开发工具或应用平台绑住是非常重要的。因为随着时间的推移，会有更多的平台、更好的开发工具上市，如果不能在这些平台或开发工具之间快速转换，终将失去早期进入市场的优势。而保持游戏核心良好的独立性，则有赖于游戏开发者在系统设计时，将“游戏核心接口”与“应用平台或开发工具”之间做良好的切割。有许多设计原则能够在这方面提供良好的指引方向，设计模式则提供了明确的设计指南。</p>
+<p><strong><font size="3">使用技术多样化</font></strong></p>
+<p>早期游戏比较常出现在大型游戏机、专用主机、个人计算机等平台，其中需要应用到的信息技术较为单一。但随着网络的普及，多人在线游戏的面世，将网络程序设计、分布式系统、大型数据库、实时语音等技术也导入到了游戏设计的领域中。同时，为了满足玩家实时消费的需求，网络在线小额付费、网络信息安全、消费者行为分析等技术也被纳入游戏设计的范畴之内，目的是期望通过这些技术强化在线游戏运营者与玩家之间的互动。可想而知，想要完成一款受欢迎的游戏，必须使用非常多的技术，以下简单列出一款“实时在线型”网络游戏可能运用到的信息学科及技术：</p>
+<ul>
+<li>客户端（Client）: 3D计算机图形学（Computer Graphic），2D图像处理（Image Processing）、游戏物理学（Game Physics）、人工智能（AI）、音效处理（Sound Processing）、数据压缩（Data Compression）。</li>
+<li>服务器端（Server）：网络通信（Network Communication）、网络程序设计（Network Programming）、动态网页服务器程序设计（Dynamic Web Server Programming）、分布式系统（Distributed Systems）、数据库系统（Database Systems）、信息安全（Information Security）。</li>
+<li>游戏运营（Game Operating）：硬件服务架设、系统服务架设、网络系统规划、网络服务监控、虚拟技术、现金流串接、开放平台账号登录、消费者行为分析。</li>
+</ul>
+<p>正因为应用到的技术非常多，所以在整合上更需要有良好的设计方法来作为各项技术之间的串接及融合。引用正确的面向对象分析方法，将各项技术之间进行接口的切割，并让每一个功能组件保持最少知识原则，或者直接引用设计模式的建议，并遵循先人累积的知识，将各项技术进行有效地串接组合。</p>
+<p>设计模式已成为软件设计领域的共同语言，在与他人进行沟通时，若是可以直接讲解系统设计时使用的是什么设计模式，即可减少沟通之间的误解，避免浪费不必要的时间。不仅小型游戏开发团队应该使用设计模式来强化系统的稳定度及可扩充性，大型的开发团队更应该使用设计模式来强化成员之间的沟通，并建立稳固的游戏框架，让多个项目之间可以共享开发资源及成果。</p>
+<h1 id="模式的应用与学习方式"><a href="#模式的应用与学习方式" class="headerlink" title="模式的应用与学习方式"></a><span style="color:#339AFF;">模式的应用与学习方式</span></h1><p>GoF的23种设计模式被分为3大类，分别对应到软件分析设计时需要面对的三个环节：</p>
+<ul>
+<li><span style="color:red">生成模式</span>（Creational）：产生对象的过程及方式。</li>
+<li><span style="color:red">结构模式</span>（Structural）：类或对象之间组合的方式（几个小类组合在一起变成一个大类，例如适配器模式）。</li>
+<li><span style="color:red">行为模式</span>（Behavioral）：类或对象之间互动或责任分配的方式（通信，例如观察者模式）。</li>
+</ul>
+<p><strong><font size="3">设计模式的应用</font></strong></p>
+<p>GoF提出的23种设计模式并不是教条式的规则及框架，它们都是“解决问题的方法”的概念呈现。没有规定一定要与书中有一模一样的架构图才能被称为某一种模式。</p>
+<p>《设计模式》一书只是提出了一个规范及定义，并不代表那是唯一的表达方法，所以23种设计模式也可以有其他变形或架构图。所以只要是符合GoF所要表达的应用情景，就可以说是“以某某模式应用的设计方法”。</p>
+<h1 id="游戏范例说明"><a href="#游戏范例说明" class="headerlink" title="游戏范例说明"></a><span style="color:#339AFF;">游戏范例说明</span></h1><p>P级阵地是一款阵地防守游戏，任务是不让玩家的阵地被敌方单位攻击。玩家可通过位于地图上的兵营，产生不同的兵种单位来防守阵地，而这些由兵营产生的玩家作战单位，会在阵地附近留守，过程之中玩家不必操控每一个作战单位，他们会自动发现来袭的敌人并将其击退。敌方单位则是定期由阵地外围不断地朝阵地中央前行，并攻击阻挡在面前的玩家单位，当有3个敌方单位抵达阵地中央时，则玩家防守失败，游戏结束。</p>
+<h1 id="自己对面向对象与设计模式的思考"><a href="#自己对面向对象与设计模式的思考" class="headerlink" title="自己对面向对象与设计模式的思考"></a><span style="color:#339AFF;">自己对面向对象与设计模式的思考</span></h1><p>PHP语言可以同时应用面向过程和面向对象方式进行编程。</p>
+<p>面向过程就是你把代码封装成子过程或函数（procedure），然后依次去做一件事情；</p>
+<p>面向对象就是你把要做的事情抽象成对象，然后告诉具体的哪一个对象去做。这个过程中只有类和对象，所有的函数都是类的方法。</p>
+<img src="/2019/08/05/游戏实现中的设计模式/1.jpeg">
+<p>C#中不允许在类外写函数。函数必须是方法。而PHP可以单独写一个函数引进来使用。</p>
+<p>C#只有类和对象。C#的语言机制决定了它是纯粹的，真正的面向对象。</p>
+<p>PHP属于弱类型语言，给予程序员的空间太大，语言太灵活，不好约束程序员；</p>
+<p>Java和C#的强制代码面向对象思想，属于强类型，语法看似啰嗦，实则非常规范，更容易标准化。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/设计模式与游戏完美开发/" rel="tag"># 设计模式与游戏完美开发</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/08/03/C-遍历指定文件夹下的所有文件和所有子目录/" rel="next" title="C#遍历指定文件夹下的所有文件和所有子目录">
+                <i class="fa fa-chevron-left"></i> C#遍历指定文件夹下的所有文件和所有子目录
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/08/06/第13章-Unity内置网络游戏/" rel="prev" title="第13章 Unity内置网络游戏">
+                第13章 Unity内置网络游戏 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">354</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">55</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2020/02/16/游戏设计快乐之道（第2版）/" title="游戏设计快乐之道（第2版）" target="_blank">游戏设计快乐之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/14/游戏剧本怎么写/" title="游戏剧本怎么写" target="_blank">游戏剧本怎么写</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/04/通关！游戏设计之道（第2版）/" title="通关！游戏设计之道（第2版）" target="_blank">通关！游戏设计之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/26/游戏设计艺术（第2版）/" title="游戏设计艺术（第2版）" target="_blank">游戏设计艺术（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/22/大师谈游戏设计创意与节奏/" title="大师谈游戏设计创意与节奏" target="_blank">大师谈游戏设计创意与节奏</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#导读"><span class="nav-number">1.</span> <span class="nav-text">导读</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#设计模式的起源"><span class="nav-number">2.</span> <span class="nav-text">设计模式的起源</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#面向对象设计中常见的设计原则"><span class="nav-number">3.</span> <span class="nav-text">面向对象设计中常见的设计原则</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#游戏程序设计与设计模式"><span class="nav-number">4.</span> <span class="nav-text">游戏程序设计与设计模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#模式的应用与学习方式"><span class="nav-number">5.</span> <span class="nav-text">模式的应用与学习方式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#游戏范例说明"><span class="nav-number">6.</span> <span class="nav-text">游戏范例说明</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#自己对面向对象与设计模式的思考"><span class="nav-number">7.</span> <span class="nav-text">自己对面向对象与设计模式的思考</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">3.7m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">56:23</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

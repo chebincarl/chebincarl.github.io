@@ -1,0 +1,1668 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="思考并回答以下问题：  可以使用foreach语句来遍历数组中的元素。可以使用foreach来遍历对象吗？如何可以要怎么做？每次这样做麻烦吗？怎么办？ 枚举器的英文是什么？可枚举类型的英文是什么？迭代器呢？ 枚举器和枚举类型是什么关系？ 什么是枚举器，什么是迭代器？两者之间有什么区别和联系？ 想要遍历对象就要创建一个枚举器太麻烦了。怎么办？ 为什么foreach一个List的时候调用RemoveA">
+<meta name="keywords" content="C#图解教程">
+<meta property="og:type" content="article">
+<meta property="og:title" content="枚举器和迭代器">
+<meta property="og:url" content="http://chebincarl.github.io/2019/09/04/枚举器和迭代器/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="思考并回答以下问题：  可以使用foreach语句来遍历数组中的元素。可以使用foreach来遍历对象吗？如何可以要怎么做？每次这样做麻烦吗？怎么办？ 枚举器的英文是什么？可枚举类型的英文是什么？迭代器呢？ 枚举器和枚举类型是什么关系？ 什么是枚举器，什么是迭代器？两者之间有什么区别和联系？ 想要遍历对象就要创建一个枚举器太麻烦了。怎么办？ 为什么foreach一个List的时候调用RemoveA">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://chebincarl.github.io/2019/09/04/枚举器和迭代器/1.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/09/04/枚举器和迭代器/2.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/09/04/枚举器和迭代器/3.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/09/04/枚举器和迭代器/4.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/09/04/枚举器和迭代器/5.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/09/04/枚举器和迭代器/6.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/09/04/枚举器和迭代器/7.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/09/04/枚举器和迭代器/8.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/09/04/枚举器和迭代器/9.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/09/04/枚举器和迭代器/10.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/09/04/枚举器和迭代器/11.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/09/04/枚举器和迭代器/12.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/09/04/枚举器和迭代器/13.png">
+<meta property="og:updated_time" content="2019-11-01T23:25:22.929Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="枚举器和迭代器">
+<meta name="twitter:description" content="思考并回答以下问题：  可以使用foreach语句来遍历数组中的元素。可以使用foreach来遍历对象吗？如何可以要怎么做？每次这样做麻烦吗？怎么办？ 枚举器的英文是什么？可枚举类型的英文是什么？迭代器呢？ 枚举器和枚举类型是什么关系？ 什么是枚举器，什么是迭代器？两者之间有什么区别和联系？ 想要遍历对象就要创建一个枚举器太麻烦了。怎么办？ 为什么foreach一个List的时候调用RemoveA">
+<meta name="twitter:image" content="http://chebincarl.github.io/2019/09/04/枚举器和迭代器/1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/09/04/枚举器和迭代器/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>枚举器和迭代器 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">专注，重复10遍</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/09/04/枚举器和迭代器/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">枚举器和迭代器
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-09-04 11:06:23" itemprop="dateCreated datePublished" datetime="2019-09-04T11:06:23+08:00">2019-09-04</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-11-02 07:25:22" itemprop="dateModified" datetime="2019-11-02T07:25:22+08:00">2019-11-02</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/C/" itemprop="url" rel="index"><span itemprop="name">C#</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">13k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">12 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>思考并回答以下问题：</p>
+<ul>
+<li>可以使用foreach语句来遍历数组中的元素。可以使用foreach来遍历对象吗？如何可以要怎么做？每次这样做麻烦吗？怎么办？</li>
+<li>枚举器的英文是什么？可枚举类型的英文是什么？迭代器呢？</li>
+<li>枚举器和枚举类型是什么关系？</li>
+<li>什么是枚举器，什么是迭代器？两者之间有什么区别和联系？</li>
+<li>想要遍历对象就要创建一个枚举器太麻烦了。怎么办？</li>
+<li>为什么foreach一个List的时候调用RemoveAt()方法会报错？</li>
+</ul>
+<a id="more"></a>
+<p>本章涵盖：</p>
+<ul>
+<li>枚举器和可枚举类型</li>
+<li>IEnumerator接口</li>
+<li>IEnumerable接口</li>
+<li>泛型枚举接口</li>
+<li>迭代器</li>
+<li>常见迭代器模式</li>
+<li>产生多个可枚举类型</li>
+<li>将迭代器作为属性</li>
+<li>迭代器的实质</li>
+</ul>
+<h1 id="枚举器和可枚举类型"><a href="#枚举器和可枚举类型" class="headerlink" title="枚举器和可枚举类型"></a><span style="color:#339AFF;">枚举器和可枚举类型</span></h1><p>我们已经知道可以使用foreach语句来遍历数组中的元素。在本章中，我们会进一步探讨数组，来看看为什么它们可以被foreach语句处理。我们还会研究如何用迭代器为用户自定义的类增加这个功能。</p>
+<font size="3">**使用foreach语句**</font>
+
+<p>当我们为数组使用foreach语句时，这个语句为我们依次取出了数组中的每一个元素，允许我们读取它的值。例如，如下的代码声明了一个有4个元素的数组，然后使用foreach来循环打印这些项的值：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span>[] arr1 = &#123; <span class="number">10</span>, <span class="number">11</span>, <span class="number">12</span>, <span class="number">13</span>&#125;; <span class="comment">// 定义数组</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">foreach</span> (<span class="keyword">int</span> item <span class="keyword">in</span> arr1)  <span class="comment">// 枚举元素</span></span><br><span class="line">    Console.WriteLine(<span class="string">"Item value: &#123;0&#125;"</span>, item);</span><br></pre></td></tr></table></figure></p>
+<p>这段代码产生了如下的输出：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Item value: 10</span><br><span class="line">Item value: 11</span><br><span class="line">Item value: 12</span><br><span class="line">Item value: 13</span><br></pre></td></tr></table></figure></p>
+<p>为什么数组可以这么做？原因是数组可以按需提供一个叫做<strong>枚举器</strong>（enumerator）的对象。枚举器可以依次返回请求的数组中的元素。枚举器“知道”项的次序并且跟踪它在序列中的位置，然后返回请求的当前项。</p>
+<p>对于有枚举器的类型而言，必须有一个方法来获取它。获取一个对象枚举器的方法是调用对象的GetEnumerator方法。实现GetEnumerator方法的类型叫做<strong>可枚举类型</strong>（enumerable type或enumerable），数组是可枚举类型。</p>
+<p>图1演示了可枚举类型和枚举器之间的关系。</p>
+<blockquote>
+<p>图1 枚举器和可枚举类型概览<br><img src="/2019/09/04/枚举器和迭代器/1.png"></p>
+</blockquote>
+<p>foreach结构设计用来和可枚举类型一起使用。只要给它的遍历对象是可枚举类型，比如数组，它就会执行如下行为：</p>
+<ul>
+<li>通过调用GetEnumerator方法获取对象的枚举器；</li>
+<li>从枚举器中请求每一项并且把它作为迭代变量（iteration variable），代码可以读取该变量但不可以改变。</li>
+</ul>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// EnumerableObject必须是可枚举类型</span></span><br><span class="line"><span class="keyword">foreach</span>( Type VarName <span class="keyword">in</span> EnumerableObject)</span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="IEnumerator接口"><a href="#IEnumerator接口" class="headerlink" title="IEnumerator接口"></a><span style="color:#339AFF;">IEnumerator接口</span></h1><p>实现了IEnumerator接口的枚举器包含3个函数成员：Current，MoveNext以及Reset。</p>
+<ul>
+<li>Current是返回序列中当前位置项的属性。<ul>
+<li>它是只读属性。</li>
+<li>它返回object类型的引用，所以可以返回任何类型。</li>
+</ul>
+</li>
+<li>MoveNext是把枚举器位置前进到集合中下一项的方法。它也返回布尔值，指示新的位置是有效位置还是已经超过了序列的尾部。<ul>
+<li>如果新的位置是有效的，方法返回true。</li>
+<li>如果新的位置是无效的（比如当前位置到达了尾部），方法返回false。</li>
+<li>枚举器的原始位置在序列中的第一项之前，因此MoveNext必须在第一次使用Current之前调用。</li>
+</ul>
+</li>
+<li>Reset是把位置重置为原始状态的方法。</li>
+</ul>
+<p>图2左边显示了3个项的集合，右边显示了枚举器。在图2中，枚举器是一个叫做ArrEnumerator类的实例。</p>
+<blockquote>
+<p>图2 小集合的枚举器<br><img src="/2019/09/04/枚举器和迭代器/2.png"></p>
+</blockquote>
+<p>枚举器与序列中的当前项保持联系的方式完全取决于实现。可以通过对象引用、索引值或其他方式来实现。对于内置的一维数组来说，就使用项的索引。</p>
+<p>图3演示了有3个项的集合的枚举器的状态。这些状态标记了1到5。</p>
+<ul>
+<li>注意，在状态1中，枚举器的原始位置是-1（也就是在集合的第一个元素之前）。</li>
+<li>状态的每次切换都由MoveNext进行，它提升了序列中的位置。每次调用MoveNext时，状态1到状态4都返回true，然而，在从状态4到状态5的过程中，位置最终超过了集合的最后一项，所以方法返回false。</li>
+<li>在最后一个状态中，任何进一步的调用MoveNext总是会返回false。</li>
+</ul>
+<blockquote>
+<p>图3 枚举器状态<br><img src="/2019/09/04/枚举器和迭代器/3.png"></p>
+</blockquote>
+<p>有了集合的枚举器，我们就可以使用MoveNext和Current成员来模仿foreach循环遍历集合中的项。例如，我们已经知道了数组就是可枚举类型，所以下面的代码手动做foreach语句自动做的事情。事实上，在编写foreach循环的时候，C#编译器将生成与下面十分类似的代码（当然，是以CIL的形式）。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span>[] MyArray = &#123;<span class="number">10</span>, <span class="number">11</span>, <span class="number">12</span>, <span class="number">13</span> &#125;; <span class="comment">// 创建数组</span></span><br><span class="line"></span><br><span class="line">    IEnumerator ie = MyArray.GetEnumerator(); <span class="comment">// 获取枚举器</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">while</span> (ie.MoveNext()) <span class="comment">// 移到下一项</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">int</span> i = (<span class="keyword">int</span>) ie.Current; <span class="comment">// 获取当前项</span></span><br><span class="line">        Console.WriteLine(<span class="string">"&#123;0&#125;"</span>, i); <span class="comment">// 输出</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这段代码产生了如下的输出，与使用内嵌的foreach语句的结果一样：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td></tr></table></figure></p>
+<p>图4演示了代码示例中的数组结构</p>
+<blockquote>
+<p>图4 .NET数组类实现了IEnumerable<br><img src="/2019/09/04/枚举器和迭代器/4.png"></p>
+</blockquote>
+<font size="3">**IEnumerable接口**</font>
+
+<p>可枚举类是指实现了IEnumerable接口的类。IEnumerable接口只有一个成员——GetEnumerator方法，它返回对象的枚举器。</p>
+<p>图5演示了一个有3个枚举项的类MyClass，通过实现GetEnumerator方法来实现IEnumerable接口。</p>
+<blockquote>
+<p>图5 GetEnumerator方法返回类的一个枚举器对象<br><img src="/2019/09/04/枚举器和迭代器/5.png"></p>
+</blockquote>
+<p>如下代码演示了可枚举类的声明形式：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">MyClass</span> : <span class="title">IEnumerable</span> <span class="comment">// 实现IEnumerable接口</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 返回IEnumerator类型的对象</span></span><br><span class="line">    <span class="keyword">public</span> IEnumerator GetEnumerator </span><br><span class="line">    &#123; </span><br><span class="line">        ... </span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>下面的代码给出了一个可枚举类的示例，使用实现了IEnumerator的枚举器类ColorEnumerator。</p>
+<p>将在下一节展示ColorEnumerator的实现。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">MyColors</span> : <span class="title">IEnumerable</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">string</span>[] Colors = &#123;<span class="string">"Red"</span>, <span class="string">"Yellow"</span>, <span class="string">"Blue"</span>&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IEnumerator <span class="title">GetEnumerator</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 返回枚举器类型的实例</span></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ColorEnumerator(Colors);</span><br><span class="line">    &#125; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<font size="3">**使用IEnumerable和IEnumerator的示例**</font>
+
+<p>下面的代码展示了一个可枚举类的完整示例，该类叫做Spectrum，它的枚举器类为ColorEnumerator，Program类在Main方法中创建了一个Spectrum实例，并用于foreach循环。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">ColorEnumerator</span> : <span class="title">IEnumerator</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">string</span>[] _colors;</span><br><span class="line">    <span class="keyword">int</span> _position = <span class="number">-1</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 构造函数</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ColorEnumerator</span>(<span class="params"><span class="keyword">string</span>[] theColors</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        _colors = <span class="keyword">new</span> <span class="keyword">string</span>[theColors.Length];</span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i&lt; theColors.Length; i++)</span><br><span class="line">            _colors[i] = theColors[i];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 属性，实现Current </span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">object</span> Current</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">get</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span>(_position == <span class="number">-1</span>)</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> InvalidOperationException();</span><br><span class="line">            <span class="keyword">if</span> (_position &gt;= _colors.Length)</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> InvalidOperationException();</span><br><span class="line">            <span class="keyword">return</span> _colors[_position];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 实现MoveNext</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">bool</span> <span class="title">MoveNext</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span>(_position &lt; _colors.Length - <span class="number">1</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            _position ++;</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span></span><br><span class="line">            <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 实现Reset</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Reset</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        _position = <span class="number">-1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">Spectrum</span> : <span class="title">IEnumerable</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">string</span>[] Colors = &#123;<span class="string">"violet"</span>, <span class="string">"blue"</span>, <span class="string">"cyan"</span>, <span class="string">"green"</span>, <span class="string">"yellow"</span>, <span class="string">"orange"</span>, <span class="string">"red"</span>&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IEnumerator <span class="title">GetEnumerator</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ColorEnumerator(Colors);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Spectrum spectrum = <span class="keyword">new</span> Spectrum();</span><br><span class="line">        <span class="comment">// 直接遍历对象</span></span><br><span class="line">        <span class="keyword">foreach</span>(<span class="keyword">string</span> color <span class="keyword">in</span> spectrum)</span><br><span class="line">            Console.WriteLine(color);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这段代码产生了如下的输出：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">violet</span><br><span class="line">blue</span><br><span class="line">cyan</span><br><span class="line">green</span><br><span class="line">yellow</span><br><span class="line">orange</span><br><span class="line">red</span><br></pre></td></tr></table></figure></p>
+<h1 id="泛型枚举接口"><a href="#泛型枚举接口" class="headerlink" title="泛型枚举接口"></a><span style="color:#339AFF;">泛型枚举接口</span></h1><p>目前我们描述的枚举接口都是非泛型版本。实际上，在大多数情况下你应该使用泛型版本IEnumerable\<t\>和IEnumerator\<t\>，它们叫做泛型是因为使用了C#泛型（参见第17章），其使用方式和非泛型形式差不多。</t\></t\></p>
+<p>两者之间的本质差别如下所示。</p>
+<ul>
+<li>对于非泛型接口形式：<ul>
+<li>IEnumerable接口的GetEnumerator方法返回实现IEnumerator枚举器类的实例；</li>
+<li>实现IEnumerator的类实现了Current属性，它返回object的引用，然后我们必须把它转化为实际类型的对象。</li>
+</ul>
+</li>
+<li>对于泛型接口形式：<ul>
+<li>IEnumerable\<t\>接口的GetEnumerator方法返回实现IEnumator\<t\>的枚举器类的实例；</t\></t\></li>
+<li>实现IEnumerator\<t\>的类实现了Current属性，它返回实际类型的对象，而不是object基类的引用。</t\></li>
+</ul>
+</li>
+</ul>
+<p>需要重点注意的是，我们目前所看到的非泛型接口的实现不是类型安全的。它们返回object类型的引用，然后必须转化为实际类型。</p>
+<p>而<strong>泛型接口</strong>的枚举器是类型安全的，它返回实际类型的引用。如果要创建自己的可枚举类，应该实现这些泛型接口。非泛型版本可用于C#2.0以前没有泛型的遗留代码。</p>
+<p>尽管泛型版本和非泛型版本一样简单易用，但其结构略显复杂。图6和图7展示了它们的结构。</p>
+<blockquote>
+<p>图6 IEnumrator\<t\>接口的实现类的结构<br><img src="/2019/09/04/枚举器和迭代器/6.png"></t\></p>
+<p>图7 IEnumerable\<t\>接口的实现类的结构<br><img src="/2019/09/04/枚举器和迭代器/7.png"></t\></p>
+</blockquote>
+<h1 id="迭代器"><a href="#迭代器" class="headerlink" title="迭代器"></a><span style="color:#339AFF;">迭代器</span></h1><p>可枚举类和枚举器在.NET集合类中被广泛使用，所以熟悉它们如何工作很重要。不过，虽然我们已经知道如何创建自己的可枚举类和枚举器了，但我们还是会很高兴听到，C#从2.0版本开始提供了更简单的创建枚举器和可枚举类型的方式。实际上，编译器将为我们创建它们。这种结构叫做迭代器（iterator）。我们可以把手动编码的可枚举类型和枚举器替换为由迭代器生成的可枚举类型和枚举器。</p>
+<p>在解释细节之前，我们先来看两个示例。下面的方法声明实现了一个产生和返回枚举器的迭代器。</p>
+<ul>
+<li><span style="color:red">迭代器返回一个泛型枚举器</span>，该枚举器返回3个string类型的项。</li>
+<li>yield return语句声明这是枚举中的下一项。</li>
+</ul>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 返回泛型枚举器，它返回的是字符串对象</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> IEnumerator&lt;<span class="keyword">string</span>&gt; <span class="title">BlackAndWhite</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">yield</span> <span class="keyword">return</span> <span class="string">"black"</span>;</span><br><span class="line">    <span class="keyword">yield</span> <span class="keyword">return</span> <span class="string">"gray"</span>;</span><br><span class="line">    <span class="keyword">yield</span> <span class="keyword">return</span> <span class="string">"white"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>下面的方法声明了另一个版本，并输出了相同的结果：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 返回泛型枚举器</span></span><br><span class="line"><span class="keyword">public</span> IEnumerator&lt;<span class="keyword">string</span>&gt; BlackAndWhite</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">string</span>[] theColors = &#123;<span class="string">"black"</span>, <span class="string">"gray"</span>, <span class="string">"white"</span>&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; theColors.Length; i++)</span><br><span class="line">        <span class="keyword">yield</span> <span class="keyword">return</span> theColors[i];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>到现在为止，我还没有解释过yield return语句。但是如果仔细看代码，你可能会觉得代码有一些奇怪。它好像不是很正确，那么yield return语句究竟做了什么呢？</p>
+<p>例如，在第一个版本中，如果方法在第一个yield return语句处返回，那么后两条语句永远不会到达。如果没有在第一条语句中返回，而是继续后面的代码，在这些值上发生了什么呢？在第二个版本中，如果循环主体中的yield retun语句在第一个迭代中返回，循环永远不会获得其他的后续迭代。</p>
+<p>除此之外，枚举器不会一次返回所有元素——每次访问Current属性时便返回一个新值。那么是怎么为我们实现枚举器的呢？很明显，该代码与之前给出的代码很不相同。</p>
+<h2 id="迭代器块"><a href="#迭代器块" class="headerlink" title="迭代器块"></a><span style="color:#00ACC1;">迭代器块</span></h2><p><strong>迭代器块</strong>是有一个或多个yield语句的代码块。下面3种类型的代码块中的任意一种都可以是迭代器块：</p>
+<ul>
+<li>方法主体；</li>
+<li>访问器主体；</li>
+<li>运算符主体。  </li>
+</ul>
+<p>迭代器块与其他代码块不同。其他块包含的语句被当作是命令式的。也就是说，先执行代码块的第一个语句，然后执行后面的语句，最后控制离开块。</p>
+<p>另一方面，迭代器块不是需要在同一时间执行的一串命令式命令，而是描述了希望编译器为我们创建的枚举器类的行为。迭代器块中的代码描述了如何枚举元素。 </p>
+<p>迭代器块有两个特殊语句。</p>
+<ul>
+<li>yield return语句指定了序列中返回的下一项。</li>
+<li>yield break语句指定在序列中没有其他项。</li>
+</ul>
+<p>编译器得到有关如何枚举项的描述后，使用它来构建包含所有需要的方法和属性实现的枚举器类。结果类被嵌套包含在迭代器声明的类中。 </p>
+<p>如图8所示，根据迭代器块的返回类型，你可以让迭代器产生枚举器或可枚举类型。</p>
+<blockquote>
+<p>图8 根据指定的返回类型，可以让迭代器产生枚举器或可枚举类型<br><img src="/2019/09/04/枚举器和迭代器/8.png"></p>
+</blockquote>
+<h2 id="使用迭代器来创建枚举器"><a href="#使用迭代器来创建枚举器" class="headerlink" title="使用迭代器来创建枚举器"></a><span style="color:#00ACC1;">使用迭代器来创建枚举器</span></h2><p>下面代码演示了如何使用迭代器来创建可枚举类。</p>
+<ul>
+<li>BlackAndwWhite方法是一个迭代器块，可以为MyClass类产生返回枚举器的方法。</li>
+<li>MyClass还实现了GetEnumerator方法，它调用BlackAndWhite并且返回BlackAndWhite返回的枚举器。</li>
+<li>注意Main方法，由于MyClass类实现了GetEnumerator，是可枚举类型，我们在foreach语句中直接使用了类的实例。</li>
+</ul>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">MyClass</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> IEnumerator&lt;<span class="keyword">string</span>&gt; <span class="title">GetEnumerator</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;   </span><br><span class="line">        <span class="comment">// 返回枚举器</span></span><br><span class="line">        <span class="keyword">return</span> BlackAndWhite();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 迭代器</span></span><br><span class="line">    <span class="comment">// 返回枚举器</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IEnumerator&lt;<span class="keyword">string</span>&gt; <span class="title">BlackAndWhite</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">yield</span> <span class="keyword">return</span> <span class="string">"black"</span>;</span><br><span class="line">        <span class="keyword">yield</span> <span class="keyword">return</span> <span class="string">"gray"</span>;</span><br><span class="line">        <span class="keyword">yield</span> <span class="keyword">return</span> <span class="string">"white"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        MyClass mc = <span class="keyword">new</span> MyClass();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 返回MyClass的实例</span></span><br><span class="line">        <span class="keyword">foreach</span> (<span class="keyword">string</span> shade <span class="keyword">in</span> mc)</span><br><span class="line">            Console.WriteLine(shade);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这段代码产生了如下的输出：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">black</span><br><span class="line">gray</span><br><span class="line">white</span><br></pre></td></tr></table></figure></p>
+<p>图9在左边演示了MyClass的代码，在右边演示了产生的对象。注意编译器为我们自动做了多少工作。</p>
+<ul>
+<li>图中左边的迭代器代码演示了它的返回类型是IEnumerator\<string\>。</string\></li>
+<li>图中右边演示了它有一个嵌套类实现了IEnumerator\<string\>。</string\></li>
+</ul>
+<blockquote>
+<p>图9 迭代器块产生了枚举器<br><img src="/2019/09/04/枚举器和迭代器/9.png"></p>
+</blockquote>
+<h2 id="使用迭代器来创建可枚举类型"><a href="#使用迭代器来创建可枚举类型" class="headerlink" title="使用迭代器来创建可枚举类型"></a><span style="color:#00ACC1;">使用迭代器来创建可枚举类型</span></h2><p>之前的示例创建的类包含两部分：产生返回枚举器方法的迭代器以及返回枚举器的GetEnumerator方法。在本节的例子中，我们用迭代器来创建可枚举类型，而不是枚举器。与之前的示例相比，本例有一些重要的不同。</p>
+<ul>
+<li>在之前的示例中， BlackAndWhite迭代器方法返回IEnumerator\<string\>，MyClass类通过返回由BlackAndWhite返回的对象来实现GetEnumerator方法。</string\></li>
+<li>在本例中，BlackAndWhite迭代器方法返回IEnumerable\<string\>而不是IEnumerator\<string\>。因此，MyClass首先调用BlackAndWhite方法获取它的可枚举类型对象，然后调用对象的GetEnumerator方法来获取它的结果，从而实现GetEnumerator方法。</string\></string\></li>
+<li>注意，在Main的foreach语句中，我们可以使用类的实例，也可以直接调用BlackAndWhite方法，因为它返回的是可枚举类型。两种方法如下:<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">MyClass</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> IEnumerator&lt;<span class="keyword">string</span>&gt; <span class="title">GetEnumerator</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;   </span><br><span class="line">        <span class="comment">// 获取可枚举类型</span></span><br><span class="line">        IEnumerable&lt;<span class="keyword">string</span>&gt; myEnumerable = BlackAndWhite();</span><br><span class="line">        <span class="comment">// 获取枚举器</span></span><br><span class="line">        <span class="keyword">return</span> myEnumerable.GetEnumerator();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 返回可枚举类型</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IEnumerable&lt;<span class="keyword">string</span>&gt; <span class="title">BlackAndWhite</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">yield</span> <span class="keyword">return</span> <span class="string">"black"</span>;</span><br><span class="line">        <span class="keyword">yield</span> <span class="keyword">return</span> <span class="string">"gray"</span>;</span><br><span class="line">        <span class="keyword">yield</span> <span class="keyword">return</span> <span class="string">"white"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        MyClass mc = <span class="keyword">new</span> MyClass();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 使用类对象</span></span><br><span class="line">        <span class="keyword">foreach</span> (<span class="keyword">string</span> shade <span class="keyword">in</span> mc)</span><br><span class="line">            Console.WriteLine(<span class="string">"&#123;0&#125; "</span>, shade);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 使用类枚举器方法</span></span><br><span class="line">        <span class="keyword">foreach</span> (<span class="keyword">string</span> shade <span class="keyword">in</span> mc.BlackAndWhite())</span><br><span class="line">            Console.WriteLine(<span class="string">"&#123;0&#125; "</span>, shade);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>这段代码产生了如下的输出：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">black gray white black gray white</span><br></pre></td></tr></table></figure></p>
+<p>图10演示了在代码中的可枚举迭代器产生了泛型可枚举类型。</p>
+<blockquote>
+<p>图10 编译器生成的类既是IEnumerable的又是IEnumerator的，并且它还生成了一个方法BlackAndWhite，它返回可枚举对象<br><img src="/2019/09/04/枚举器和迭代器/10.png"></p>
+</blockquote>
+<ul>
+<li>图中左边的迭代器代码演示了它的返回类型是IEnumerable\<string\>。</string\></li>
+<li>图中右边演示了它有一个嵌套类实现了IEnumerator\<string\>和IEnumerable\<string\>。</string\></string\></li>
+</ul>
+<h1 id="常见迭代器模式"><a href="#常见迭代器模式" class="headerlink" title="常见迭代器模式"></a><span style="color:#339AFF;">常见迭代器模式</span></h1><p>前面两节的内容显示了，我们可以创建迭代器来返回<strong>可枚举类型</strong>或<strong>枚举器</strong>。图11总结了如何使用普通迭代器模式。</p>
+<blockquote>
+<p>图11 常见迭代器模式<br><img src="/2019/09/04/枚举器和迭代器/11.png"></p>
+</blockquote>
+<ul>
+<li>当我们实现返回枚举器的迭代器时，必须通过实现GetEnumerator来让类可枚举，它返回由迭代器返回的枚举器。如图11中左部分所示。</li>
+<li>如果我们在类中实现迭代器返回可枚举类型，我们可以让类实现GetEnumerator来让类本身可被枚举，或不实现GetEnumerator，让类不可枚举。<ul>
+<li>如果实现GetEnumerator，让它调用迭代器方法以获取自动生成的实现IEnumerable的类实例。然后，从IEnumerable对象返回由GetEnumerator创建的枚举器，如图11右边所示。</li>
+<li>如果通过不实现GetEnumerator使类本身不可枚举，仍然可以使用由迭代器返回的可枚举类，只需要直接调用迭代器方法，如图11中右边第二个foreach语句所示。</li>
+</ul>
+</li>
+</ul>
+<h1 id="产生多个可枚举类型"><a href="#产生多个可枚举类型" class="headerlink" title="产生多个可枚举类型"></a><span style="color:#339AFF;">产生多个可枚举类型</span></h1><p>在下面的示例中，Spectrum类有两个可枚举类型的迭代器——一个从紫外线到红外线枚举光谱中的颜色，而另一个以逆序进行枚举。注意，尽管它有两个方法返回可枚举类型，但类本身不是可枚举类型，因为它没有实现GetEnumerator。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">Spectrum</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">string</span>[] colors = &#123;<span class="string">"violet"</span>, <span class="string">"blue"</span>, <span class="string">"cyan"</span>, <span class="string">"green"</span>, <span class="string">"yellow"</span>, <span class="string">"orange"</span>, <span class="string">"red"</span>&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 返回一个可枚举类型</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IEnumerable&lt;<span class="keyword">string</span>&gt; <span class="title">UVtoIR</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; colors.Length; i ++)</span><br><span class="line">            <span class="keyword">yield</span> <span class="keyword">return</span> colors[i];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 返回一个可枚举类型</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IEnumerable&lt;<span class="keyword">string</span>&gt; <span class="title">IRtoUV</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = colors.Length - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--)</span><br><span class="line">            <span class="keyword">yield</span> <span class="keyword">return</span> colors[i];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Spectrum spectrum = <span class="keyword">new</span> Spectrum();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">foreach</span> (<span class="keyword">string</span> color <span class="keyword">in</span> spectrum.UVtoIR())</span><br><span class="line">            Console.WriteLine(<span class="string">"&#123;0&#125; "</span>, color);</span><br><span class="line">        Console.WriteLine();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">foreach</span> (<span class="keyword">string</span> color <span class="keyword">in</span> spectrum.IRtoUV())</span><br><span class="line">            Console.WriteLine(<span class="string">"&#123;0&#125; "</span>, color);</span><br><span class="line">        Console.WriteLine();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这段代码产生了如下的输出：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">violet blue cyan green yellow orange red</span><br><span class="line">red orange yellow green cyan blue violet</span><br></pre></td></tr></table></figure></p>
+<h1 id="将迭代器作为属性"><a href="#将迭代器作为属性" class="headerlink" title="将迭代器作为属性"></a><span style="color:#339AFF;">将迭代器作为属性</span></h1><p>之前的示例使用迭代器来产生具有两个可枚举类型的类。本例演示两个方面的内容：第一，使用迭代器来产生具有两个枚举器的类；第二，演示迭代器如何能实现为属性而不是方法。</p>
+<p>这段代码声明了两个属性来定义两个不同的枚举器。GetEnumerator方法根据_listFromUVtoIR布尔变量的值返回两个枚举器中的一个。如果_listFromUVtoIR为true，则返回UvtoIR枚举器；否则，返回IRtoUv枚举器。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">Spectrum</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">bool</span> _listFromUVtoIR;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">string</span>[] colors = &#123;<span class="string">"violet"</span>, <span class="string">"blue"</span>, <span class="string">"cyan"</span>, <span class="string">"green"</span>, <span class="string">"yellow"</span>, <span class="string">"orange"</span>, <span class="string">"red"</span>&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Spectrum</span>(<span class="params"><span class="keyword">bool</span> listFromUVtoIR</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        _listFromUVtoIR = listFromUVtoIR;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> IEnumerator&lt;<span class="keyword">string</span>&gt; <span class="title">GetEnumerator</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> _listFromUVtoIR ? UVtoIR : IRtoUV;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> IEnumerator&lt;<span class="keyword">string</span>&gt; UVtoIR</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">get</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; colors.Length; i++)</span><br><span class="line">                <span class="keyword">yield</span> <span class="keyword">return</span> colors[i];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> IEnumerator&lt;<span class="keyword">string</span>&gt; IRtoUV</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">get</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = colors.Length - <span class="number">1</span>; i &gt;= <span class="number">0</span>; i--)</span><br><span class="line">                <span class="keyword">yield</span> <span class="keyword">return</span> colors[i];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Spectrum startUV = <span class="keyword">new</span> Spectrum( <span class="literal">true</span> );</span><br><span class="line">        Spectrum startIR = <span class="keyword">new</span> Spectrum( <span class="literal">false</span> );</span><br><span class="line"></span><br><span class="line">        <span class="keyword">foreach</span> (<span class="keyword">string</span> color <span class="keyword">in</span> startUV)</span><br><span class="line">            Console.Write(<span class="string">"&#123;0&#125; "</span>, color);</span><br><span class="line"></span><br><span class="line">        Console.WriteLine();</span><br><span class="line"></span><br><span class="line">        <span class="keyword">foreach</span> (<span class="keyword">string</span> color <span class="keyword">in</span> startIR)</span><br><span class="line">            Console.Write(<span class="string">"&#123;0&#125; "</span>, color);</span><br><span class="line"></span><br><span class="line">        Console.WriteLine();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这段代码产生了如下的输出：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">violet blue cyan green yellow orange red</span><br><span class="line">red orange yellow green cyan blue violet</span><br></pre></td></tr></table></figure></p>
+<h1 id="迭代器实质"><a href="#迭代器实质" class="headerlink" title="迭代器实质"></a><span style="color:#339AFF;">迭代器实质</span></h1><p>如下是需要了解的有关迭代器的其他重要事项。</p>
+<ul>
+<li>迭代器需要System.Collections.Generic命名空间，因此我们需要使用using指令引入它。</li>
+<li>在编译器生成的枚举器中，Reset方法没有实现。而它是接口需要的方法，因此调用时总是抛出System.NotSupportedException异常。注意，在图9中Reset方法显示为灰色在后台，由编译器生成的枚举器类是包含4个状态的状态机。</li>
+<li>Before 首次调用MoveNext的初始状态。</li>
+<li>Running 调用MoveNext后进入这个状态。在这个状态中，枚举器检测并设置下一项的位置。在遇到yield return、yield break或在迭代器体结束时，退出状态。</li>
+<li>Suspended 状态机等待下次调用MoveNext的状态。</li>
+<li>After 没有更多项可以枚举。</li>
+</ul>
+<p>如果状态机在Before或Suspended状态时调用了MoveNext方法，就转到了Running状态。在Running状态中，它检测集合的下一项并设置位置。</p>
+<p>如果有更多项，状态机会转入Suspended状态，如果没有更多项，它转入并保持在After状态。图12演示了这个状态机。</p>
+<blockquote>
+<p>图12 迭代器状态机<br><img src="/2019/09/04/枚举器和迭代器/12.png"></p>
+</blockquote>
+<img src="/2019/09/04/枚举器和迭代器/13.png">
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C-图解教程/" rel="tag"># C#图解教程</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/09/03/一步一步造个IoC轮子（三）：构造基本的IoC容器/" rel="next" title="一步一步造个IoC轮子（三）：构造基本的IoC容器">
+                <i class="fa fa-chevron-left"></i> 一步一步造个IoC轮子（三）：构造基本的IoC容器
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/09/04/迭代器与Unity协程/" rel="prev" title="迭代器与Unity协程">
+                迭代器与Unity协程 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">354</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">55</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2020/02/16/游戏设计快乐之道（第2版）/" title="游戏设计快乐之道（第2版）" target="_blank">游戏设计快乐之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/14/游戏剧本怎么写/" title="游戏剧本怎么写" target="_blank">游戏剧本怎么写</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/04/通关！游戏设计之道（第2版）/" title="通关！游戏设计之道（第2版）" target="_blank">通关！游戏设计之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/26/游戏设计艺术（第2版）/" title="游戏设计艺术（第2版）" target="_blank">游戏设计艺术（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/22/大师谈游戏设计创意与节奏/" title="大师谈游戏设计创意与节奏" target="_blank">大师谈游戏设计创意与节奏</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#枚举器和可枚举类型"><span class="nav-number">1.</span> <span class="nav-text">枚举器和可枚举类型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#IEnumerator接口"><span class="nav-number">2.</span> <span class="nav-text">IEnumerator接口</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#泛型枚举接口"><span class="nav-number">3.</span> <span class="nav-text">泛型枚举接口</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#迭代器"><span class="nav-number">4.</span> <span class="nav-text">迭代器</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#迭代器块"><span class="nav-number">4.1.</span> <span class="nav-text">迭代器块</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用迭代器来创建枚举器"><span class="nav-number">4.2.</span> <span class="nav-text">使用迭代器来创建枚举器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用迭代器来创建可枚举类型"><span class="nav-number">4.3.</span> <span class="nav-text">使用迭代器来创建可枚举类型</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#常见迭代器模式"><span class="nav-number">5.</span> <span class="nav-text">常见迭代器模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#产生多个可枚举类型"><span class="nav-number">6.</span> <span class="nav-text">产生多个可枚举类型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#将迭代器作为属性"><span class="nav-number">7.</span> <span class="nav-text">将迭代器作为属性</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#迭代器实质"><span class="nav-number">8.</span> <span class="nav-text">迭代器实质</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">3.7m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">56:23</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

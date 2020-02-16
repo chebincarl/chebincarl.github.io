@@ -1,0 +1,1712 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="思考并回答以下问题：  状态模式的官方定义是什么？如何用德鲁伊来描述状态模式？Context类就是德鲁伊怎么理解？Context和State接口互相用类成员调用怎么理解？ “一个对象”，Context就是那个对象。怎么理解？ 动手画一下状态模式的类图。 德鲁伊怎么玩？首先我要告诉德鲁伊最初的状态是什么，然后操作德鲁伊攻击。 什么场景使用状态模式？ A类作为B类的成员，然后在B类的function">
+<meta name="keywords" content="设计模式与游戏完美开发">
+<meta property="og:type" content="article">
+<meta property="og:title" content="游戏场景的转换--状态模式">
+<meta property="og:url" content="http://chebincarl.github.io/2019/08/06/游戏场景的转换--状态模式/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="思考并回答以下问题：  状态模式的官方定义是什么？如何用德鲁伊来描述状态模式？Context类就是德鲁伊怎么理解？Context和State接口互相用类成员调用怎么理解？ “一个对象”，Context就是那个对象。怎么理解？ 动手画一下状态模式的类图。 德鲁伊怎么玩？首先我要告诉德鲁伊最初的状态是什么，然后操作德鲁伊攻击。 什么场景使用状态模式？ A类作为B类的成员，然后在B类的function">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/06/游戏场景的转换--状态模式/1.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/06/游戏场景的转换--状态模式/2.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/06/游戏场景的转换--状态模式/3.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/06/游戏场景的转换--状态模式/4.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/06/游戏场景的转换--状态模式/5.png">
+<meta property="og:updated_time" content="2020-01-23T02:09:01.981Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="游戏场景的转换--状态模式">
+<meta name="twitter:description" content="思考并回答以下问题：  状态模式的官方定义是什么？如何用德鲁伊来描述状态模式？Context类就是德鲁伊怎么理解？Context和State接口互相用类成员调用怎么理解？ “一个对象”，Context就是那个对象。怎么理解？ 动手画一下状态模式的类图。 德鲁伊怎么玩？首先我要告诉德鲁伊最初的状态是什么，然后操作德鲁伊攻击。 什么场景使用状态模式？ A类作为B类的成员，然后在B类的function">
+<meta name="twitter:image" content="http://chebincarl.github.io/2019/08/06/游戏场景的转换--状态模式/1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/08/06/游戏场景的转换--状态模式/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>游戏场景的转换--状态模式 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">专注，重复10遍</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/08/06/游戏场景的转换--状态模式/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">游戏场景的转换--状态模式
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-08-06 20:04:08" itemprop="dateCreated datePublished" datetime="2019-08-06T20:04:08+08:00">2019-08-06</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2020-01-23 10:09:01" itemprop="dateModified" datetime="2020-01-23T10:09:01+08:00">2020-01-23</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Unity/" itemprop="url" rel="index"><span itemprop="name">Unity</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">19k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">18 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>思考并回答以下问题：</p>
+<ul>
+<li>状态模式的官方定义是什么？如何用德鲁伊来描述状态模式？Context类就是德鲁伊怎么理解？Context和State接口互相用类成员调用怎么理解？</li>
+<li>“一个对象”，Context就是那个对象。怎么理解？</li>
+<li>动手画一下状态模式的类图。</li>
+<li>德鲁伊怎么玩？首先我要告诉德鲁伊最初的状态是什么，然后操作德鲁伊攻击。</li>
+<li>什么场景使用状态模式？</li>
+<li>A类作为B类的成员，然后在B类的function SetA(A)方法里赋值，参数是A类对象，怎么理解？</li>
+<li>状态在自身里面进行状态转换怎么理解？</li>
+<li>if else的判断条件跑到了哪里？</li>
+<li>Context这个词表示上下文和执行环境的意思。怎么理解？</li>
+<li>理解状态模式最关键的两点在Context类：1.调用Context类的对象的一个方法（一个对象的行为）时要<span style="color:red">设置一个初始状态</span>；2.给这个方法传会触发转换的参数。怎么理解？</li>
+<li>代码转成使用状态模式时要新建状态接口和具体状态子类。怎么理解？</li>
+<li>几个状态之间无法通过引用进行调用，虽然都是状态基类的子类，但只能通过Context互相通信。这就是为什么状态类要引用Context的原因。怎么理解？</li>
+</ul>
+<a id="more"></a>
+<p>本章涵盖：</p>
+<ul>
+<li>游戏场景<ul>
+<li>场景的转换</li>
+<li>游戏场景可能的实现方式</li>
+</ul>
+</li>
+<li>状态模式<ul>
+<li>状态模式的定义</li>
+<li>状态模式的说明</li>
+<li>状态模式的实现范例</li>
+</ul>
+</li>
+<li>使用状态模式实现游戏场景的转换<ul>
+<li>SceneState的实现</li>
+<li>实现说明</li>
+<li>使用状态模式的优点</li>
+<li>游戏执行流程及场景转换说明</li>
+</ul>
+</li>
+<li>状态模式面对变化时</li>
+<li>结论</li>
+</ul>
+<h1 id="游戏场景"><a href="#游戏场景" class="headerlink" title="游戏场景"></a><span style="color:#339AFF;">游戏场景</span></h1><h2 id="场景的转换"><a href="#场景的转换" class="headerlink" title="场景的转换"></a><span style="color:#00ACC1;">场景的转换</span></h2><p>当游戏比较复杂时，通常会设计成多个场景，让玩家在几个场景之间转换。</p>
+<p>我们可规划出数个场景，每个场景分别负责多项功能的执行。</p>
+<ul>
+<li>登录场景：负责游戏片头、加载游戏数据、出现游戏主画面、等待玩家登录游戏。</li>
+<li>主画面场景：负责进入游戏画面、玩家在主城/主画面中的操作、在地图上打怪打宝…</li>
+<li>战斗场景：负责与玩家组队之后进入副本关卡、挑战王怪…</li>
+</ul>
+<p>在游戏场景规划完成后，就可以利用“状态图”将各场景的关系连接起来，并且说明它们之间的转换条件以及状态转换的流程，如图1所示。</p>
+<blockquote>
+<p>图1 各场景转换条件以及状态转换的“状态图”</p>
+</blockquote>
+<img src="/2019/08/06/游戏场景的转换--状态模式/1.png">
+<font size="3">**切分场景的好处**</font>
+
+<p>将游戏中不同的功能分类在不同的场景中来执行，除了可以将游戏功能执行时需要的环境明确分类之外，“重复使用”也是使用场景转换的好处之一。</p>
+<p>从上面几个例子中可以看出，“登录场景”几乎是每款游戏必备的场景之一。而一般在登录场景中，会实现游戏初始化功能或玩家登录游戏时需要执行的功能，例如：</p>
+<ul>
+<li>单机游戏：登录场景可以有加载游戏数据、让玩家选择存盘、进入游戏等步骤。</li>
+<li>在线游戏：登录场景包含了许多复杂的在线登录流程，比如使用第三方认证系统、使用玩家自定义账号、与服务器连接、数据验证…</li>
+</ul>
+<p>对于大多数的游戏开发公司来说，登录场景实现的功能，会希望通用于不同的游戏开发项目，使其保持流程的一致性。尤其对于在线游戏这种类型的项目而言，由于登录流程较为复杂，若能将各项目共同的部分（场景）独立出来，由专人负责开发维护并同步更新给各个项目，那么效率就能获得提升，也是比较安全的方式。在项目开发时，若是能重复使用这些已经设计良好的场景，将会减少许多开发时间。</p>
+<p>《P级阵地》规划了3个场景，如图2所示。</p>
+<blockquote>
+<p>图2 《P级阵地》规划的3个场景</p>
+</blockquote>
+<img src="/2019/08/06/游戏场景的转换--状态模式/2.png">
+<ul>
+<li>开始场景（StartScene）：GameLoop游戏对象的所在，游戏启动及相关游戏设置的加载。</li>
+<li>主画面场景（MainMenuScene）：显示游戏名称和“开始”按钮。</li>
+<li>战斗场景（BattleScene）：游戏主要执行的场景。</li>
+</ul>
+<h2 id="游戏场景可能的实现方式"><a href="#游戏场景可能的实现方式" class="headerlink" title="游戏场景可能的实现方式"></a><span style="color:#00ACC1;">游戏场景可能的实现方式</span></h2><p>实现Unity3D的场景转换较为直接的方式如下:</p>
+<blockquote>
+<p>Listing1 一般场景控制的写法</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"><span class="keyword">using</span> UnityEngine.UI;</span><br><span class="line"><span class="keyword">using</span> UnityEngine.SceneManagement;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">SceneMgr</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">string</span> m_state =<span class="string">"开始"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 改换场景</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ChangeScene</span>(<span class="params"><span class="keyword">string</span> StateName</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_state = StateName;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">switch</span> (m_state)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">"菜单"</span>:</span><br><span class="line">                SceneManager.LoadScene(<span class="string">"MainMenuScene"</span>);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">case</span> <span class="string">"主场景"</span>:</span><br><span class="line">                SceneManager.LoadScene(<span class="string">"GameScene"</span>);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Update is called once per frame</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">switch</span> (m_state)</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">case</span> <span class="string">"开始"</span>:</span><br><span class="line">                Debug.Log(<span class="string">"现在在开始场景"</span>);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">case</span> <span class="string">"菜单"</span>:</span><br><span class="line">                Debug.Log(<span class="string">"现在在菜单场景"</span>);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">case</span> <span class="string">"主场景"</span>:</span><br><span class="line">                Debug.Log(<span class="string">"现在在主场景"</span>);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">GameMgr</span> : <span class="title">MonoBehaviour</span> </span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> SceneMgr scene_mgr;</span><br><span class="line">    <span class="comment">// Use this for initialization</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span> (<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        scene_mgr = gameObject.GetComponent&lt;SceneMgr&gt;();</span><br><span class="line">        scene_mgr.ChangeScene(<span class="string">"菜单"</span>);</span><br><span class="line">        DontDestroyOnLoad(<span class="keyword">this</span>.gameObject);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Update is called once per frame</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span> (<span class="params"></span>)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (Input.GetMouseButtonDown(<span class="number">0</span>))</span><br><span class="line">        &#123;</span><br><span class="line">            scene_mgr.ChangeScene(<span class="string">"主场景"</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (Input.GetMouseButtonDown(<span class="number">1</span>))</span><br><span class="line">        &#123;</span><br><span class="line">            scene_mgr.ChangeScene(<span class="string">"开始"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上述的实现方式会有以下缺点：</p>
+<ul>
+<li>只要增加一个状态，则所有switch(m_state)的程序代码都需要增加对应的程序代码。</li>
+<li>与每一个状态有关的对象，都必须在SceneManager类中被保留，当这些对象被多个状态共享时，可能会产生混淆，不太容易识别是由哪个状态设置的，造成游戏程序调试上的困难。</li>
+<li>每一个状态可能使用不同的类对象，容易造成SceneManager类过度依赖其他类，让SceneManager类不容易移植到其他项目中。</li>
+</ul>
+<p>为了避免出现上述缺点，修正的目标会希望使用一个“场景类”来负责维护一个场景，让与此场景相关的程序代码和对象能整合在一起。这个负责维护的“场景类”，其主要工作如下:</p>
+<ul>
+<li>场景初始化；</li>
+<li>场景结束后，负责清除资源；</li>
+<li>定时更新游戏逻辑单元；</li>
+<li>转换到其他场景；</li>
+<li>其他与该场景有关的游戏实现。</li>
+</ul>
+<p>由于在范例程序中我们规划了3个场景，所以会产生对应的3个“场景类”，但如何让这3个“场景类”相互合作、彼此转换呢？我们可以使用GoF的状态模式来解决这些问题。</p>
+<h1 id="状态模式"><a href="#状态模式" class="headerlink" title="状态模式"></a><span style="color:#339AFF;">状态模式</span></h1><p>状态模式（State），在多数的设计模式书籍中都会提及，它也是游戏程序设计中应用最频繁的一种模式。主要是因为“状态”经常被应用在游戏设计的许多环节中，包含AI人工智能状态、账号登录状态、角色状态。</p>
+<h2 id="状态模式的定义"><a href="#状态模式的定义" class="headerlink" title="状态模式的定义"></a><span style="color:#00ACC1;">状态模式的定义</span></h2><p>状态模式，在GoF中的解释是:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">让一个对象的行为随着内部状态的改变而变化，而该对象也像是换了类一样。</span><br></pre></td></tr></table></figure>
+<p>自己的理解：对象的行为可以认为是类方法做的事情。<span style="color:red">对象（Mathf）的某个方法（计算次方CalculatePower）因为传入参数的不同而变的行为和之前完全不一样。传入小于等于10的值返回平方，传入了大于10的实参返回了该值的3次方。所以，有多个状态时，只需要传对应的值进这个对象的那个方法即可得到正确的返回值。本来的实现是在Mathf.CalculatePower里直接if elseif else判断，现在因为开闭原则，要去掉if语句，改为交由具体状态类来计算。</span></p>
+<p><span style="color:red">使用场景：对象.方法（形参）里面对形参进行了各种判断，返回不同的结果。此时可以用状态模式。</span></p>
+<p>如果将GoF对状态模式的定义改以游戏的方式来解释，就会像下面这样:</p>
+<p>“当德鲁伊（对象）由人形变化为兽形状态（内部状态改变）时，他所施展的技能（对象的行为）也会有所变化，玩家此时就像是在操作另一个不同的角色（像是换了类）”。</p>
+<p>“德鲁伊”是一种经常出现在角色扮演游戏（RPG）中的角色名称。变化外形是他们常使用的能力，通过外形的变化，使德鲁伊具备了转换为其他形体的能力，而变化为“兽形”是比较常见的游戏设计。当玩家决定施展外形转换能力时，德鲁伊会进入“兽形状态”，这时候的德鲁伊会以“兽形”来表现其行为，包含移动和攻击施展的方式；当玩家决定转换回人形时，德鲁伊会复原为一般形态，继续与游戏世界互动。</p>
+<p>所以，变化外形的能力可以看成是德鲁伊的一种“内部状态的转换”。通过变化外形的结果，角色表现出另外一种行为模式，而<span style="color:red">这一切的转化过程都可以由德鲁伊的内部控制功能来完成，玩家不必理解这个转化过程</span>。但无论怎么变化，玩家操作的角色都是德鲁伊，并不会因为他内部状态的转变而有所差异。</p>
+<p>当某个对象状态改变时，虽然它“表现的行为”会有所变化，但是对于客户端来说，并不会因为这样的变化，而改变对它的“操作方法”或“信息沟通”的方式。也就是说，这个对象与外界的对应方式不会有任何改变。但是，对象的内部确实是会通过“更换状态类对象”的方式来进行状态的转换。当状态对象更换到另一个类时，对象就会通过新的状态类，表现出它在这个状态下该有的行为。但这一切只会发生在对象内部，对客户端来说，完全不需要了解这些状态转换的过程及对应的方式。</p>
+<h2 id="状态模式的说明"><a href="#状态模式的说明" class="headerlink" title="状态模式的说明"></a><span style="color:#00ACC1;">状态模式的说明</span></h2><p>状态模式的结构如图3所示。</p>
+<blockquote>
+<p>图3 状态模式的结构图</p>
+</blockquote>
+<img src="/2019/08/06/游戏场景的转换--状态模式/3.png">
+<p>参与者的说明如下：</p>
+<ul>
+<li>Context（状态拥有者）<ul>
+<li>是一个具有“状态”属性的类，可以制定相关的接口，让外界能够得知状态的改变或通过操作让状态改变。</li>
+<li>有状态属性的类，例如：游戏角色有潜行、攻击、施法等状态；好友上线、脱机、忙碌等状态；GoF使用TCP联网为例，有已连接、等待连接、断线等状态。这些类中会有一个ConcreteState[X]子类的对象为其成员，用来代表当前的状态。</li>
+</ul>
+</li>
+<li>State（状态接口类）：制定状态的接口，负责规范Context （状态拥有者）在特定状态下要表现的行为。</li>
+<li>ConcreteState（具体状态类）<ul>
+<li>继承自State（状态接口类）。</li>
+<li>实现Context（状态拥有者）在特定状态下该有的行为。例如，实现角色在潜行状态时该有的行动变缓、3D模型变半透明、不能被敌方角色察觉等行为。</li>
+</ul>
+</li>
+</ul>
+<h2 id="状态模式的实现范例"><a href="#状态模式的实现范例" class="headerlink" title="状态模式的实现范例"></a><span style="color:#00ACC1;">状态模式的实现范例</span></h2><p>首先定义Context类：</p>
+<blockquote>
+<p>Listing2 定义Context类（State.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Context</span></span><br><span class="line">&#123;</span><br><span class="line">    State m_State = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Request</span>(<span class="params"><span class="keyword">int</span> Value</span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_State.Handle(Value);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">SetState</span>(<span class="params">State theState</span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Debug.Log(<span class="string">"Context.SetState:"</span>+ theState);</span><br><span class="line">        m_State = theState;  </span><br><span class="line">    &#125;    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Context类中，拥有一个State属性用来代表当前的状态，外界可以通过Request方法，让Context类呈现当前状态下的行为。SetState方法可以指定Context类当前的状态，而State状态接口类则用来定义每一个状态该有的行为：</p>
+<blockquote>
+<p>Listing3 State类（State.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">State</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">protected</span> Context m_Context = <span class="literal">null</span>;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">State</span>(<span class="params">Context theContext</span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_Context = theContext;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">Handle</span>(<span class="params"><span class="keyword">int</span> Value</span>)</span>;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在产生State类对象时，可以传入Context类对象，并将其指定给State的类成员m_Context，让State类在后续的操作中，可以获取Context对象的信息或操作Context对象。然后定义Handle抽象方法，让继承的子类可以重新定义该方法，来呈现各自不同的状态行为。</p>
+<p>最后定义3个继承自State类的子类：</p>
+<blockquote>
+<p>Listing4 定义3个状态（State.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//状态A</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ConcreteStateA</span> : <span class="title">State</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ConcreteStateA</span>(<span class="params">Context theContext</span>) : <span class="title">base</span>(<span class="params">theContext</span>)</span>&#123;&#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Handle</span>(<span class="params"><span class="keyword">int</span> Value</span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Debug.Log(<span class="string">"ConcreteStateA.Handle"</span>);</span><br><span class="line">        <span class="keyword">if</span>( Value &gt; <span class="number">10</span>)</span><br><span class="line">            m_Context.SetState( <span class="keyword">new</span> ConcreteStateB(m_Context));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//状态B</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ConcreteStateB</span> : <span class="title">State</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ConcreteStateB</span>(<span class="params">Context theContext</span>) : <span class="title">base</span>(<span class="params">theContext</span>)</span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Handle</span>(<span class="params"><span class="keyword">int</span> Value</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Debug.Log(<span class="string">"ConcreteStateB.Handle"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>( Value &gt; <span class="number">20</span>)</span><br><span class="line">            m_Context.SetState( <span class="keyword">new</span> ConcreteStateC(m_Context)) ;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 状态C</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ConcreteStateC</span> : <span class="title">State</span></span><br><span class="line">&#123;       </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ConcreteStateC</span>(<span class="params">Context theContext</span>) : <span class="title">base</span>(<span class="params">theContext</span>)</span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Handle</span>(<span class="params"><span class="keyword">int</span> Value</span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Debug.Log(<span class="string">"ConcreteStateC.Handle"</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>( Value &gt; <span class="number">30</span>)</span><br><span class="line">            m_Context.SetState( <span class="keyword">new</span> ConcreteStateA(m_Context)); </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上述3个子类，都要重新定义父类State的Handle抽象方法，用来表示在各自状态下的行为。在范例中，我们先让它们各自显示不同的信息（代表当前的状态行为），再按照本身状态的行为定义来判断是否要通知Context对象转换到另一个状态。</p>
+<p>Context类中提供了一个SetState方法，让外界能够设置Context对象当前的状态，而所谓的“外界”，也可以是由另一个State状态来调用。所以实现上，状态的转换可以有下列两种方式：</p>
+<ul>
+<li>交由Context类本身，按条件在各状态之间转换；</li>
+<li>产生Context类对象时，马上指定初始状态给Context对象，而在后续执行过程中的状态转换则交由State对象负责，Context对象不再介入。</li>
+</ul>
+<p>笔者在实现时，大部分情况下会选择第2种方式，原因在于：</p>
+<p>状态对象本身比较清楚“在什么条件下，可以让Context对象转移到另一个State状态”，所以在每个ConcreteState类的程序代码中，可以看到“状态转换条件”的判断，以及设置哪一个ConcreteState对象成为新的状态。</p>
+<p>每个ConcreteState状态都可以保持自己的属性值，作为状态转换或展现状态行为的依据，不会与其他的ConcreteState状态混用，在维护时比较容易理解。</p>
+<p>因为判断条件及状态属性都被转换到ConcreteState类中，故而可缩减Context类的大小。</p>
+<p>4个类定义好之后，我们可以通过测试范例来看看客户端程序会怎样利用这个设计：</p>
+<blockquote>
+<p>Listing5 State的测试范例（StateTest.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">UnitTest</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Context theContext = <span class="keyword">new</span> Context();</span><br><span class="line">    theContext.SetState(<span class="keyword">new</span> ConcreteStateA(theContext));</span><br><span class="line">    theContext.Request(<span class="number">5</span>);</span><br><span class="line">    theContext.Request(<span class="number">15</span>);</span><br><span class="line">    theContext.Request(<span class="number">25</span>);</span><br><span class="line">    theContext.Request(<span class="number">35</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>首先产生Context对象theContext，并立即设置为ConcreteStateA状态；然后调用Context类的Request方法，并传入作为“状态转换判断”用途的参数，让当前状态（ConcreteStateA）判断是否要转移到ConcreteStateB；最后调用几次Request方法，并传入不同的参数。</p>
+<p>从输出的信息中可以看到，Context对象的状态由ConcreteStateA按序转换到ConcreteStateB、ConcreteStateC状态，最后回到ConcreteStateA状态。</p>
+<blockquote>
+<p>执行结果 State测试范例产生的信息</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Context.SetState:ConcreteStateA</span><br><span class="line">ConcreteStateA.Handle</span><br><span class="line">ConcreteStateA.Handle</span><br><span class="line">Context.SetState:ConcreteStateB</span><br><span class="line">ConcreteStateB.Handle</span><br><span class="line">Context.SetState:ConcreteStateC</span><br><span class="line">ConcreteStateC.Handle</span><br><span class="line">Context.SetState:ConcreteStateA</span><br></pre></td></tr></table></figure>
+<h1 id="使用状态模式实现游戏场景的转换"><a href="#使用状态模式实现游戏场景的转换" class="headerlink" title="使用状态模式实现游戏场景的转换"></a><span style="color:#339AFF;">使用状态模式实现游戏场景的转换</span></h1><p>在Unity3D的环境中，游戏只会在一个场景中运行，所以我们可以让每个场景都由一个“场景类”来负责维护。此时，如果将场景类当成“状态”来比喻的话，那么就可以利用状态模式的转换原理，来完成场景转换的功能。</p>
+<p>由于每个场景所负责执行的功能不同，通过状态模式的状态转移，除了可以实现游戏内部功能的转换外，对于客户端来说，也不必根据不同的游戏状态来编写不同的程序代码，同时也减少了外界对于不同游戏状态的依赖性。</p>
+<p>而原本的Unity3D场景转换判断功能，可以在各自的场景类中完成，并且状态模式同时间也只会让一个状态存在（同时间只会有一个状态在运行），因此可以满足Unity3D执行时只能有一个场景（状态）存在的要求。</p>
+<h2 id="SceneState的实现"><a href="#SceneState的实现" class="headerlink" title="SceneState的实现"></a><span style="color:#00ACC1;">SceneState的实现</span></h2><p>《P级阵地》的场景分成3个：开始场景（StarScene）、主画面场景（MainMenuScene）和战斗场景（BattleScene），所以声明3个场景类负责对应这3个场景。这3个场景类都继承自ISceneState而SceneStateController则是作为这些状态的拥有者（Context），最后将SceneStateController对象放入GameLoop类下，作为与Unity3D运行的互动接口，上述结构如图4所示。</p>
+<blockquote>
+<p>图4 3个场景类的结构图</p>
+</blockquote>
+<img src="/2019/08/06/游戏场景的转换--状态模式/4.png">
+<p>其中的参与者如下说明：</p>
+<ul>
+<li>ISceneState：场景类的接口，定义《P级阵地》中场景转换和执行时需要调用的方法。</li>
+<li>StartState、MainMenuState、BattleState：分别对应范例中的开始场景（StartScene），主画面场景（MainMenuScene）及战斗场景（BattleScene），作为这些场景执行时的操作类。</li>
+<li>SceneStateController：场景状态的拥有者（Context），保持当前游戏场景状态，并作为与GameLoop类互动的接口。除此之外，也是执行“Unity3D场景转换”的地方。</li>
+<li>GameLoop：游戏主循环类。作为Unity3D与《P级阵地》的互动接口，包含了初始化游戏和定期调用更新操作。</li>
+</ul>
+<h2 id="实现说明"><a href="#实现说明" class="headerlink" title="实现说明"></a><span style="color:#00ACC1;">实现说明</span></h2><p>首先，定义ISceneState接口如下:</p>
+<blockquote>
+<p>Listing6 定义ISceneState类（ISceneState.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ISceneState</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 状态名称</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">string</span> m_StateName = <span class="string">"ISceneState"</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">string</span> StateName</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">get</span>&#123; <span class="keyword">return</span> m_StateName; &#125;</span><br><span class="line">        <span class="keyword">set</span>&#123; m_StateName = <span class="keyword">value</span>; &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 控制者</span></span><br><span class="line">    <span class="keyword">protected</span> SceneStateController m_Controller = <span class="literal">null</span>;</span><br><span class="line">        </span><br><span class="line">    <span class="comment">// 构造函数</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ISceneState</span>(<span class="params">SceneStateController Controller</span>)</span></span><br><span class="line"><span class="function"></span>    &#123; </span><br><span class="line">        m_Controller = Controller; </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 开始</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">StateBegin</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 结束</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">StateEnd</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 更新</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">StateUpdate</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">string</span> <span class="title">ToString</span> (<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">string</span>.Format(<span class="string">"[I_SceneState: StateName=&#123;0&#125;]"</span>, StateName);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>ISceneState定义了在《P级阵地》中，场景转换执行时需要被Unity3D通知的操作，包含：</p>
+<ul>
+<li>StateBegin方法：场景转换成功后会利用这个方法通知类对象。其中可以实现在该场景执行时需要加载的资源及游戏参数的设置。SceneStateController在此时才传入（不像前一节范例那样在构造函数中传入），因为Unity3D在转换场景时会花费一些时间，所以必须先等到场景完全加载成功后才能继续执行。</li>
+<li>StateEnd方法：场景将要被释放时会利用这个方法通知类对象。其中可以释放游戏不再使用的资源，或者重新设置游戏场景状态。</li>
+<li>StateUpdate方法：“游戏定时更新”时会利用这个方法通知类对象。该方法可以让Unity3D的“定时更新功能”被调用，并通过这个方法让其他游戏系统也定期更新。这个方法可以让游戏系统类不必继承Unity3D的MonoBehaviour类，也可以拥有定时更新功能，在<a href="/2019/08/08/游戏的主循环-Game-Loop/" title="游戏的主循环-Game-Loop">游戏的主循环-Game-Loop</a>一章会对此进行更详细地说明。</li>
+<li>m_StateName属性：可以在调试（Debug）时使用。</li>
+</ul>
+<p>StateBegin、StateEnd及StateUpdate这3个方法，虽然是定义为IScenesState中的接口方法，但是由于不强迫子类重新实现它，所以并没有被定义为抽象方法。</p>
+<p>共有3个子类继承自ISceneState，分别用来负责各Unity3D Scene的运行和转换。首先是负责开始场景（StartScene）的类，程序代码如下：</p>
+<blockquote>
+<p>Listing7 定义开始状态类（StartState.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">StartState</span> : <span class="title">ISceneState</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">StartState</span>(<span class="params">SceneStateController Controller</span>) : <span class="title">base</span>(<span class="params">Controller</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">this</span>.StateName = <span class="string">"StartState"</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 开始</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">StateBegin</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 可在此进行游戏数据加载和初始化等</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 更新</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">StateUpdate</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 更换为</span></span><br><span class="line">        m_Controller.SetState(<span class="keyword">new</span> MainMenuState(m_Controller), <span class="string">"MainMenuScene"</span>);</span><br><span class="line">    &#125;   </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>《P级阵地》的运行，必须在开始场景（StartScene）中单击“开始”按钮才能运行，所以游戏最开始的场景状态会被设置为StartState。因此在实现上，可在StateBegin方法中，将游戏启动时所需要的资源加载，这些资源可以是游戏属性数据、角色组件预载、游戏系统初始化、版本信息等。当StartState的StateUpdate第一次被调用时，会马上将游戏场景状态转换为MainMenuState，完成StartState/StartScene初始化游戏的任务。</p>
+<p>主画面场景（MainMenuScene）负责显示游戏的开始画面，并且提供简单的界面让玩家可以开始进入游戏，程序代码如下：</p>
+<blockquote>
+<p>Listing8 定义主菜单状态（MainMenuState.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">MainMenuState</span> : <span class="title">ISceneState</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">MainMenuState</span>(<span class="params">SceneStateController Controller</span>) : <span class="title">base</span>(<span class="params">Controller</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">this</span>.StateName = <span class="string">"MainMenuState"</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 开始</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">StateBegin</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 获取开始按钮</span></span><br><span class="line">        Button tmpBtn = UITool.GetUIComponent&lt;Button&gt;(<span class="string">"StartGameBtn"</span>);</span><br><span class="line">        <span class="keyword">if</span>(tmpBtn != <span class="literal">null</span>)</span><br><span class="line">            tmpBtn.onClick.AddListener( ()=&gt; OnStartGameBtnClick(tmpBtn) );</span><br><span class="line">    &#125;</span><br><span class="line">            </span><br><span class="line">    <span class="comment">// 开始游戏</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">OnStartGameBtnClick</span>(<span class="params">Button theButton</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Debug.Log (<span class="string">"OnStartBtnClick:"</span>+theButton.gameObject.name);</span><br><span class="line">        m_Controller.SetState(<span class="keyword">new</span> BattleState(m_Controller), <span class="string">"BattleScene"</span> );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>《P级阵地》的开始画面上只有一个“开始”按钮，这个按钮是使用Unity3D的UI工具增加的。从原本Unity3D的UI设置界面上，可直接设置当按钮被鼠标单击时，需要由哪一个脚本组件的方法来执行；这个设置动作也可以改由程序代码来指定。至于《P级阵地》与Unity3D的UI设计工具的整合，在<a href="/2019/08/14/Unity3D的界面设计-组合模式/" title="Unity3D的界面设计-组合模式">Unity3D的界面设计-组合模式</a>中有进一步的说明。</p>
+<p>因此，在MainMenuState的StateBegin方法中，获取MainMenuScene的“开始”按钮（StartGameBtn）后，将其OnClick事件的监听者设置为OnStartGameBtnClick方法，而该方法也将直接实现在MainMenuState类中。所以，当玩家单击“开始”按钮时， OnStartGameBtnClick会被调用，并将游戏场景状态通过SceneStateController转换到战斗场景（BattleScene）。</p>
+<p>战斗场景为《P级阵地》真正游戏玩法（阵地防守）场景，程序代码如下:</p>
+<blockquote>
+<p>Listing9 定义战斗状态（BattleState.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">BattleState</span> : <span class="title">ISceneState</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">BattleState</span>(<span class="params">SceneStateController Controller</span>) : <span class="title">base</span>(<span class="params">Controller</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">this</span>.StateName = <span class="string">"BattleState"</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 开始</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">StateBegin</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        PBaseDefenseGame.Instance.Initinal();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 结束</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">StateEnd</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        PBaseDefenseGame.Instance.Release();</span><br><span class="line">    &#125;</span><br><span class="line">            </span><br><span class="line">    <span class="comment">// 更新</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">StateUpdate</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;   </span><br><span class="line">        <span class="comment">// 输入</span></span><br><span class="line">        InputProcess();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 游戏逻辑</span></span><br><span class="line">        PBaseDefenseGame.Instance.Update();</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// Render由Unity负责</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">// 游戏是否结束</span></span><br><span class="line">        <span class="keyword">if</span>( PBaseDefenseGame.Instance.ThisGameIsOver())</span><br><span class="line">            m_Controller.SetState(<span class="keyword">new</span> MainMenuState(m_Controller), <span class="string">"MainMenuScene"</span> );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 输入</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">InputProcess</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 玩家输入判断程序代码......</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>负责战斗场景（BattleScene）的BattleState状态类在StateBegin方法中，首先调用了游戏主程序PBaseDefenseGame的初始化方法：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">StateBegin</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    PBaseDefenseGame.Instance.Initinal();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>当《P级阵地》在一场战斗结束或放弃战斗时，玩家可以回到主菜单场景（MainMenuState）。所以，当战斗场景即将结束时，StateEnd方法就会被调用，实现上，会在此调用释放游戏主程序的操作：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">StateEnd</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    PBaseDefenseGame.Instance.Release();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>BattleState的StateUpdate方法扮演着“游戏循环”的角色（GameLoop将在<a href="/2019/08/08/游戏的主循环-Game-Loop/" title="游戏的主循环-Game-Loop">游戏的主循环-Game-Loop</a>中说明）。先获取玩家的“输入操作”后，再执行“游戏逻辑”（调用PBaseDefenseGame的Update方法），并且不断地定时重复调用，直到游戏结束转换为主菜单场景（MainMenuState）为止：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">StateUpdate</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;   </span><br><span class="line">    <span class="comment">// 输入</span></span><br><span class="line">    InputProcess();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 游戏逻辑</span></span><br><span class="line">    PBaseDefenseGame.Instance.Update();</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// Render由Unity负责</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 游戏是否结束</span></span><br><span class="line">    <span class="keyword">if</span>( PBaseDefenseGame.Instance.ThisGameIsOver())</span><br><span class="line">        m_Controller.SetState(<span class="keyword">new</span> MainMenuState(m_Controller), <span class="string">"MainMenuScene"</span> );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>3个主要的游戏状态类都定义完成后，接下来就是实现这些场景转换和控制的功能：</p>
+<blockquote>
+<p>Listing10 定义场景状态控制者（SceneStateController.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">SceneStateController</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> ISceneState m_State;    </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">bool</span> m_bRunBegin = <span class="literal">false</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">SceneStateController</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置状态</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">SetState</span>(<span class="params">ISceneState State, <span class="keyword">string</span> LoadSceneName</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Debug.Log (<span class="string">"SetState:"</span>+State.ToString());</span><br><span class="line">        m_bRunBegin = <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 载入场景</span></span><br><span class="line">        LoadScene( LoadSceneName );</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 通知前一个State结束</span></span><br><span class="line">        <span class="keyword">if</span>( m_State != <span class="literal">null</span> )</span><br><span class="line">            m_State.StateEnd();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 设置</span></span><br><span class="line">        m_State = State;  </span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 载入场景</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">LoadScene</span>(<span class="params"><span class="keyword">string</span> LoadSceneName</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">if</span>( LoadSceneName == <span class="literal">null</span> || LoadSceneName.Length == <span class="number">0</span> )</span><br><span class="line">            <span class="keyword">return</span> ;</span><br><span class="line">        SceneManager.LoadLevel( LoadSceneName );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 更新</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">StateUpdate</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 是否还在加载</span></span><br><span class="line">        <span class="keyword">if</span>( Application.isLoadingLevel)</span><br><span class="line">            <span class="keyword">return</span> ;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 通知新的State开始</span></span><br><span class="line">        <span class="keyword">if</span>( m_State != <span class="literal">null</span> &amp;&amp; m_bRunBegin ==<span class="literal">false</span>)</span><br><span class="line">        &#123;</span><br><span class="line">            m_State.StateBegin();</span><br><span class="line">            m_bRunBegin = <span class="literal">true</span>;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>( m_State != <span class="literal">null</span>)</span><br><span class="line">            m_State.StateUpdate();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>SceneStateController类中有一个ISceneState成员，用来代表当前的游戏场景状态。在SetState方法中，实现了转换场景状态的功能，该方法先使用SceneManager.LoadLevel方法来加载场景；然后通知前一个状态的StateEnd方法来释放前一个状态；最后将传入的参数设置为当前状态。</p>
+<p>至于SceneUpdate方法，则是会先判断场景是否载入成功，成功之后才会调用当前游戏场景状态的StateBegin方法来初始化游戏场景状态。</p>
+<p>最后，将SceneStateController与GameLoop脚本组件结合如下：</p>
+<blockquote>
+<p>Listing11 与游戏主循环的结合（GameLoop.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">GameLoop</span> : <span class="title">MonoBehaviour</span> </span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 场景状态</span></span><br><span class="line">    SceneStateController m_SceneStateController = <span class="keyword">new</span> SceneStateController();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Awake</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 转换场景不会被删除</span></span><br><span class="line">        GameObject.DontDestroyOnLoad( <span class="keyword">this</span>.gameObject );         </span><br><span class="line"></span><br><span class="line">        <span class="comment">// 随机数种子</span></span><br><span class="line">        UnityEngine.Random.seed = (<span class="keyword">int</span>)DateTime.Now.Ticks;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Use this for initialization</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 设置起始的场景</span></span><br><span class="line">        m_SceneStateController.SetState(<span class="keyword">new</span> StartState(m_SceneStateController), <span class="string">""</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Update is called once per frame</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_SceneStateController.StateUpdate();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在GameLoop脚本组件中，定义并初始化SceneStateController类对象，并在Start方法中设置第一个游戏场景状态：StartState。之后在GameLoop脚本组件每次的Update更新方法中，调用SceneStateController对象的StateUpdate方法，让当前的场景状态类能够被定时更新。</p>
+<h2 id="使用状态模式的优点"><a href="#使用状态模式的优点" class="headerlink" title="使用状态模式的优点"></a><span style="color:#00ACC1;">使用状态模式的优点</span></h2><p>使用状态模式来实现游戏场景转换，有下列优点:</p>
+<p><strong>减少错误的发生并降低维护难度</strong></p>
+<p>不再使用switch(m_state)来判断当前的状态，这样可以减少新增游戏状态时，因未能检查到所有switch(m_state)程序代码而造成的错误。</p>
+<p><strong>状态执行环境单一化</strong></p>
+<p>与每一个状态有关的对象及操作都被实现在一个场景状态类下，这样可以清楚地了解每一个状态执行时所需要的对象及配合的类。</p>
+<p><strong>项目之间可以共享场景</strong></p>
+<p>本章开始时就提到，有些场景可以在不同项目之间共享。以当前《P级阵地》使用的3个场景及状态类为例，其中的开始场景（StartScene）和开始状态类（StartState）都可以在不同项目之间共享。例如：可以在开始状态类（StartState）的StateBegin方法中，明确定义出游戏初始化时的步骤，并将这些步骤搭配“模版方法模式（Template Method）”或“策略模式（Strategy）”，就能让各项目自行定义符合各个游戏需求的具体实现，达到各项目共享场景的目的。</p>
+<p>这种做法对于网络在线型的游戏项目特别有用，在此类型的项目中，玩家的上线、登录、验证、数据同步等过程，实现上存在一定的复杂度。若将这些复杂的操作放在共享的场景中，共享使用与维护，就可以节省许多的开发时间及成本。</p>
+<h2 id="游戏执行流程及场景转换说明"><a href="#游戏执行流程及场景转换说明" class="headerlink" title="游戏执行流程及场景转换说明"></a><span style="color:#00ACC1;">游戏执行流程及场景转换说明</span></h2><p>从Unity游戏开始执行的流程来看，《P级阵地》通过StartScene场景中唯一的GameLoop游戏对象，以及挂在其上的GameLoop脚本组件，将整个游戏运行起来。所以，在GameLoop的Start方法中设置好第一个游戏场景状态后， GameLoop的Update方法就将游戏的控制权交给SceneStateController。而SceneStateController内部则会记录当前的游戏场景状态类，之后再通过调用游戏场景状态的StateUpdate方法，就能够完成更新当前游戏场景状态的需求。上述流程可以参考下面的流程图，如图5所示。</p>
+<blockquote>
+<p>图5 流程图</p>
+</blockquote>
+<img src="/2019/08/06/游戏场景的转换--状态模式/5.png">
+<h1 id="状态模式面对变化时"><a href="#状态模式面对变化时" class="headerlink" title="状态模式面对变化时"></a><span style="color:#339AFF;">状态模式面对变化时</span></h1><p>随着项目开发进度进入中后期，游戏策划可能会提出新的系统功能来增加游戏内容。这些提案可能是增加小游戏关卡、提供查看角色信息图鉴、玩家排行等功能。当程序人员在分析这些新增的系统需求后，如果觉得无法在现有的场景下实现，就必须使用新的场景来完成。而在现有的架构下，程序人员只需要完成下列几项工作：</p>
+<ul>
+<li>在Unity3D编辑模式下新增场景。</li>
+<li>加入一个新的场景状态类对应到新的场景，并在其中实现相关功能。</li>
+<li>决定要从哪个现有场景转换到新的场景。</li>
+<li>决定新的场景结束后要转换到哪一个场景。</li>
+</ul>
+<p>上述流程，就程序代码的修改而言，只会新增一个程序文件（.cs）用来实现新的场景状态类，并修改一个现有的游戏状态，让游戏能按照需求转换到新的场景状态。除此之外，不需要修改其他任何的程序代码。</p>
+<h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a><span style="color:#339AFF;">结论</span></h1><p>在本章中，我们利用状态模式实现了游戏场景的切换，这种做法并非全然都是优点，但与传统的switch(state_code)相比，已经算是更好的设计。此外，正如前面章节所介绍的，设计模式并非只能单独使用，在实际开发中，若多种设计模式搭配得宜，将会是更好的设计。因此，本章结尾，我们将讨论，本章所做的设计还有哪些应该注意的地方，以及还可以将状态模式应用在游戏设计的哪些地方。</p>
+<p><strong><font size="3">状态模式的优缺点</font></strong></p>
+<p>使用状态模式可以清楚地了解某个场景状态执行时所需要配合使用的类对象，并且减少因新增状态而需要大量修改现有程序代码的维护成本。</p>
+<p>《P级阵地》只规划了3个场景来完成整个游戏，算是“产出较少状态类”的应用。但如果状态模式是应用在有大量状态的系统时，就会遇到“产生过多状态类”的情况，此时会伴随着类爆炸的问题，这算是一个缺点。不过与传统使用switch(state_code)的实现方式相比，使用状态模式对于项目后续的长期维护效益上，仍然具有优势。</p>
+<p>在<a href="/2019/08/11/角色AI-状态模式/" title="角色AI-状态模式">角色AI-状态模式</a>一章讲解到AI实现时，还会再次使用状态模式来实现，届时，读者可看到其他利用状态模式的应用。</p>
+<p><strong><font size="3">与其他模式的合作</font></strong></p>
+<p>在《P级阵地》的BattleState类实现中，分别调用了PBaseDefenseGame类的不同方法，此时的PBaseDefenseGame使用的是“单例模式”，这是一种让BattleState类方法中的程序代码，可以取得唯一对象的方式。而PBaseDefenseGame也使用了“外观模式”来整合PBaseDefenseGame内部的复杂系统，因此BattleState类不必了解太多关于PBaseDefenseGame内部的实现方式。</p>
+<p>状态模式的其他应用方式：</p>
+<ul>
+<li>角色AI：使用状态模式来控制角色在不同状态下的AI行为。</li>
+<li>游戏服务器连线状态：网络游戏的客户端，需要处理与游戏服务器的连线状态，一般包含开始连线、连线中、断线等状态，而在不同的状态下，会有不同的封包信息处理方式，需要分别实现。</li>
+<li>关卡进行状态：如果是通关型游戏，进入关卡时通常会分成不同的阶段，包含加载数据、显示关卡信息、倒数通知开始、关卡进行、关卡结束和分数计算，这些不同的阶段可以使用不同的状态类来负责实现。</li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/设计模式与游戏完美开发/" rel="tag"># 设计模式与游戏完美开发</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/08/06/Unity资产，特殊文件夹以及重要路径/" rel="next" title="Unity资产，特殊文件夹以及重要路径">
+                <i class="fa fa-chevron-left"></i> Unity资产，特殊文件夹以及重要路径
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/08/07/读写文件/" rel="prev" title="读写文件">
+                读写文件 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">354</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">55</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2020/02/16/游戏设计快乐之道（第2版）/" title="游戏设计快乐之道（第2版）" target="_blank">游戏设计快乐之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/14/游戏剧本怎么写/" title="游戏剧本怎么写" target="_blank">游戏剧本怎么写</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/04/通关！游戏设计之道（第2版）/" title="通关！游戏设计之道（第2版）" target="_blank">通关！游戏设计之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/26/游戏设计艺术（第2版）/" title="游戏设计艺术（第2版）" target="_blank">游戏设计艺术（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/22/大师谈游戏设计创意与节奏/" title="大师谈游戏设计创意与节奏" target="_blank">大师谈游戏设计创意与节奏</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#游戏场景"><span class="nav-number">1.</span> <span class="nav-text">游戏场景</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#场景的转换"><span class="nav-number">1.1.</span> <span class="nav-text">场景的转换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#游戏场景可能的实现方式"><span class="nav-number">1.2.</span> <span class="nav-text">游戏场景可能的实现方式</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#状态模式"><span class="nav-number">2.</span> <span class="nav-text">状态模式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#状态模式的定义"><span class="nav-number">2.1.</span> <span class="nav-text">状态模式的定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#状态模式的说明"><span class="nav-number">2.2.</span> <span class="nav-text">状态模式的说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#状态模式的实现范例"><span class="nav-number">2.3.</span> <span class="nav-text">状态模式的实现范例</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用状态模式实现游戏场景的转换"><span class="nav-number">3.</span> <span class="nav-text">使用状态模式实现游戏场景的转换</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#SceneState的实现"><span class="nav-number">3.1.</span> <span class="nav-text">SceneState的实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现说明"><span class="nav-number">3.2.</span> <span class="nav-text">实现说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用状态模式的优点"><span class="nav-number">3.3.</span> <span class="nav-text">使用状态模式的优点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#游戏执行流程及场景转换说明"><span class="nav-number">3.4.</span> <span class="nav-text">游戏执行流程及场景转换说明</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#状态模式面对变化时"><span class="nav-number">4.</span> <span class="nav-text">状态模式面对变化时</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#结论"><span class="nav-number">5.</span> <span class="nav-text">结论</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">3.7m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">56:23</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="思考并回答以下问题：">
+<meta name="keywords" content="设计模式：基于C#的工程化实现与扩展">
+<meta property="og:type" content="article">
+<meta property="og:title" content="观察者模式">
+<meta property="og:url" content="http://chebincarl.github.io/2019/10/14/观察者模式-2/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="思考并回答以下问题：">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://chebincarl.github.io/2019/10/14/观察者模式-2/1.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/10/14/观察者模式-2/2.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/10/14/观察者模式-2/3.png">
+<meta property="og:updated_time" content="2019-10-18T11:12:03.152Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="观察者模式">
+<meta name="twitter:description" content="思考并回答以下问题：">
+<meta name="twitter:image" content="http://chebincarl.github.io/2019/10/14/观察者模式-2/1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/10/14/观察者模式-2/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>观察者模式 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">专注，重复10遍</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/10/14/观察者模式-2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">观察者模式
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-10-14 14:22:24" itemprop="dateCreated datePublished" datetime="2019-10-14T14:22:24+08:00">2019-10-14</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-10-18 19:12:03" itemprop="dateModified" datetime="2019-10-18T19:12:03+08:00">2019-10-18</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/设计模式/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">12k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">11 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>思考并回答以下问题：</p>
+<a id="more"></a>
+<p>本章涵盖：</p>
+<ul>
+<li>说明</li>
+<li>经典回顾</li>
+<li>.NET内置的Observer机制——事件</li>
+<li>具有Observer的集合类型</li>
+<li>面向服务接口的Observer</li>
+<li>小结</li>
+</ul>
+<h1 id="说明"><a href="#说明" class="headerlink" title="说明"></a>说明</h1><p>Define a one-to-many dependency between objects so that when one object changes state, all its dependents are notified and updated automatically..      —Design Patterns: Elements of Reusable Object-Oriented Software</p>
+<p>观察者模式主要用于1:N的通知发布机制，它希望解决一个对象状态变化时可以及时告知相关依赖对象的问题，令它们也可以做出响应。生活中类似的案例很多，大至自上而下的政策调整、奥运赛场信息的发布，小至项目中一个需求点的调整，我们都可以发现存在类似的通知要求，而且无论是会议、人力还是工具，其中都存在一个角色，它的作用就是保持对相关问题（或称之为主题）的关注，在问题发生变化的时候是“TA”把消息通知相关各方。观察者模式采用的就是类似的方法，它<span style="color:red">抽象一类对象（观察者）专门负责“盯着”目标对象，当目标对象状态有变动的时候，每个观察者就会获得通知并做出响应。观察者模式解决的也是调用通知关系带来的依赖。</span></p>
+<p>用一段代码作为示例也许更为直观，这里假设类型X状态更新后要同时告知A、B、C三个类型，那么一个直观的实现方式如下：</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> A\B\C为希望获得X通知的类型 </span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">A</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> Data;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params"><span class="keyword">int</span> data</span>) </span></span><br><span class="line"><span class="function"></span>    &#123; </span><br><span class="line">        <span class="keyword">this</span>.Data = data; </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">B</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> Count;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">NotifyCount</span>(<span class="params"><span class="keyword">int</span> data</span>) </span></span><br><span class="line"><span class="function"></span>    &#123; </span><br><span class="line">        <span class="keyword">this</span>.Count = data; </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">C</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> N;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Set</span>(<span class="params"><span class="keyword">int</span> data</span>) </span></span><br><span class="line"><span class="function"></span>    &#123; </span><br><span class="line">        <span class="keyword">this</span>.N = data; </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> X在自己属性更新的时候需要同时通知多个对象</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">X</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> data;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> A instanceA;</span><br><span class="line">    <span class="keyword">public</span> B instanceB;</span><br><span class="line">    <span class="keyword">public</span> C instanceC;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">SetData</span>(<span class="params"><span class="keyword">int</span> data</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">this</span>.data = data;</span><br><span class="line">        instanceA.Update(data);</span><br><span class="line">        instanceB.NotifyCount(data);</span><br><span class="line">        instanceC.Set(data);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>UnitTest</strong></p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">[<span class="meta">TestMethod</span>]</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Test</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    A a = <span class="keyword">new</span> A();</span><br><span class="line">    B b = <span class="keyword">new</span> B();</span><br><span class="line">    C c = <span class="keyword">new</span> C();</span><br><span class="line"></span><br><span class="line">    X x = <span class="keyword">new</span> X();</span><br><span class="line">    x.instanceA = a;</span><br><span class="line">    x.instanceB = b;</span><br><span class="line">    x.instanceC = c;</span><br><span class="line">    x.SetData(<span class="number">10</span>);</span><br><span class="line"></span><br><span class="line">    Assert.AreEqual&lt;<span class="keyword">int</span>&gt;(<span class="number">10</span>, a.Data);</span><br><span class="line">    Assert.AreEqual&lt;<span class="keyword">int</span>&gt;(<span class="number">10</span>, b.Count);</span><br><span class="line">    Assert.AreEqual&lt;<span class="keyword">int</span>&gt;(<span class="number">10</span>, c.N);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里类型X只需引用A、B、C三个类型即可，但这样会给类型X带来似乎过多的依赖关系，因为它需要同时引用三个类型。不难发现，其实A、B、C三个类型本身都有类似的执行更新的方法，如果对它们进行抽象就可以让X仅仅依赖于一个抽象类型，于是对代码进行如下修改：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> 对类型A/B/C做抽象后的接口</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title">IUpdatableObject</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">int</span> Data &#123; <span class="keyword">get</span>; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params"><span class="keyword">int</span> newData</span>)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> 具体的待更新类型</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">A</span> : <span class="title">IUpdatableObject</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> data;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> Data&#123;<span class="keyword">get</span> &#123; <span class="keyword">return</span> <span class="keyword">this</span>.data;&#125;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params"><span class="keyword">int</span> newData</span>)</span> &#123; <span class="keyword">this</span>.data = newData; &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">B</span> : <span class="title">IUpdatableObject</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> count;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> Data &#123; <span class="keyword">get</span> &#123; <span class="keyword">return</span> <span class="keyword">this</span>.count; &#125; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params"><span class="keyword">int</span> newData</span>)</span> &#123; <span class="keyword">this</span>.count = newData; &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">C</span> : <span class="title">IUpdatableObject</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> n;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> Data &#123; <span class="keyword">get</span> &#123; <span class="keyword">return</span> <span class="keyword">this</span>.n; &#125; &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params"><span class="keyword">int</span> newData</span>)</span> &#123; <span class="keyword">this</span>.n = newData; &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">X</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> IUpdatableObject[] objects = <span class="keyword">new</span> IUpdatableObject[<span class="number">3</span>];</span><br><span class="line">    <span class="comment">// 索引器</span></span><br><span class="line">    <span class="keyword">public</span> IUpdatableObject <span class="keyword">this</span>[<span class="keyword">int</span> index] &#123; <span class="keyword">set</span> &#123; objects[index] = <span class="keyword">value</span>; &#125; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> data;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params"><span class="keyword">int</span> newData</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">this</span>.data = newData;</span><br><span class="line">        <span class="keyword">foreach</span> (IUpdatableObject obj <span class="keyword">in</span> objects)</span><br><span class="line">            obj.Update(newData);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>UnitTest</strong></p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">[<span class="meta">TestMethod</span>]</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Test</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    X x = <span class="keyword">new</span> X();</span><br><span class="line">    IUpdatableObject a = <span class="keyword">new</span> A();</span><br><span class="line">    IUpdatableObject b = <span class="keyword">new</span> B();</span><br><span class="line">    IUpdatableObject c = <span class="keyword">new</span> C();</span><br><span class="line">    x[<span class="number">0</span>] = a;</span><br><span class="line">    x[<span class="number">1</span>] = b;</span><br><span class="line">    x[<span class="number">2</span>] = c;</span><br><span class="line">    x.Update(<span class="number">10</span>);</span><br><span class="line">    Assert.AreEqual&lt;<span class="keyword">int</span>&gt;(<span class="number">10</span>, a.Data);</span><br><span class="line">    Assert.AreEqual&lt;<span class="keyword">int</span>&gt;(<span class="number">10</span>, b.Data);</span><br><span class="line">    Assert.AreEqual&lt;<span class="keyword">int</span>&gt;(<span class="number">10</span>, c.Data);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样做有什么区别呢？我们会发现如果后面示例中A\B\C实例可以通过其他方式注入，客户程序仅需要依赖一个抽象的接口——IUpdatableObject。变化后的结构如图1所示。</p>
+<blockquote>
+<p>图1 抽象前后的1:N通知机制</p>
+</blockquote>
+<img src="/2019/10/14/观察者模式-2/1.png">
+<p>通过一个简单的抽象，客户程序所依赖的类型变成一个，这样为其带来进一步扩展的灵活性，而且不容易因为A\B\C的变化受到影响。</p>
+<h1 id="经典回顾"><a href="#经典回顾" class="headerlink" title="经典回顾"></a>经典回顾</h1><p>上面的分析还有一个问题没有说明，即对目标对象的状态修改的抽象，不仅存在修改某个对象需要其他几个对象的情况，而且很多对象都存在类似的情况。根据我们面向对象的经验，这时候非常有必要对目标对象本身也进行一次抽象，这样任何符合类似特征的对象都可以采用类似的方式做到松散耦合的通知。观察者模式的静态结构如图2所示。</p>
+<blockquote>
+<p>图2 经典观察者模式的静态结构</p>
+</blockquote>
+<img src="/2019/10/14/观察者模式-2/2.png">
+<p>该模式不仅对目标对象进行了抽象，同时对它保持关注的对象（观察者）也进行了抽象，通过在目标对象维护一个观察者对象列表的方式，当状态变更的时候进行逐个通知。它的主要应用情景如下：</p>
+<ul>
+<li><p>当存在一类对象通知关系上依赖于另一类对象的时候，把它们进行抽象，确保两类对象的具体实现都可以相对独立的变化，但它们交互的接口保持稳定。</p>
+</li>
+<li><p>一个类型状态变化时，需要通知未知数量的其他对象，例如：我们第一个例子中X明确知道有A\B\C各一个实例需要通知，但如果增加D类型或有两个A需要通知，X就需要频繁修改了。</p>
+</li>
+<li><p>最重要的是提供了目标对象与希望获得通知的对象间松散耦合。</p>
+</li>
+</ul>
+<p>下面我们看一个示例，其代码如下：</p>
+<p>C#抽象定义部分</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> 观察者类型接口</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;typeparam name="T"&gt;</span><span class="doctag">&lt;/typeparam&gt;</span></span></span><br><span class="line">public interface IObserver&lt;T&gt;</span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Update</span>(<span class="params">SubjectBase&lt;T&gt; subject</span>)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> 目标对象抽象类型</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">public abstract class SubjectBase&lt;T&gt; </span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> 登记所有需要通知的观察者</span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">    <span class="keyword">protected</span> IList&lt;IObserver&lt;T&gt;&gt; observers = <span class="keyword">new</span> List&lt;IObserver&lt;T&gt;&gt;();</span><br><span class="line">    <span class="keyword">protected</span> T state;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">virtual</span> T State&#123;<span class="keyword">get</span>&#123;<span class="keyword">return</span> state;&#125;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> Attach</span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="subject"&gt;</span><span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="observer"&gt;</span><span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;returns&gt;</span><span class="doctag">&lt;/returns&gt;</span></span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> SubjectBase&lt;T&gt; <span class="keyword">operator</span> +(SubjectBase&lt;T&gt; subject, IObserver&lt;T&gt; observer)</span><br><span class="line">    &#123;</span><br><span class="line">        subject.observers.Add(observer);</span><br><span class="line">        <span class="keyword">return</span> subject;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> Detach</span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="subject"&gt;</span><span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="observer"&gt;</span><span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;returns&gt;</span><span class="doctag">&lt;/returns&gt;</span></span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> SubjectBase&lt;T&gt; <span class="keyword">operator</span> -(SubjectBase&lt;T&gt; subject, IObserver&lt;T&gt; observer)</span><br><span class="line">    &#123;</span><br><span class="line">        subject.observers.Remove(observer);</span><br><span class="line">        <span class="keyword">return</span> subject;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> 更新各观察者</span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">Notify</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">foreach</span> (IObserver&lt;T&gt; observer <span class="keyword">in</span> observers)</span><br><span class="line">            observer.Update(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> 供客户程序对目标对象进行操作的方法</span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;param name="state"&gt;</span><span class="doctag">&lt;/param&gt;</span></span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params">T state</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">this</span>.state = state;</span><br><span class="line">        Notify();   <span class="comment">// 触发对外通知</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>C#具体类型部分</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> 具体目标类型</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;typeparam name="T"&gt;</span><span class="doctag">&lt;/typeparam&gt;</span></span></span><br><span class="line">public class SubjectA&lt;T&gt; : SubjectBase&lt;T&gt; &#123; &#125;</span><br><span class="line">public class SubjectB&lt;T&gt; : SubjectBase&lt;T&gt; &#123; &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> 具体观察者类型</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;typeparam name="T"&gt;</span><span class="doctag">&lt;/typeparam&gt;</span></span></span><br><span class="line">public class Observer&lt;T&gt; : IObserver&lt;T&gt;</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> T State;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params">SubjectBase&lt;T&gt; subject</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">this</span>.State = subject.State;   </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>UnitTest</p>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">[<span class="meta">TestClass</span>]</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">TestObserver</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> 验证目标类型对观察者类型的1:N通知</span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">    [<span class="meta">TestMethod</span>]</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">TestMulticst</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        SubjectBase&lt;<span class="keyword">int</span>&gt; subject = <span class="keyword">new</span> SubjectA&lt;<span class="keyword">int</span>&gt;();</span><br><span class="line">        Observer&lt;<span class="keyword">int</span>&gt; observer1 = <span class="keyword">new</span> Observer&lt;<span class="keyword">int</span>&gt;();</span><br><span class="line">        observer1.State = <span class="number">10</span>;</span><br><span class="line">        Observer&lt;<span class="keyword">int</span>&gt; observer2 = <span class="keyword">new</span> Observer&lt;<span class="keyword">int</span>&gt;();</span><br><span class="line">        observer2.State = <span class="number">20</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Attach Observer</span></span><br><span class="line">        subject += observer1;</span><br><span class="line">        subject += observer2;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 确认通知的有效性</span></span><br><span class="line">        subject.Update(<span class="number">1</span>);</span><br><span class="line">        Assert.AreEqual&lt;<span class="keyword">int</span>&gt;(<span class="number">1</span>, observer1.State);</span><br><span class="line">        Assert.AreEqual&lt;<span class="keyword">int</span>&gt;(<span class="number">1</span>, observer2.State);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 确认变更通知列表后的有效性</span></span><br><span class="line">        subject -= observer1;</span><br><span class="line">        subject.Update(<span class="number">5</span>);</span><br><span class="line">        Assert.AreNotEqual&lt;<span class="keyword">int</span>&gt;(<span class="number">5</span>, observer1.State);</span><br><span class="line">        Assert.AreEqual&lt;<span class="keyword">int</span>&gt;(<span class="number">5</span>, observer2.State);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> 验证同一个观察者对象可以同时“观察”多个目标对象</span></span><br><span class="line">    <span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line">    [<span class="meta">TestMethod</span>]</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">TestMultiSubject</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        SubjectBase&lt;<span class="keyword">int</span>&gt; subjectA = <span class="keyword">new</span> SubjectA&lt;<span class="keyword">int</span>&gt;();</span><br><span class="line">        SubjectBase&lt;<span class="keyword">int</span>&gt; subjectB = <span class="keyword">new</span> SubjectA&lt;<span class="keyword">int</span>&gt;();</span><br><span class="line">        Observer&lt;<span class="keyword">int</span>&gt; observer = <span class="keyword">new</span> Observer&lt;<span class="keyword">int</span>&gt;();</span><br><span class="line">        observer.State = <span class="number">20</span>;</span><br><span class="line">        subjectA += observer;</span><br><span class="line">        subjectB += observer;</span><br><span class="line"></span><br><span class="line">        subjectA.Update(<span class="number">10</span>);</span><br><span class="line">        Assert.AreEqual&lt;<span class="keyword">int</span>&gt;(<span class="number">10</span>, observer.State);</span><br><span class="line">        subjectB.Update(<span class="number">5</span>);</span><br><span class="line">        Assert.AreEqual&lt;<span class="keyword">int</span>&gt;(<span class="number">5</span>, observer.State);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们分析一下这个例子：</p>
+<ul>
+<li>SubjectBase本身不知道会有哪些1Observer类型希望获得它的更新通知。</li>
+<li>具体的Observer类型也并不需要真正了解目标类型是什么，知道它们是SubjectcBase即可。</li>
+<li>SubjectBase通过一个观察者列表逐个通知，单元测试验证其有效。</li>
+<li>同样，每一个观察者由于仅依赖于抽象的目标类型，因此一个观察者实际上可以跟踪多个目标类型。</li>
+</ul>
+<p>下面我们讨论一下观察者如何更新自己数据，当目标对象状态更新的时候，观察者可以通过以下两种方式更新信息：</p>
+<ul>
+<li>目标对象在通知里把需要更新的信息作为参数提供给IObserver的Update()方法。</li>
+<li>目标对象仅仅告诉观察者有新的状态，至于该状态是什么，观察者自己访问目标对象来获取。</li>
+</ul>
+<p>前者我们称之为“推”方式，更新的数据是目标对象硬塞给观察者的；后者被称为“拉”模式，是观察者主动从目标对象拽下来的。从面向对象来看，它们的优劣如下：</p>
+<ul>
+<li>“推”方式每次都会把通知以广播方式发送给所有观察者，所有观察者只能被动接受，如果通知的内容比较多，多个观察者同时接受可能会对网络、内存（可能还会涉及IO）有比较大的影响。</li>
+<li>“拉”方式更加自由，它只要知道“有情况”就可以了，至于什么时候获取、获取哪些内容、甚至是否要获取都可以自主决定，但这也带来两个问题，如果某个观察者“不紧不慢”，它可能会漏掉之前通知的内容；另外它必须保存一个对目标对象的引用，而且需要了解目标对象的结构，即产生了一定依赖。</li>
+</ul>
+<p>项目中将这两种方式区分开来，其更主要原因来自于安全性要求，原则上我们都希望高信任区域可以读写低信任区域，而低信任区域不能写高信任区域，很多时候连读都不允许，这时候“推”模式比较适合高信任区域不信任低信任区域的写方式，而“拉”一般要求高信任区域信任某个低信任区域的访问，或者就是高信任区域访问低信任区域。</p>
+<p>我们上面的示例其实是综合两者优缺点后一个折中的办法，整体上看比较贴近“推”方式，但推送的内容并不是实际的状态，而是一个对抽象目标对象的引用，观察者可以根据需要通过这个引用访问到状态，从这个角度看又是“拉”方式（见图3）。</p>
+<blockquote>
+<p>图3 观察者模式的时序</p>
+</blockquote>
+<img src="/2019/10/14/观察者模式-2/3.png">
+<h1 id="NET内置的Observer机制——事件"><a href="#NET内置的Observer机制——事件" class="headerlink" title=".NET内置的Observer机制——事件"></a>.NET内置的Observer机制——事件</h1><p>前面的章节里我们已经多次介绍过委托和事件，从其执行效果看，.NET的事件处理过程本身就是个观察者模式的范例，前面讨论过，虽然从直接的编码角度看，.NET CLR对上层众多事件的调度属于中介者方式，但从应用层的使用看事件所定义的委托类型本身就是个抽象的观察者，相对于上面示例中的观察者接口而言，它令应用结构更加松散耦合，实际上直接依赖的除了作为目标对象的EventArgs以外就是.NET CLR自己了。</p>
+<p>上面是一个简单的.NET事件，其中观察者是满足.NET事件委托要求（例如NameChanged）所定义的具体方法，相对于我们常说的抽象观察者接口和具体观察者对象而言，.NET的委托机制更为简单，从编码上看就是抽象一个方法签名。</p>
+<p>不难看出这个结构更加松散，客户程序不必实现一个IObserver接口，.NET事件机制是：NET内置的，观察者与目标对象之间也是松散耦合的，观察者可以随时通过重载的+=、-=的建立与目标对象的联系，同时所有的目标类型都是继承自EventArgs的，它是通用的。对于使用普通委托的情况而言，每个delegate定义其实可视为使用MulticastDelegate做组播，它可以满足我们对更多委托参数（即更多主题内容）的要求。</p>
+<p>因此，我们建议：除非类型参数或配置体系有专门的要求，必须要定义自己的10bserver接口，项目中可以考虑用松散的委托或事件方式设计观察者。甚至我们在设计应用的时候，尤其是对应用交互部分可以采用事件驱动（EDA： Event-Driven Architect）方式，业务实体对象也好，业务流程对象也好，把对外部应用的切入点设计为各种事件，这样它们执行中可以按照自己的方式处理，至于会有多少人“盯着”其行为，操作本身并不理会。</p>
+<h1 id="具有Observer的集合类型"><a href="#具有Observer的集合类型" class="headerlink" title="具有Observer的集合类型"></a>具有Observer的集合类型</h1><p>工程中很多时候我们会使用集合类型（例如： IList<t>、IDictionary<tkey. tvalue>）来缓存一系列信息，这些信息往往会被多个模块共享，如果缓存信息发生变更，有可能需要通知到各使用方，我们可以采用为集合类型增加事件的方式令它们具有Observer机制。<br>.NET Framework提供的常用集合类型-Dictionary<tkey, tvalue>， List<t>，并没有提供更新事件，估计其本意也是为了提高集合操作效率，所以这里就采用两套相对简便的方式来实现示例。<br>其代码如下：</t></tkey,></tkey.></t></p>
+<h1 id="面向服务接口的Observer"><a href="#面向服务接口的Observer" class="headerlink" title="面向服务接口的Observer"></a>面向服务接口的Observer</h1><p>在Web Service世界中同样可以借助事件机制完成两个服务对象间的通知-观察方式，比较主要的标准是微软联合相关厂商推出的WS-Eventing，不过它采用的是观察者模式的一个更进一步的变体-出版/预定模式，出版/预定模式我们会在后面的架构模式部分作介绍，本章先提一下服务接口环境下实现的概念步骤。</p>
+<p>这很大程度上与服务调用中，发出通知的源对象难于管理需要通知的各个对象有关，采用下面的直接方式，源对象至少需要了解如下内容：<br>每个目标对象的地址（对于Web Service而言，大部分是URL）<br>如何与每个目标对象绑定，双方的通过什么协议、接口关联在一起。<br>服务环境下的通知关系如图4所示。</p>
+<p>图4服务环境下的通知关系示意图</p>
+<p>由于服务源服务接口需要服务的对象还不确定的内容非常多，也可能非常杂，如果让它实现服务的同时又去管理这些“杂事”，对其运行有不利的影响，而且承担的职责太多，同时会产生过多的对外依赖关系。虽然通过WS-MEX （Web Service MetadataExchange）可以让源与每个目标对象间完成对消息交换方式的协商，但还是免不了1：N的依赖关系。还有一个问题，即我们设计的服务接口往往不像之前示例中那么简单，需要通知的事情（正常情况、异常情况、延期超时、追加通知，同一个业务领域下的不同主体 ）也比较多，相应的目标方关注的内容也不一样（例如，虽然银行提供了催缴电话费的短信服务，但这些服务不能每次都“群”，还是要有的放矢）。</p>
+<p>所以，很有必要安排一个观察者负责关注源的动向，另外还需要增加一个持久化机制，把每个目标方关注的内容和源实际可能通知的事件类别进行登记并匹配，这样即便有各种类型、各种适用个性化的通知，也可以“按需”完成通知。在Ws-Eventing中规定了几个</p>
+<p>概念<br>Event Source：实际发生事件的源。<br>Event Message：通知本身作为事件的消息，在松散的服务接口间传递。<br>Event Sink：实际接受Event Message的目标方，类似WCF中的概念体系，它也是用ABC（Address. Binding， Contract）描述的（ABC的组合常被称为ServiceEndpoint）下面我们看一下一般设计服务接口层次ws-Eventing系统的结构，如图5所示。</p>
+<p>图5 WS-Eventing的系统结构</p>
+<p>这里SubscriptionStore是个抽象的概念预订信息访问对象，它保存的信息包括哪些Eventsink会对何种事件感兴趣，需要接收该事件，而通知管理机制在收到新的通知事件的时候，往往采用wS-Transfer方式提取、查找相关信息。至于具体用什么技术实现WS-Transfer，则没有明确要求，比如用数据访问、用XPath查找一个xML文件都可以。该方式的时序如图6所示。</p>
+<p>考虑到NotificationManager主要负责有关运行过程中的执行，为了和SubscriptionStore打交道，之前还需要有个对象管理对预定信息的收集、登记、撤销，所以我们在上面系统结构上增加一个SubscriptionManager的对象，它和NotificaionManager没有直接的交互，两者仅基于SubscriptionStore实现各自独立的处理，如图7所示。</p>
+<p>这里有意把SubscriberManager的回复写在下一个操作之前，其意在说明Subscriber的预定过程可以是异步的，也可以同步执行。</p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>本章介绍了观察者模式，由于它可以比较有效地降低调用关系中1：N的依赖，同时对无法预知数量的观察者提供支持，所以无论在.NET Framework还是在项目实施中都被普遍使用。</p>
+<p>但与此同时，观察者模式也会产生一些不太好的后果，例如：<br>降低了性能：不使用该模式的时候对象间是直接引用的调用过程，而且引用关系在编译阶段就决定的。<br>内存泄漏：即便每个主题对象上的所有观察者都已经失效了，但它们没有调用Detach方法，因此无论是观察者本身还是主题对象间都可能因为相互的引用关系无法被GC回收。<br>测试和调试更加困难：采用观察者模式会令调用关系的依赖不如之前的直接调用明显，因此在测试或调试的时候我们需要时刻注意每一个Attach和Detach过程，而且还要注意Notify当前遍历的位置，否则难于跟踪并找到当前实际执行的类型。<br>除非特殊需要，很多时候.NET环境下开发并非必须定义独立的IObserver接口，我们可以直接采用.NET的事件机制完成。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/设计模式：基于C-的工程化实现与扩展/" rel="tag"># 设计模式：基于C#的工程化实现与扩展</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/10/11/PureMVC入门与进阶/" rel="next" title="PureMVC入门与进阶">
+                <i class="fa fa-chevron-left"></i> PureMVC入门与进阶
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/10/14/StrangeIOC官方案例/" rel="prev" title="StrangeIOC官方案例">
+                StrangeIOC官方案例 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">354</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">55</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2020/02/16/游戏设计快乐之道（第2版）/" title="游戏设计快乐之道（第2版）" target="_blank">游戏设计快乐之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/14/游戏剧本怎么写/" title="游戏剧本怎么写" target="_blank">游戏剧本怎么写</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/04/通关！游戏设计之道（第2版）/" title="通关！游戏设计之道（第2版）" target="_blank">通关！游戏设计之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/26/游戏设计艺术（第2版）/" title="游戏设计艺术（第2版）" target="_blank">游戏设计艺术（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/22/大师谈游戏设计创意与节奏/" title="大师谈游戏设计创意与节奏" target="_blank">大师谈游戏设计创意与节奏</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#说明"><span class="nav-number">1.</span> <span class="nav-text">说明</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#经典回顾"><span class="nav-number">2.</span> <span class="nav-text">经典回顾</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#NET内置的Observer机制——事件"><span class="nav-number">3.</span> <span class="nav-text">.NET内置的Observer机制——事件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#具有Observer的集合类型"><span class="nav-number">4.</span> <span class="nav-text">具有Observer的集合类型</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#面向服务接口的Observer"><span class="nav-number">5.</span> <span class="nav-text">面向服务接口的Observer</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#小结"><span class="nav-number">6.</span> <span class="nav-text">小结</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">3.7m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">56:23</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1787 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="思考并回答以下问题：  如何在脚本中获取自身所在的GameObject？ Debug.Log的第2个参数有什么作用？ 如何通过物体名字查找物体？ GameObject.Find()有什么缺点？是深度遍历还是广度遍历？如何解决？ 如何修改物体的active状态？ activeInHierarchy和active有什么区别？ 如何用代码创建空物体？ 如何用代码创建内置几何体？ 怎么得到游戏对象的lay">
+<meta name="keywords" content="大话Unity2018">
+<meta property="og:type" content="article">
+<meta property="og:title" content="GameObject API">
+<meta property="og:url" content="http://chebincarl.github.io/2019/08/08/GameObject-API/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="思考并回答以下问题：  如何在脚本中获取自身所在的GameObject？ Debug.Log的第2个参数有什么作用？ 如何通过物体名字查找物体？ GameObject.Find()有什么缺点？是深度遍历还是广度遍历？如何解决？ 如何修改物体的active状态？ activeInHierarchy和active有什么区别？ 如何用代码创建空物体？ 如何用代码创建内置几何体？ 怎么得到游戏对象的lay">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/08/GameObject-API/1.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/08/GameObject-API/2.gif">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/08/GameObject-API/3.png">
+<meta property="og:updated_time" content="2019-11-06T22:09:07.148Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="GameObject API">
+<meta name="twitter:description" content="思考并回答以下问题：  如何在脚本中获取自身所在的GameObject？ Debug.Log的第2个参数有什么作用？ 如何通过物体名字查找物体？ GameObject.Find()有什么缺点？是深度遍历还是广度遍历？如何解决？ 如何修改物体的active状态？ activeInHierarchy和active有什么区别？ 如何用代码创建空物体？ 如何用代码创建内置几何体？ 怎么得到游戏对象的lay">
+<meta name="twitter:image" content="http://chebincarl.github.io/2019/08/08/GameObject-API/1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/08/08/GameObject-API/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>GameObject API | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">专注，重复10遍</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/08/08/GameObject-API/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">GameObject API
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-08-08 19:38:11" itemprop="dateCreated datePublished" datetime="2019-08-08T19:38:11+08:00">2019-08-08</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-11-07 06:09:07" itemprop="dateModified" datetime="2019-11-07T06:09:07+08:00">2019-11-07</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Unity/" itemprop="url" rel="index"><span itemprop="name">Unity</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">7.2k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">7 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>思考并回答以下问题：</p>
+<ul>
+<li>如何在脚本中获取自身所在的GameObject？</li>
+<li>Debug.Log的第2个参数有什么作用？</li>
+<li>如何通过物体名字查找物体？</li>
+<li>GameObject.Find()有什么缺点？是深度遍历还是广度遍历？如何解决？</li>
+<li>如何修改物体的active状态？</li>
+<li>activeInHierarchy和active有什么区别？</li>
+<li>如何用代码创建空物体？</li>
+<li>如何用代码创建内置几何体？</li>
+<li>怎么得到游戏对象的layer，tag和所在场景名？</li>
+<li>如何给游戏对象添加组件？</li>
+</ul>
+<a id="more"></a>
+<p>GameObject本身没有功能，它是组件的容器，很多时候我们需要在脚本中操作GameObject。</p>
+<h1 id="如何在脚本中获取自身所在的GameObject？"><a href="#如何在脚本中获取自身所在的GameObject？" class="headerlink" title="如何在脚本中获取自身所在的GameObject？"></a><span style="color:#339AFF;">如何在脚本中获取自身所在的GameObject？</span></h1><p>我们知道脚本必须挂在一个GameObject上面才能执行，那么如何知道当前脚本所挂载的GameObject是哪一个呢？</p>
+<p>这就需要用到gameObject属性了。</p>
+<p><strong>gameObject</strong>属性可以在所有继承MonoBehaviour的类中获取到，因为脚本必须要挂载到一个物体上才能执行，这个gameObject就是脚本挂到的物体。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Test</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span> (<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Debug.Log(gameObject.name, gameObject);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>上面的代码就会打印出脚本所挂物体的名字。</p>
+<p>注意这里Debug.Log传入了两个参数，这是为什么呢？</p>
+<p>遇到这种问题，我们首先查一下Unity的文档。</p>
+<p>为什么要查Unity的文档呢？</p>
+<img src="/2019/08/08/GameObject-API/1.png">
+<p>从图中可以看到，将光标移到Debug上面时，显示Debug类是属于UnityEngine这个命名空间的，也就是Unity提供的API。</p>
+<p>Debug.Log有两种形式：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Log</span>(<span class="params"><span class="keyword">object</span> message</span>)</span>;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Log</span>(<span class="params"><span class="keyword">object</span> message, Object context</span>)</span>;</span><br></pre></td></tr></table></figure></p>
+<p>第二种形式中可以传入一个Object类型的参数，传入这个参数时，在Console中显示的log会与脚本所在的物体关联。点击Console中这条信息时，会在Hierarchy中高亮这一个物体。</p>
+<blockquote>
+<p>Log关联GameObject<br><img src="/2019/08/08/GameObject-API/2.gif"></p>
+</blockquote>
+<h1 id="如何通过物体名字查找物体？"><a href="#如何通过物体名字查找物体？" class="headerlink" title="如何通过物体名字查找物体？"></a><span style="color:#339AFF;">如何通过物体名字查找物体？</span></h1><p>GameObject类中有一个静态（static）方法Find，用于通过名字查找场景中的物体。</p>
+<p>什么是<strong>静态方法</strong>？</p>
+<p>静态方法是标记为static的方法。静态方法独立于实例对象存在。即使没有类的实例，仍然可以通过类名.静态方法调用。静态方法中不能访问实例成员，可以访问其他静态成员。</p>
+<p>静态方法在定义时需要在返回值类型前面加上static修饰符，比如：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Walk</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Debug.Log(<span class="string">"Walking"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>访问时，可以直接通过类名.方法名调用。比如查找物体的方法就是GameObject.Find(“cat”)。</p>
+<p>查找的名称字符串中可以包含“/”，比如GameObject.Find(“animals/cat”）就只会查到父物体名字为animals的cat物体。如果“/”字符在字符串中最开始的位置，那么会在根节点开始找，比如GameObject.Find(“/animals/cat”)就只会查到根节点为animals物体的子物体cat。</p>
+<p>查找过后，一定要判断一下是否为空，因为Find有可能找不到你想找的物体。</p>
+<p><span style="color:red"><strong>特别注意1</strong></span></p>
+<p>这个方法的效率比较低，不要在Update中调用此方法，否则可能会造成游戏卡顿。一般的做法是，在Awake或Start方法中通过Find找到，然后保存到成员变量中。</p>
+<p>比如：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Test</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> GameObject cat;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">Start</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        cat = GameObject.Find(<span class="string">"cat"</span>);</span><br><span class="line">        <span class="keyword">if</span>(cat != <span class="literal">null</span>)</span><br><span class="line">            Debug.Log(<span class="string">"找到了cat物体"</span>, cat);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><span style="color:red"><strong>特别注意2</strong></span></p>
+<p>这个方法无法找到active为false的物体。</p>
+<p>那么如何查找active为false的物体呢？</p>
+<p>1、不要使用Find，直接在代码中通过public的变量关联物体。</p>
+<p>2、不要设置物体的active为false，先在游戏最开始时通过代码找到物体，然后通过代码设为false。</p>
+<p>3、通过transform.Find。</p>
+<h1 id="如何修改物体的active状态？"><a href="#如何修改物体的active状态？" class="headerlink" title="如何修改物体的active状态？"></a><span style="color:#339AFF;">如何修改物体的active状态？</span></h1><p>修改物体的active状态是一个快速隐藏/显示物体的方法。物体的active是false时，物体上所有的组件都不会执行，相当于将物体隐藏了。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">gameObject.SetActive(<span class="literal">false</span>);</span><br></pre></td></tr></table></figure></p>
+<p><span style="color:red"><strong>特别注意</strong></span></p>
+<p><span style="color:red">这个方法只会改变物体自身的active属性。</span>如果该物体有子物体，那么子物体也会被隐藏，但是active属性不会变。如果该物体的父物体的active是false，即使将该物体的active设置为true，该物体也不会显示出来。</p>
+<p>物体的active可以通过两个属性来判断：</p>
+<p><span style="color:blue">activeInHierarchy</span> 物体是否在Hierarchy中是激活状态。这个属性为true时，则可知该物体及其所有父物体的active都为true。</p>
+<p><span style="color:blue">activeSelf</span> 物体自身的active属性是否为true，即使该物体的父物体的active可能为false。</p>
+<h1 id="如何通过tag查找物体？"><a href="#如何通过tag查找物体？" class="headerlink" title="如何通过tag查找物体？"></a><span style="color:#339AFF;">如何通过tag查找物体？</span></h1><p>除了通过物体的name查找物体，通过物体的tag也可以查找。Tag即在Inspector上设置的一个标签，如下图所示：</p>
+<img src="/2019/08/08/GameObject-API/3.png">
+<p>一个物体只能有一个Tag，但是一个Tag可以被多个物体使用。</p>
+<p>通过tag查找有两个方法：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> GameObject <span class="title">FindWithTag</span>(<span class="params"><span class="keyword">string</span> tag</span>)</span>;</span><br></pre></td></tr></table></figure></p>
+<p>返回第一个查找到的标签为tag的active为true的物体（以字母排序），如果没有找到则返回null。</p>
+<p>tag必须在TagManager中设置过，否则会抛出异常。异常内容是：UnityException: Tag: cat is not defined.含义是：标签：cat 没有定义。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> GameObject[] <span class="title">FindGameObjectsWithTag</span>(<span class="params"><span class="keyword">string</span> tag</span>)</span>;</span><br></pre></td></tr></table></figure></p>
+<p>由于一个Tag可以被多个物体使用，所以这个方法可以找到所有使用该标签的active为true的物体，并返回对应的数组。如果没有找到，会返回一个空数组（长度为0的数组）。</p>
+<p>tag必须在TagManager中设置过，否则会抛出异常。异常内容是：UnityException: Tag: xxx is not defined.含义是：标签：xxx 没有定义。</p>
+<h1 id="如何用代码创建空物体？"><a href="#如何用代码创建空物体？" class="headerlink" title="如何用代码创建空物体？"></a><span style="color:#339AFF;">如何用代码创建空物体？</span></h1><p>有时候为了组织Hierarchy的结构，需要动态创建空物体作为文件夹使用。</p>
+<p>创建空物体可以使用如下代码：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">GameObject go = <span class="keyword">new</span> GameObject();</span><br><span class="line">go.name = <span class="string">"EmptyGameObject"</span>;</span><br><span class="line">GameObject dog = <span class="keyword">new</span> GameObject(<span class="string">"Puppy"</span>);</span><br></pre></td></tr></table></figure></p>
+<p>new的时候可以传入一个字符串作为GameObject的名字。也可以不传，默认名字是New Game Object。也可以创建后再修改空物体的名字。</p>
+<h1 id="如何用代码创建内置几何体？"><a href="#如何用代码创建内置几何体？" class="headerlink" title="如何用代码创建内置几何体？"></a><span style="color:#339AFF;">如何用代码创建内置几何体？</span></h1><p>通过代码也很容易创建Unity中的几种默认几何体。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> GameObject <span class="title">CreatePrimitive</span>(<span class="params">PrimitiveType type</span>)</span>;</span><br></pre></td></tr></table></figure></p>
+<p>其中PrimitiveType是一个枚举（enum）类型，包括的类型有：Sphere、Capsule、Cylinder、Cube、Plane、Quad。</p>
+<p>具体的用法如下：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);</span><br></pre></td></tr></table></figure></p>
+<p>上面的代码可以创建一个Cube，和通过菜单栏GameObject › 3D Object › Cube创建出来的Cube一致。</p>
+<p><strong>什么是枚举？</strong></p>
+<p>枚举是一组命名整型常量。枚举类型是使用enum关键字声明的。</p>
+<p>C#枚举是值类型。换句话说，枚举包含自己的值，且不能继承或传递继承。</p>
+<p>声明枚举的一般语法：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> ‹enum_name›</span><br><span class="line">&#123; </span><br><span class="line">    enumeration list </span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>其中，</p>
+<p><span style="color:blue">enum_name</span> 指定枚举的类型名称。</p>
+<p><span style="color:blue">enumeration list</span> 是一个用逗号分隔的标识符列表。</p>
+<p>枚举列表中的每个符号代表一个整数值，一个比它前面的符号大的整数值。默认情况下，第一个枚举符号的值是0。例如：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">enum</span> Days &#123; Sun, Mon, tue, Wed, thu, Fri, Sat &#125;;</span><br></pre></td></tr></table></figure></p>
+<p>使用时，可以使用Days.Sun来表示星期日。</p>
+<h1 id="官方文档"><a href="#官方文档" class="headerlink" title="官方文档"></a><span style="color:#339AFF;">官方文档</span></h1><p>class in UnityEngine / Inherits from:Object / Implemented in:UnityEngine.CoreModule</p>
+<p><strong>Description</strong><br>Base class for all entities（实体） in Unity Scenes.</p>
+<p><strong>Properties</strong></p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:left">属性</th>
+<th style="text-align:left">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">activeInHierarchy</td>
+<td style="text-align:left">Defines whether the GameObject is active in the Scene.</td>
+</tr>
+<tr>
+<td style="text-align:left">activeSelf</td>
+<td style="text-align:left">The local active state of this GameObject. (Read Only)</td>
+</tr>
+<tr>
+<td style="text-align:left">isStatic</td>
+<td style="text-align:left">Editor only API that specifies if a game object is static.</td>
+</tr>
+<tr>
+<td style="text-align:left">layer</td>
+<td style="text-align:left">The layer the game object is in. 返回数字</td>
+</tr>
+<tr>
+<td style="text-align:left">scene</td>
+<td style="text-align:left">Scene that the GameObject is part of.返回UnityEngine.SceneManagement.Scene,obj.scene.name可得到场景名</td>
+</tr>
+<tr>
+<td style="text-align:left">tag</td>
+<td style="text-align:left">The tag of this game object.</td>
+</tr>
+<tr>
+<td style="text-align:left">transform</td>
+<td style="text-align:left">The Transform attached to this GameObject.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Constructors</strong></p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:left">名称</th>
+<th style="text-align:left">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">GameObject</td>
+<td style="text-align:left">Creates a new game object, named name.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Public Methods</strong></p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:left">名称</th>
+<th style="text-align:left">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">AddComponent</td>
+<td style="text-align:left">Adds a component class named className to the game object.</td>
+</tr>
+<tr>
+<td style="text-align:left">BroadcastMessage</td>
+<td style="text-align:left">Calls the method named methodName on every MonoBehaviour in this game object or any of its children.</td>
+</tr>
+<tr>
+<td style="text-align:left">CompareTag</td>
+<td style="text-align:left">Is this game object tagged with tag ?</td>
+</tr>
+<tr>
+<td style="text-align:left">GetComponent</td>
+<td style="text-align:left">Returns the component of Type type if the game object has one attached, null if it doesn’t.</td>
+</tr>
+<tr>
+<td style="text-align:left">GetComponentInChildren</td>
+<td style="text-align:left">Returns the component of Type type in the GameObject or any of its children using depth first search.</td>
+</tr>
+<tr>
+<td style="text-align:left">GetComponentInParent</td>
+<td style="text-align:left">Returns the component of Type type in the GameObject or any of its parents.</td>
+</tr>
+<tr>
+<td style="text-align:left">GetComponents</td>
+<td style="text-align:left">Returns all components of Type type in the GameObject.</td>
+</tr>
+<tr>
+<td style="text-align:left">GetComponentsInChildren</td>
+<td style="text-align:left">Returns all components of Type type in the GameObject or any of its children.</td>
+</tr>
+<tr>
+<td style="text-align:left">GetComponentsInParent</td>
+<td style="text-align:left">Returns all components of Type type in the GameObject or any of its parents.</td>
+</tr>
+<tr>
+<td style="text-align:left">SendMessage</td>
+<td style="text-align:left">Calls the method named methodName on every MonoBehaviour in this game object.</td>
+</tr>
+<tr>
+<td style="text-align:left">SendMessageUpwards</td>
+<td style="text-align:left">Calls the method named methodName on every MonoBehaviour in this game object and on every ancestor（祖先） of the behaviour.</td>
+</tr>
+<tr>
+<td style="text-align:left">SetActive</td>
+<td style="text-align:left">Activates/Deactivates the GameObject, depending on the given true or false value.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Static Methods</strong></p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:left">名称</th>
+<th style="text-align:left">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">CreatePrimitive</td>
+<td style="text-align:left">Creates a game object with a primitive mesh renderer and appropriate collider.</td>
+</tr>
+<tr>
+<td style="text-align:left">Find</td>
+<td style="text-align:left">Finds a GameObject by name and returns it.</td>
+</tr>
+<tr>
+<td style="text-align:left">FindGameObjectsWithTag</td>
+<td style="text-align:left">Returns a list of active GameObjects tagged tag. Returns empty array if no GameObject was found.</td>
+</tr>
+<tr>
+<td style="text-align:left">FindWithTag</td>
+<td style="text-align:left">Returns one active GameObject tagged tag. Returns null if no GameObject was found.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Inherited Members</strong></p>
+<p><strong>Properties</strong></p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:left">名称</th>
+<th style="text-align:left">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">hideFlags</td>
+<td style="text-align:left">Should the object be hidden, saved with the Scene or modifiable by the user?</td>
+</tr>
+<tr>
+<td style="text-align:left">name</td>
+<td style="text-align:left">The name of the object.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Public Methods</strong></p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:left">名称</th>
+<th style="text-align:left">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">GetInstanceID</td>
+<td style="text-align:left">Returns the instance id of the object.</td>
+</tr>
+<tr>
+<td style="text-align:left">ToString</td>
+<td style="text-align:left">Returns the name of the GameObject.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Static Methods</strong></p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:left">名称</th>
+<th style="text-align:left">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Destroy</td>
+<td style="text-align:left">Removes a gameobject, component or asset.</td>
+</tr>
+<tr>
+<td style="text-align:left">DestroyImmediate</td>
+<td style="text-align:left">Destroys the object obj immediately. You are strongly recommended to use Destroy instead.</td>
+</tr>
+<tr>
+<td style="text-align:left">DontDestroyOnLoad</td>
+<td style="text-align:left">Do not destroy the target Object when loading a new Scene.</td>
+</tr>
+<tr>
+<td style="text-align:left">FindObjectOfType</td>
+<td style="text-align:left">Returns the first active loaded object of Type type.</td>
+</tr>
+<tr>
+<td style="text-align:left">FindObjectsOfType</td>
+<td style="text-align:left">Returns a list of all active loaded objects of Type type.</td>
+</tr>
+<tr>
+<td style="text-align:left">Instantiate</td>
+<td style="text-align:left">Clones the object original and returns the clone.</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Operators</strong></p>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:left">名称</th>
+<th style="text-align:left">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">bool</td>
+<td style="text-align:left">Does the object exist?</td>
+</tr>
+<tr>
+<td style="text-align:left">operator!=</td>
+<td style="text-align:left">Compares if two objects refer to a different object.</td>
+</tr>
+<tr>
+<td style="text-align:left">operator==</td>
+<td style="text-align:left">Compares two object references to see if they refer to the same object.</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/大话Unity2018/" rel="tag"># 大话Unity2018</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/08/07/游戏内各系统的整合-中介者模式/" rel="next" title="游戏内各系统的整合--中介者模式">
+                <i class="fa fa-chevron-left"></i> 游戏内各系统的整合--中介者模式
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/08/08/游戏的主循环-Game-Loop/" rel="prev" title="游戏的主循环--Game Loop">
+                游戏的主循环--Game Loop <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">354</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">55</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2020/02/16/游戏设计快乐之道（第2版）/" title="游戏设计快乐之道（第2版）" target="_blank">游戏设计快乐之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/14/游戏剧本怎么写/" title="游戏剧本怎么写" target="_blank">游戏剧本怎么写</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/04/通关！游戏设计之道（第2版）/" title="通关！游戏设计之道（第2版）" target="_blank">通关！游戏设计之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/26/游戏设计艺术（第2版）/" title="游戏设计艺术（第2版）" target="_blank">游戏设计艺术（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/22/大师谈游戏设计创意与节奏/" title="大师谈游戏设计创意与节奏" target="_blank">大师谈游戏设计创意与节奏</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#如何在脚本中获取自身所在的GameObject？"><span class="nav-number">1.</span> <span class="nav-text">如何在脚本中获取自身所在的GameObject？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#如何通过物体名字查找物体？"><span class="nav-number">2.</span> <span class="nav-text">如何通过物体名字查找物体？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#如何修改物体的active状态？"><span class="nav-number">3.</span> <span class="nav-text">如何修改物体的active状态？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#如何通过tag查找物体？"><span class="nav-number">4.</span> <span class="nav-text">如何通过tag查找物体？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#如何用代码创建空物体？"><span class="nav-number">5.</span> <span class="nav-text">如何用代码创建空物体？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#如何用代码创建内置几何体？"><span class="nav-number">6.</span> <span class="nav-text">如何用代码创建内置几何体？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#官方文档"><span class="nav-number">7.</span> <span class="nav-text">官方文档</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">3.7m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">56:23</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

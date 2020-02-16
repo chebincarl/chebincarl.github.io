@@ -1,0 +1,1656 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="思考并回答以下问题：  “适配”这个词是什么意思？适配器是什么？为什么要适配？举一个生活中的物品。 适配器模式的官方定义是什么？背下来。 适配器模式为什么是结构型模式？ 使用俘兵的例子来理解适配器模式是个很好方法，为什么？ 原先是有3个类，一个是客户端，一个是Target接口类，还有一个是与预期不同的类。适配器模式就是增加一个适配器类。就像二孔插头和插座，希望三孔插头可以使用，需要增加一个二孔到三">
+<meta name="keywords" content="设计模式与游戏完美开发">
+<meta property="og:type" content="article">
+<meta property="og:title" content="俘兵--适配器模式">
+<meta property="og:url" content="http://chebincarl.github.io/2019/08/19/俘兵-适配器模式/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="思考并回答以下问题：  “适配”这个词是什么意思？适配器是什么？为什么要适配？举一个生活中的物品。 适配器模式的官方定义是什么？背下来。 适配器模式为什么是结构型模式？ 使用俘兵的例子来理解适配器模式是个很好方法，为什么？ 原先是有3个类，一个是客户端，一个是Target接口类，还有一个是与预期不同的类。适配器模式就是增加一个适配器类。就像二孔插头和插座，希望三孔插头可以使用，需要增加一个二孔到三">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/19/俘兵-适配器模式/1.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/19/俘兵-适配器模式/2.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/19/俘兵-适配器模式/3.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/19/俘兵-适配器模式/4.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/19/俘兵-适配器模式/5.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/19/俘兵-适配器模式/6.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/19/俘兵-适配器模式/7.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/08/19/俘兵-适配器模式/8.png">
+<meta property="og:updated_time" content="2020-01-23T02:09:01.950Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="俘兵--适配器模式">
+<meta name="twitter:description" content="思考并回答以下问题：  “适配”这个词是什么意思？适配器是什么？为什么要适配？举一个生活中的物品。 适配器模式的官方定义是什么？背下来。 适配器模式为什么是结构型模式？ 使用俘兵的例子来理解适配器模式是个很好方法，为什么？ 原先是有3个类，一个是客户端，一个是Target接口类，还有一个是与预期不同的类。适配器模式就是增加一个适配器类。就像二孔插头和插座，希望三孔插头可以使用，需要增加一个二孔到三">
+<meta name="twitter:image" content="http://chebincarl.github.io/2019/08/19/俘兵-适配器模式/1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/08/19/俘兵-适配器模式/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>俘兵--适配器模式 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">专注，重复10遍</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/08/19/俘兵-适配器模式/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">俘兵--适配器模式
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-08-19 00:01:33" itemprop="dateCreated datePublished" datetime="2019-08-19T00:01:33+08:00">2019-08-19</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2020-01-23 10:09:01" itemprop="dateModified" datetime="2020-01-23T10:09:01+08:00">2020-01-23</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Unity/" itemprop="url" rel="index"><span itemprop="name">Unity</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">17k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">16 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>思考并回答以下问题：</p>
+<ul>
+<li>“适配”这个词是什么意思？适配器是什么？为什么要适配？举一个生活中的物品。</li>
+<li>适配器模式的官方定义是什么？背下来。</li>
+<li>适配器模式为什么是结构型模式？</li>
+<li>使用俘兵的例子来理解适配器模式是个很好方法，为什么？</li>
+<li>原先是有3个类，一个是客户端，一个是Target接口类，还有一个是与预期不同的类。适配器模式就是增加一个适配器类。就像二孔插头和插座，希望三孔插头可以使用，需要增加一个二孔到三孔的转换器。一旦想到适配器模式，就是增加一个适配器类。这个类要保持需要适配的类的引用，继承Target接口类，就像电源适配器连接两头一样。然后客户端使用里氏替换原则调用，怎么理解？</li>
+</ul>
+<a id="more"></a>
+<p>本章涵盖：</p>
+<ul>
+<li>游戏的宠物系统</li>
+<li>适配器模式<ul>
+<li>适配器模式的定义</li>
+<li>适配器模式的说明</li>
+<li>适配器模式的实现范例</li>
+</ul>
+</li>
+<li>使用适配器模式实现俘兵系统<ul>
+<li>俘兵系统的架构设计</li>
+<li>实现说明</li>
+<li>与俘兵相关的新增部分</li>
+<li>使用适配器模式的优点</li>
+</ul>
+</li>
+<li>适配器模式面对变化时</li>
+<li>结论</li>
+</ul>
+<h1 id="游戏的宠物系统"><a href="#游戏的宠物系统" class="headerlink" title="游戏的宠物系统"></a><span style="color:#339AFF;">游戏的宠物系统</span></h1><p>“宠物系统”一直是吸引玩家进入游戏的重点系统，想象在打怪冲关的过程中，旁边伴随着一只宠物协同一起作战和探险，除了跟随着玩家的简单行为外，有些游戏也会设计一些辅助功能给宠物，如捡宝、补血、提示信息等之类的操作。</p>
+<p>就笔者参与过的项目来说，宠物系统的需求多半会在游戏开发的中后时期才出现，因为这通常是顺应市场变化而增加的新需求。当然，近几年开发的游戏只要内容合适，就会提早在游戏企划的初期就决定加入宠物系统。因此，对于一早就有计划要实现宠物系统的游戏来说，会在一开始就在设计内加入与宠物相关的系统架构及类，例如：</p>
+<ul>
+<li>负责控制宠物的角色类。</li>
+<li>战斗时要使用的AI状态类。</li>
+<li>工厂类提供对应的宠物工厂方法。</li>
+<li>宠物专用的角色属性。</li>
+<li>3D成像规则等等。</li>
+</ul>
+<p>若在项目中后期才决定要加入宠物系统，系统新增及修改的相关工作同样也是避免不了的，至于是否要大量更改原设计，就要看原有架构是否设计得够灵活。</p>
+<p>当然，上述要求不管是初始时期或中后期才加入，都是专门设计一个宠物系统所要满足的，即美术部门需要产生项目的3D模型，编程部门需要编写新的宠物相关功能的类。还有另一种比较复杂的情况是，宠物系统也能将敌人（或所谓的怪物）收为己用，简单地说，就是被玩家打败过的敌人会被收录/记录下来（“招于麾下”），之后玩家在通关打怪时，就可以将之召唤出来成为宠物，一起帮助玩家通关。会有这样的设计想法不外乎是因为：</p>
+<ul>
+<li>提供玩家收集的乐趣，但不只是收集，收集之后还能够被使用。</li>
+<li>当打败的对手可以被重新召唤成为自己的手下时，玩家会有另一种成就感。其实在大型多人在线角色扮演游戏（MMORPG）的设计中，让其他玩家看到自己身边带一只非常难以打倒的Boss，会有一种炫耀的满足感。因此这样的宠物系统设计，在大型多人在线角色扮演游戏（MMORPG）中，多半都会列为重点系统之一。</li>
+<li>当发现原本的宠物设置不足或上市后发现宠物系统为主要收入来源时，为了快速增加宠物数量以确保持续的营收收入，直接选择将“敌人”设置成为宠物，是最直觉的想法。</li>
+</ul>
+<p>综合上述的情况，会发现功能需求多半是想将已经设计好的“敌人怪物”转换成“宠物”或“玩家可操控的单位”，但同时也希望保留敌人怪物的原始设置，而不是重新设计一组新的设置数据，这些设置数据包括角色属性、攻击方式、攻击能力等。简单来说，就是宠物在原本的“敌人”状态下，所呈现的外形或使用的招式，当它被玩家收服后，玩家也会希望成为宠物的它，也同样能做出相同的攻击方式以及发出同样绚丽的招式，如图1所示。</p>
+<blockquote>
+<p>图1 宠物系统图解</p>
+</blockquote>
+<img src="/2019/08/19/俘兵-适配器模式/1.png">
+<p><strong><font size="3">俘兵系统</font></strong></p>
+<p>当前《P级阵地》项目算是进入了开发的后期，所有的系统和接口大多已经设计完成，系统架构也都实现完成了，但此时项目增加了下列需求，主要是想让游戏更具趣味性：</p>
+<ul>
+<li>当玩家击倒对手达到一定数量时，地图上会出现一个特殊兵营——“俘兵兵营”，这个兵营可以训练出敌方的角色。</li>
+<li>俘兵的角色属性和攻击方式不改变。</li>
+<li>由“俘兵兵营”训练出的单位会为玩家效力，一同守护玩家阵营。</li>
+<li>“俘兵兵营”不提供升级功能，所以只能训练同一等级且使用同种武器的作战单位。</li>
+</ul>
+<p>由上述的说明可知，新的需求是希望玩家能够训练出原本应该是敌方阵营的作战单位，而且训练出来的敌方作战单位要能保留原本的设置属性和攻击力，训练完成后进入到战场上时，也要能帮忙防护玩家阵营。类似这样的需求，就像章节一开始所提到的，《P级阵地》想要敌方角色直接改为玩家单位来使用。</p>
+<p>《P级阵地》面对这样的需求时，应该如何进行调整才能满足这一项需求呢？就《P级阵地》当前的系统架构来看，或许可以增加一个“俘兵角色”类，且这个类必须具备两边阵营的部分行为。例如：俘兵角色产生时，必须运用敌方阵营的属性（EnemyAttr），所以不会有等级上的优势，也不能升级；AI行为则必须采用玩家阵营的AI行为——防护阵营而非攻击阵营；显示上则是使用敌方阵营的角色模型，如图2所示。</p>
+<blockquote>
+<p>图2 游戏范例俘兵示意图</p>
+</blockquote>
+<img src="/2019/08/19/俘兵-适配器模式/2.png">
+<p>之后还需要新增一个“俘兵角色建造者（SoldierCaptiveBuilder）”，让已经运用建造者模式（Builder）的角色建造者系统（CharacterBuilderSystem），可产生“俘兵角色”对象。这个新增的“俘兵角色建造者（SoldierCaptiveBuilder）”内部，就会按照需求从当前双方阵营的功能中拼装出来：</p>
+<blockquote>
+<p>Listing1 俘兵功能的实现</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 建立俘兵时所需的参数</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">SoldierCaptiveBuildParam</span> : <span class="title">ICharacterBuildParam</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">SoldierCaptiveBuildParam</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 俘兵各个部位的构建</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">SoldierCaptiveBuilder</span> : <span class="title">ICharacterBuilder</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> SoldierCaptiveBuildParam m_BuildParam = <span class="literal">null</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">SetBuildParam</span>(<span class="params"> ICharacterBuildParam theParam </span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_BuildParam = theParam <span class="keyword">as</span> SoldierCaptiveBuildParam;    </span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 加载Asset中的角色模型（Enemy）</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">LoadAsset</span>(<span class="params"> <span class="keyword">int</span> GameObjectID </span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        IAssetFactory AssetFactory = PBDFactory.GetAssetFactory();</span><br><span class="line">        GameObject EnemyGameObject = AssetFactory.LoadEnemy( m_BuildParam.NewCharacter.GetAssetName() );</span><br><span class="line">        EnemyGameObject.transform.position = m_BuildParam.SpawnPosition;</span><br><span class="line">        EnemyGameObject.gameObject.name = <span class="keyword">string</span>.Format(<span class="string">"Enemy[&#123;0&#125;]"</span>,GameObjectID);</span><br><span class="line">        m_BuildParam.NewCharacter.SetGameObject( EnemyGameObject );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 加入武器</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">AddWeapon</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        IWeaponFactory  WeaponFactory = PBDFactory.GetWeaponFactory();</span><br><span class="line">        IWeapon Weapon = WeaponFactory.CreateWeapon( m_BuildParam.emWeapon ); </span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 设置给角色</span></span><br><span class="line">        m_BuildParam.NewCharacter.SetWeapon( Weapon );</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 设置角色能力（Enemy）</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">SetCharacterAttr</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 获取Enemy的属性</span></span><br><span class="line">        IAttrFactory theAttrFactory = PBDFactory.GetAttrFactory();</span><br><span class="line">        <span class="keyword">int</span> AttrID = m_BuildParam.NewCharacter.GetAttrID();</span><br><span class="line">        EnemyAttr theEnemyAttr = theAttrFactory.GetEnemyAttr( AttrID ); </span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 设置属性的计算策略</span></span><br><span class="line">        theEnemyAttr.SetAttStrategy( <span class="keyword">new</span> EnemyAttrStrategy() );</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 设置给角色</span></span><br><span class="line">        m_BuildParam.NewCharacter.SetCharacterAttr( theEnemyAttr );</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 加入AI（Soldier）</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">AddAI</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        SoldierAI theAI = <span class="keyword">new</span> SoldierAI( m_BuildParam.NewCharacter );</span><br><span class="line">        m_BuildParam.NewCharacter.SetAI( theAI );</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 加入管理器（Soldier）</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">AddCharacterSystem</span>(<span class="params"> PBaseDefenseGame PBDGame </span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        PBDGame.AddSoldier( m_BuildParam.NewCharacter <span class="keyword">as</span> ISoldier );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>但是，这样的设计方式并不好，因为就像俘兵角色建造者（SoldierCaptiveBuilder）的程序代码所显示的，功能都来自双方阵营中不同的部分所拼装出来的，不像是个完整封装的类，而且大部分的功能可能还使用了“复制+粘贴”的方式来处理。如果不想产生过多重复的程序代码，那么针对现有的建造者（SoldierBuilder、EnemyBuilder）就必须再进行重构，让程序代码通过共享来解决“复制+粘贴”的问题，但这样一来又必须更改两个原有的类。</p>
+<p>如果想要实现具有“完整性”概念的封装类，那么连带属性系统和AI系统，也都必须新增与“俘兵”相关的对应类，修改的工程就更为庞大了。</p>
+<p>所以，应该思考的是，有没有更简单的方式<span style="color:red">让敌方类直接就能“假装”成玩家类</span>，然后加入玩家类群组中。</p>
+<p>在GoF的设计模式中，是否有合适的模式可以让《P级阵地》进行这样的修改呢？是否有某种模式，能够将一个类（敌方阵营）通过一个转换，就可直接被当成是另外一个类（玩家阵营）来使用呢？答案是有的，适配器模式正是用来解决这种情况，其功能也正如其名，适合用来进行“转接”两个类。</p>
+<h1 id="适配器模式"><a href="#适配器模式" class="headerlink" title="适配器模式"></a><span style="color:#339AFF;">适配器模式</span></h1><p>适配器模式如同字面上的意思，能将“接口”完全不符合的东西转换成符合的状态。换句话说，被转换的类一定与原有类的“接口不合”，这一点可以用来分辨与另外两个相似模式之间的差异。</p>
+<h2 id="适配器模式的定义"><a href="#适配器模式的定义" class="headerlink" title="适配器模式的定义"></a><span style="color:#00ACC1;">适配器模式的定义</span></h2><p>GoF对于适配器模式（Adapter）的定义是：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">将一个类的接口转换成为客户端期待的类接口。适配器模式让原本接口不兼容的类能一起合作。</span><br></pre></td></tr></table></figure></p>
+<p>解释适配器模式，最常举的例子就是一般生活中很容易遇到的“插头适配器”，如图3所示。</p>
+<blockquote>
+<p>图3 插头适配器</p>
+</blockquote>
+<img src="/2019/08/19/俘兵-适配器模式/3.png">
+<p>出国旅游，尤其是到欧美国家，想要为携带的3C产品充电时，就必须考虑充电插头是否能插入当地国家的插座中。如果不行，最简单的方式就是买一个能够转接到当地插座的“适配器”。一般家中也会常遇到这样的情况，买的电器用品附带的插头是三头的，但是墙上的插座却是两孔的，如果不想折断三头插头上的接地线，那么同样也必须到电器行买一个“适配器”来进行转换。</p>
+<p>运用相同的概念，软件设计上的“适配器”做的也是同样的转换工作，当出现一个不符合客户端接口的情况时，在不想破坏接口的前提下（例如不想折断三头插头上的接地线），就必须设计一个适配器来进行转换，将原本不符合的接口，转换到客户端预期的接口上，所以概念上是非常简单的。</p>
+<h2 id="适配器模式的说明"><a href="#适配器模式的说明" class="headerlink" title="适配器模式的说明"></a><span style="color:#00ACC1;">适配器模式的说明</span></h2><p>适配器模式的类结构如图4所示。</p>
+<blockquote>
+<p>图4 适配器模式的类结构</p>
+</blockquote>
+<img src="/2019/08/19/俘兵-适配器模式/4.png">
+<p>GoF参与者的说明如下：</p>
+<ul>
+<li>Client（客户端）：客户端预期使用的是Target目标接口的对象。</li>
+<li>Target（目标接口）：定义提供给客户端使用的接口。</li>
+<li>Adaptee（被转换类）：与客户端预期接口不同的类。</li>
+<li>Adapter（适配器）<ul>
+<li>继承自Target目标接口，让客户端可以操作；</li>
+<li>包含Adaptee被转换类，可以设为引用或组合；</li>
+<li>实现Target的接口方法Request时，应调用适当的Adaptee方法来完成实现。</li>
+</ul>
+</li>
+</ul>
+<h2 id="适配器模式的实现范例"><a href="#适配器模式的实现范例" class="headerlink" title="适配器模式的实现范例"></a><span style="color:#00ACC1;">适配器模式的实现范例</span></h2><p>适配器模式的实现不难理解，首先要定义一个Client预期使用的类接口：</p>
+<blockquote>
+<p>Listing2 应用领域（Client）所需的接口（AdapterTest.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">class</span> <span class="title">Target</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="keyword">void</span> <span class="title">Request</span>(<span class="params"></span>)</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>另外，就是一个已经实现完整的类，它可能是第三方函数库或项目内的一个已经设计完整的功能类，且当前可能无法更改或修改这个已经实现完成的类，这个类就是需要被转换的类：</p>
+<blockquote>
+<p>Listing3 不同于应用领域（Client）的实现，需要被转换（AdapterTest.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Adaptee</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Adaptee</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">SpecificRequest</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Debug.Log(<span class="string">"调用Adaptee.SpecificRequest"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>所以，在无法修改Adaptee的情况下，可以另外声明一个类，这个类继承自Target目标接口，其中包含一个Adaptee类对象；</p>
+<blockquote>
+<p>Listing4 将Adaptee转换成Target接口（AdapterTest.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Adapter</span> : <span class="title">Target</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> Adaptee m_Adaptee = <span class="keyword">new</span> Adaptee();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Adapter</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Reguest</span>(<span class="params"></span>) </span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_Adaptee.SpecificRequest();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Adapter在实现Target的接口方法Request时，则是调用Adaptee类中合适的方法来完成“转接”的工作。</p>
+<p>对于Client端（测试程序）而言，面对的对象一样是Target接口，但内部已经被转换为由另一个类来执行：</p>
+<blockquote>
+<p>Listing5 测试适配器模式（AdapterTest.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">UnitTest</span> (<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Target theTarget = <span class="keyword">new</span> Adapter(); <span class="comment">// 里氏替换</span></span><br><span class="line">    theTarget.Request();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>从执行信息上可以看出，真正的功能是由Adaptee类执行的：</p>
+<blockquote>
+<p>执行结果</p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">调用Adaptee.SpecificRequest</span><br></pre></td></tr></table></figure>
+<h1 id="使用适配器模式实现俘兵系统"><a href="#使用适配器模式实现俘兵系统" class="headerlink" title="使用适配器模式实现俘兵系统"></a><span style="color:#339AFF;">使用适配器模式实现俘兵系统</span></h1><p>因为游戏实现已进入了后期，所以在当前的实现情况下使用适配器模式，将“敌人角色接口”转接成“玩家角色接口”会比较方便。如果是在游戏开发初期，笔者则建议将这个开发需求一并列入角色的设计中，这样才是比较好的开发规划。</p>
+<h2 id="俘兵系统的架构设计"><a href="#俘兵系统的架构设计" class="headerlink" title="俘兵系统的架构设计"></a><span style="color:#00ACC1;">俘兵系统的架构设计</span></h2><p>适配器模式在应用上非常简单：<span style="color:red">当有一个类与预期使用的接口不同时，就实现一个适配器类，使用这个适配器类将接口不合的类转换成预期的类接口。</span>在《P级阵地》新增的需求中，希望将敌方角色的类对象“转换/转接”成为玩家角色来使用，那么就可以直接实现一个“角色适配器”，来将敌方角色类转接为玩家角色类（的子类），因此《P级阵地》针对新增的需求，运用适配器模式后类结构如图5所示。</p>
+<blockquote>
+<p>图5 《P级阵地》针对新增的需求，运用适配器模式后的类结构</p>
+</blockquote>
+<img src="/2019/08/19/俘兵-适配器模式/5.png">
+<p>参与者的说明如下：</p>
+<ul>
+<li>OtherGameSystem：《P级阵地》中其他的游戏系统，这些系统预期使用“俘兵”单位时，要和玩家阵营单位有一样的接口。</li>
+<li>ISoldier：玩家阵营角色的接口，新的需求是“俘兵”的概念，敌方角色单位要被转换成玩家阵营来使用。</li>
+<li>Enemy：敌方阵营角色类会被当作俘兵使用，但在适配器模式之下，接口不需要做任何调整。</li>
+<li>SoldierCaptive：俘兵类作为适配器类，负责将敌方角色类转换为玩家角色类来使用。</li>
+</ul>
+<h2 id="实现说明"><a href="#实现说明" class="headerlink" title="实现说明"></a><span style="color:#00ACC1;">实现说明</span></h2><p>《P级阵地》在运用适配器模式实现时，先取消之前使用俘兵角色建造者（BuilderSoldierCaptiveBuilder）的写法，改为只新增一个俘兵角色类（SoldierCaptive）作为类转接之用：</p>
+<blockquote>
+<p>Listing6 实现俘兵类（SoldierCaptive.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">SoldierCaptive</span> : <span class="title">ISoldier</span> </span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> IEnemy m_Captive = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">SoldierCaptive</span>(<span class="params"> IEnemy theEnemy</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_emSoldier = ENUM_Soldier.Captive;</span><br><span class="line">        m_Captive = theEnemy;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 设置成像</span></span><br><span class="line">        SetGameObject( theEnemy.GetGameObject() );</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 将Enemy属性转成Soldier用的属性</span></span><br><span class="line">        SoldierAttr tempAttr = <span class="keyword">new</span> SoldierAttr();</span><br><span class="line">        tempAttr.SetSoldierAttr( theEnemy.GetCharacterAttr().GetBaseAttr() );</span><br><span class="line">        tempAttr.SetAttStrategy( theEnemy.GetCharacterAttr().GetAttStrategy());</span><br><span class="line">        tempAttr.SetSoldierLv( <span class="number">1</span> ); <span class="comment">// 设置为1级</span></span><br><span class="line">        SetCharacterAttr( tempAttr );</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 设置武器</span></span><br><span class="line">        SetWeapon( theEnemy.GetWeapon() );</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 更改为SoldierAI</span></span><br><span class="line">        m_AI = <span class="keyword">new</span> SoldierAI( <span class="keyword">this</span> );</span><br><span class="line">        m_AI.ChangeAIState( <span class="keyword">new</span> IdleAIState() );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 播放音效</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">DoPlayKilledSound</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_Captive.DoPlayHitSound();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 显示特效</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">DoShowKilledEffect</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_Captive.DoShowHitEffect();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 执行Visitor</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">RunVisitor</span>(<span class="params">ICharacterVisitor Visitor</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        Visitor.VisitSoldierCaptive(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在实现的内部转换过程中，无论是角色设置值得更换，还是播放音效、显示特效时的转换，都比旧方式更明确，也未破坏原有类的接口和设计概念。所以就这次新增的需求来看，“单纯的转换”比起重新设计组装一个新的类要好得多。</p>
+<h2 id="与俘兵相关的新增部分"><a href="#与俘兵相关的新增部分" class="headerlink" title="与俘兵相关的新增部分"></a><span style="color:#00ACC1;">与俘兵相关的新增部分</span></h2><p>当俘兵角色类（SoldierCaptive）被实现之后，无论采用的是哪一种方式（转接方式或是组装方式），《P级阵地》中，还有其他需要配合的部分。而修改的部分大多以“增加”类的方式来完成较少更改到现有的类接口。首先是新增一个可以训练俘兵角色单位的俘兵兵营（CaptiveCamp）：</p>
+<blockquote>
+<p>Listing7 新增俘兵兵营（CaptiveCamp.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">CaptiveCamp</span> : <span class="title">ICamp</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> GameObject m_GameObject = <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">private</span> ENUM_Enemy m_emEnemy = ENUM_Enemy.Null;</span><br><span class="line">    <span class="keyword">private</span> Vector3 m_Position;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置兵营产生的单位及冷却值</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">CaptiveCamp</span>(<span class="params">GameObject theGameObject, ENUM_Enemy emEnemy, <span class="keyword">string</span> CampName,<span class="keyword">string</span> IconSprite ,<span class="keyword">float</span> TrainCoolDown,Vector3 Position</span>):<span class="title">base</span>(<span class="params">theGameObject, TrainCoolDown,CampName, IconSprite </span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_emSoldier = ENUM_Soldier.Captive;</span><br><span class="line">        m_emEnemy = emEnemy;            </span><br><span class="line">        m_Position = Position;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取训练金额</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">int</span> <span class="title">GetTrainCost</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">10</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 训练Soldier</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Train</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 产生一个训练命令</span></span><br><span class="line">        TrainCaptiveCommand NewCommand = <span class="keyword">new</span> TrainCaptiveCommand( m_emEnemy, m_Position,m_PBDGame);  </span><br><span class="line">        AddTrainCommand( NewCommand );</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>与玩家阵营中的其他兵营一样，继承自ICamp类后，再重新定义需要的方法。而在关键的训练方法Train中，则是产生一个新的训练俘兵（TrainCaptiveCommand）的命令：</p>
+<blockquote>
+<p>Listing8 新增训练俘兵命令（TrainCaptiveCommand.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">TrainCaptiveCommand</span> : <span class="title">ITrainCommand</span></span><br><span class="line">&#123;       </span><br><span class="line">    <span class="keyword">private</span> PBaseDefenseGame m_PBDGame = <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">private</span> ENUM_Enemy       m_emEnemy; <span class="comment">// 兵种</span></span><br><span class="line">    <span class="keyword">private</span> Vector3          m_Position; <span class="comment">// 出现位置</span></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">TrainCaptiveCommand</span>(<span class="params">ENUM_Enemy emEnemy, Vector3 Position,PBaseDefenseGame PBDGame</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_PBDGame = PBDGame;</span><br><span class="line">        m_emEnemy = emEnemy;</span><br><span class="line">        m_Position = Position;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Execute</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 先产生Enemy</span></span><br><span class="line">        ICharacterFactory Factory = PBDFactory.GetCharacterFactory();</span><br><span class="line">        IEnemy theEnemy = Factory.CreateEnemy ( m_emEnemy, ENUM_Weapon.Gun , m_Position ,Vector3.zero);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 再产生俘兵（适配器）</span></span><br><span class="line">        SoldierCaptive NewSoldier = <span class="keyword">new</span> SoldierCaptive( theEnemy );</span><br><span class="line">                </span><br><span class="line">        <span class="comment">// 删除Enemy</span></span><br><span class="line">        m_PBDGame.RemoveEnemy( theEnemy );</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 加入Soldier</span></span><br><span class="line">        m_PBDGame.AddSoldier( NewSoldier );</span><br><span class="line">    &#125;       </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>因为兵营类使用命令模式（Command）来对训练作战单位的命令进行管理，因此新的“训练俘兵命令”必须继承自ITrainCommand，才能配合原有的设计模式。而在训练命令执行方法Execute中，可以看到实现上是先将原有的敌方角色对象产生后，再利用转接概念产生俘兵角色，之后顺应角色管理系统（CharacterSystem）的要求，将新产生的俘兵角色加入到玩家角色管理器中。</p>
+<p>接下来，要修改的是兵营系统（CampSystem），因为现有的三座玩家兵营是由该系统来管理和初始化的，所以新增的俘兵兵营（CaptiveCamp）一样要放在兵营系统中来管理：</p>
+<blockquote>
+<p>Listing9 兵营系统（CampSystem.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">CampSystem</span> : <span class="title">IGameSystem</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> Dictionary&lt;ENUM_Soldier, ICamp&gt; m_SoldierCamps = <span class="keyword">new</span> Dictionary&lt;ENUM_Soldier,ICamp&gt;(); </span><br><span class="line">    <span class="keyword">private</span> Dictionary&lt;ENUM_Enemy , ICamp&gt; m_CaptiveCamps = <span class="keyword">new</span> Dictionary&lt;ENUM_Enemy,ICamp&gt;(); </span><br><span class="line"></span><br><span class="line">    <span class="comment">// 初始化兵营系统</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Initialize</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 加入三个兵营</span></span><br><span class="line">        m_SoldierCamps.Add ( ENUM_Soldier.Rookie, SoldierCampFactory( ENUM_Soldier.Rookie ));</span><br><span class="line">        m_SoldierCamps.Add ( ENUM_Soldier.Sergeant, SoldierCampFactory( ENUM_Soldier.Sergeant ));</span><br><span class="line">        m_SoldierCamps.Add ( ENUM_Soldier.Captain, SoldierCampFactory( ENUM_Soldier.Captain ));</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 加入一个俘兵营</span></span><br><span class="line">        m_CaptiveCamps.Add ( ENUM_Enemy.Elf, CaptiveCampFactory( ENUM_Enemy.Elf ));</span><br><span class="line">        <span class="comment">// 注册游戏事件观察者</span></span><br><span class="line">        m_PBDGame.RegisterGameEvent( ENUM_GameEvent.EnemyKilled, <span class="keyword">new</span> EnemyKilledObserverCaptiveCamp(<span class="keyword">this</span>));</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 获取场景中的俘兵营</span></span><br><span class="line">    <span class="function"><span class="keyword">private</span> CaptiveCamp <span class="title">CaptiveCampFactory</span>(<span class="params"> ENUM_Enemy emEnemy </span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">string</span> GameObjectName = <span class="string">"CaptiveCamp_"</span>;</span><br><span class="line">        <span class="keyword">float</span> CoolDown = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">string</span> CampName = <span class="string">""</span>;</span><br><span class="line">        <span class="keyword">string</span> IconSprite = <span class="string">""</span>;</span><br><span class="line">        <span class="keyword">switch</span>( emEnemy )</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">case</span> ENUM_Enemy.Elf :</span><br><span class="line">                GameObjectName += <span class="string">"Elf"</span>;</span><br><span class="line">                CoolDown = <span class="number">3</span>;</span><br><span class="line">                CampName = <span class="string">"精灵俘兵营"</span>;</span><br><span class="line">                IconSprite = <span class="string">"CaptiveCamp"</span>;</span><br><span class="line">                <span class="keyword">break</span>;      </span><br><span class="line">            <span class="keyword">default</span>:</span><br><span class="line">                Debug.Log(<span class="string">"没有指定["</span>+emEnemy+<span class="string">"]要获取的场景对象名称"</span>);</span><br><span class="line">                <span class="keyword">break</span>;              </span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 获取对象</span></span><br><span class="line">        GameObject theGameObject = UnityTool.FindGameObject( GameObjectName );</span><br><span class="line">                </span><br><span class="line">        <span class="comment">// 获取集合点</span></span><br><span class="line">        Vector3 TrainPoint = GetTrainPoint( GameObjectName );</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 产生兵营</span></span><br><span class="line">        CaptiveCamp NewCamp = <span class="keyword">new</span> CaptiveCamp(theGameObject, emEnemy, CampName, IconSprite, CoolDown, TrainPoint); </span><br><span class="line">        NewCamp.SetPBaseDefenseGame( m_PBDGame );</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 设置兵营使用的Script</span></span><br><span class="line">        AddCampScript( theGameObject, NewCamp);</span><br><span class="line">        <span class="comment">// 先隐藏</span></span><br><span class="line">        NewCamp.SetVisible(<span class="literal">false</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 返回</span></span><br><span class="line">        <span class="keyword">return</span> NewCamp;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>与玩家兵营的初始化过程类似，先搜索场景内由场景设计人员安排好的俘兵兵营对象，之后再新增一个俘兵兵营（CaptiveCamp）对象来和游戏对象对应，接着将兵营先隐藏并加入到管理器中。先隐藏的原因是，让俘兵兵营（CaptiveCamp）的出现由是否符合某项条件来决定。</p>
+<p>而当前的规划是将条件设置为“当玩家击退敌方角色达到一定数量以上”时，而为了得知当前敌方角色的阵亡情况，所以针对“敌人角色阵亡主题（EnemyKilled Subject）”注册了一个观察者EnemyKilledObserverCaptiveCamp：</p>
+<blockquote>
+<p>Listing10 兵营观察Enemey阵亡事件（EnemyKilledObserverCaptiveCamp.cs）</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">EnemyKilledObserverCaptiveCamp</span> : <span class="title">IGameEventObserver</span> </span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> EnemyKilledSubject m_Subject = <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">private</span> CampSystem m_CampSystem = <span class="literal">null</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">EnemyKilledObserverCaptiveCamp</span>(<span class="params">CampSystem  theCampSystem</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_CampSystem = theCampSystem;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置观察的主题</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">SetSubject</span>(<span class="params"> IGameEventSubject Subject </span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_Subject = Subject <span class="keyword">as</span> EnemyKilledSubject;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 通知Subject被更新</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 累计阵亡10以上时即出现俘兵营</span></span><br><span class="line">        <span class="keyword">if</span>( m_Subject.GetKilledCount() &gt; <span class="number">10</span> ) </span><br><span class="line">            m_CampSystem.ShowCaptiveCamp();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个观察者会累计当前敌人单位阵亡的计数，当发现已达设置的上限时，就会将场景内的俘兵兵营（CaptiveCamp）显示出来。之后玩家就能够通过俘兵兵营（CaptiveCamp）下达训练指令，来产生俘兵角色（SoldierCaptive）。</p>
+<p>针对这次需求的修改，兵营系统（CampSystem）增加了类成员及方法，但并未更改到其他实现，所以不会影响其他的客户端。这次的修改全都是由“新增类”的方式来完成的，类结构图如图6所示，其中标有底色的类，就是为这次的需求而新增的类。</p>
+<blockquote>
+<p>图6 新增了俘兵相关的类成员及方法后的类结构图</p>
+</blockquote>
+<img src="/2019/08/19/俘兵-适配器模式/6.png">
+<p>对于系统的修改都能以“新增类”的方式来实现，这代表着符合“开一闭原则（OCP）”，也就是，在不更改现有接口的前提下，完成功能的新增。</p>
+<p>角色访问者（CharacterVisitor）也因为这次修改，新增了一个成员方法VisitSoldierCaptive。所以在修正上，还必须去查看所有的访问者子类，判断是否都需要重新实现这个方法。而这个缺点在<a href="/2019/08/19/角色信息查询-访问者模式/" title="角色信息查询-访问者模式">角色信息查询-访问者模式</a>中已经提过，这是访问者模式（Visitor）在提供遍历对象功能时，所必须面对的取舍。</p>
+<p>在完成上述的实现之后，当玩家在成功击退一定数量的敌方角色时，阵地中就会出现一座“俘兵兵营”，让玩家可以训练敌方角色，如图7所示。</p>
+<blockquote>
+<p>图7 可以训练俘兵的兵营</p>
+</blockquote>
+<img src="/2019/08/19/俘兵-适配器模式/7.png">
+<h2 id="使用适配器模式的优点"><a href="#使用适配器模式的优点" class="headerlink" title="使用适配器模式的优点"></a><span style="color:#00ACC1;">使用适配器模式的优点</span></h2><p>虽然适配器模式看似只不过是将同项目下的不同类进行转换，但适配器模式其实也具有减少项目依赖于第三方函数库的好处。游戏项目在开发时常常会引入第三方工具函数库来强化游戏功能，但一经引用就代表项目被绑定在第三方工具/函数库了。此时若没有适当的方式，将项目与第三方工具/函数库进行隔离，那么当第三方工具/函数库进行大规模改动时，或是想要替换成另一套有相同功能的工具/函数库时，都可能引发项目的大规模修改。</p>
+<p>在这个时候，适配器模式可以适时扮演分离项目与第三方工具函数库的角色。在项目内先自行定义功能使用接口，再利用适配器模式，将真正执行的第三方工具运用在子类的实现之中，以此来形成隔离。若有多个第三方函数库可以选择时，对于项目而言，就不会造成太多转换上的困扰。</p>
+<p>以项目常用的XML工具来说，当前常使用的有.Net Framework中的System.Xml工具以及Mono版的XML工具。如果不想让项目依赖于任何一个实现的话，那么可以先定义一个XMLInterface作为客户端使用的接口，之后再针对使用不同的工具库进行子类的实现，类结构图如图8所示。</p>
+<blockquote>
+<p>图8 定义一个XMLInterface作为客户端使用的接口，即为“适配器”</p>
+</blockquote>
+<img src="/2019/08/19/俘兵-适配器模式/8.png">
+<h1 id="适配器模式面对变化时"><a href="#适配器模式面对变化时" class="headerlink" title="适配器模式面对变化时"></a><span style="color:#339AFF;">适配器模式面对变化时</span></h1><p>《P级阵地》中的敌方角色可成为俘兵被玩家训练使用，那么反过来，玩家单位其实也可以被敌方阵营所用。虽然《P级阵地》的游戏设计上，并不容易设计出一个合理的情况，让玩家单位转而成为敌方阵营。但随着游戏持续开发和维护，这也不是不可能发生的需求（例如某一天，敌方阵营改为在线由另一个玩家来操作，而非计算机自动操作时），所以，同样可以使用适配器类，来将玩家角色类转换成敌方角色类使用：</p>
+<blockquote>
+<p>Listing11 玩家俘兵</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">EnemyCaptive</span> : <span class="title">IEnemy</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> ISoldier m_Captive = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">EnemyCaptive</span>(<span class="params"> ISoldier theSoldier, Vector3 AttackPos</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_emEnemyType = ENUM_Enemy.Catpive;</span><br><span class="line">        m_Captive = theSoldier;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 设置成像</span></span><br><span class="line">        SetGameObject( theSoldier.GetGameObject() );</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 将Soldier属性转成Enemy用的属性</span></span><br><span class="line">        EnemyAttr tempAttr = <span class="keyword">new</span> EnemyAttr();</span><br><span class="line">        ...</span><br><span class="line">        SetCharacterAttr( tempAttr );</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 设置武器</span></span><br><span class="line">        SetWeapon( theSoldier.GetWeapon() );</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 更改为SoldierAI</span></span><br><span class="line">        m_AI = <span class="keyword">new</span> EnemyAI( <span class="keyword">this</span>, AttackPos );</span><br><span class="line">        m_AI.ChangeAIState( <span class="keyword">new</span> IdleAIState() );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 播放音效</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">DoPlayHitSound</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_Captive.DoPlayKilledSound();</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 显示特效</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">DoShowHitEffect</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_Captive.DoShowKilledEffect();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 执行Visitor</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">RunVisitor</span>(<span class="params">ICharacterVisitor Visitor</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h1 id="结论"><a href="#结论" class="headerlink" title="结论"></a><span style="color:#339AFF;">结论</span></h1><p>适配器模式的优点是不必使用复杂的方法，就能将两个不同接口的类对象交换使用。此外，它也可以作为隔离项目与第三方工具/函数库的一个方式。</p>
+<p><strong><font size="3">其他应用方式</font></strong></p>
+<p>早期Unity（4.6版本之前）官方的2D界面效果不容易转为使用其他接口工具，如NGUI。因此，在游戏界面开发上，可以使用适配器模式作为转换，让界面上的组件都能先定义一个专用的UI类，与这些第三方套装软件隔离。笔者就亲身遭遇过，因为使用了适配器，所以将NGUI从2.6版转换到3.8版时，只调整了几个UI类与NGUI 3.8版对应，就将项目的UI系统顺利地升级到NGUI 3.8版。</p>
+<p>载具的驾驶系统会因为载具类型的不同而有所差异。早期设计时若是没有通盘考虑，很可能设计出让角色很难驾驭的驾驶系统。同样地，如果是在游戏开发后期才发现这个问题，游戏企划可能会希望某角色能去操控原本没有规划在内的载具，那么此时也可以利用适配器模式来作为两个驾驶系统之间的转接。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/设计模式与游戏完美开发/" rel="tag"># 设计模式与游戏完美开发</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/08/19/前缀字尾-装饰模式/" rel="next" title="前缀字尾--装饰模式">
+                <i class="fa fa-chevron-left"></i> 前缀字尾--装饰模式
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/08/19/加载速度的优化-代理模式/" rel="prev" title="加载速度的优化--代理模式">
+                加载速度的优化--代理模式 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">354</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">55</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2020/02/16/游戏设计快乐之道（第2版）/" title="游戏设计快乐之道（第2版）" target="_blank">游戏设计快乐之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/14/游戏剧本怎么写/" title="游戏剧本怎么写" target="_blank">游戏剧本怎么写</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/04/通关！游戏设计之道（第2版）/" title="通关！游戏设计之道（第2版）" target="_blank">通关！游戏设计之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/26/游戏设计艺术（第2版）/" title="游戏设计艺术（第2版）" target="_blank">游戏设计艺术（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/22/大师谈游戏设计创意与节奏/" title="大师谈游戏设计创意与节奏" target="_blank">大师谈游戏设计创意与节奏</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#游戏的宠物系统"><span class="nav-number">1.</span> <span class="nav-text">游戏的宠物系统</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#适配器模式"><span class="nav-number">2.</span> <span class="nav-text">适配器模式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#适配器模式的定义"><span class="nav-number">2.1.</span> <span class="nav-text">适配器模式的定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#适配器模式的说明"><span class="nav-number">2.2.</span> <span class="nav-text">适配器模式的说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#适配器模式的实现范例"><span class="nav-number">2.3.</span> <span class="nav-text">适配器模式的实现范例</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用适配器模式实现俘兵系统"><span class="nav-number">3.</span> <span class="nav-text">使用适配器模式实现俘兵系统</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#俘兵系统的架构设计"><span class="nav-number">3.1.</span> <span class="nav-text">俘兵系统的架构设计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现说明"><span class="nav-number">3.2.</span> <span class="nav-text">实现说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#与俘兵相关的新增部分"><span class="nav-number">3.3.</span> <span class="nav-text">与俘兵相关的新增部分</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用适配器模式的优点"><span class="nav-number">3.4.</span> <span class="nav-text">使用适配器模式的优点</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#适配器模式面对变化时"><span class="nav-number">4.</span> <span class="nav-text">适配器模式面对变化时</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#结论"><span class="nav-number">5.</span> <span class="nav-text">结论</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">3.7m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">56:23</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

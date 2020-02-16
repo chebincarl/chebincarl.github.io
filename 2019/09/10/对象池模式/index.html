@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="思考并回答以下问题：">
+<meta name="keywords" content="游戏设计模式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="对象池模式">
+<meta property="og:url" content="http://chebincarl.github.io/2019/09/10/对象池模式/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="思考并回答以下问题：">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://chebincarl.github.io/2019/09/10/对象池模式/1.png">
+<meta property="og:updated_time" content="2019-09-10T11:04:31.593Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="对象池模式">
+<meta name="twitter:description" content="思考并回答以下问题：">
+<meta name="twitter:image" content="http://chebincarl.github.io/2019/09/10/对象池模式/1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/09/10/对象池模式/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>对象池模式 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">专注，重复10遍</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/09/10/对象池模式/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">对象池模式
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-09-10 13:45:48 / 修改时间：19:04:31" itemprop="dateCreated datePublished" datetime="2019-09-10T13:45:48+08:00">2019-09-10</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Unity/" itemprop="url" rel="index"><span itemprop="name">Unity</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">11k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">10 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>思考并回答以下问题：</p>
+<a id="more"></a>
+<p>本章涵盖：</p>
+<ul>
+<li>意图</li>
+<li>动机<ul>
+<li>碎片的诅咒</li>
+<li>兼得鱼和熊掌</li>
+</ul>
+</li>
+<li>模式</li>
+<li>何时使用</li>
+<li>记住<ul>
+<li>池可能在不需要的对象上浪费内存</li>
+<li>同时只能激活固定数量的对象</li>
+<li>每个对象的内存大小是固定的</li>
+<li>重用对象不会自动清除</li>
+<li>未使用的对象会保留在内存中</li>
+</ul>
+</li>
+<li>示例代码<ul>
+<li>空闲列表</li>
+</ul>
+</li>
+<li>设计决策<ul>
+<li>对象和池耦合吗？</li>
+<li>谁负责初始化重用对象？</li>
+</ul>
+</li>
+<li>参见</li>
+</ul>
+<h1 id="意图"><a href="#意图" class="headerlink" title="意图"></a><span style="color:#339AFF;">意图</span></h1><p><strong>放弃单独地分配和释放对象，从固定的池中重用对象，以提高性能和内存使用率。</strong></p>
+<h1 id="动机"><a href="#动机" class="headerlink" title="动机"></a><span style="color:#339AFF;">动机</span></h1><p>我们在处理游戏的视觉效果。当英雄释放了法术，我们想要在屏幕上爆发闪光。这需要调用<strong>粒子系统</strong>，产生动态的闪烁图形， 显示动画直到图形消失。</p>
+<p>由于一次简单的魔杖挥舞就能产生成百上千的粒子，系统需要能够快速地生成它们。 更重要的是，我们需要保证创建和销毁这些粒子不会造成<strong>内存碎片</strong>。</p>
+<h2 id="碎片的诅咒"><a href="#碎片的诅咒" class="headerlink" title="碎片的诅咒"></a><span style="color:#00ACC1;">碎片的诅咒</span></h2><p>为游戏主机或者移动设备编程在许多方面比为普通的计算机编程更像是嵌入式编程。内存紧张，玩家希望游戏能如磐石般稳定运行，压缩内存的管理器很难有效。在这种环境下，内存碎片是致命的。</p>
+<p>碎片意味着在堆中的空余空间被打碎成了很多小的内存碎片，而不是大的连续内存块。<strong>总共</strong>的可用内存也许很大，但是最长的<strong>连续</strong>空间可能难以忍受地小。假设我们有十四个空余字节，但是被一块正在使用的内存分割成了两个七字节的碎片。而我们尝试分配十二字节的对象，那么就会失败。屏幕上不会有更多的闪烁火花了。</p>
+<blockquote>
+<p>这有点像在已经停了很多车的繁忙街道上停车。如果它们挤在一起，尽管空间还是有剩余的，但空闲地带变成了车之间的碎片空间。</p>
+<p>一系列导致碎片化的内存操作。 </p>
+</blockquote>
+<img src="/2019/09/10/对象池模式/1.png">
+<blockquote>
+<p>这里展现了堆是怎么碎片化的，以及即使在理论上有足够的可用内存，内存也会分配失败。</p>
+</blockquote>
+<p>哪怕碎片化发生得不频繁，它也仍会逐渐把堆变成有空洞和裂隙的不可用泡沫，最终完全无法运行游戏。</p>
+<blockquote>
+<p>大多数主机游戏制作商要求游戏通过“浸泡测试”，即让游戏在demo模式运行上几天。如果游戏崩溃了，他们不允许游戏发售。浸泡测试失败有时是因为发生罕见的漏洞，但碎片增长或者内存泄露是造成游戏停止的大部分原因。</p>
+</blockquote>
+<h2 id="兼得鱼和熊掌"><a href="#兼得鱼和熊掌" class="headerlink" title="兼得鱼和熊掌"></a><span style="color:#00ACC1;">兼得鱼和熊掌</span></h2><p>由于碎片化和可能很慢的内存分配，游戏中何时何处管理内存通常需要十分小心。一个简单又有效的办法是——游戏开始时取一大块内存，然后直到游戏结束才去释放它。但是这对要在游戏运行时创建和销毁事物的系统来说是痛苦的。</p>
+<p>使用对象池能让我们兼得鱼和熊掌。对内存管理器，我们只需要将一大块内存分出来，保持在游戏运行时不释放它。对于池的使用者，我们可以简单地构造析构我们想要的内容对象。</p>
+<h1 id="模式"><a href="#模式" class="headerlink" title="模式"></a><span style="color:#339AFF;">模式</span></h1><p>定义一个<strong><u>池</u></strong>对象，其包含了一组<u><strong>可重用对象</strong></u>。其中每个可重用对象都支持<u><strong>查询“使用中”状态</strong></u>，说明它是不是“正在使用”。池被初始化时，它就创建了整个对象集合（通常使用一次连续的分配），然后初始化所有对象到“不在使用中”状态。</p>
+<p>当你需要新对象，向池子要一个。它找到一个可用对象，初始化为“使用中”然后返回。 当对象不再被需要，它被设置回“不在使用中”。通过这种方式，可以轻易地创建和销毁对象而不必分配内存或其他资源。</p>
+<h1 id="何时使用"><a href="#何时使用" class="headerlink" title="何时使用"></a><span style="color:#339AFF;">何时使用</span></h1><p>这个模式广泛应用于可见的事物上，比如游戏实体和视觉效果，但是它也可在不那么视觉化的数据结构上使用，比如正在播放的声音。 在以下情况中使用对象池：</p>
+<ul>
+<li>需要频繁创建和销毁对象。</li>
+<li>对象大小相仿。</li>
+<li>在堆上进行对象内存分配十分缓慢或者会导致内存碎片。</li>
+<li>每个对象都封装了像数据库或者网络连接这样很昂贵又可以重用的资源。</li>
+</ul>
+<h1 id="记住"><a href="#记住" class="headerlink" title="记住"></a><span style="color:#339AFF;">记住</span></h1><p>你通常依赖垃圾回收机制或者<span style="color:blue">new</span>和<span style="color:blue">delete</span>来处理内存管理。通过使用对象池，你是在说，“我知道如何更好地处理这些字节。”这就意味着处理内存的责任落到了你头上。</p>
+<h2 id="池可能在不需要的对象上浪费内存"><a href="#池可能在不需要的对象上浪费内存" class="headerlink" title="池可能在不需要的对象上浪费内存"></a><span style="color:#00ACC1;">池可能在不需要的对象上浪费内存</span></h2><p>对象池的大小需要根据游戏的需求设置。当池子太<strong>小</strong>时，很明显需要调整（没有什么比崩溃更能获得你的注意力了）。但是也要小心确保池子没有太<strong>大</strong>。更小的池子提供了空余的内存做其他有趣的事情。</p>
+<h2 id="同时只能激活固定数量的对象"><a href="#同时只能激活固定数量的对象" class="headerlink" title="同时只能激活固定数量的对象"></a><span style="color:#00ACC1;">同时只能激活固定数量的对象</span></h2><p>在某种程度上这是好事。将内存按不同的对象类型划分单独的池保证了这点。举个例子，一连串爆炸不会让粒子系统消耗掉<strong>所有</strong>可用内存，然后阻碍创建新敌人这样的关键事件。</p>
+<p>尽管如此，这也意味着试图从池子重用对象可能会失败，因为它们都在使用中。这里有几个常见对策：</p>
+<ul>
+<li><p><strong>完全阻止这点</strong>。这是通常的“修复”：增加对象池的大小，这样无论用户做什么，它们都不会溢出。对于重要对象，比如敌人或游戏道具，这通常是正确的选择。也许没有“正确的”方法来处理玩家抵达关底时创建巨大Boss内存不足的问题，所以最聪明的办法就是保证这不发生。</p>
+<p>  这个的副作用是强迫你为那些只在一两个罕见情况下需要的对象分配过多的内存。因此，固定大小的对象池也许不对所有的游戏状态都适用。举个例子，某些关卡也许需要更多的效果而其他的需要声音。在这种情况下，考虑为每个场景调整对象池的大小。</p>
+</li>
+<li><p><strong>就不要创建对象了</strong>。这听起来很糟，但是对于像粒子系统这样的情况很有道理。如果所有的粒子都在使用，那么屏幕已经充满了闪动的图形。用户不会注意到下个爆炸不如现在的这个一样引人注目。</p>
+</li>
+<li><p><strong>强制干掉一个已有的对象</strong>。想想正在播放声音的内存池，假设需要播放新声音而对象池满了。你不想简单地忽视新声音——用户会注意到魔法剑有时会发出戏剧般的声音，有时顽固地一声不吭。更好的解决方法是找到播放中最轻的声音，然后用新声音替代之。新声音会覆盖掉前一个声音。</p>
+<p>  大体上，如果已有对象的<strong>消失</strong>要比新对象的<strong>出现</strong>更不引人察觉，这也许是正确的选择。</p>
+</li>
+<li><p><strong>增加池的大小</strong>。如果游戏允许你使用一点内存上的灵活性，我们也许会在运行时增加池子的大小或者创建新的溢出池。如果用这种方式获取内存，考虑下在增加的内存不再需要时，池是否需要缩回原来的大小。</p>
+</li>
+</ul>
+<h2 id="每个对象的内存大小是固定的"><a href="#每个对象的内存大小是固定的" class="headerlink" title="每个对象的内存大小是固定的"></a><span style="color:#00ACC1;">每个对象的内存大小是固定的</span></h2><p>多数对象池将对象存储在一个数组中。如果你所有的对象都是同样的类型，这很好。但是，如果你想要在同一个对象池中存储不同类型的对象，或者存储子类的实例，你需要保证池中的每个位置对<strong>最大的</strong>可能对象都有足够的内存。否则，超过预期大小的对象会占据下一个对象的内存空间，导致内存崩坏。</p>
+<p>同时，如果对象大小是变化的，你是在浪费内存。每个槽都需要能存储最大的对象。如果对象很少那么大，每放进去一个小对象都是在浪费内存。这很像是通过机场安检时，使用最大允许尺寸的箱子，而里面只放了钥匙和钱包。</p>
+<p>当你发现自己在用这种方式浪费内存，考虑将池根据对象的大小分割为分离的池——大箱子给大行李，小箱子给口袋里的东西。</p>
+<blockquote>
+<p>这是一种实现有效率的内存管理的常用模式。管理者拥有一系列池，池的块大小不相同。当你申请分配一块，它会从合适块大小的池中取出一块，然后分配给你。</p>
+</blockquote>
+<h2 id="重用对象不会自动清除"><a href="#重用对象不会自动清除" class="headerlink" title="重用对象不会自动清除"></a><span style="color:#00ACC1;">重用对象不会自动清除</span></h2><p>很多内存管理系统拥有debug特性，会清除或释放所有内存成特定的值，比如<span style="color:blue">0xdeadbeef</span>。这帮助你找到使用未初始化变量或使用已被释放内存造成的痛苦漏洞。</p>
+<p>由于对象池重用对象不再经过内存管理系统，我们失去了这层安全网。更糟的是，为“新”对象使用的内存之前存储的是同样类型的对象。这使你很难分辨出创建新对象时的未初始化问题：那个存储新对象的内存已经保存了来自于上个生命周期中的<strong>几乎完全</strong>正确的数据。</p>
+<p>由于这点，特别注意在池里初始化对象的代码，保证它<strong>完全</strong>地初始化了对象。甚至很值得加个在对象回收时清空对象槽的debug选项。</p>
+<blockquote>
+<p>如果你将其清空为0x1deadb0b，我会很荣幸的。</p>
+</blockquote>
+<h2 id="未使用的对象会保留在内存中"><a href="#未使用的对象会保留在内存中" class="headerlink" title="未使用的对象会保留在内存中"></a><span style="color:#00ACC1;">未使用的对象会保留在内存中</span></h2><p>对象池在支持垃圾回收的系统中很少见，因为内存管理系统通常会为你处理这些碎片。但是对象池仍然是避免构建和析构的有用手段，特别是在有更慢CPU和更简陋垃圾回收系统的移动设备上。</p>
+<p>如果你使用有垃圾回收的对象池系统，注意潜在的冲突。由于池不会在对象不再使用时真正地析构它们，如果对象仍然保留任何对其他<strong>对象</strong>的引用，也会阻止垃圾回收器回收它。为了避免这点，当池中对象不再使用，清除它对其他对象的所有引用。</p>
+<h1 id="示例代码"><a href="#示例代码" class="headerlink" title="示例代码"></a><span style="color:#339AFF;">示例代码</span></h1><p>现实世界的粒子系统通常应用重力，风，摩擦，和其他物理效果。我们简陋的例子只在直线上移动粒子几帧，然后销毁粒子。这不是工业级的代码，但足够说明如何使用对象池。</p>
+<p>我们应该从最简单的可能实现开始。首先是小小的粒子类：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Particle</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        Particle()</span><br><span class="line">        : framesLeft_(<span class="number">0</span>)</span><br><span class="line">        &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">init</span><span class="params">(<span class="keyword">double</span> x, <span class="keyword">double</span> y,</span></span></span><br><span class="line"><span class="function"><span class="params">                <span class="keyword">double</span> xVel, <span class="keyword">double</span> yVel, <span class="keyword">int</span> lifetime)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        x_ = x; y_ = y;</span><br><span class="line">        xVel_ = xVel; yVel_ = yVel;</span><br><span class="line">        framesLeft_ = lifetime;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">animate</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (!inUse()) <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">        framesLeft_--;</span><br><span class="line">        x_ += xVel_;</span><br><span class="line">        y_ += yVel_;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">inUse</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> framesLeft_ &gt; <span class="number">0</span>; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span>:</span><br><span class="line">        <span class="keyword">int</span> framesLeft_;</span><br><span class="line">        <span class="keyword">double</span> x_, y_;</span><br><span class="line">        <span class="keyword">double</span> xVel_, yVel_;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>默认的构造器将粒子初始化为“不在使用中”。之后对<span style="color:blue">init()</span>的调用初始化粒子到活跃状态。粒子随着时间播放动画，一帧调用一次<span style="color:blue">animate()</span>函数。</p>
+<p>对象池需要知道哪个粒子可以被重用。它通过粒子的<span style="color:blue">inUse()</span>函数获知这点。这个函数利用了粒子生命时间有限这点，并使用变量<span style="color:blue">framesLeft_</span>来决定哪些粒子在被使用，无需存储分离的标识。</p>
+<p>对象池类也很简单：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ParticlePool</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">create</span><span class="params">(<span class="keyword">double</span> x, <span class="keyword">double</span> y,</span></span></span><br><span class="line"><span class="function"><span class="params">                  <span class="keyword">double</span> xVel, <span class="keyword">double</span> yVel, <span class="keyword">int</span> lifetime)</span></span>;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">animate</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; POOL_SIZE; i++)</span><br><span class="line">        &#123;</span><br><span class="line">            particles_[i].animate();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span>:</span><br><span class="line">        <span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">int</span> POOL_SIZE = <span class="number">100</span>;</span><br><span class="line">        Particle particles_[POOL_SIZE];</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p><span style="color:blue">create()</span>函数允许外部代码创建新粒子。游戏每帧调用<span style="color:blue">animate()</span>一次，让对象池中的粒子轮流显示动画。</p>
+<blockquote>
+<p>animate()方法是更新方法模式的一个例子。</p>
+</blockquote>
+<p>粒子本身被存储在对象池类中一个固定大小的数组里。在这个简单的实现中，池的大小在类声明时被硬编码了，但是也可以使用动态大小的数组或使用由外部定义的模板变量。</p>
+<p>创建新粒子很直观：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">void ParticlePool::create(double x, double y,</span><br><span class="line">                          <span class="keyword">double</span> xVel, <span class="keyword">double</span> yVel,</span><br><span class="line">                          <span class="keyword">int</span> lifetime)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 找到一个可用粒子</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; POOL_SIZE; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (!particles_[i].inUse())</span><br><span class="line">        &#123;</span><br><span class="line">            particles_[i].init(x, y, xVel, yVel, lifetime);</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>我们遍历对象池找到第一个可用粒子。当我们找到后，初始化它然后就完成了。注意在这个实现中，如果这里没有找到任何可用的粒子，就不创建新的粒子。</p>
+<p>做一个简单粒子系统的所有东西都在这里了，当然，没有包含渲染粒子。我们现在可以创建对象池然后使用它创建粒子。当时间到了，粒子会自动失效。</p>
+<p>这足够承载一个游戏了，但是敏锐的读者也许会注意到创建新粒子（可能）需要遍历整个集合，直到找到一个空闲槽。如果池很大很满，这可能很慢。让我们看看可以怎样改进这一点。</p>
+<blockquote>
+<p>创建一个粒子的复杂度是O(n)，上过算法课的人都知道。</p>
+</blockquote>
+<h2 id="空闲列表"><a href="#空闲列表" class="headerlink" title="空闲列表"></a><span style="color:#00ACC1;">空闲列表</span></h2><p>如果不想浪费时间在<strong>查找</strong>空闲粒子上，明显的解决方案是不要失去对它们的追踪。我们可以存储指向每个未使用粒子的单独指针列表。然后，当需要创建粒子时，我们从列表中移除第一个指针，然后重用它指向的粒子。</p>
+<p>不幸的是，这回要我们管理一个和对象池同样大小的单独数组。无论如何，在我们创建池时，<strong>所有的</strong>粒子都未被使用，所以列表初始会包含池中每个对象的指针。</p>
+<p>如果<strong>无需</strong>牺牲任何内存就能修复性能问题那就好了。方便的是，这里已经有可以借用的内存了——那些未使用粒子自身的内存。</p>
+<p>当粒子未被使用时，它的大部分的状态都是无关紧要的。它的位置和速度没有被使用。唯一需要的是表示自身是否激活的状态。在我们的例子中，那是<span style="color:blue">framesLeft_</span>成员。其他的所有位都可以被重用。这里是改进后的粒子：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Particle</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="comment">// ...</span></span><br><span class="line"></span><br><span class="line">        <span class="function">Particle* <span class="title">getNext</span><span class="params">()</span> <span class="keyword">const</span> </span>&#123; <span class="keyword">return</span> state_.next; &#125;</span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">setNext</span><span class="params">(Particle* next)</span> </span>&#123; state_.next = next; &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span>:</span><br><span class="line">        <span class="keyword">int</span> framesLeft_;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">union</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// 使用时的状态</span></span><br><span class="line">            <span class="class"><span class="keyword">struct</span></span></span><br><span class="line"><span class="class">            &#123;</span></span><br><span class="line">              <span class="keyword">double</span> x, y;</span><br><span class="line">              <span class="keyword">double</span> xVel, yVel;</span><br><span class="line">            &#125; live;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 可重用时的状态</span></span><br><span class="line">            Particle* next;</span><br><span class="line">        &#125; state_;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>我们将除<span style="color:blue">framesLeft_</span>外的所有成员变量移到<span style="color:blue">live</span>结构中，而该结构存储在union<span style="color:blue">state_</span>中。这个结构保存粒子在播放动画时的状态。当粒子被重用时，union的其他部分，<span style="color:blue">next</span>成员被使用了。它保留了一个指向这个粒子后面的可用粒子的指针。</p>
+<blockquote>
+<p>Unions近些年不那么常见了，所以你可能不熟悉这些语法。如果你在游戏团队中，你可能会遇见“内存大师”，当游戏遇到不可避免的内存耗尽问题时，他们就挺身而出。问问他们关于unions的事。他们知道所有有关union的事情，还有其他有趣的位压缩技巧。</p>
+</blockquote>
+<p>我们可以使用这些指针构建链表，将池中每个未使用的粒子都连在一起。我们有可用粒子的列表，而且无需使用额外的内存。我们使用了死亡粒子本身的内存来存储列表。</p>
+<p>这种聪明的技术被称为<span style="color:blue">freelist</span>。为了让其工作，我们需要保证指针正确地初始化，在粒子创建和销毁时好好被管理了。并且，当然，我们要追踪列表的头指针：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ParticlePool</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="comment">// ...</span></span><br><span class="line">    <span class="keyword">private</span>:</span><br><span class="line">        Particle* firstAvailable_;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>当首次创建对象池时，<strong>所有的</strong>粒子都是可用的，所以空余列表应该贯穿整个对象池。对象池构造器设置了这些：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">ParticlePool::ParticlePool()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 第一个可用的粒子</span></span><br><span class="line">    firstAvailable_ = &amp;particles_[<span class="number">0</span>];</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 每个粒子指向下一个</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; POOL_SIZE - <span class="number">1</span>; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        particles_[i].setNext(&amp;particles_[i + <span class="number">1</span>]);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 最后一个终结的列表</span></span><br><span class="line">    particles_[POOL_SIZE - <span class="number">1</span>].setNext(<span class="literal">NULL</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>现在为了创建新粒子，我们直接跳到首个可用的粒子：</p>
+<blockquote>
+<p>O(1)复杂度，孩子！这才叫编码！</p>
+</blockquote>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> ParticlePool::create(<span class="keyword">double</span> x, <span class="keyword">double</span> y,</span><br><span class="line">                          <span class="keyword">double</span> xVel, <span class="keyword">double</span> yVel,</span><br><span class="line">                          <span class="keyword">int</span> lifetime)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">// 保证池没有满</span></span><br><span class="line">    assert(firstAvailable_ != <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将它从可用粒子列表中移除</span></span><br><span class="line">    Particle* newParticle = firstAvailable_;</span><br><span class="line">    firstAvailable_ = newParticle-&gt;getNext();</span><br><span class="line"></span><br><span class="line">    newParticle-&gt;init(x, y, xVel, yVel, lifetime);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们需要知道粒子何时死亡，这样可将其放回到空闲列表中，所以我们将<span style="color:blue">animate()</span>改为在粒子不再活跃时返回<span style="color:blue">true</span>：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">bool</span> Particle::animate()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span> (!inUse()) <span class="keyword">return</span> <span class="literal">false</span>;</span><br><span class="line"></span><br><span class="line">    framesLeft_--;</span><br><span class="line">    x_ += xVel_;</span><br><span class="line">    y_ += yVel_;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> framesLeft_ == <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>当那发生时，简单地将其放回列表：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> ParticlePool::animate()</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; POOL_SIZE; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">if</span> (particles_[i].animate())</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="comment">// 将粒子加到列表的前部</span></span><br><span class="line">            particles_[i].setNext(firstAvailable_);</span><br><span class="line">            firstAvailable_ = &amp;particles_[i];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这样就成了，一个小对象池，拥有常量时间的构造和删除。</p>
+<h1 id="设计决策"><a href="#设计决策" class="headerlink" title="设计决策"></a><span style="color:#339AFF;">设计决策</span></h1><p>如你所见，对象池最简单的实现非常平凡：创建对象数组，在需要它们时重新初始化。 实际的代码很少会那么简单，这里还有很多方式让池更加的通用，安全，或容易管理。 在游戏中实现对象池时，你需要回答以下问题：</p>
+<h2 id="对象和池耦合吗？"><a href="#对象和池耦合吗？" class="headerlink" title="对象和池耦合吗？"></a><span style="color:#00ACC1;">对象和池耦合吗？</span></h2><p>写对象池时第一个需要思考的问题：对象本身是否需要知道它们在池子中。大多数情况下它们需要，但是那样你就不大可能写一个通用对象池类来保存任意对象。</p>
+<ul>
+<li><p><u><strong>如果对象与池耦合</strong>：</u></p>
+<ul>
+<li><strong>实现更简单。</strong>你可以在对象中简单地放个“在使用中”标识或者函数，就完成了。</li>
+<li><p><strong>你可以保证对象只能被对象池创建。</strong>在C++中，做这事最简单的方法是让池对象是对象类的友类，将对象的构造器设为私有。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Particle</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">friend</span> <span class="class"><span class="keyword">class</span> <span class="title">ParticlePool</span>;</span></span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span>:</span><br><span class="line">        Particle()</span><br><span class="line">        : inUse_(<span class="literal">false</span>)</span><br><span class="line">        &#123;&#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">bool</span> inUse_;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ParticlePool</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    Particle pool_[<span class="number">100</span>];</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+<p>在类间保持这种关系来确保使用者无法创建对象池没有追踪的对象。</p>
+</li>
+<li><p><strong>你也许可以避免显式存储“使用中”的标识。</strong>很多对象已经保存了可以告诉外界它有没有在使用的状态。举个例子，粒子的位置如果不在屏幕上，也许它就可以被重用。如果对象类知道它在对象池中，那它可以提供一个inUse()来查询这个状态。这省下了对象池存储“在使用中”标识的多余内存。</p>
+</li>
+</ul>
+</li>
+<li><p><u><strong>如果对象没有和对象池耦合：</strong></u></p>
+<ul>
+<li><p><strong>可以保存多种类型的对象。</strong>这是最大的好处。通过解耦对象和对象池，你可以实现通用的、可重用的对象池类。</p>
+</li>
+<li><p><strong>必须在对象的外部追踪“使用中”状态。</strong>做这点最简单的方式是创建分离的位字段：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">TObject</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">class</span> <span class="title">GenericPool</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">private</span>:</span><br><span class="line">        <span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">int</span> POOL_SIZE = <span class="number">100</span>;</span><br><span class="line"></span><br><span class="line">    TObject pool_[POOL_SIZE];</span><br><span class="line">    <span class="keyword">bool</span>    inUse_[POOL_SIZE];</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="谁负责初始化重用对象？"><a href="#谁负责初始化重用对象？" class="headerlink" title="谁负责初始化重用对象？"></a><span style="color:#00ACC1;">谁负责初始化重用对象？</span></h2><p>为了重用一个已经存在的对象，它必须用新状态重新初始化。这里的关键问题是你需要在对象池的内部还是外部重新初始化。</p>
+<ul>
+<li><p><u><strong>如果在对象池的内部重新初始化：</strong></u></p>
+<ul>
+<li><p><strong>对象池可以完全封装管理对象。</strong>取决于对象需要的其他能力，你可以让它们完全处于池的内部。 这保证了其外部代码不会引用到已重用的对象。</p>
+</li>
+<li><p><strong>对象池与对象是如何初始化的相绑定。</strong>池中对象也许提供了不同的初始化函数。 如果对象池控制了初始化，它的接口需要支持所有的初始化函数，然后转发给对象。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Particle</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="comment">// 多种初始化方式……</span></span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">init</span><span class="params">(<span class="keyword">double</span> x, <span class="keyword">double</span> y)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">init</span><span class="params">(<span class="keyword">double</span> x, <span class="keyword">double</span> y, <span class="keyword">double</span> angle)</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">init</span><span class="params">(<span class="keyword">double</span> x, <span class="keyword">double</span> y, <span class="keyword">double</span> xVel, <span class="keyword">double</span> yVel)</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ParticlePool</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">create</span><span class="params">(<span class="keyword">double</span> x, <span class="keyword">double</span> y)</span></span></span><br><span class="line"><span class="function">        </span>&#123;</span><br><span class="line">        <span class="comment">// 转发给粒子……</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">create</span><span class="params">(<span class="keyword">double</span> x, <span class="keyword">double</span> y, <span class="keyword">double</span> angle)</span></span></span><br><span class="line"><span class="function">        </span>&#123;</span><br><span class="line">        <span class="comment">// 转发给粒子……</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">create</span><span class="params">(<span class="keyword">double</span> x, <span class="keyword">double</span> y, <span class="keyword">double</span> xVel, <span class="keyword">double</span> yVel)</span></span></span><br><span class="line"><span class="function">        </span>&#123;</span><br><span class="line">        <span class="comment">// 转发给粒子……</span></span><br><span class="line">        &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p><u><strong>如果外部代码初始化对象：</strong></u></p>
+<ul>
+<li><strong>对象池的接口更简单。</strong>无需提供覆盖每种对象初始化的多种函数，对象池只需要返回新对象的引用：<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Particle</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="comment">// 多种初始化方法</span></span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">init</span><span class="params">(<span class="keyword">double</span> x, <span class="keyword">double</span> y)</span></span>;</span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">init</span><span class="params">(<span class="keyword">double</span> x, <span class="keyword">double</span> y, <span class="keyword">double</span> angle)</span></span>;</span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">init</span><span class="params">(<span class="keyword">double</span> x, <span class="keyword">double</span> y, <span class="keyword">double</span> xVel, <span class="keyword">double</span> yVel)</span></span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ParticlePool</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="function">Particle* <span class="title">create</span><span class="params">()</span></span></span><br><span class="line"><span class="function">        </span>&#123;</span><br><span class="line">        <span class="comment">// 返回可用粒子的引用……</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span>:</span><br><span class="line">        Particle pool_[<span class="number">100</span>];</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+</ul>
+<p>调用者可以使用对象暴露的任何方法进行初始化：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ParticlePool pool;</span><br><span class="line"></span><br><span class="line">pool.create()-&gt;init(<span class="number">1</span>, <span class="number">2</span>);</span><br><span class="line">pool.create()-&gt;init(<span class="number">1</span>, <span class="number">2</span>, <span class="number">0.3</span>);</span><br><span class="line">pool.create()-&gt;init(<span class="number">1</span>, <span class="number">2</span>, <span class="number">3.3</span>, <span class="number">4.4</span>);</span><br></pre></td></tr></table></figure></p>
+<ul>
+<li><strong>外部代码需要处理无法创建新对象的失败。</strong>前面的例子假设create()总能成功地返回一个指向对象的指针。但如果对象池已经满了，返回的会是NULL。安全起见，你需要在初始化之前检查这一点。<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Particle* particle = pool.create();</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (particle != <span class="literal">NULL</span>) particle-&gt;init(<span class="number">1</span>, <span class="number">2</span>);</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h1 id="参见"><a href="#参见" class="headerlink" title="参见"></a><span style="color:#339AFF;">参见</span></h1><ul>
+<li>这看上去很像是享元模式。两者都控制了一系列可重用的对象。不同在于“重用”的含义。享元对象分享实例间<strong>同时</strong>拥有的相同部分。享元模式在不同上下文中使用相同对象避免了<strong>重复</strong>内存使用。</li>
+<li>对象池中的对象也被重用了，但是是在不同的时间点上被重用的。“重用”在对象池中意味着对象在原先的对象用完<strong>之后</strong>分配内存。对象池没有期待对象会在它的生命周期中分享什么。</li>
+<li>将内存中同样类型的对象进行整合，能确保在遍历对象时CPU缓存总是满的。数据局部性模式介绍了这一点。</li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/游戏设计模式/" rel="tag"># 游戏设计模式</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/09/10/C-反射/" rel="next" title="C#反射">
+                <i class="fa fa-chevron-left"></i> C#反射
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/09/10/简易对象池/" rel="prev" title="简易对象池">
+                简易对象池 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">354</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">55</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2020/02/16/游戏设计快乐之道（第2版）/" title="游戏设计快乐之道（第2版）" target="_blank">游戏设计快乐之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/14/游戏剧本怎么写/" title="游戏剧本怎么写" target="_blank">游戏剧本怎么写</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/04/通关！游戏设计之道（第2版）/" title="通关！游戏设计之道（第2版）" target="_blank">通关！游戏设计之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/26/游戏设计艺术（第2版）/" title="游戏设计艺术（第2版）" target="_blank">游戏设计艺术（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/22/大师谈游戏设计创意与节奏/" title="大师谈游戏设计创意与节奏" target="_blank">大师谈游戏设计创意与节奏</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#意图"><span class="nav-number">1.</span> <span class="nav-text">意图</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#动机"><span class="nav-number">2.</span> <span class="nav-text">动机</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#碎片的诅咒"><span class="nav-number">2.1.</span> <span class="nav-text">碎片的诅咒</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#兼得鱼和熊掌"><span class="nav-number">2.2.</span> <span class="nav-text">兼得鱼和熊掌</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#模式"><span class="nav-number">3.</span> <span class="nav-text">模式</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#何时使用"><span class="nav-number">4.</span> <span class="nav-text">何时使用</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#记住"><span class="nav-number">5.</span> <span class="nav-text">记住</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#池可能在不需要的对象上浪费内存"><span class="nav-number">5.1.</span> <span class="nav-text">池可能在不需要的对象上浪费内存</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#同时只能激活固定数量的对象"><span class="nav-number">5.2.</span> <span class="nav-text">同时只能激活固定数量的对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#每个对象的内存大小是固定的"><span class="nav-number">5.3.</span> <span class="nav-text">每个对象的内存大小是固定的</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#重用对象不会自动清除"><span class="nav-number">5.4.</span> <span class="nav-text">重用对象不会自动清除</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#未使用的对象会保留在内存中"><span class="nav-number">5.5.</span> <span class="nav-text">未使用的对象会保留在内存中</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#示例代码"><span class="nav-number">6.</span> <span class="nav-text">示例代码</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#空闲列表"><span class="nav-number">6.1.</span> <span class="nav-text">空闲列表</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#设计决策"><span class="nav-number">7.</span> <span class="nav-text">设计决策</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#对象和池耦合吗？"><span class="nav-number">7.1.</span> <span class="nav-text">对象和池耦合吗？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#谁负责初始化重用对象？"><span class="nav-number">7.2.</span> <span class="nav-text">谁负责初始化重用对象？</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参见"><span class="nav-number">8.</span> <span class="nav-text">参见</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">3.7m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">56:23</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

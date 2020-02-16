@@ -1,0 +1,1534 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="思考并回答以下问题：  什么是对象缓冲池技术？是为了解决什么问题？ 怎么使用缓冲池技术？">
+<meta name="keywords" content="Unity3D&#x2F;2D游戏开发从0到1">
+<meta property="og:type" content="article">
+<meta property="og:title" content="预加载与对象缓冲池技术">
+<meta property="og:url" content="http://chebincarl.github.io/2019/07/29/预加载与对象缓冲池技术/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="思考并回答以下问题：  什么是对象缓冲池技术？是为了解决什么问题？ 怎么使用缓冲池技术？">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-08-05T13:36:56.130Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="预加载与对象缓冲池技术">
+<meta name="twitter:description" content="思考并回答以下问题：  什么是对象缓冲池技术？是为了解决什么问题？ 怎么使用缓冲池技术？">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/07/29/预加载与对象缓冲池技术/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>预加载与对象缓冲池技术 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">专注，重复10遍</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/07/29/预加载与对象缓冲池技术/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">预加载与对象缓冲池技术
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-07-29 21:52:09" itemprop="dateCreated datePublished" datetime="2019-07-29T21:52:09+08:00">2019-07-29</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-08-05 21:36:56" itemprop="dateModified" datetime="2019-08-05T21:36:56+08:00">2019-08-05</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Unity/" itemprop="url" rel="index"><span itemprop="name">Unity</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">7.7k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">7 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>思考并回答以下问题：</p>
+<ul>
+<li>什么是对象缓冲池技术？是为了解决什么问题？</li>
+<li>怎么使用缓冲池技术？</li>
+</ul>
+<a id="more"></a>
+<p>本章涵盖：</p>
+<ul>
+<li>简单对象缓冲池技术</li>
+<li>高级对象缓冲池技术</li>
+</ul>
+<p>对象缓冲池技术是游戏开发领域的一个高级知识点，它的出现主要解决游戏开发过程中由于大量游戏道具的生成与销毁而造成系统瓶颈的问题。关于游戏项目中的性能优化策略，我们使用了整整一章<a href="/2019/07/29/项目研发常用优化策略/" title="项目研发常用优化策略">项目研发常用优化策略</a>进行详细的讨论与论述，而本章所要讨论的问题其实就是Unity引擎中针对脚本性能优化而推荐的优秀解决方案。</p>
+<p>预加载是整个对象缓冲池技术的实现原理与实现前提，本章使用两个优秀的示例，具体讲解两类对象缓冲池的实现原理与使用方法。</p>
+<h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a><span style="color:#039BE5;">概述</span></h1><p>对象缓冲池技术不是Unity所专用的技术，它来自软件开发中对于数据库的优化方案，从“数据库连接缓冲池”经过改造与变化而来。由于在做CS/BS软件开发的过程中，我们写的软件系统都一定要与数据库打交道，而频繁地访问数据库又是一件非常消耗数据库资源的问题（数据库服务器能同时被“连接”访问的次数是有限的，而且系统申请连接数据库也是比较耗费时间的）。所以软件开发领域出现了“数据库连接缓冲池”技术，也就是系统中首先提前建立一个数据库连接访问“池”（本质就是一个“集合”，如List&lt;&gt;），“池”中预先存放了一定数量的连接数据库的实例，当我们在需要使用数据库连接的时候，首先查看“池”中是否有现成的“连接实例”，如果有，直接从“池”中获取即可，避免了反复申请连接与断连接等费事操作，大大提高了系统效率。</p>
+<p>游戏开发项目中存在相同的问题，而且或许更加突出与严峻。我们的游戏项目如果要开发的“高大上”，则必然需要使用大量的“次时代”游戏道具与大量的游戏粒子特效等。但是大量的游戏道具与粒子系统的出现，必然会导致频繁的创建、克隆、销毁游戏对象，这就很大程度地消耗了大量的CPU资源，使得游戏出现明显的“卡顿”现象。</p>
+<p>后来，聪明的游戏研发人员就考虑是否把需要销毁的游戏对象进行“隐藏”，也就是可以使用脚本“GameObject.SetActive(false)”禁用游戏对象，当我们再次需要使用此游戏对象的时候则进行启用即可（使用GameObjet.SetActive(true)），这就形成了一个优化的基本观点，使用“隐藏”代替“销毁”.</p>
+<p>再后来，我们就考虑是否在真正的游戏场景开始之前就把需要用到的大量游戏对象与粒子系统等提前加载到一个“池”中，然后需要的时候再直接从“池”中取得，避免使用的时候进行大量“克隆”操作，影响系统效率，造成游戏操作过程中的“卡顿”现象。于是这就形成了“预加载”的概念。</p>
+<p>把以上两种方式（“禁用”、“启用”脚本与“预加载”）结合起来，形成了我们今天要研究的“对象缓冲池”的基本原理。</p>
+<h1 id="简单对象缓冲池技术"><a href="#简单对象缓冲池技术" class="headerlink" title="简单对象缓冲池技术"></a><span style="color:#039BE5;">简单对象缓冲池技术</span></h1><p>如图1所示，我们使用一个“射击木箱靶墙”的小场景，结合一个最简单的对象缓冲池脚本，演示与说明简单对象缓冲池的具体实现原理和基本应用方法。</p>
+<p>首先我们研究与解释一个最简单的对象缓冲池脚本，如代码清单1所示。</p>
+<blockquote>
+<p>代码清单1 ObjectPoolManager.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * Title:学习“对象缓冲池”管理</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> *        对象缓冲池管理器</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * Description:</span></span><br><span class="line"><span class="comment"> *      基本原理：</span></span><br><span class="line"><span class="comment"> *      通过池管理思路，在游戏初始化的时候，生成一个初始的池，存放我们要复用的元素</span></span><br><span class="line"><span class="comment"> *      当要用到游戏对象时，从池中取出；不再需要的时候，不直接删除对象，而是把对象重新回收到“池”中</span></span><br><span class="line"><span class="comment"> *      这样就避免了对内存中大量对象的反复实例化与回收垃圾处理，提高了资源的利用率</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * Author:</span></span><br><span class="line"><span class="comment"> * </span></span><br><span class="line"><span class="comment"> * Date:</span></span><br><span class="line"><span class="comment"> * Version:</span></span><br><span class="line"><span class="comment"> * Modify Record:</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> UnityEngine;</span><br><span class="line"><span class="keyword">using</span> System.Collections;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">ObjectPoolManager</span> : <span class="title">MonoBehaviour</span> </span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> GameObject ObjPrefab; <span class="comment">// 池中所使用的元素预设</span></span><br><span class="line">    <span class="keyword">public</span> Transform TranObjPrefabParent; <span class="comment">// 池中所使用的元素预设的父对象</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">int</span> InitialCapacity; <span class="comment">// Capacity 容积，池 初始容量</span></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> _startCapacityIndex; <span class="comment">// 初始下标</span></span><br><span class="line">    <span class="keyword">private</span> List&lt;<span class="keyword">int</span>&gt; _avaliableIndex; <span class="comment">// 可用“池"游戏对象下标</span></span><br><span class="line">    <span class="keyword">private</span> Dictionary&lt;<span class="keyword">int</span>, GameObject&gt; _totalObjList; <span class="comment">// 池中全部元素的容器</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>从ObjectPoolManager.cs脚本的头注释中可以清楚地查看到本脚本的基本原理说明：在游戏初始化的时候，生成一个初始的“池”，存放我们要复用的元素。当要用到游戏对象时，从池中取出。不再需要的时候不直接删除对象，而是把对象重新回收到“池”中，这样避免了对内存中大量对象的反复实例化与回收垃圾处理，提高了资源利用率。</p>
+<p>脚本字段定义中比较重要的是“_totalObjList”，它是实际存储“池”元素的容器集合，而“_avaliableIndex”则是记录当前“池”中所有可以使用的“池”元素下标数值。</p>
+<blockquote>
+<p>代码清单2</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> 初始化缓冲池</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">Awake</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    _avaliableIndex = <span class="keyword">new</span> List&lt;<span class="keyword">int</span>&gt;(InitialCapacity);</span><br><span class="line">    _totalObjList = <span class="keyword">new</span> Dictionary&lt;<span class="keyword">int</span>, GameObject&gt;(InitialCapacity);</span><br><span class="line">    <span class="comment">// 初始化池</span></span><br><span class="line">    expandPool();</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> 取得游戏对象</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;returns&gt;</span><span class="doctag">&lt;/returns&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">public</span> KeyValuePair&lt;<span class="keyword">int</span>, GameObject&gt; <span class="title">PickObj</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123; </span><br><span class="line">    <span class="comment">// 容量不够，进行“池”扩展</span></span><br><span class="line">    <span class="keyword">if</span> (_avaliableIndex.Count == <span class="number">0</span>)</span><br><span class="line">        expandPool();</span><br><span class="line">    <span class="comment">// 取得一个可用的池下标数值</span></span><br><span class="line">    <span class="keyword">int</span> id = _avaliableIndex[<span class="number">0</span>];</span><br><span class="line"></span><br><span class="line">    <span class="comment">// “可用池下标”集合，删除对应下标</span></span><br><span class="line">    _avaliableIndex.Remove(id);</span><br><span class="line">    <span class="comment">// 设置“池”对象可用</span></span><br><span class="line">    _totalObjList[id].SetActive(<span class="literal">true</span>);</span><br><span class="line">    <span class="comment">// 从“池”中提取一个对象返回</span></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> KeyValuePair&lt;<span class="keyword">int</span>, GameObject&gt;(id, _totalObjList[id]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>代码清单2中定义的Awake()事件函数的作用是初始化“池”容器集合和初始化“池”，即expandPool()方法实例化指定数量的被禁用的“游戏对象预设”，提前放入集合中。代码清单2中的PickObj()方法是从“池”中取得一个可用的游戏对象（预设）。其原理如代码清单2中的26行代码所示，把指定id序列号的游戏对象预设“激活”（使用“SetActive(true)”）。</p>
+<blockquote>
+<p>代码清单3</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> 回收游戏对象</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">RecyleObj</span>(<span class="params"><span class="keyword">int</span> id</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// 设置对应对象不可用（即：放回池操作）</span></span><br><span class="line">    _totalObjList[id].SetActive(<span class="literal">false</span>);</span><br><span class="line">    <span class="comment">// 指定Id的游戏对象下标，重新进入可用“池”下标集合中</span></span><br><span class="line">    _avaliableIndex.Add(id);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;summary&gt;</span></span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> 扩展池</span></span><br><span class="line"><span class="comment"><span class="doctag">///</span> <span class="doctag">&lt;/summary&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">expandPool</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> start = _startCapacityIndex;</span><br><span class="line">    <span class="keyword">int</span> end = _startCapacityIndex + InitialCapacity;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; end; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 加入验证判断，避免在多个请求同时触发扩展池需求</span></span><br><span class="line">        <span class="keyword">if</span> (_totalObjList.ContainsKey(i))</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        GameObject newObj = Instantiate(ObjPrefab) <span class="keyword">as</span> GameObject;</span><br><span class="line">        <span class="comment">// 生成的池对象增加父对象，容易查看与检查</span></span><br><span class="line">        newObj.transform.parent = TranObjPrefabParent.transform;</span><br><span class="line">        <span class="comment">// 每一个生成的对象，设置暂时不可用</span></span><br><span class="line">        newObj.SetActive(<span class="literal">false</span>);</span><br><span class="line">        <span class="comment">// 下标记入“池”可用下标集合中</span></span><br><span class="line">        _avaliableIndex.Add(i);</span><br><span class="line">        <span class="comment">// 新产生的对象，并入本池容器集合中</span></span><br><span class="line">        _totalObjList.Add(i, newObj);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 扩展“初始下标”</span></span><br><span class="line">    _startCapacityIndex = end;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>代码清单3中的RecyleObj()方法回收指定id序列号的游戏对象重新回到“池”中，本质就是代码清单3中的第7行代码所示的，把指定序列号的游戏对象预设重新禁用。14-35行代码是expandPool()扩展池方法，其目的是当游戏刚开始或者“池”中的元素不够使用的时候，扩展容器类中元素的数量。23行代码使用Instantiate()方法通过复制“原型预设”（即变量“ObjPrefab”）的方法扩充新的游戏对象预设元素，加入到“_totalObjList”这个容器类集合中，其查找用的元素下标数值则存储在“_avaliableIndex”集合中。</p>
+<p>这样，一个最简单的“对象缓冲池”脚本就解释完毕了，如何使用呢？需要读者在理解上述脚本的原理上，写其他的测试脚本，通过调用相关方法来使用。也就是说，核心的“对象缓冲池”脚本只是一个“中间件”，不能单独运行，需要我们写脚本来使用。如代码清单4所示，我们使用本书之前讲解的射击场景，运用和测试对象缓冲池的实际效用。</p>
+<blockquote>
+<p>代码清单4 ShottingUseBufferPool.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>代码清单4中的ShottingUseBufferPool.cs脚本是在本书之前提及的RayDemo.cs脚本基础上加入“对象缓冲池”技术改造升级之后的脚本。其中代码清单4中的24-27行代码是关于运用“对象缓冲池”新加入的字段。</p>
+<blockquote>
+<p>代码清单5</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>代码清单5中，Start()事件函数的主要作用是建立“射击靶墙”，OnGUI()事件函数的作用是绘制射击光标。</p>
+<blockquote>
+<p>代码清单6</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>代码清单6中的第73行代码取代原先的创建“子弹”，而是从“缓冲池”取得已经存在的“预设对象”，即调用PickObj，第76行代码SendMessage()函数的作用是传递子弹在缓冲池中的“序号”给“子弹”所在的对象脚本，目的是当子弹超出摄像机视野范围的时候主动“回收”子弹实例。</p>
+<blockquote>
+<p>代码清单7</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>代码清单7中使用OnBecamelnvisible()方法实现当子弹离开摄像机视野范围时，子弹再次自动回收到“缓冲池”中的操作。代码清单7中的ReceiveBulletID()方法是接收ShottingUseBufferPool.cs脚本中用SendMessage()方法传来的子弹序号数据，用于回收子弹使用。</p>
+<p>以上3个核心脚本介绍完毕，请读者查看随书第27章的示例项目，但程序运行之后，我们就会发现在正式开始射击之前，所有指定数量的“子弹预设”就已经创建完毕了，只不过是“禁用”状态。当开始射击的时候，会发现随着子弹的射击，其“子弹缓冲池”列表中的子弹预设对象其状态（“启用”或者“禁用”）也在不断的变化。</p>
+<h1 id="高级对象缓冲池技术"><a href="#高级对象缓冲池技术" class="headerlink" title="高级对象缓冲池技术"></a><span style="color:#039BE5;">高级对象缓冲池技术</span></h1><p>上面我们介绍了简单对象缓冲池的实现原理与实验项目，读者能否发现有什么不方便使用的地方，或者功能需求上的缺失呢？</p>
+<p>之前介绍的对象缓冲池的不足之处，如下所示。</p>
+<p>第1条：使用对象缓冲池的时候必须把一个名为“缓冲对象id号”传给“缓冲对象”所在的脚本，否则不能正确回收“对象”。</p>
+<p>第2条：对象缓冲池不支持多“类”对象的缓冲池处理，即如果射击项目中增加“子弹”、“飞弹”、“炮弹”等不同种类的游戏对象，就不能直接应用了。</p>
+<p>第3条：对象缓冲池中，对象必须明确回收的条件，不能自动按照时间进行“回收”处理。例如，跑酷游戏中，大量的“红宝石”等道具如果用缓冲池，就需要具备一定时间以后自动回收的功能实现。</p>
+<p>为了解决以上简单对象缓冲池的不足，我们来研发更加高级的对象缓冲池， 目的就是既要使用简单，又要功能强大。</p>
+<p>图27.10就是应用高级对象缓冲池的实验项目，从图中的方框中可以看出这个对象缓冲.池支持多类型对象缓冲处理，而且本实验项目中已经有了按照指定时间自动“回收”缓冲    现在就从代码的层级来介绍这个缓冲池的构成与基本原理。功能强大但脚本相对比较简单，核心仅2个脚本和4个类，结构如下。</p>
+<p>1)脚本: “Pools. cs”<br>包含以下3个类。<br>类: Pools  作用:负责多个类型对象缓冲器的实现。<br>类: PoolOption  作用:负责单类型对象缓冲器的实现。<br>类: PoolTimeObject 作用:辅助功能，时间处理。</p>
+<p>2)脚本: “Pool Manager. cs”<br>类: PoolManager 作用:负责多个类型复合对象缓冲器，使用到前面3个类的方法调用。</p>
+<p>图27.11给出了Pools， cs脚本完整的头注释，利于相互学习与借鉴。</p>
+<p>图27.12给出了脚本中包含的3个类的简略定义。为了使读者更好地理解，我们先从类”PoolOption” (图27.12代码中的第178行)开始介绍，这个类是负责单个类型对象缓冲器的具体代码实现。</p>
+<p>图27.13中定义了PoolOption类的字段与“预加载” (Preload)方法，图中183行与185行代码中的”ActiveCameObjectArray”、 “InactiveCameObjectArray”是核心容器类集合，分别存放“活动游戏对象(预设)”与“非活动游戏对象(预设)”。其中， “预加载”方法的作用是克隆指定游戏对象，然后重命名后对此对象做“禁用”处理(图中代码200行)，最后加入到“非活动游戏对象”集合中。</p>
+<p>图27.14中的“激活游戏对象” (Active)是Pooloption类的重要方法。当我们需要从缓冲池中提取出一个游戏对象时，首先从“非活动游戏集合”容器中取出下标为0的游戏对象，然后经过方位调整后(即游戏对象应有的位置、旋转、缩放等信息)加入“活动池”容器中，且正式“启用”此对象(设置SetActive (true) )，然后返回。</p>
+<p>图27. 15中的”Deactive”是“禁用游戏对象”方法，通过活动与非活动集合的操作，以及设置对象“禁用”来实现。图27. 15中的其他方法以统计集合中的数据为重点，这里为了突出基本原理，不做介绍。</p>
+<p>关于PoolOption类的重要功能就介绍到这里。为了使此对象缓冲池可以容纳多种类型的游戏对象，我们在PoolOption类的基础上又“包裹”了一层代码，即Pools类，从而实现对多种游戏对象类型的支持，代码如图27.16所示。</p>
+<p>图27.16中的第33行代码就是包含PoolOption类的泛型集合，从而实现多种类型对象缓冲的支持。图中第40行代码中的PeloadGameObjet()是预加载方法，即多种类游戏对象的预加载。</p>
+<p>图27.17中的PreLoadGameObject ()与BirthGameObject()分别是Pools类中关于“多模”对象缓冲池中的“预加载”与“生成单个游戏对象”的方法，其基本原理是通过调用Pool-Option中的相关方法来实现的<br>图27， 18中的RecoverGameObject ( )方法是“多模”状态下的“同收”缓冲池对象<br>方法。<br>下面我们来介绍Pools类中关于定时回收对象的基本原理，如图27.19所示。</p>
+<p>图27. 19中的ProcessCameObject NameTime ( )是Pools类中的“时间截”方法，即系统根据开发人员的要求指定特定种类游戏对象的存活时间，到时间就会自动回收缓冲池对象的机制。</p>
+<p>图27.21中的”PoolManager”与子对象”RedDiamend”、”_Tree”都是建立的空对象，”PoolManager”对象上赋值”PoolManager. cs”脚本，两个子空对象赋值”Pools. cs”脚本。</p>
+<p>我们使用前面学习的“跑酷”项目作为测试实验项目，其调用方式如图27.22和图27.23所示。</p>
+<p>图27.22中的第76行代码表明使用缓冲池的方法，首先确定缓冲池的类型名称，这里用”strPoolsTypeObjName”动态获得，然后调用(Pools类中) BirthGameObject ()方法生成缓冲池对象，当然，这是对应于初始缓冲池中的对象不够用时才进行调用的。</p>
+<p>图27.23中，第51行代码定义了回收缓冲池游戏对象的方法，写法与生成游戏对象的写法类似。</p>
+<h1 id="本章练习与总结"><a href="#本章练习与总结" class="headerlink" title="本章练习与总结"></a><span style="color:#039BE5;">本章练习与总结</span></h1><p>本章我们学习了对象缓冲池技术，此技术是基于Unity引擎中非常重要的性能优化手段。首先我们介绍了“预加载”的概念，然后介绍了对象缓冲池的来历与基本原理。在此基础上我们提供了两种截然不同、功能高、低搭配的两种缓冲池技术实现，使用两个不同的示例，演示了两种缓冲池在不同项目中的具体部署与代码使用方式。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Unity3D-2D游戏开发从0到1/" rel="tag"># Unity3D/2D游戏开发从0到1</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/07/29/项目研发常用优化策略/" rel="next" title="项目研发常用优化策略">
+                <i class="fa fa-chevron-left"></i> 项目研发常用优化策略
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/07/30/基础/" rel="prev" title="基础">
+                基础 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">354</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">55</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2020/02/16/游戏设计快乐之道（第2版）/" title="游戏设计快乐之道（第2版）" target="_blank">游戏设计快乐之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/14/游戏剧本怎么写/" title="游戏剧本怎么写" target="_blank">游戏剧本怎么写</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/04/通关！游戏设计之道（第2版）/" title="通关！游戏设计之道（第2版）" target="_blank">通关！游戏设计之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/26/游戏设计艺术（第2版）/" title="游戏设计艺术（第2版）" target="_blank">游戏设计艺术（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/22/大师谈游戏设计创意与节奏/" title="大师谈游戏设计创意与节奏" target="_blank">大师谈游戏设计创意与节奏</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#简单对象缓冲池技术"><span class="nav-number">2.</span> <span class="nav-text">简单对象缓冲池技术</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#高级对象缓冲池技术"><span class="nav-number">3.</span> <span class="nav-text">高级对象缓冲池技术</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#本章练习与总结"><span class="nav-number">4.</span> <span class="nav-text">本章练习与总结</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">3.7m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">56:23</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

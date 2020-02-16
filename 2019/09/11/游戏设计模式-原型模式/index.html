@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="思考并回答以下问题：">
+<meta name="keywords" content="游戏设计模式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="游戏设计模式--原型模式">
+<meta property="og:url" content="http://chebincarl.github.io/2019/09/11/游戏设计模式-原型模式/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="思考并回答以下问题：">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://chebincarl.github.io/2019/09/11/游戏设计模式-原型模式/1.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/09/11/游戏设计模式-原型模式/2.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/09/11/游戏设计模式-原型模式/3.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/09/11/游戏设计模式-原型模式/4.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/09/11/游戏设计模式-原型模式/5.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/09/11/游戏设计模式-原型模式/6.png">
+<meta property="og:updated_time" content="2019-09-20T14:00:22.170Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="游戏设计模式--原型模式">
+<meta name="twitter:description" content="思考并回答以下问题：">
+<meta name="twitter:image" content="http://chebincarl.github.io/2019/09/11/游戏设计模式-原型模式/1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/09/11/游戏设计模式-原型模式/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>游戏设计模式--原型模式 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">专注，重复10遍</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/09/11/游戏设计模式-原型模式/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">游戏设计模式--原型模式
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-09-11 11:18:34" itemprop="dateCreated datePublished" datetime="2019-09-11T11:18:34+08:00">2019-09-11</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-09-20 22:00:22" itemprop="dateModified" datetime="2019-09-20T22:00:22+08:00">2019-09-20</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Unity/" itemprop="url" rel="index"><span itemprop="name">Unity</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">10k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">9 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>思考并回答以下问题：</p>
+<a id="more"></a>
+<p>本章涵盖：</p>
+<p>我第一次听到“原型”这个词是在设计模式中。如今，似乎每个人都在用这个词，但他们讨论的实际上不是设计模式。我们会讨论他们所说的原型，也会讨论术语“原型”的有趣之处，和其背后的理念。但首先，让我们重访传统的设计模式。</p>
+<blockquote>
+<p>“传统的”一词可不是随便用的。设计模式引自1963年IvanSutherland的<a href="http://en.wikipedia.org/wiki/Sketchpad" title="[Sketchpad]" target="_blank" rel="noopener">Sketchpad</a>传奇项目，那是这个模式首次出现。当其他人在听迪伦和甲壳虫乐队时，Sutherland正忙于，你知道的，发明CAD，交互图形和面向对象编程的基本概念。<br><br>看看这个<a href="http://www.youtube.com/watch?v=USyoT_Ha_bA" title="[demo]" target="_blank" rel="noopener">demo</a>，跪服吧。</p>
+</blockquote>
+<h1 id="原型设计模式"><a href="#原型设计模式" class="headerlink" title="原型设计模式"></a><span style="color:#339AFF;">原型设计模式</span></h1><p>假设我们要用《圣铠传说》的风格做款游戏。野兽和恶魔围绕着英雄，争着要吃他的血肉。这些可怖的同行者通过“生产者”进入这片区域，每种敌人有不同的生产者。</p>
+<p>在这个例子中，假设我们游戏中每种怪物都有不同的类——Ghost，Demon，Sorcerer等等，像这样：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Monster</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="comment">// 代码……</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Ghost</span> :</span> <span class="keyword">public</span> Monster &#123;&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Demon</span> :</span> <span class="keyword">public</span> Monster &#123;&#125;;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Sorcerer</span> :</span> <span class="keyword">public</span> Monster &#123;&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>生产者构造特定种类怪物的实例。为了在游戏中支持每种怪物，我们可以用一种暴力的实现方法，让每个怪物类都有生产者类，得到平行的类结构：</p>
+<blockquote>
+<p>平行的类结构，恶灵，恶魔，巫师都继承怪物。恶灵生产者。恶魔生产者，巫师生产者都继承生产者。</p>
+</blockquote>
+<img src="/2019/09/11/游戏设计模式-原型模式/1.png">
+<p>实现后看起来像是这样：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Spawner</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="keyword">virtual</span> ~Spawner() &#123;&#125;</span><br><span class="line">        <span class="function"><span class="keyword">virtual</span> Monster* <span class="title">spawnMonster</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GhostSpawner</span> :</span> <span class="keyword">public</span> Spawner</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="function"><span class="keyword">virtual</span> Monster* <span class="title">spawnMonster</span><span class="params">()</span></span></span><br><span class="line"><span class="function">        </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> Ghost();</span><br><span class="line">        &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DemonSpawner</span> :</span> <span class="keyword">public</span> Spawner</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="function"><span class="keyword">virtual</span> Monster* <span class="title">spawnMonster</span><span class="params">()</span></span></span><br><span class="line"><span class="function">        </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> Demon();</span><br><span class="line">        &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 你知道思路了……</span></span><br></pre></td></tr></table></figure></p>
+<p>除非你会根据代码量来获得工资，否则将这些焊在一起很明显不是好方法。众多类，众多引用，众多冗余，众多副本，众多重复自我……</p>
+<p>原型模式提供了一个解决方案。关键思路是<strong>一个对象可以产出与它自己相近的对象</strong>。如果你有一个恶灵，你可以制造更多恶灵。如果你有一个恶魔，你可以制造其他恶魔。任何怪物都可以被视为<strong>原型</strong>怪物，产出其他版本的自己。</p>
+<p>为了实现这个功能，我们给基类Monster添加一个抽象方法clone()：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Monster</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="keyword">virtual</span> ~Monster() &#123;&#125;</span><br><span class="line">        <span class="function"><span class="keyword">virtual</span> Monster* <span class="title">clone</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 其他代码……</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>每个怪兽子类提供一个特定实现，返回与它自己的类和状态都完全一样的新对象。举个例子：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Ghost</span> :</span> <span class="keyword">public</span> Monster </span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        Ghost(<span class="keyword">int</span> health, <span class="keyword">int</span> speed)</span><br><span class="line">        : health_(health),</span><br><span class="line">            speed_(speed)</span><br><span class="line">        &#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">virtual</span> Monster* <span class="title">clone</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Ghost(health_, speed_);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span>:</span><br><span class="line">        <span class="keyword">int</span> health_;</span><br><span class="line">        <span class="keyword">int</span> speed_;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>一旦我们所有的怪物都支持这个，我们不再需要为每个怪物类创建生产者类。我们只需定义一个类：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Spawner</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        Spawner(Monster* prototype)</span><br><span class="line">        : prototype_(prototype)</span><br><span class="line">        &#123;&#125;</span><br><span class="line"></span><br><span class="line">        <span class="function">Monster* <span class="title">spawnMonster</span><span class="params">()</span></span></span><br><span class="line"><span class="function">        </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> prototype_-&gt;clone();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span>:</span><br><span class="line">        Monster* prototype_;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>它内部存有一个怪物，一个隐藏的怪物，它唯一的任务就是被生产者当做模板，去产生更多一样的怪物，有点像一个从来不离开巢穴的蜂后。</p>
+<blockquote>
+<p>一个生产者包含一个对怪物应用的原型字段。他调用原型的clone()方法来产生新的怪物。<br><img src="/2019/09/11/游戏设计模式-原型模式/2.png"></p>
+</blockquote>
+<p>为了得到恶灵生产者，我们创建一个恶灵的原型实例，然后创建拥有这个实例的生产者：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Monster* ghostPrototype = <span class="keyword">new</span> Ghost(<span class="number">15</span>, <span class="number">3</span>);</span><br><span class="line">Spawner* ghostSpawner = <span class="keyword">new</span> Spawner(ghostPrototype);</span><br></pre></td></tr></table></figure></p>
+<p>这个模式的灵巧之处在于它不但拷贝原型的<strong>类</strong>，也拷贝它的<strong>状态</strong>。这就意味着我们可以创建一个生产者，生产快速鬼魂，虚弱鬼魂，慢速鬼魂，而只需创建一个合适的原型鬼魂。</p>
+<p>我在这个模式中找到了一些既优雅又令人惊叹的东西。 我无法想象自己是如何创造出它们的，但我更无法想象<strong>不知道</strong>这些东西的自己该如何是好。</p>
+<h2 id="效果如何？"><a href="#效果如何？" class="headerlink" title="效果如何？"></a>效果如何？</h2><p>好吧，我们不需要为每个怪物创建单独的生产者类，那很好。但我们<strong>确实</strong>需要在每个怪物类中实现clone()。这和使用生产者方法比起来也没节约多少代码量。</p>
+<p>当你坐下来试着写一个正确的clone()，会遇见令人不快的语义漏洞。 做深层拷贝还是浅层拷贝呢？换言之，如果恶魔拿着叉子，克隆恶魔也要克隆叉子吗？</p>
+<p>同时，这看上去没减少已存问题上的代码， 事实上还增添了些<strong>人为的问题</strong>。我们需要将每个怪物有独立的类作为前提条件。这绝对<strong>不是</strong>当今大多数游戏引擎运作的方法。</p>
+<p>我们中大部分痛苦地学到，这样庞杂的类层次管理起来很痛苦， 那就是我们为什么用组件模式和类型对象为不同的实体建模，这样无需一一建构自己的类。</p>
+<h2 id="生产函数"><a href="#生产函数" class="headerlink" title="生产函数"></a>生产函数</h2><p>哪怕我们确实需要为每个怪物构建不同的类，这里还有其他的实现方法。 不是使用为每个怪物建立分离的生产者<strong>类</strong>，我们可以创建生产<strong>函数</strong>，就像这样：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Monster* <span class="title">spawnGhost</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Ghost();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这比构建怪兽生产者类更简洁。生产者类只需简单地存储一个函数指针：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> Monster* (*SpawnCallback)();</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Spawner</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        Spawner(SpawnCallback spawn)</span><br><span class="line">        : spawn_(spawn)</span><br><span class="line">        &#123;&#125;</span><br><span class="line"></span><br><span class="line">        <span class="function">Monster* <span class="title">spawnMonster</span><span class="params">()</span></span></span><br><span class="line"><span class="function">        </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> spawn_();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span>:</span><br><span class="line">        SpawnCallback spawn_;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>为了给恶灵构建生产者，你需要做：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Spawner* ghostSpawner = <span class="keyword">new</span> Spawner(spawnGhost);</span><br></pre></td></tr></table></figure></p>
+<h2 id="模板"><a href="#模板" class="headerlink" title="模板"></a>模板</h2><p>如今，大多数C++开发者已然熟悉模板了。生产者类需要为某类怪物构建实例，但是我们不想硬编码是哪类怪物。自然的解决方案是将它作为模板中的<strong>类型参数</strong>：</p>
+<blockquote>
+<p>我不太确定程序员是学着喜欢C++模板还是完全畏惧并远离了C++。不管怎样，今日我见到的程序员中，使用C++的也都会使用模板。<br><br><br>这里的Spawner类不必考虑将生产什么样的怪物，它总与指向Monster的指针打交道。<br><br><br>如果我们只有SpawnerFor<t>类，模板类型没有办法共享父模板，这样的话，如果一段代码需要与产生多种怪物类型的生产者打交道，就都得接受模板参数。<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Spawner</span></span></span><br><span class="line"><span class="class">&#123;</span></span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="keyword">virtual</span> ~Spawner() &#123;&#125;</span><br><span class="line">        <span class="function"><span class="keyword">virtual</span> Monster* <span class="title">spawnMonster</span><span class="params">()</span> </span>= <span class="number">0</span>;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">template</span> &lt;<span class="class"><span class="keyword">class</span> <span class="title">T</span>&gt;</span></span><br><span class="line"><span class="class"><span class="title">class</span> <span class="title">SpawnerFor</span> :</span> <span class="keyword">public</span> Spawner</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span>:</span><br><span class="line">        <span class="function"><span class="keyword">virtual</span> Monster* <span class="title">spawnMonster</span><span class="params">()</span> </span>&#123; <span class="keyword">return</span> <span class="keyword">new</span> T(); &#125;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></t></p>
+</blockquote>
+<p>像这样使用它：<br><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Spawner* ghostSpawner = <span class="keyword">new</span> SpawnerFor&lt;Ghost&gt;();</span><br></pre></td></tr></table></figure></p>
+<h2 id="第一公民类型"><a href="#第一公民类型" class="headerlink" title="第一公民类型"></a>第一公民类型</h2><p>前面的两个解决方案使用类完成了需求，Spawner使用类型进行参数化。在C++中，类型不是第一公民，所以需要一些改动。如果你使用JavaScript，Python，或者Ruby这样的动态类型语言，它们的类是可以传递的对象，你可以用更直接的办法解决这个问题。</p>
+<blockquote>
+<p>某种程度上，类型对象也是为了弥补第一公民类型的缺失。 但那个模式在拥有第一公民类型的语言中也有用，因为它让你决定什么是“类型”。你也许想要与语言内建的类不同的语义。</p>
+</blockquote>
+<p>当你完成一个生产者，直接向它传递要构建的怪物类——那个代表了怪物类的运行时对象。超容易的，对吧。</p>
+<p>综上所述，老实说，我不能说找到了一种情景，而在这个情景下，原型设计模式是最好的方案。 也许你的体验有所不同，但现在把它搁到一边，我们讨论点别的：将原型作为一种<strong>语言范式</strong>。</p>
+<h1 id="原型语言范式"><a href="#原型语言范式" class="headerlink" title="原型语言范式"></a>原型语言范式</h1><p>很多人认为“面向对象编程”和“类”是同义词。OOP的定义却让人感觉正好相反，毫无疑问，<strong>OOP让你定义“对象”，将数据和代码绑定在一起</strong>。与C这样的结构化语言相比，与Scheme这样的函数语言相比，OOP的特性是它将状态和行为紧紧地绑在一起。</p>
+<p>你也许认为类是完成这个的唯一方式方法， 但是包括Dave Ungar和Randall Smith的一大堆家伙一直在拼命区分OOP和类。他们在80年代创建了一种叫做Self的语言。它不用类实现了OOP。</p>
+<h2 id="Self语言"><a href="#Self语言" class="headerlink" title="Self语言"></a>Self语言</h2><p>就单纯意义而言，Self比基于类的语言<strong>更加</strong>面向对象。 我们认为OOP将状态和行为绑在一起，但是基于类的语言实际将状态和行为割裂开来。</p>
+<p>拿你最喜欢的基于类的语言的语法来说。 为了接触对象中的一些状态，你需要在实例的内存中查询。状态<strong>包含</strong>在实例中。</p>
+<p>但是，为了调用方法，你需要找到实例的类，然后在<strong>那里</strong>调用方法。行为包含在<strong>类</strong>中。获得方法总需要通过中间层，这意味着字段和方法是不同的。</p>
+<blockquote>
+<p>一个类，包含了一系列方法。一个实例，包含了一系列字段和指向类的指针。<br><img src="/2019/09/11/游戏设计模式-原型模式/3.png"></p>
+<p>举个例子，为了调用C++中的虚方法，你需要在实例中找指向虚方法表的指针，然后再在那里找方法。</p>
+</blockquote>
+<p>Self结束了这种分歧。<strong>无论你要找啥</strong>，都只需在对象中找。实例同时包含状态和行为。你可以构建拥有完全独特方法的对象。</p>
+<blockquote>
+<p>一个对象中同时包含了字段和方法。<br><img src="/2019/09/11/游戏设计模式-原型模式/4.png"></p>
+<p>没有人能与世隔绝，但这个对象是。</p>
+</blockquote>
+<p>如果这就是Self语言的全部，那它将很难使用。 基于类的语言中的继承，不管有多少缺陷，总归提供了有用的机制来重用代码，避免重复。为了不使用类而实现一些类似的功能，Self语言加入了<strong>委托</strong>。</p>
+<p>如果要在对象中寻找字段或者调用方法，首先在对象内部查找。如果能找到，那就成了。如果找不到，在对象的<strong>父对象</strong>中寻找。这里的父类仅仅是一个对其他对象的引用。 当我们没能在第一个对象中找到属性，我们尝试它的父对象，然后父类的父对象，继续下去直到找到或者没有父对象为止。换言之，失败的查找被<strong>委托</strong>给对象的父对象。</p>
+<blockquote>
+<p>我在这里简化了。Self实际上支持多个父对象。父对象只是特别标明的字段，意味着你可以继承它们或者在运行时改变他们， 你最终得到了“动态继承”。</p>
+<p>一个对象包含了字段和方法，以及一个指向委托对象的指针。<br><img src="/2019/09/11/游戏设计模式-原型模式/5.png"></p>
+</blockquote>
+<p>父对象让我们在不同对象间重用行为（还有状态！），这样就完成了类的公用功能。 类做的另一个关键事情就是给出了创建实例的方法。当你需要新的某物，你可以直接new Thingamabob()，或者随便什么你喜欢的表达法。类是实例的生产工厂。</p>
+<p>不用类，我们怎样创建新的实例？特别地，我们如何创建一堆有共同点的新东西？ 就像这个设计模式，在Self中，达到这点的方式是使用克隆。</p>
+<p>在Self语言中，就好像每个对象都自动支持原型设计模式。任何对象都能被克隆。为了获得一堆相似的对象，你：</p>
+<p>将对象塑造成你想要的状态。你可以直接克隆系统内建的基本Object，然后向其中添加字段和方法。克隆它来产出……额……随你想要多少就克隆多少个对象。无需烦扰自己实现clone()；我们就实现了优雅的原型模式，原型被内建在系统中。</p>
+<p>这个系统美妙，灵巧，而且小巧，一听说它，我就开始创建一个基于原型的语言来进一步学习。</p>
+<blockquote>
+<p>我知道从头开始构建一种编程语言语言不是学习它最有效率的办法，但我能说什么呢？我可算是个怪人。如果你很好奇，我构建的语言叫Finch.</p>
+</blockquote>
+<h2 id="它的实际效果如何？"><a href="#它的实际效果如何？" class="headerlink" title="它的实际效果如何？"></a>它的实际效果如何？</h2><p>能使用纯粹基于原型的语言让我很兴奋，但是当我真正上手时， 我发现了一个令人不快的事实：用它编程没那么有趣。</p>
+<blockquote>
+<p>从小道消息中，我听说很多Self程序员得出了相同的结论。但这项目并不是一无是处。Self非常的灵活，为此创造了很多虚拟机的机制来保持高速运行。<br><br><br>他们发明了JIT编译，垃圾回收，以及优化方法分配——这都是由同一批人实现的—— 这些新玩意让动态类型语言能快速运行，构建了很多大受欢迎的应用。</p>
+</blockquote>
+<p>是的，语言本身很容易实现，那是因为它把复杂度甩给了用户。一旦开始试着使用这语言，我发现我想念基于类语言中的层次结构。最终，在构建语言缺失的库概念时，我放弃了。</p>
+<p>鉴于我之前的经验都来自基于类的语言，因此我的头脑可能已经固定在它的范式上了。但是直觉上，我认为大部分人还是喜欢有清晰定义的“事物”。</p>
+<p>除去基于类的语言自身的成功以外，看看有多少游戏用类建模描述玩家角色，以及不同的敌人、物品、技能。不是游戏中的每个怪物都与众不同，你不会看到“洞穴人和哥布林还有雪混合在一起”这样的怪物。</p>
+<p>原型是非常酷的范式，我希望有更多人了解它，但我很庆幸不必天天用它编程。完全皈依原型的代码是一团浆糊，难以阅读和使用。</p>
+<blockquote>
+<p>这同时证明，很少 有人使用原型风格的代码。我查过了。</p>
+</blockquote>
+<h2 id="JavaScript又怎么样呢？"><a href="#JavaScript又怎么样呢？" class="headerlink" title="JavaScript又怎么样呢？"></a>JavaScript又怎么样呢？</h2><p>好吧，如果基于原型的语言不那么友好，怎么解释JavaScript呢？ 这是一个有原型的语言，每天被数百万人使用。运行JavaScript的机器数量超过了地球上其他所有的语言。</p>
+<p>Brendan Eich，JavaScript的缔造者，从Self语言中直接汲取灵感，很多JavaScript的语义都是基于原型的。每个对象都有属性的集合，包含字段和“方法”（事实上只是存储为字段的函数）。A对象可以拥有B对象，B对象被称为A对象的“原型”，如果A对象的字段获取失败就会委托给B对象。</p>
+<blockquote>
+<p>作为语言设计者，原型的诱人之处是它们比类更易于实现。Eich充分利用了这一点，他在十天内创建了JavaScript的第一个版本。</p>
+</blockquote>
+<p>但除那以外，我相信在实践中，JavaScript更像是基于类的而不是基于原型的语言。JavaScript与Self有所偏离，其中一个要点是除去了基于原型语言的核心操作“克隆”。</p>
+<p>在JavaScript中没有方法来克隆一个对象。最接近的方法是Object.create()，允许你创建新对象作为现有对象的委托。这个方法在ECMAScript5中才添加，而那已是JavaScript出现后的第十四年了。相对于克隆，让我带你参观一下JavaScript中定义类和创建对象的经典方法。我们从<strong>构造器函数</strong>开始：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">Weapon</span>(<span class="params">range, damage</span>) </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">this</span>.range = range;</span><br><span class="line">    <span class="keyword">this</span>.damage = damage;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这创建了一个新对象，初始化了它的字段。你像这样引入它：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> sword = <span class="keyword">new</span> Weapon(<span class="number">10</span>, <span class="number">16</span>);</span><br></pre></td></tr></table></figure></p>
+<p>这里的new调用Weapon()函数，而this绑定在新的空对象上。函数为新对象添加了一系列字段，然后返回填满的对象。</p>
+<p>new也为你做了另外一件事。当它创建那个新的空对象时，它将空对象的委托和一个原型对象连接起来。你可以用Weapon.prototype来获得原型对象。</p>
+<p>属性是添加到构造器中的，而定义行为通常是通过向原型对象添加方法。就像这样：<br><figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Weapon.prototype.attack = <span class="function"><span class="keyword">function</span>(<span class="params">target</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">if</span> (distanceTo(target) &gt; <span class="keyword">this</span>.range) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">"Out of range!"</span>);</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    target.health -= <span class="keyword">this</span>.damage;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这给武器原型添加了attack属性，其值是一个函数。由于new Weapon()返回的每一个对象都有给Weapon.prototype的委托，你现在可以通过调用sword.attack()来调用那个函数。看上去像是这样：</p>
+<blockquote>
+<p>一个武器原型包含一个attack()方法和其他方法。一个宝剑对象包含一个指向武器的委托和其他字段。<br><img src="/2019/09/11/游戏设计模式-原型模式/6.png"></p>
+</blockquote>
+<p>让我们复习一下：</p>
+<ul>
+<li>通过“new”操作创建对象，该操作引入代表类型的对象——构造器函数。</li>
+<li>状态存储在实例中。</li>
+<li>行为通过间接层——原型的委托——被存储在独立的对象中，代表了一系列特定类型对象的共享方法。</li>
+</ul>
+<p>说我疯了吧，但这听起来很像是我之前描述的类。你可以在JavaScript中写原型风格的代码（<strong>不用</strong>克隆），但是语言的语法和惯用法更鼓励基于类的实现。</p>
+<p>个人而言，我认为这是好事。就像我说的，我发现如果一切都使用原型，就很难编写代码，所以我喜欢JavaScript，它将整个核心语义包上了一层糖衣。</p>
+<h1 id="为数据模型构建原型"><a href="#为数据模型构建原型" class="headerlink" title="为数据模型构建原型"></a>为数据模型构建原型</h1><p>好吧，我之前不断地讨论我<strong>不喜欢</strong>原型的原因，这让这一章读起来令人沮丧。 我认为这本书应该更欢乐些，所以在最后，让我们讨论讨论原型<strong>确实</strong>有用，或者更加精确，<strong>委托</strong>有用的地方。</p>
+<p>随着编程的进行，如果你比较程序与数据的字节数，那么你会发现数据的占比稳定地增长。 早期的游戏在程序中生成几乎所有东西，这样程序可以塞进磁盘和老式游戏卡带。在今日的游戏中，代码只是驱动游戏的“引擎”，游戏是完全由数据定义的。</p>
+<p>这很好，但是将内容推到数据文件中并不能魔术般地解决组织大项目的挑战。 它只能把这挑战变得更难。 我们使用编程语言就因为它们有办法管理复杂性。</p>
+<p>不再是将一堆代码拷来拷去，我们将其移入函数中，通过名字调用。 不再是在一堆类之间复制方法，我们将其放入单独的类中，让其他类可以继承或者组合。</p>
+<p>当游戏数据达到一定规模时，你真的需要考虑一些相似的方案。我不指望在这里能说清数据模式这个问题， 但我确实希望提出个思路，让你在游戏中考虑考虑：使用原型和委托来重用数据。</p>
+<p>假设我们为早先提到的山寨版《圣铠传说》定义数据模型。游戏设计者需要在很多文件中设定怪物和物品的属性。</p>
+<blockquote>
+<p>这标题是我原创的，没有受到任何已存的多人地下城游戏的影响。请不要起诉我。</p>
+</blockquote>
+<p>一个常用的方法是使用JSON。数据实体一般是<strong>字典</strong>，或者<strong>属性集合</strong>，或者其他什么术语，因为程序员就喜欢为旧事物发明新名字。</p>
+<blockquote>
+<p>我们重新发明了太多次，Steve Yegge称之为“通用设计模式”。</p>
+</blockquote>
+<p>所以游戏中的哥布林也许被定义为像这样的东西：<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"name"</span>: <span class="string">"goblin grunt"</span>,</span><br><span class="line">    <span class="attr">"minHealth"</span>: <span class="number">20</span>,</span><br><span class="line">    <span class="attr">"maxHealth"</span>: <span class="number">30</span>,</span><br><span class="line">    <span class="attr">"resists"</span>: [<span class="string">"cold"</span>, <span class="string">"poison"</span>],</span><br><span class="line">    <span class="attr">"weaknesses"</span>: [<span class="string">"fire"</span>, <span class="string">"light"</span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这看上去很易懂，哪怕是最讨厌文本的设计者也能使用它。所以，你可以给哥布林大家族添加几个兄弟分支：<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"name"</span>: <span class="string">"goblin wizard"</span>,</span><br><span class="line">    <span class="attr">"minHealth"</span>: <span class="number">20</span>,</span><br><span class="line">    <span class="attr">"maxHealth"</span>: <span class="number">30</span>,</span><br><span class="line">    <span class="attr">"resists"</span>: [<span class="string">"cold"</span>, <span class="string">"poison"</span>],</span><br><span class="line">    <span class="attr">"weaknesses"</span>: [<span class="string">"fire"</span>, <span class="string">"light"</span>],</span><br><span class="line">    <span class="attr">"spells"</span>: [<span class="string">"fire ball"</span>, <span class="string">"lightning bolt"</span>]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">    <span class="attr">"name"</span>: <span class="string">"goblin archer"</span>,</span><br><span class="line">    <span class="attr">"minHealth"</span>: <span class="number">20</span>,</span><br><span class="line">    <span class="attr">"maxHealth"</span>: <span class="number">30</span>,</span><br><span class="line">    <span class="attr">"resists"</span>: [<span class="string">"cold"</span>, <span class="string">"poison"</span>],</span><br><span class="line">    <span class="attr">"weaknesses"</span>: [<span class="string">"fire"</span>, <span class="string">"light"</span>],</span><br><span class="line">    <span class="attr">"attacks"</span>: [<span class="string">"short bow"</span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>现在，如果这是代码，我们会闻到了臭味。在实体间有很多的重复，训练优良的程序员<strong>讨厌</strong>重复。它浪费了空间，消耗了作者更多时间。你需要仔细阅读代码才知道这些数据<strong>是不是</strong>相同的。这难以维护。如果我们决定让所有哥布林变强，需要记得将三个哥布林都更新一遍。糟糕糟糕糟糕。</p>
+<p>如果这是代码，我们会为“哥布林”构建抽象，并在三个哥布林类型中重用。但是无能的JSON没法这么做。所以让我们把它做得更加巧妙些。</p>
+<p>我们可以为对象添加”prototype”字段，记录委托对象的名字。如果在此对象内没找到一个字段，那就去委托对象中查找。</p>
+<blockquote>
+<p>这让“prototype”不再是数据，而成为了元数据。哥布林有绿色疣皮和黄色牙齿。它们没有原型。原型是表示哥布林的数据模型的属性，而不是哥布林本身的属性。</p>
+</blockquote>
+<p>这样，我们可以简化我们的哥布林JSON内容：<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"name"</span>: <span class="string">"goblin grunt"</span>,</span><br><span class="line">    <span class="attr">"minHealth"</span>: <span class="number">20</span>,</span><br><span class="line">    <span class="attr">"maxHealth"</span>: <span class="number">30</span>,</span><br><span class="line">    <span class="attr">"resists"</span>: [<span class="string">"cold"</span>, <span class="string">"poison"</span>],</span><br><span class="line">    <span class="attr">"weaknesses"</span>: [<span class="string">"fire"</span>, <span class="string">"light"</span>]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">    <span class="attr">"name"</span>: <span class="string">"goblin wizard"</span>,</span><br><span class="line">    <span class="attr">"prototype"</span>: <span class="string">"goblin grunt"</span>,</span><br><span class="line">    <span class="attr">"spells"</span>: [<span class="string">"fire ball"</span>, <span class="string">"lightning bolt"</span>]</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">    <span class="attr">"name"</span>: <span class="string">"goblin archer"</span>,</span><br><span class="line">    <span class="attr">"prototype"</span>: <span class="string">"goblin grunt"</span>,</span><br><span class="line">    <span class="attr">"attacks"</span>: [<span class="string">"short bow"</span>]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>由于弓箭手和术士都将grunt作为原型，我们就不需要在它们中重复血量，防御和弱点。 我们为数据模型增加的逻辑超级简单——基本的单一委托——但已经成功摆脱了一堆冗余。</p>
+<p>有趣的事情是，我们没有更进一步，把哥布林委托的<strong>抽象</strong>原型设置成“基本哥布林”。相反，我们选择了最简单的哥布林，然后委托给它。</p>
+<p>在基于原型的系统中，对象可以克隆产生新对象是很自然的，我认为在这里也一样自然。这特别适合记录那些只有一处不同的实体的数据。</p>
+<p>想想Boss和其他独特的事物，它们通常是更加常见事物的重新定义，原型委托是定义它们的好方法。断头魔剑，就是一把拥有加成的长剑，可以像下面这样表示：<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"name"</span>: <span class="string">"Sword of Head-Detaching"</span>,</span><br><span class="line">    <span class="attr">"prototype"</span>: <span class="string">"longsword"</span>,</span><br><span class="line">    <span class="attr">"damageBonus"</span>: <span class="string">"20"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>只需在游戏引擎上多花点时间，你就能让设计者更加方便地添加不同的武器和怪物，而增加的这些丰富度能够取悦玩家。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/游戏设计模式/" rel="tag"># 游戏设计模式</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/09/11/游戏设计模式-单例模式/" rel="next" title="游戏设计模式--单例模式">
+                <i class="fa fa-chevron-left"></i> 游戏设计模式--单例模式
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/09/11/享元模式/" rel="prev" title="享元模式">
+                享元模式 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">354</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">55</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2020/02/16/游戏设计快乐之道（第2版）/" title="游戏设计快乐之道（第2版）" target="_blank">游戏设计快乐之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/14/游戏剧本怎么写/" title="游戏剧本怎么写" target="_blank">游戏剧本怎么写</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/04/通关！游戏设计之道（第2版）/" title="通关！游戏设计之道（第2版）" target="_blank">通关！游戏设计之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/26/游戏设计艺术（第2版）/" title="游戏设计艺术（第2版）" target="_blank">游戏设计艺术（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/22/大师谈游戏设计创意与节奏/" title="大师谈游戏设计创意与节奏" target="_blank">大师谈游戏设计创意与节奏</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#原型设计模式"><span class="nav-number">1.</span> <span class="nav-text">原型设计模式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#效果如何？"><span class="nav-number">1.1.</span> <span class="nav-text">效果如何？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#生产函数"><span class="nav-number">1.2.</span> <span class="nav-text">生产函数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#模板"><span class="nav-number">1.3.</span> <span class="nav-text">模板</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第一公民类型"><span class="nav-number">1.4.</span> <span class="nav-text">第一公民类型</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#原型语言范式"><span class="nav-number">2.</span> <span class="nav-text">原型语言范式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Self语言"><span class="nav-number">2.1.</span> <span class="nav-text">Self语言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#它的实际效果如何？"><span class="nav-number">2.2.</span> <span class="nav-text">它的实际效果如何？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#JavaScript又怎么样呢？"><span class="nav-number">2.3.</span> <span class="nav-text">JavaScript又怎么样呢？</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#为数据模型构建原型"><span class="nav-number">3.</span> <span class="nav-text">为数据模型构建原型</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">3.7m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">56:23</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

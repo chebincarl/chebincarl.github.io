@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="思考并回答以下问题：">
+<meta name="keywords" content="PureMVC">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PureMVC源码分析">
+<meta property="og:url" content="http://chebincarl.github.io/2019/10/27/PureMVC源码分析/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="思考并回答以下问题：">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://chebincarl.github.io/2019/10/27/PureMVC源码分析/1.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/10/27/PureMVC源码分析/2.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/10/27/PureMVC源码分析/3.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/10/27/PureMVC源码分析/4.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/10/27/PureMVC源码分析/5.png">
+<meta property="og:image" content="http://chebincarl.github.io/2019/10/27/PureMVC源码分析/6.png">
+<meta property="og:updated_time" content="2019-10-27T08:17:17.407Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="PureMVC源码分析">
+<meta name="twitter:description" content="思考并回答以下问题：">
+<meta name="twitter:image" content="http://chebincarl.github.io/2019/10/27/PureMVC源码分析/1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2019/10/27/PureMVC源码分析/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>PureMVC源码分析 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">专注，重复10遍</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2019/10/27/PureMVC源码分析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">PureMVC源码分析
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-10-27 12:39:29 / 修改时间：16:17:17" itemprop="dateCreated datePublished" datetime="2019-10-27T12:39:29+08:00">2019-10-27</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Unity/" itemprop="url" rel="index"><span itemprop="name">Unity</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">25k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">23 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>思考并回答以下问题：</p>
+<a id="more"></a>
+<h1 id="目录"><a href="#目录" class="headerlink" title="目录"></a><span style="color:#339AFF;">目录</span></h1><ul>
+<li>PureMVC整体架构图</li>
+<li>PureMVC主要设计模式</li>
+<li>源代码目录结构分析</li>
+<li>三大核心类分析</li>
+<li>入口与外围类分析</li>
+</ul>
+<h1 id="PureMVC整体架构图"><a href="#PureMVC整体架构图" class="headerlink" title="PureMVC整体架构图"></a><span style="color:#339AFF;">PureMVC整体架构图</span></h1><blockquote>
+<p>原版PureMVC整体架构图</p>
+</blockquote>
+<img src="/2019/10/27/PureMVC源码分析/1.png">
+<blockquote>
+<p>简化版</p>
+</blockquote>
+<img src="/2019/10/27/PureMVC源码分析/2.png">
+<h1 id="PureMVC主要设计模式"><a href="#PureMVC主要设计模式" class="headerlink" title="PureMVC主要设计模式"></a><span style="color:#339AFF;">PureMVC主要设计模式</span></h1><h2 id="Mediator模式"><a href="#Mediator模式" class="headerlink" title="Mediator模式"></a><span style="color:#00ACC1;">Mediator模式</span></h2><p>Mediator中介者模式/迪米特法则（LoD）也叫最少知识原则。</p>
+<ul>
+<li><p>定义1：如果两个类不必彼此直接通信，那么这两个类就不应当发生直接的相互作用。如果其中一个类需要调用另一个类的某一个方法的话，可以<span style="color:red">通过第三者转发</span>这个调用。</p>
+</li>
+<li><p>定义2：定义一个中介对象来封装系列对象之间的交互。<span style="color:red">中介者使各个对象不需要显式的相互引用，从而使其耦合性松散</span>，可以独立地改变他们之间的交互。</p>
+</li>
+</ul>
+<img src="/2019/10/27/PureMVC源码分析/3.png">
+<img src="/2019/10/27/PureMVC源码分析/4.png">
+<p>Mediator的设计用意在于<span style="color:red">通过一个媒介对象，完成一组对象的交互</span>，避免对象间相互引用，产生复杂的依赖关系。</p>
+<h2 id="观察者模式"><a href="#观察者模式" class="headerlink" title="观察者模式"></a><span style="color:#00ACC1;">观察者模式</span></h2><p>观察者模式（也叫发布-订阅[Publish/Subscribe]模式）</p>
+<p>定义了一种<span style="color:red">一对多的依赖关系</span>，让<span style="color:red">多个观察者对象同时监听某一个主题对象</span>。这个主题对象在状态发生变化时，会通知所有观察者对象，使他们能够自动更新自己。</p>
+<p>其三层的通信，采用框架本身【观察者模式】Publish/Subscribe的方式实现事件机制来驱动，并由Facade类统筹三层在框架实际使用中的实现。</p>
+<p>事件机制起到了至关重要的作用。事件机制可以让<span style="color:red">当前对象专注于处理其职责范围内的事务，而不必关心超出部分由谁来处理以及怎样处理。</span></p>
+<p>当前对象只需要广播一个事件，就会有对此事件感兴趣的其他对象出来接手下一步的工作，当前<span style="color:red">对象与接手对象之间不存在直接依赖，甚至感知不到彼此的存在</span>，这是事件机制被普遍认为是一种松耦合机制的重要原因。</p>
+<h2 id="Facade模式"><a href="#Facade模式" class="headerlink" title="Facade模式"></a><span style="color:#00ACC1;">Facade模式</span></h2><p>Facade（门面模式/外观模式）</p>
+<p><span style="color:red">为子系统中的一组接口提供一个一致的界面</span>，此模式定义了一个高层接口，这个接口使得这一子系统<span style="color:red">更加容易使用</span>。</p>
+<p>作用：使得架构外部的类与脚本，更方便的与架构内部的核心类通讯，但相互之间不直接沟通。（生活中：中小学的 “课代表”、政府的“信访办”等）</p>
+<img src="/2019/10/27/PureMVC源码分析/5.png">
+<h2 id="其他"><a href="#其他" class="headerlink" title="其他"></a><span style="color:#00ACC1;">其他</span></h2><p>代理模式（Proxy）：</p>
+<ul>
+<li>为其他对象提供一种代理以控制对这个对象的访问。</li>
+</ul>
+<p>命令模式（Command）：</p>
+<ul>
+<li>将一个请求封装为一个对象，从而使你可用不同的请求对客户进行参数化；</li>
+<li><p>对请求排队或记录请求日志，以及支持可撤销的操作。</p>
+<p>  命令模式的优点：<span style="color:red">把请求一个操作的对象与知道怎么执行一个操作的对象分隔开。</span></p>
+</li>
+</ul>
+<h1 id="源代码目录结构分析"><a href="#源代码目录结构分析" class="headerlink" title="源代码目录结构分析"></a><span style="color:#339AFF;">源代码目录结构分析</span></h1><img src="/2019/10/27/PureMVC源码分析/6.png">
+<p>分三大目录，共21个类（接口）</p>
+<h2 id="Core目录"><a href="#Core目录" class="headerlink" title="Core目录"></a><span style="color:#00ACC1;">Core目录</span></h2><p>包含三大核心类：Model、View、Controller。</p>
+<h2 id="Interfaces目录"><a href="#Interfaces目录" class="headerlink" title="Interfaces目录"></a><span style="color:#00ACC1;">Interfaces目录</span></h2><p>包含十个接口。</p>
+<p>接口的名称比较好理解，使用者可以实现这些接口来完成自己定制的功能。</p>
+<h2 id="Patterns目录"><a href="#Patterns目录" class="headerlink" title="Patterns目录"></a><span style="color:#00ACC1;">Patterns目录</span></h2><p>其他辅助类：<br>Mediator、Proxy、SimpleCommand（MarcoCommand）等</p>
+<p><strong>Observer</strong></p>
+<p>Notification：消息封装类。包含Name、Body、Type三个重要的字段，本身这个类的作用，就是一种消息的封装载体。</p>
+<p>Notifer：传递消息父类。让最上面三个类继承使用。传递消息使用，里面存在SendNotification()三个方法重载类，本质是引用Facade类中SendNotification()方法。</p>
+<p><span style="color:red"><strong>Observer</strong></span>：对指定对象调用指定方法。NotifyObserver()就是这个类的核心方法，我们在应用框架开发的时候，使用SendNotification()方法发送的消息，最终消息的执行，就是由这个方法最终完成。</p>
+<h3 id="Command"><a href="#Command" class="headerlink" title="Command"></a><span style="color:#EF7060;">Command</span></h3><p>1&gt; 在puremvc里面提供了2种command，分别为SimpleCommand和MacroCommand，显然SimpleCommand是对应一个消息进行的处理，在创建具体的commmand的时候需要覆盖SimpleCommand的execute方法。</p>
+<p>2&gt; MacroCommand则是加载了一个SimpleCommand的队列，按先进先出的顺序执行队列中的SimpleCommand，无论是SimpleCommand和MacroCommand都需实现Icommand接口的execute方法，以便在控制器中能有统一的方法来执行逻辑操作。</p>
+<h3 id="Facade"><a href="#Facade" class="headerlink" title="Facade"></a><span style="color:#EF7060;">Facade</span></h3><p>Facade作为一个门面，用于统筹整合MVC三层的实现，在查看Facade之前，不妨先看一下core这个包中的三个类。</p>
+<h3 id="Mediator"><a href="#Mediator" class="headerlink" title="Mediator"></a><span style="color:#EF7060;">Mediator</span></h3><h3 id="Observer"><a href="#Observer" class="headerlink" title="Observer"></a><span style="color:#EF7060;">Observer</span></h3><p>1&gt; 观察者模式的实现是贯通这个框架的关键。下面对该包下的三个类：Notification，Notifier，Observer进行一下讲述。</p>
+<p>2&gt; <span style="color:red">Notification类</span>是在PureMVC中传递的<span style="color:red">消息体</span>，其name属性定义了唯一的消息名，其data属性允许在消息体中附加数据，使得框架的各部分相互作用变得更生动。</p>
+<blockquote>
+<p>Notification.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* </span></span><br><span class="line"><span class="comment">    消息封装类。</span></span><br><span class="line"><span class="comment">    功能：作为一个消息的载体。</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> PureMVC.Interfaces;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">PureMVC.Patterns</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Notification</span> : <span class="title">INotification</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 消息的名称</span></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">string</span> m_name;</span><br><span class="line">        <span class="comment">// 消息的类型</span></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">string</span> m_type;</span><br><span class="line">        <span class="comment">// 消息内容</span></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">object</span> m_body;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">string</span> Name</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">get</span> &#123; <span class="keyword">return</span> m_name; &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 属性 */</span></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">object</span> Body</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">get</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">return</span> m_body;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">set</span></span><br><span class="line">            &#123;</span><br><span class="line">                m_body = <span class="keyword">value</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">string</span> Type</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">get</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">return</span> m_type;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">set</span></span><br><span class="line">            &#123;</span><br><span class="line">                m_type = <span class="keyword">value</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 构造函数 */</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">Notification</span>(<span class="params"><span class="keyword">string</span> name</span>)</span></span><br><span class="line"><span class="function">            : <span class="title">this</span>(<span class="params">name, <span class="literal">null</span>, <span class="literal">null</span></span>)</span>&#123; &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">Notification</span>(<span class="params"><span class="keyword">string</span> name, <span class="keyword">object</span> body</span>)</span></span><br><span class="line"><span class="function">            : <span class="title">this</span>(<span class="params">name, body, <span class="literal">null</span></span>)</span>&#123; &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">Notification</span>(<span class="params"><span class="keyword">string</span> name, <span class="keyword">object</span> body, <span class="keyword">string</span> type</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            m_name = name;</span><br><span class="line">            m_body = body;</span><br><span class="line">            m_type = type;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">string</span> <span class="title">ToString</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">string</span> msg = <span class="string">"Notification Name: "</span> + Name;</span><br><span class="line">            msg += <span class="string">"\nBody:"</span> + ((Body == <span class="literal">null</span>) ? <span class="string">"null"</span> : Body.ToString());</span><br><span class="line">            msg += <span class="string">"\nType:"</span> + ((Type == <span class="literal">null</span>) ? <span class="string">"null"</span> : Type);</span><br><span class="line">            <span class="keyword">return</span> msg;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>3&gt; Notifier类是消息的发送者。Command，Proxy，Mediator这三个类都继承了Notifier，故在三者中都可对消息（SendNotification）进行传递。</p>
+<blockquote>
+<p>Notifier.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* </span></span><br><span class="line"><span class="comment">    通知辅助类</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> PureMVC.Interfaces;</span><br><span class="line"><span class="keyword">using</span> PureMVC.Patterns;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">PureMVC.Patterns</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Notifier</span> : <span class="title">INotifier</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">private</span> IFacade m_facade = PureMVC.Patterns.Facade.Instance;</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">protected</span> IFacade Facade</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">get</span> &#123; <span class="keyword">return</span> m_facade; &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">SendNotification</span>(<span class="params"><span class="keyword">string</span> notificationName</span>) </span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            m_facade.SendNotification(notificationName);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">SendNotification</span>(<span class="params"><span class="keyword">string</span> notificationName, <span class="keyword">object</span> body</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            m_facade.SendNotification(notificationName, body);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">SendNotification</span>(<span class="params"><span class="keyword">string</span> notName, <span class="keyword">object</span> body, <span class="keyword">string</span> type</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            m_facade.SendNotification(notName, body, type);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>4&gt; <span style="color:red"><strong>Observer类</strong></span>是重点，注意到此类有2个关键属性，notify与context，以及一个关键的方法notifyObserver，对消息响应的统一封装。</p>
+<blockquote>
+<p>Observer.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* </span></span><br><span class="line"><span class="comment">    观察者类</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Reflection;</span><br><span class="line"><span class="keyword">using</span> PureMVC.Interfaces;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">PureMVC.Patterns</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Observer</span> : <span class="title">IObserver</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">/* 字段 */</span> </span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">string</span> m_notifyMethod;                       <span class="comment">// 通知方法名称</span></span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">object</span> m_notifyContext;                      <span class="comment">// 通知上下文</span></span><br><span class="line">        <span class="keyword">protected</span> <span class="keyword">readonly</span> <span class="keyword">object</span> m_syncRoot = <span class="keyword">new</span> <span class="keyword">object</span>(); <span class="comment">// 锁定</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 属性 */</span></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">string</span> NotifyMethod</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">private</span> <span class="keyword">get</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">return</span> m_notifyMethod;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">set</span></span><br><span class="line">            &#123;</span><br><span class="line">                m_notifyMethod = <span class="keyword">value</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">object</span> NotifyContext</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">private</span> <span class="keyword">get</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">return</span> m_notifyContext;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">set</span></span><br><span class="line">            &#123;</span><br><span class="line">                m_notifyContext = <span class="keyword">value</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 构造函数 */</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">Observer</span>(<span class="params"><span class="keyword">string</span> notifyMethod, <span class="keyword">object</span> notifyContext</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            m_notifyMethod = notifyMethod;</span><br><span class="line">            m_notifyContext = notifyContext;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 指定的对象，调用指定方法</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">NotifyObserver</span>(<span class="params">INotification notification</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">object</span> context;</span><br><span class="line">            <span class="keyword">string</span> method; <span class="comment">// 方法名</span></span><br><span class="line"></span><br><span class="line">            <span class="keyword">lock</span> (m_syncRoot)</span><br><span class="line">            &#123;</span><br><span class="line">                context = NotifyContext;</span><br><span class="line">                method = NotifyMethod;</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 反射</span></span><br><span class="line">            Type t = context.GetType();</span><br><span class="line">            BindingFlags f = BindingFlags.Instance | BindingFlags.Public | BindingFlags.IgnoreCase;</span><br><span class="line">            MethodInfo mi = t.GetMethod(method, f);</span><br><span class="line">            mi.Invoke(context, <span class="keyword">new</span> <span class="keyword">object</span>[] &#123; notification &#125;);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">bool</span> <span class="title">CompareNotifyContext</span>(<span class="params"><span class="keyword">object</span> obj</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">lock</span> (m_syncRoot)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">return</span> NotifyContext.Equals(obj);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Proxy"><a href="#Proxy" class="headerlink" title="Proxy"></a><span style="color:#EF7060;">Proxy</span></h3><h1 id="三大核心类分析"><a href="#三大核心类分析" class="headerlink" title="三大核心类分析"></a><span style="color:#339AFF;">三大核心类分析</span></h1><p>Core文件夹下：Model、View、Controller</p>
+<p>公共特性。</p>
+<p><strong>共同点：</strong></p>
+<ul>
+<li>A：面向接口编程。</li>
+<li>B：存在4个方法：<ul>
+<li>注册方法 <span style="color:red">Register</span>XXX();</li>
+<li>查询方法 <span style="color:red">Retrieve</span>XXX();</li>
+<li>删除方法 <span style="color:red">Remove</span>XXX();</li>
+<li>是否存在方法 <span style="color:red">Has</span>XXX();</li>
+</ul>
+</li>
+<li>C：都是“线程安全”、<span style="color:red">“延迟加载”</span>的单例类。</li>
+<li>D：很多方法都是“虚方法”（Virtual），方便通过子类继承的方式，来重载“修改”框架既有实现 。</li>
+<li>E：注册“类实例”时候，调用<span style="color:red">OnRegister()</span>方法。移除“类实例”，调用<span style="color:red">OnRemove()</span>方法。</li>
+</ul>
+<p><strong>不同点：</strong></p>
+<p>Model.cs类中是没有处理发来消息的定义，即不处理消息。这也就解释PureMVC应用层架构图中，Proxy只能被“方法调用”的原因了。</p>
+<h2 id="延迟加载"><a href="#延迟加载" class="headerlink" title="延迟加载"></a><span style="color:#00ACC1;">延迟加载</span></h2><h2 id="Model"><a href="#Model" class="headerlink" title="Model"></a><span style="color:#00ACC1;">Model</span></h2><blockquote>
+<p>IModel.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">PureMVC.Interfaces</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">interface</span> <span class="title">IModel</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">RegisterProxy</span>(<span class="params">IProxy proxy</span>)</span>;</span><br><span class="line"></span><br><span class="line">        <span class="function">IProxy <span class="title">RetrieveProxy</span>(<span class="params"><span class="keyword">string</span> proxyName</span>)</span>;</span><br><span class="line"></span><br><span class="line">        <span class="function">IProxy <span class="title">RemoveProxy</span>(<span class="params"><span class="keyword">string</span> proxyName</span>)</span>;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">bool</span> <span class="title">HasProxy</span>(<span class="params"><span class="keyword">string</span> proxyName</span>)</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Model.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* </span></span><br><span class="line"><span class="comment">    核心层： 模型类</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> PureMVC.Interfaces;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">PureMVC.Core</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Model</span> : <span class="title">IModel</span></span><br><span class="line">    &#123;   </span><br><span class="line">        <span class="comment">/* 字段 */</span> </span><br><span class="line">        <span class="keyword">protected</span> <span class="keyword">static</span> <span class="keyword">volatile</span> IModel m_instance;        <span class="comment">// 本类实例</span></span><br><span class="line">        <span class="keyword">protected</span> IDictionary&lt;<span class="keyword">string</span>, IProxy&gt; m_proxyMap;   <span class="comment">// 代理集合类</span></span><br><span class="line">        <span class="keyword">protected</span> <span class="keyword">readonly</span> <span class="keyword">object</span> m_syncRoot = <span class="keyword">new</span> <span class="keyword">object</span>();<span class="comment">// 同步锁定对象（配合Lock关键字）</span></span><br><span class="line">        <span class="keyword">protected</span> <span class="keyword">static</span> <span class="keyword">readonly</span> <span class="keyword">object</span> m_staticSyncRoot = <span class="keyword">new</span> <span class="keyword">object</span>();<span class="comment">// 静态同步锁定对象</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 构造函数，只允许子类重写 */</span> </span><br><span class="line">        <span class="function"><span class="keyword">protected</span> <span class="title">Model</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            m_proxyMap = <span class="keyword">new</span> Dictionary&lt;<span class="keyword">string</span>, IProxy&gt;();</span><br><span class="line">            InitializeModel();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 静态构造函数 */</span> </span><br><span class="line">        <span class="function"><span class="keyword">static</span> <span class="title">Model</span>(<span class="params"></span>)</span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 得到“线程安全”，延迟加载的单例类 */</span> </span><br><span class="line">        <span class="comment">// 延迟加载</span></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">static</span> IModel Instance</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">get</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span> (m_instance == <span class="literal">null</span>)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">lock</span> (m_staticSyncRoot)</span><br><span class="line">                    &#123;</span><br><span class="line">                        <span class="keyword">if</span> (m_instance == <span class="literal">null</span>) m_instance = <span class="keyword">new</span> Model();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">return</span> m_instance;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">/* 初始化模型层 */</span> </span><br><span class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">InitializeModel</span>(<span class="params"></span>)</span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 注册</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">RegisterProxy</span>(<span class="params">IProxy proxy</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">lock</span> (m_syncRoot)</span><br><span class="line">            &#123;</span><br><span class="line">                m_proxyMap[proxy.ProxyName] = proxy;</span><br><span class="line">            &#125;</span><br><span class="line">            proxy.OnRegister();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 查询</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> IProxy <span class="title">RetrieveProxy</span>(<span class="params"><span class="keyword">string</span> proxyName</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">lock</span> (m_syncRoot)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span> (!m_proxyMap.ContainsKey(proxyName)) <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">                <span class="keyword">return</span> m_proxyMap[proxyName];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 是否存在</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">bool</span> <span class="title">HasProxy</span>(<span class="params"><span class="keyword">string</span> proxyName</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">lock</span> (m_syncRoot)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">return</span> m_proxyMap.ContainsKey(proxyName);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 移除</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> IProxy <span class="title">RemoveProxy</span>(<span class="params"><span class="keyword">string</span> proxyName</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            IProxy proxy = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">lock</span> (m_syncRoot)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span> (m_proxyMap.ContainsKey(proxyName))</span><br><span class="line">                &#123;</span><br><span class="line">                    proxy = RetrieveProxy(proxyName);</span><br><span class="line">                    m_proxyMap.Remove(proxyName);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">       </span><br><span class="line">            <span class="keyword">if</span> (proxy != <span class="literal">null</span>) proxy.OnRemove();</span><br><span class="line">            <span class="keyword">return</span> proxy;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Controller"><a href="#Controller" class="headerlink" title="Controller"></a><span style="color:#00ACC1;">Controller</span></h2><blockquote>
+<p>IController.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* </span></span><br><span class="line"><span class="comment">    接口：控制</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">PureMVC.Interfaces</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">interface</span> <span class="title">IController</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">RegisterCommand</span>(<span class="params"><span class="keyword">string</span> notificationName, Type commandType</span>)</span>;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">ExecuteCommand</span>(<span class="params">INotification notification</span>)</span>;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">RemoveCommand</span>(<span class="params"><span class="keyword">string</span> notificationName</span>)</span>;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">bool</span> <span class="title">HasCommand</span>(<span class="params"><span class="keyword">string</span> notificationName</span>)</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>Controller.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* </span></span><br><span class="line"><span class="comment">     核心层： 控制类</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> PureMVC.Interfaces;</span><br><span class="line"><span class="keyword">using</span> PureMVC.Patterns;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">PureMVC.Core</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">Controller</span> : <span class="title">IController</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">protected</span> IView m_view;                             <span class="comment">// IView 的引用</span></span><br><span class="line">        <span class="keyword">protected</span> IDictionary&lt;<span class="keyword">string</span>, Type&gt; m_commandMap;   <span class="comment">// Command 类引用的（通知名）映射</span></span><br><span class="line">        <span class="keyword">protected</span> <span class="keyword">static</span> <span class="keyword">volatile</span> IController m_instance;   <span class="comment">// 接口实例</span></span><br><span class="line">        <span class="keyword">protected</span> <span class="keyword">readonly</span> <span class="keyword">object</span> m_syncRoot = <span class="keyword">new</span> <span class="keyword">object</span>();<span class="comment">// 锁对象</span></span><br><span class="line">        <span class="keyword">protected</span> <span class="keyword">static</span> <span class="keyword">readonly</span> <span class="keyword">object</span> m_staticSyncRoot = <span class="keyword">new</span> <span class="keyword">object</span>();<span class="comment">// 静态锁</span></span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">protected</span> <span class="title">Controller</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            m_commandMap = <span class="keyword">new</span> Dictionary&lt;<span class="keyword">string</span>, Type&gt;();</span><br><span class="line">            InitializeController();                         <span class="comment">// 初始化</span></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">static</span> <span class="title">Controller</span>(<span class="params"></span>)</span> &#123;&#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">static</span> IController Instance</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">get</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span> (m_instance == <span class="literal">null</span>)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">lock</span> (m_staticSyncRoot)</span><br><span class="line">                    &#123;</span><br><span class="line">                        <span class="keyword">if</span> (m_instance == <span class="literal">null</span>) m_instance = <span class="keyword">new</span> Controller();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">return</span> m_instance;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">InitializeController</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            m_view = View.Instance;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 执行命令</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">ExecuteCommand</span>(<span class="params">INotification note</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            Type commandType = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">lock</span> (m_syncRoot)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span> (!m_commandMap.ContainsKey(note.Name)) <span class="keyword">return</span>;</span><br><span class="line">                commandType = m_commandMap[note.Name];</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">object</span> commandInstance = Activator.CreateInstance(commandType);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (commandInstance <span class="keyword">is</span> ICommand)</span><br><span class="line">            &#123;</span><br><span class="line">                ((ICommand) commandInstance).Execute(note);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">RegisterCommand</span>(<span class="params"><span class="keyword">string</span> notificationName, Type commandType</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">lock</span> (m_syncRoot)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span> (!m_commandMap.ContainsKey(notificationName))</span><br><span class="line">                &#123;</span><br><span class="line">                    m_view.RegisterObserver(notificationName, <span class="keyword">new</span> Observer(<span class="string">"executeCommand"</span>, <span class="keyword">this</span>));</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                m_commandMap[notificationName] = commandType;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">bool</span> <span class="title">HasCommand</span>(<span class="params"><span class="keyword">string</span> notificationName</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">lock</span> (m_syncRoot)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">return</span> m_commandMap.ContainsKey(notificationName);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">RemoveCommand</span>(<span class="params"><span class="keyword">string</span> notificationName</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">lock</span> (m_syncRoot)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span> (m_commandMap.ContainsKey(notificationName))</span><br><span class="line">                &#123;</span><br><span class="line">                    m_view.RemoveObserver(notificationName, <span class="keyword">this</span>);</span><br><span class="line">                    m_commandMap.Remove(notificationName);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;<span class="comment">// Class_end</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>重点字段“m_commandMap” 定义的类型 IDictionary\<string，type\> ，表<br>明Controller 的Type 类型，可以运用反射技术动态调用方法。<br> 增加了一个字段“m_view” ，View实例的引用。</string，type\></p>
+<p>重点方法：<br>RegisterCommand();<br>两个功能：<br>1&gt; 处理注册的“消息”问题。<br>通过 View实例中的RegisterObserver() 方法，实现消息的注册。即实<br>现“消息字符串” 与 对应“执行方法”的绑定。这里通过反射的技术，实现<br>“字符串消息”与“执行方法”的对应关系。<br>2&gt; 注册本身。</p>
+<p> ExecuteCommand()<br>两个功能：<br>1&gt; 根据消息字符串，得到<br>对应注册（集合中的）类的Type<br>类型。<br>2&gt; 根据Type 类型，得到<br>类实例，进而调用执行接口方法：<br>Execute() 方法。</p>
+<h2 id="View"><a href="#View" class="headerlink" title="View"></a><span style="color:#00ACC1;">View</span></h2><blockquote>
+<p>IView.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">namespace</span> <span class="title">PureMVC.Interfaces</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">interface</span> <span class="title">IView</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">RegisterObserver</span>(<span class="params"><span class="keyword">string</span> notificationName, IObserver observer</span>)</span>;</span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">RemoveObserver</span>(<span class="params"><span class="keyword">string</span> notificationName, <span class="keyword">object</span> notifyContext</span>)</span>;</span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">NotifyObservers</span>(<span class="params">INotification note</span>)</span>;</span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">RegisterMediator</span>(<span class="params">IMediator mediator</span>)</span>;</span><br><span class="line">        <span class="function">IMediator <span class="title">RetrieveMediator</span>(<span class="params"><span class="keyword">string</span> mediatorName</span>)</span>;</span><br><span class="line">        <span class="function">IMediator <span class="title">RemoveMediator</span>(<span class="params"><span class="keyword">string</span> mediatorName</span>)</span>;</span><br><span class="line">        <span class="function"><span class="keyword">bool</span> <span class="title">HasMediator</span>(<span class="params"><span class="keyword">string</span> mediatorName</span>)</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>View.cs</p>
+</blockquote>
+<figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* </span></span><br><span class="line"><span class="comment">    核心类： 视图层</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> PureMVC.Interfaces;</span><br><span class="line"><span class="keyword">using</span> PureMVC.Patterns;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">PureMVC.Core</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">View</span> : <span class="title">IView</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">protected</span> IDictionary&lt;<span class="keyword">string</span>, IMediator&gt; m_mediatorMap; <span class="comment">// 缓存IMediator实例集合</span></span><br><span class="line">        <span class="keyword">protected</span> IDictionary&lt;<span class="keyword">string</span>, IList&lt;IObserver&gt;&gt; m_observerMap;</span><br><span class="line">        <span class="keyword">protected</span> <span class="keyword">static</span> <span class="keyword">volatile</span> IView m_instance;    </span><br><span class="line">        <span class="keyword">protected</span> <span class="keyword">readonly</span> <span class="keyword">object</span> m_syncRoot = <span class="keyword">new</span> <span class="keyword">object</span>();</span><br><span class="line">        <span class="keyword">protected</span> <span class="keyword">static</span> <span class="keyword">readonly</span> <span class="keyword">object</span> m_staticSyncRoot = <span class="keyword">new</span> <span class="keyword">object</span>();</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">protected</span> <span class="title">View</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            m_mediatorMap = <span class="keyword">new</span> Dictionary&lt;<span class="keyword">string</span>, IMediator&gt;();</span><br><span class="line">            m_observerMap = <span class="keyword">new</span> Dictionary&lt;<span class="keyword">string</span>, IList&lt;IObserver&gt;&gt;();</span><br><span class="line">            InitializeView();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">static</span> <span class="title">View</span>(<span class="params"></span>)</span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">static</span> IView Instance</span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">get</span></span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span> (m_instance == <span class="literal">null</span>)</span><br><span class="line">                &#123;</span><br><span class="line">                    <span class="keyword">lock</span> (m_staticSyncRoot)</span><br><span class="line">                    &#123;</span><br><span class="line">                        <span class="keyword">if</span> (m_instance == <span class="literal">null</span>) m_instance = <span class="keyword">new</span> View();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">return</span> m_instance;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">protected</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">InitializeView</span>(<span class="params"></span>)</span>&#123; &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">#<span class="meta-keyword">region</span> 消息中心</span></span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">RegisterObserver</span>(<span class="params"><span class="keyword">string</span> notificationName, IObserver observer</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;            </span><br><span class="line">            <span class="keyword">lock</span> (m_syncRoot)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span> (!m_observerMap.ContainsKey(notificationName))</span><br><span class="line">                &#123;</span><br><span class="line">                    m_observerMap[notificationName] = <span class="keyword">new</span> List&lt;IObserver&gt;();</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                m_observerMap[notificationName].Add(observer);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">NotifyObservers</span>(<span class="params">INotification notification</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            IList&lt;IObserver&gt; observers = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">lock</span> (m_syncRoot)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span> (m_observerMap.ContainsKey(notification.Name))</span><br><span class="line">                &#123;</span><br><span class="line">                    IList&lt;IObserver&gt; observers_ref = m_observerMap[notification.Name];</span><br><span class="line">                    observers = <span class="keyword">new</span> List&lt;IObserver&gt;(observers_ref);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (observers != <span class="literal">null</span>)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="comment">// Notify Observers from the working array              </span></span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; observers.Count; i++)</span><br><span class="line">                &#123;</span><br><span class="line">                    IObserver observer = observers[i];</span><br><span class="line">                    observer.NotifyObserver(notification);</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">RemoveObserver</span>(<span class="params"><span class="keyword">string</span> notificationName, <span class="keyword">object</span> notifyContext</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">lock</span> (m_syncRoot)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span> (m_observerMap.ContainsKey(notificationName))</span><br><span class="line">                &#123;</span><br><span class="line">                    IList&lt;IObserver&gt; observers = m_observerMap[notificationName];</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; observers.Count; i++)</span><br><span class="line">                    &#123;</span><br><span class="line">                        <span class="keyword">if</span> (observers[i].CompareNotifyContext(notifyContext))</span><br><span class="line">                        &#123;</span><br><span class="line">                            <span class="comment">// there can only be one Observer for a given notifyContext </span></span><br><span class="line">                            <span class="comment">// in any given Observer list, so remove it and break</span></span><br><span class="line">                            observers.RemoveAt(i);</span><br><span class="line">                            <span class="keyword">break</span>;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                    <span class="keyword">if</span> (observers.Count == <span class="number">0</span>)</span><br><span class="line">                    &#123;</span><br><span class="line">                        m_observerMap.Remove(notificationName);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">#<span class="meta-keyword">endregion</span></span></span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">RegisterMediator</span>(<span class="params">IMediator mediator</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">lock</span> (m_syncRoot)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span> (m_mediatorMap.ContainsKey(mediator.MediatorName)) <span class="keyword">return</span>;</span><br><span class="line">                m_mediatorMap[mediator.MediatorName] = mediator;</span><br><span class="line"></span><br><span class="line">                IList&lt;<span class="keyword">string</span>&gt; interests = mediator.ListNotificationInterests();</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (interests.Count &gt; <span class="number">0</span>)</span><br><span class="line">                &#123;</span><br><span class="line">                    IObserver observer = <span class="keyword">new</span> Observer(<span class="string">"handleNotification"</span>, mediator);</span><br><span class="line">                    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; interests.Count; i++)</span><br><span class="line">                    &#123;</span><br><span class="line">                        RegisterObserver(interests[i].ToString(), observer);</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            mediator.OnRegister();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> IMediator <span class="title">RetrieveMediator</span>(<span class="params"><span class="keyword">string</span> mediatorName</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">lock</span> (m_syncRoot)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span> (!m_mediatorMap.ContainsKey(mediatorName)) <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">                <span class="keyword">return</span> m_mediatorMap[mediatorName];</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> IMediator <span class="title">RemoveMediator</span>(<span class="params"><span class="keyword">string</span> mediatorName</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            IMediator mediator = <span class="literal">null</span>;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">lock</span> (m_syncRoot)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">if</span> (!m_mediatorMap.ContainsKey(mediatorName)) <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">                mediator = (IMediator) m_mediatorMap[mediatorName];</span><br><span class="line"></span><br><span class="line">                IList&lt;<span class="keyword">string</span>&gt; interests = mediator.ListNotificationInterests();</span><br><span class="line"></span><br><span class="line">                <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; interests.Count; i++)</span><br><span class="line">                &#123;</span><br><span class="line">                    RemoveObserver(interests[i], mediator);</span><br><span class="line">                &#125;</span><br><span class="line">    </span><br><span class="line">                m_mediatorMap.Remove(mediatorName);</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">            <span class="keyword">if</span> (mediator != <span class="literal">null</span>) mediator.OnRemove();</span><br><span class="line">            <span class="keyword">return</span> mediator;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">bool</span> <span class="title">HasMediator</span>(<span class="params"><span class="keyword">string</span> mediatorName</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            <span class="keyword">lock</span> (m_syncRoot)</span><br><span class="line">            &#123;</span><br><span class="line">                <span class="keyword">return</span> m_mediatorMap.ContainsKey(mediatorName);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>本类功能点可以分两大部分：</p>
+<p>消息中心：<br>m_observerMap 字段，以及对应的注册、通知、移除方法。</p>
+<p>m_mediatorMap 字段以及对应的注册、查询、移除、是否存在方法。<br>“消息中心”功能分析：<br>1&gt; RegisterObserver() 注册观察者。<br>把“消息名称”与“IObserver” 实例作为一个“键值对”进行存储。<br>一个“消息名称”，对应一个“IObserver” 实例集合（即：IList<iobserver>）</iobserver></p>
+<p>“消息中心”功能分析：<br>2&gt; Observer 类代码分析 [功能：对指定对象，调用指定方法]<br> 字段“通知上下文”： m_notifyContext （object 类型）<br> 字段“通知方法名称”： m_notifyMethod （string 类型）其中的<br>NotifyObserver() 方法，就是使用反射技术，调用“通知上下文”的<br>“通知方法”。</p>
+<p> “消息中心”功能分析（续）：<br>3&gt; NotifyObservers() “通知观察者”方法。<br> 按照通知名称，查询出对应”IObserver” 集合，且实例化对应集合拷<br>贝IList<iobserver> 数据。<br> 循环遍历“IObserver”集合中每一项，且执行（Observer 实例中的)方<br>法“NotifyObserver()”，实现调用（注册时）定义的每一个方法。</iobserver></p>
+<p> “消息中心”功能分析（续）：<br>NotifyObservers() 方法的详细描述：<br>1&gt; NotifyObservers 方法进行消息广播，是“消息中心”的关键。<br>Controller和Mediator都是双向接收消息(proxy只能发送消息，而不能接收)。<br>2&gt; 关于controller的registerCommand方法以及view的registerMediator方<br>法，对事件的响应形式都是以Observer统一起来。在view的notifyObservers<br>方法，其实就是遍历消息与Observer关联的哈希表，当Observer对目前发送<br>的消息感兴趣时，则调用其保存的方法函数，执行实际在command或者<br>mediator的相应方法。</p>
+<p> “消息中心”功能分析（续）：<br>4&gt; RemoveObserver() “移除通知”方法<br>方法的参数是“通知名称”与“通知上下文”，所以本方式可以实现，移<br>除特定的对象。 [即： Observer 中的“上下文”]</p>
+<p> 本类核心字段功能点分析： ( m_mediatorMap 字段）<br>1&gt; RegisterMediator()<br> 注册“消息名称”与对应“Mediator子类对象”到字段<br>“m_mediatorMap”中。<br> 获取“Mediator子类对象” 中ListNoticatiionInterests() 返回的字符串<br>集合。<br> 实例化“Observer” 对象，然后调用“RegisterObserver()” 方法，从<br>而实现通过一个“消息”，调用Mediator子类对象的<br>HandleNotification 方法的功能实现。（即： 将消息与Observer之间的<br>对应持久在一个字典表中）</p>
+<p> 本类核心字段功能点分析（续）：<br>2&gt; RemoveMediator()<br> 根据Mediator子类对象名称，首先(集合中)查询出对应IMediator 的引<br>用。<br> 得到这个IMediator 引用的所有“感兴趣”方法集合[通过<br>ListNotificationInterests()]<br> 调用“RemoveObserver()” 方法，移除注册的对应所有消息。<br> 移除对于“m_mediatorMap” 的引用。<br> 调用Meidiator对象引用的 OnRemove() 方法。<br> 返回此Mediator对象引用 （此步骤同Model 的移除方法）</p>
+<p>入口 与外围类 分析 :Facade (1)<br> Facade 类分析 [门面模式/外观模式]<br> 理解core包的controller，proxy，view 3层的实现之后，facadee里面的代<br>码理解就十分容易了，facade只是做为一个外壳，统一管理3个层次的实<br>现，<br> Facade模式，对应了GoF中的Facade模式，是一种将复杂且庞大的内部<br>实现暴露为一个简单接口的设计模式，例如对大型类库的封装。<br> 在PureMVC中，Facade是与核心层（Model，View，Controller）进行通信<br>的唯一接口，目的是简化开发复杂度。</p>
+<p> Facader 类分析 (续)<br> 具备三大核心类的引用（作为字段），在自身构造函数中进行实例化。<br>Facade()—&gt;InitializeFacade()<br>—&gt;InitializeModel();<br>—&gt;InitializeController();<br>—&gt;InitializeView();<br> 整合三大类（模型、视图、控制三层）所有主要核心方法，即：“注册”、<br>“查询”、“移除”、“是否存在”方法。</p>
+<p> 辅助类（方法）分析<br> 分析“消息载体封装类” ： Notification 类<br>（名称、内容、类型）<br> SendNotification() 方法分析<br>1&gt; 此方法最终转为调用View实例中的 “NotifyObservers()”方法，从而完<br>成消息与方法执行的对应关系。<br>2&gt; SendNotification() 流程分析：<br>Façade 实例的NotifyObservers()—&gt; View 实例的NotifyObservers();</p>
+<p>入口 与外围类 分析: : 外围类 (1)<br> 辅助类（方法）分析(续)<br> Mediator、SimpleCommand、MacroCommand、与Notifier 类关系<br>1&gt; Mediator 定义了m_mdiatorName 字段 ，保存名称m_ViewComponet 字<br>段 ，保存数据体定义虚方法如下：<br> ListNotificationInterests();<br> HandleNotification()<br> OnRegister();<br> OnRemove();</p>
+<p>入口 与外围类 分析: : 外围类 (2)<br> 辅助类（方法）分析(续)<br> Notifier<br>定义 SendNotifacation()<br>1&gt; 代理保有 Facade 的引用。<br>2&gt; 间接的调用 Facade 类中的SendNotifacation()方法，从而简化“外围<br>类”调用发送消息的成本。</p>
+<p>架构对 设计模式 的应用: : 观察 者 模式<br> 概念：<br>观察者模式(Publish/Subscribe):<br>定义了一种一对多的依赖关系，让多个观察者对象同时监听某一个主题对象。<br>这个主题对象在状态发生变化时，会通知所有观察者对象，使它们能够自动<br>更新自己。<br> 整个PureMVC 中关于Viw、Controller 必须先注册，然后使用<br>SendNotification 可以执行类实例方法调用，这种框架思路就是“观察者<br>模式”。</p>
+<p>架构对 设计模式 的应用 ： 中介 者 模式<br> 概念：<br>中介者模式(Mediator):<br>用一个中介对象来封装一系列的对象交互。中介者使各对象不需要显示的相<br>互引用，从而使其耦合松散，而且可以独立的改变它们之间的交互。<br>整个PureMvc 通过框架的约束与规则，对于外部系统（例如Unity脚本）来说，<br>就是起到了一种”中介者”的作用，脚本之间不直接关联与调用，这就是一种架构<br>级别的“Mediator” （中介者）设计模式的体现。</p>
+<p>架构对 设计模式 的应用_ _ 外观 模式<br> 概念：<br>外观模式(facadee):<br>为子系统中的一组接口提供一个一致的界面，此模式定义了一个高层接口，这<br>个接口使得这一子系统更加容易使用。<br>Facade 是一种外观模式。在PureMVC 架构中，系统的三大核心类（View、<br>Contoroller、Model），完成框架绝大多数功能。系统的设计者为了使得外部系统<br>更好的应用本框架，应用“外观模式”(Facade)开发了一个Facade 类，简化了外<br>围系统与系统三大核心类交互的复杂度。</p>
+<p>架构三层职责总结： Mediator<br> 发送与监听消息。<br> 监听Component 自身的事件，且转化为消息。<br> 设置与调用Component 数据与方法。<br> 直接调用Proxy (推荐尽量少用)</p>
+<p>架构三层职责总结<br><br>发送但不接收消息。<br> 与服务器端连接，获取与上传业务数据。<br> 大型网络游戏，可以进一步抽象出“数据代理服务层”，专门从事与服务器交<br>互通信事宜。</p>
+<p>架构三层职责总结 :Command<br> 管理Proxy与Mediator 层，负责注册、查询获取、移除等。<br> 直接调用多个Proxy，进行复杂业务逻辑处理。<br> 对(继承MonoBehaviour)的脚本，做动态管理与对象加载操作。<br> Command 本身生命周期很短，在整个生命周期中并没有类的实例在运行，而<br>是通过反射技术，一次性的得到类的对象(object)，执行完(Execute) 后结束。</p>
+<p>PureMVC 架构图</p>
+<p>架构三层不同 生命周期 的设计 原则<br> Controller不同于view与model，view与model都有各自天然的粒度组织<br>依据，View 的组织粒度直接承袭用户界面设计，Model的组织粒度则是<br>依据某种分析设计思想，进行领域建模的结果。<br> 针对一个用户操作(User Action) 设计一个command，然后将两者映射<br>在一起，是一件非常自然而简单的事情。</p>
+<p>Command 中消息数量的问题<br> 命令模式(Command) 将逻辑操作分离出来，使程序的耦合进一步降低。<br>但在实际的使用中可能会导致数量太多的问题。<br> 如果对每一个“操作”（按钮、请求等）都去写一个Command的话，显<br>得太过琐碎，消息名与Command的过量反而难以管理，这个需要在实际项目<br>中结合具体业务逻辑进行取舍与综合考虑。</p>
+<p>模块化 协作 开发的问题<br> PureMVC 通过Mediator与消息事件的机制，强有力的对项目进行分层<br>解耦，这特别有利于模块化的开发与多人分工协作。<br> 模块与模块之间只需注意其消息的交互，而不用理会其里边的实际逻<br>辑，在划分好功能模块后，使得多人合作开发能够更好的执行。</p>
+<p>模块化 协作 开发的问题 ( ( 续) )<br> 在实际项目开发过程中，应用不当容易造成Mediator“过重”的问题。<br>由于每个小的用户请求都对应一个Command的，则会导致过于繁琐，<br>“命令消息”过多问题。<br> 把更多的逻辑都放在Mediator里面做处理，则可能会导致Mediator太<br>庞大的问题。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/PureMVC/" rel="tag"># PureMVC</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/10/26/MMOARPG地下守护神单机版/" rel="next" title="MMOARPG地下守护神单机版">
+                <i class="fa fa-chevron-left"></i> MMOARPG地下守护神单机版
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/10/27/最后一战大型moba游戏开发/" rel="prev" title="最后一战大型moba游戏开发">
+                最后一战大型moba游戏开发 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">354</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">8</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">55</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2020/02/16/游戏设计快乐之道（第2版）/" title="游戏设计快乐之道（第2版）" target="_blank">游戏设计快乐之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/14/游戏剧本怎么写/" title="游戏剧本怎么写" target="_blank">游戏剧本怎么写</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/02/04/通关！游戏设计之道（第2版）/" title="通关！游戏设计之道（第2版）" target="_blank">通关！游戏设计之道（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/26/游戏设计艺术（第2版）/" title="游戏设计艺术（第2版）" target="_blank">游戏设计艺术（第2版）</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/01/22/大师谈游戏设计创意与节奏/" title="大师谈游戏设计创意与节奏" target="_blank">大师谈游戏设计创意与节奏</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#目录"><span class="nav-number">1.</span> <span class="nav-text">目录</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#PureMVC整体架构图"><span class="nav-number">2.</span> <span class="nav-text">PureMVC整体架构图</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#PureMVC主要设计模式"><span class="nav-number">3.</span> <span class="nav-text">PureMVC主要设计模式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Mediator模式"><span class="nav-number">3.1.</span> <span class="nav-text">Mediator模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#观察者模式"><span class="nav-number">3.2.</span> <span class="nav-text">观察者模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Facade模式"><span class="nav-number">3.3.</span> <span class="nav-text">Facade模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#其他"><span class="nav-number">3.4.</span> <span class="nav-text">其他</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#源代码目录结构分析"><span class="nav-number">4.</span> <span class="nav-text">源代码目录结构分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Core目录"><span class="nav-number">4.1.</span> <span class="nav-text">Core目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Interfaces目录"><span class="nav-number">4.2.</span> <span class="nav-text">Interfaces目录</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Patterns目录"><span class="nav-number">4.3.</span> <span class="nav-text">Patterns目录</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Command"><span class="nav-number">4.3.1.</span> <span class="nav-text">Command</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Facade"><span class="nav-number">4.3.2.</span> <span class="nav-text">Facade</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Mediator"><span class="nav-number">4.3.3.</span> <span class="nav-text">Mediator</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Observer"><span class="nav-number">4.3.4.</span> <span class="nav-text">Observer</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Proxy"><span class="nav-number">4.3.5.</span> <span class="nav-text">Proxy</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#三大核心类分析"><span class="nav-number">5.</span> <span class="nav-text">三大核心类分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#延迟加载"><span class="nav-number">5.1.</span> <span class="nav-text">延迟加载</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Model"><span class="nav-number">5.2.</span> <span class="nav-text">Model</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Controller"><span class="nav-number">5.3.</span> <span class="nav-text">Controller</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#View"><span class="nav-number">5.4.</span> <span class="nav-text">View</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">3.7m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">56:23</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>
