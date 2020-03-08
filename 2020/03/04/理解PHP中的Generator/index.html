@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="思考并回答以下问题：  C#的Iterator和PHP都是相通的。是这样吗？ 为什么Generator可以用于实现协程？C#中是这么做的吗？">
+<meta name="keywords" content="设计模式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="理解PHP中的Generator">
+<meta property="og:url" content="http://chebincarl.github.io/2020/03/04/理解PHP中的Generator/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="思考并回答以下问题：  C#的Iterator和PHP都是相通的。是这样吗？ 为什么Generator可以用于实现协程？C#中是这么做的吗？">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-03-07T00:24:23.059Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="理解PHP中的Generator">
+<meta name="twitter:description" content="思考并回答以下问题：  C#的Iterator和PHP都是相通的。是这样吗？ 为什么Generator可以用于实现协程？C#中是这么做的吗？">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2020/03/04/理解PHP中的Generator/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>理解PHP中的Generator | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">专注，重复10遍</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2020/03/04/理解PHP中的Generator/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">理解PHP中的Generator
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2020-03-04 20:47:42" itemprop="dateCreated datePublished" datetime="2020-03-04T20:47:42+08:00">2020-03-04</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2020-03-07 08:24:23" itemprop="dateModified" datetime="2020-03-07T08:24:23+08:00">2020-03-07</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/PHP/" itemprop="url" rel="index"><span itemprop="name">PHP</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">10k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">9 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>思考并回答以下问题：</p>
+<ul>
+<li>C#的Iterator和PHP都是相通的。是这样吗？</li>
+<li>为什么Generator可以用于实现协程？C#中是这么做的吗？</li>
+</ul>
+<a id="more"></a>
+<p>Generator的中文词语是“生成器”，是一个可以生成一系列数据的工具，这个工具可以具体为一个类、一个函数或者是一个语句（由特殊的关键字构成），而且事实上也确实如此。<span style="color:red">在PHP中Generator是由函数生成的</span>，但这个函数又跟普通的函数不同。</p>
+<p>我们先介绍Generator的另外一个特点，这个特点也是php的官方文档介绍Generator的第一句话：Generator提供了一种方便的实现简单的Iterator（迭代器）的方式，使用Generator实现Iterator不需要创建一个类来继承Iterator接口。</p>
+<h1 id="Iterator接口"><a href="#Iterator接口" class="headerlink" title="Iterator接口"></a><span style="color:#339AFF;">Iterator接口</span></h1><p>所以如果想搞清楚Generator，需要先了解Iterator接口。我们通常使用foreach对数组进行遍历，如果要对对象进行遍历，那么这个对象的类就必须实现Iterator接口，并且实现Iterator接口所提供的5个方法：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Iterator extends Traversable </span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">/* Methods */</span></span><br><span class="line">    <span class="keyword">abstract</span> <span class="keyword">public</span> mixed current ( void )   <span class="comment">//返回当前位置的元素</span></span><br><span class="line">    <span class="keyword">abstract</span> <span class="keyword">public</span> scalar key ( void )      <span class="comment">//返回当前元素对应的key</span></span><br><span class="line">    <span class="keyword">abstract</span> <span class="keyword">public</span> void next ( void )       <span class="comment">//移到指向下一个元素的位置</span></span><br><span class="line">    <span class="keyword">abstract</span> <span class="keyword">public</span> void rewind ( void )     <span class="comment">//倒回到指向第一个元素的位置</span></span><br><span class="line">    <span class="keyword">abstract</span> <span class="keyword">public</span> boolean valid ( void )   <span class="comment">//判断当前位置是否有效</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这5个方法非常简单明确，在foreach遍历过程中，这些方法都会被隐式调用，其中next()方法就是控制元素移动的，current()可以获取当前位置的元素。</p>
+<p>Iterator接口扩展了Traversable接口，Traversable是一个空接口，它相当于一个标志，所有实现Iterator接口的类肯定也实现了Traversable接口，所以我们通常可以用下面的代码来判断一个变量是否可以通过foreach进行遍历：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">    <span class="keyword">if</span>( !is_array( $items ) &amp;&amp; !$items <span class="keyword">instanceof</span> Traversable )</span><br><span class="line">        <span class="comment">//Throw exception here</span></span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure></p>
+<h1 id="Generator对象"><a href="#Generator对象" class="headerlink" title="Generator对象"></a><span style="color:#339AFF;">Generator对象</span></h1><p>我们现在已经知道了Iterator接口的用法，那么Generator跟Iterator有什么关系呢？</p>
+<p>上面说到Generator在php中是由一个函数生成的，它可以使用foreach进行遍历，所以我们可以推断<span style="color:red">Generator是一个实现了Iterator接口的类</span>，我们先来看一个Generator的经典示例：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">xrange</span><span class="params">($start, $end, $step = <span class="number">1</span>)</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span> ($i = $start; $i &lt;= $end; $i += $step) </span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">yield</span> $i;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">foreach</span> (xrange(<span class="number">1</span>, <span class="number">1000000</span>) <span class="keyword">as</span> $num) </span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">echo</span> $num, <span class="string">"\n"</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>xrange()这个方法如同php内置的range方法，不同的是range会一次性返回包含所有元素的数组，而xrange是遍历过程中迭代一次返回一个，它之所以可以这么做是因为调用xrange返回的是一个Generator对象，我们再在上面的代码添加几行代码：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$range = xrange(<span class="number">1</span>, <span class="number">1000000</span>);</span><br><span class="line">var_dump($range); <span class="comment">// object(Generator)#1</span></span><br><span class="line">var_dump($range <span class="keyword">instanceof</span> Iterator); <span class="comment">// bool(true)</span></span><br></pre></td></tr></table></figure></p>
+<p>第二个var_dump输出的是object(Generator)#1，这表示$range变量是一个Generator对象，它是xrange函数返回的。这个对象可以使用foreach遍历，所以它肯定实现了Iterator接口，我们现在看看文档中Generator类的定义：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Generator implements Iterator </span><br><span class="line">&#123;</span><br><span class="line">    <span class="comment">/* Methods */</span></span><br><span class="line">    <span class="keyword">public</span> mixed current ( void )</span><br><span class="line">    <span class="keyword">public</span> mixed key ( void )</span><br><span class="line">    <span class="keyword">public</span> void next ( void )</span><br><span class="line">    <span class="keyword">public</span> void rewind ( void )</span><br><span class="line">    <span class="keyword">public</span> mixed send ( mixed $value )</span><br><span class="line">    <span class="keyword">public</span> mixed <span class="keyword">throw</span> ( <span class="keyword">Exception</span> $exception )</span><br><span class="line">    <span class="keyword">public</span> bool valid ( void )</span><br><span class="line">    <span class="keyword">public</span> void __wakeup ( void )</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>它实现了Iterator中的5个方法，还提供了三个新方法，其中__wakeup是一个魔术方法，用于序列化，Generator实现这个方法是为了防止序列化。另外两个新方法是throw和send，我们需要关注的只是send方法，这个等会介绍。我们现在解决了Generator对象可以遍历的问题，因为它实现了Iterator接口，下面的问题是它是怎么产生的。在回答这个问题之前，我们可以看看是否能够通过new关键字来创建Generator对象：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$g = <span class="keyword">new</span> Generator();</span><br></pre></td></tr></table></figure></p>
+<p>运行这个代码会得到下面的错误：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Catchable fatal error: The &quot;Generator&quot; class is reserved for internal use and cannot be manually instantiated in ***</span><br></pre></td></tr></table></figure></p>
+<p>上面的错误的含义是“Generator类仅供内部参考，概不外借”，所以我们不能使用new关键字来创建Generator对象。我们再看下xrange函数的代码，它会返回一个Generator对象，但是在这个函数的内部并没有任何跟Generator相关的字样，甚至连一个return语句都没有。但它也并非是毫无特色，它有一个yield关键字，这个关键字我们之前根本都没见过，所以可以大胆猜测它就是罪魁祸首。</p>
+<h1 id="yield"><a href="#yield" class="headerlink" title="yield"></a><span style="color:#339AFF;">yield</span></h1><p><span style="color:red">在php中，yield关键字只能在函数中使用</span>（你可以尝试下在函数外使用，看看会发生什么），而且使用了yield关键字的函数都会返回一个Generator对象，我们把这种函数叫做generator函数（我自己取的名字，用于区分普通函数）。</p>
+<p>yield语句有点像return语句，代码执行到yield语句，generator函数的执行就会终止，并且会返回yield语句中的表达式的值给Generator对象，这跟return语句一样，不同的是，这返回值只是作为遍历Generator对象的当前元素，而不能赋值给其他变量。</p>
+<p>当对Generator对象继续迭代，generator函数中的yield后面的代码会继续执行，直到generator函数中的yield语句全部执行完毕，或者是碰到generator函数中的空return语句（返回null的return语句），在generator函数中使用带有非null返回值的return语句会报编译错误。</p>
+<p>再来看一个简单的示例：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">gen</span><span class="params">()</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">yield</span> <span class="number">1</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$g = gen();</span><br><span class="line"><span class="keyword">echo</span> $g-&gt;valid();    <span class="comment">//1</span></span><br><span class="line"><span class="keyword">echo</span> $g-&gt;current();  <span class="comment">//1</span></span><br><span class="line"><span class="keyword">echo</span> $g-&gt;next();</span><br><span class="line"><span class="keyword">echo</span> $g-&gt;valid();    <span class="comment">//</span></span><br><span class="line"><span class="keyword">echo</span> $g-&gt;current();  <span class="comment">//</span></span><br></pre></td></tr></table></figure></p>
+<p>上面的代码首先调用gen函数生成一个Generator对象赋值给变量$g，因为Generator对象实现了Iterator接口，所以可以直接使用Iterator接口中的方法。首先调用valid方法，它会返回1，表示这个对象当前处于可迭代状态；然后调用current方法，它也会输出1，就是yield所返回的值，它是当前迭代的元素的值，在这个示例中也是第一个元素；紧接着会调用next方法，它会对Generator对象做一次迭代，就是把当前迭代的位置向下移动一位，然后再次调用valid()，这个时候输出为空，这表示对Generator的迭代已终止，再次调用current()返回也是空值。</p>
+<p>在这个示例中，gen函数是一个generator函数，调用它会返回一个Generator对象，并且赋值给变量$g，由于函数gen中只有一个yield语句，所以对$g的遍历只能进行一次。</p>
+<p>通常的函数中只可能执行一次return语句，如果一个generator函数中有多个yield语句会怎么样？</p>
+<h1 id="多个yield语句"><a href="#多个yield语句" class="headerlink" title="多个yield语句"></a><span style="color:#339AFF;">多个yield语句</span></h1><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">gen</span><span class="params">()</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">yield</span> <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">yield</span> <span class="number">2</span>;</span><br><span class="line">    <span class="keyword">yield</span> <span class="number">3</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$g = gen();</span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> $g-&gt;valid(); <span class="comment">// 1</span></span><br><span class="line"><span class="keyword">echo</span> $g-&gt;current(); <span class="comment">// 1</span></span><br><span class="line"><span class="keyword">echo</span> <span class="string">"&lt;br/&gt;"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> $g-&gt;next(); </span><br><span class="line"><span class="keyword">echo</span> $g-&gt;valid(); <span class="comment">// 1</span></span><br><span class="line"><span class="keyword">echo</span> $g-&gt;current(); <span class="comment">// 2</span></span><br><span class="line"><span class="keyword">echo</span> <span class="string">"&lt;br/&gt;"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> $g-&gt;next();</span><br><span class="line"><span class="keyword">echo</span> $g-&gt;valid(); <span class="comment">// 1</span></span><br><span class="line"><span class="keyword">echo</span> $g-&gt;current(); <span class="comment">// 3</span></span><br><span class="line"><span class="keyword">echo</span> <span class="string">"&lt;br/&gt;"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> $g-&gt;next();</span><br><span class="line"><span class="keyword">echo</span> $g-&gt;valid();</span><br><span class="line"><span class="keyword">echo</span> $g-&gt;current();</span><br></pre></td></tr></table></figure>
+<p>Generator对象的中可迭代的元素就是所有yield语句返回的值的集合，在这个示例中是[1,2,3]。看起来跟数组很像，但它跟数组有本质的区别，遍历Generator对象的每次迭代都只会执行前一次yield语句之后的代码，而且碰到yield语句就会返回一个值，相当于从generator函数中返回，这有点像挂起一个进程（线程）的执行（yield在很多语言中就是用于挂起进程（线程）），然后又启动它继续执行，周而复始直到进程（线程）执行中止，这也是为什么Generator可以用于实现协程的原因。</p>
+<p>当然我们一般不会写上面的代码，而是在generator函数中使用for循环，而遍历则使用foreach，跟上面介绍的xrange()函数一样。当我们使用foreach遍历数组的时候，有时候会使用到数组的key，所以yield是否也可以返回键值对的形式呢？当然可以，而且yield还可以返回null，或者是返回引用，关于这些特殊的用法可以参考yield的文档。</p>
+<h1 id="send方法"><a href="#send方法" class="headerlink" title="send方法"></a><span style="color:#339AFF;">send方法</span></h1><p>yield也可以用于表达式的上下文中，例如用于赋值语句的右侧：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$data = (<span class="keyword">yield</span> $value);</span><br></pre></td></tr></table></figure></p>
+<p>注意这里必须使用圆括号，要不然则会产生解析错误。</p>
+<p>这里的yield相当于一个表达式，它需要跟Generator对象中的send函数配合使用。send函数接收一个参数，它会将这个参数的值传递给Generator对象并作为当前yield表达式的结果，同时还会恢复generator函数的执行。我们通过一个示例来说明这个过程：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">gen</span><span class="params">()</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    $ret = (<span class="keyword">yield</span> <span class="string">'yield1'</span>);</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">'$ret-'</span>.$ret;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">'&lt;br/&gt;'</span>;</span><br><span class="line">    $ret = (<span class="keyword">yield</span> <span class="string">'yield2'</span>);</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">'$ret-'</span>.$ret;</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">'&lt;br/&gt;'</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$g = gen();</span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> <span class="string">'current-'</span>.$g-&gt;current(); <span class="comment">// yield1</span></span><br><span class="line"><span class="keyword">echo</span> <span class="string">'&lt;br/&gt;'</span>;</span><br><span class="line"><span class="keyword">echo</span> <span class="string">'send-'</span>.$g-&gt;send(<span class="string">'ret1'</span>); <span class="comment">// yield2</span></span><br><span class="line"><span class="keyword">echo</span> <span class="string">'&lt;br/&gt;'</span>;</span><br><span class="line"><span class="keyword">echo</span> <span class="string">'send-'</span>.$g-&gt;send(<span class="string">'ret2'</span>);</span><br></pre></td></tr></table></figure></p>
+<p>上面的代码运行后的输出为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">current-yield1</span><br><span class="line">$ret-ret1</span><br><span class="line">send-yield2</span><br><span class="line">$ret-ret2</span><br><span class="line">send-</span><br></pre></td></tr></table></figure></p>
+<p>上面的代码首先是调用函数gen生成一个Generator对象，然后调用这个对象的current方法返回第一个值，显然它是第一个yield语句的返回值，也就是’yield1’，这个时候gen函数的执行就会被中止，接着执行var_dump($g-&gt;send(‘ret1’));。</p>
+<p>调用$g-&gt;send(‘ret1’)，传入参数为字符串’ret1’，按照上面的说明，它会赋值给第一个yield表达式，也就是(yield ‘yield1’)中的yield（注意：这个时候不包括’yield1’），它的值为’ret1’，然后会赋值给$ret，所以第二个输出’ret1’就是gen函数中的第一个var_dump输出的。此时对Generator对象的迭代会恢复继续执行，实际上就是调用了一次next函数，它会执行到下一个yield语句：yield ‘yield2’，这个语句会返回’yield2’，它会作为$g-&gt;send(‘ret1’)的返回值，所以函数外第二个var_dump会输出’yield2’。</p>
+<p>最后再次调用send函数，这次传入的参数为字符串’ret2’，跟上面一样，Generator对象当前位置的元素是在gen函数的第二个yield上，所以’ret2’会被传递给第二个yield表达式，也就是作为(yield ‘yield2’)中的yield的值，并且会被赋值给$ret变量，然后gen函数恢复执行，它会执行gen函数中的最后一个var_dump，此时对Generator对象$g的遍历也结束了，第二个send函数的返回值为NULL，这也是函数外的最后一个var_dump的输出。</p>
+<p>读了这么一段分析以后，你现在最大的困惑是什么呢？</p>
+<p>我最大的困惑是为什么同一个yied关键字，它既是语句，又是表达式，而且这两种情况是同时存在的：</p>
+<p>对于所有在generator函数中出现的yield，首先它都是语句，而跟在yield后面的任何表达式的值将作为调用generator函数的返回值，如果yield后面没有任何表达式（变量、常量都是表达式），那么它会返回NULL，这一点跟return语句一致。</p>
+<p>yield也是表达式，它的值就是send函数传过来的值（相当于一个特殊变量，只不过赋值是通过send函数进行的）。只要调用send方法，并且Generator对象的迭代并未终结，那么当前位置的yield就会得到send方法传递过来的值，这跟generator函数有没有把这个值赋值给某个变量没有任何关系。</p>
+<p><span style="color:red">从上面两点我们就可以看出，任何时候yield关键词都即是语句——可以为generator函数返回值，也是表达式——可以接收Generator对象发过来的值。</span></p>
+<p>这里有一点需要特别注意，就是上面说的必须使用圆括号把yield表达式括起来（php5.5，5.6需要此限制，php7已经取消所有），这个是PHP的文档中说的，这是不正确的，只有需要将yield表达式的值赋值给变量的时候才需要使用圆括号，有些情况下圆括号并非必须的，把上面的例子改一下：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">gen</span><span class="params">()</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    var_dump(<span class="keyword">yield</span> <span class="string">'yield1'</span>);</span><br><span class="line">    var_dump(<span class="keyword">yield</span> <span class="string">'yield2'</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$g = gen();</span><br><span class="line"></span><br><span class="line">var_dump($g-&gt;current());</span><br><span class="line">var_dump($g-&gt;send(<span class="string">'ret1'</span>));</span><br><span class="line">var_dump($g-&gt;send(<span class="string">'ret2'</span>));</span><br></pre></td></tr></table></figure></p>
+<p>这次的输出跟上面的代码的输出结果一样，而这里并未使用圆括号将yield ‘yield1’括起来。我们再看一个例子：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">logger</span><span class="params">($fileName)</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    $fileHandle = fopen($fileName,<span class="string">'a'</span>);</span><br><span class="line">    <span class="keyword">while</span>(<span class="keyword">true</span>) </span><br><span class="line">    &#123;</span><br><span class="line">        fwrite($fileHandle,<span class="keyword">yield</span> . <span class="string">"\n"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$logger = logger(<span class="keyword">__DIR__</span>.<span class="string">'/log'</span>);</span><br><span class="line">var_dump($logger-&gt;send(<span class="string">'Foo'</span>));</span><br><span class="line">var_dump($logger-&gt;send(<span class="string">'Bar'</span>));</span><br></pre></td></tr></table></figure></p>
+<p>这个示例中的函数logger是一个generator函数，它用于写日志，我们看到它里面的yield根本就没有使用圆括号，它被当做一个字符串一样使用，而它的值就是调用logger函数创建的Generator对象的send方法传递过来的。猜一下上面的代码中的两个var_dump的输出是什么？</p>
+<p>所以说yield本身就即是语句，可以像return一样从函数返回值，也是表达式，可以进行求值，还可以像普通变量一样进行运算和操作，例如上面的字符串连接，或者是算术运算。</p>
+<p>跟Generator相关的所有知识基本都已介绍完，在所有这些概念中最关键的连个是：Generator对象和generator函数。</p>
+<h1 id="Generator对象和generator函数的通信"><a href="#Generator对象和generator函数的通信" class="headerlink" title="Generator对象和generator函数的通信"></a><span style="color:#339AFF;">Generator对象和generator函数的通信</span></h1><p>首先申明一点，Generator对象是官方的说法，而generator函数是我自己命名的（注意是小写），这个命名可以把它跟普通函数区分开来，而且这个函数作用就是返回一个Generator对象，而对Generator的操作又会反过来影响generator函数，这些都是通过yield关键字实现的，这相当于可以它们两者之间进行通信，整个过程可以概括为下面4点：</p>
+<ul>
+<li>1.generator函数中的yield语句可以中止generator函数的执行，并且将代码执行权交给Generator对象。这跟函数调用是类似的，return语句可以从子函数中退出，并返回到主函数的调用处，相当于将代码执行权转交给主函数。而且在多任务调度中也有这种模型，这叫非抢占式调度，就是由子任务主动交出调度权，而不是由某个任务调度器来管理，一些老的操作系统是按照这种模式来管理任务调度，现在的采用的都是抢占式调度，会有一个调度管理器来根据任务的优先级以及运行情况来决定调度权，它也可以强制收回某个任务的调度权，这种模式叫做抢占式调度。</li>
+<li>2.generator函数中的yield语句除了让渡调度权，还可以给Generator对象返回数据。</li>
+<li>3.Generator对象可以控制generator函数的执行，可以接收generator函数返回的数据，它有两种控制generator函数执行的方式，一种是next方法，另外一种就是send方法。</li>
+<li>4.Generator对象最重要的特点是可以给generator函数传递数据，这个也是send方法所做的事情。</li>
+</ul>
+<p>再看一个示例：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">nums</span><span class="params">()</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span> ($i = <span class="number">0</span>; $i &lt; <span class="number">5</span>; ++$i) </span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">//get a value from the caller</span></span><br><span class="line">        $cmd = (<span class="keyword">yield</span> $i);</span><br><span class="line">        <span class="keyword">if</span>($cmd == <span class="string">'stop'</span>)</span><br><span class="line">            <span class="keyword">return</span>;<span class="comment">//exit the function</span></span><br><span class="line">    &#125;     </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$gen = nums();</span><br><span class="line"></span><br><span class="line"><span class="keyword">foreach</span>($gen <span class="keyword">as</span> $v)</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span>($v == <span class="number">3</span>)<span class="comment">//we are satisfied</span></span><br><span class="line">        $gen-&gt;send(<span class="string">'stop'</span>);</span><br><span class="line">    <span class="keyword">echo</span> <span class="string">"&#123;$v&#125;\n"</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//Output</span></span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">0</span></span><br><span class="line"><span class="comment">1</span></span><br><span class="line"><span class="comment">2</span></span><br><span class="line"><span class="comment">3</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure></p>
+<p>在这个示例中对nums函数返回的Generator对象的遍历就是从nums函数中获取数据，这相当于从generator函数传递数据给Generator对象，而当Generator对象可以’stop’传递给nums函数来要求终止Generator的遍历了，这相当于从Generator对象到generator函数的通信。</p>
+<h1 id="Generator的作用"><a href="#Generator的作用" class="headerlink" title="Generator的作用"></a><span style="color:#339AFF;">Generator的作用</span></h1><p>如果不考虑用Generator来实现协程，那么Generator的一个最大的作用就是为含有大量数据的集合（当前这些数据集是规则的，就像xrange所返回的那些数据）的遍历节省空间，这一点是显而易见的，我们写一个简单的benchmark来测试一下：比较range函数跟xrange函数的时间和空间的开销，代码如下：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$n = <span class="number">100000</span>;</span><br><span class="line">$startTime = microtime(<span class="keyword">true</span>);</span><br><span class="line">$startMemory = memory_get_usage();</span><br><span class="line">$array = range(<span class="number">1</span>, $n);</span><br><span class="line"></span><br><span class="line"><span class="keyword">foreach</span>($array <span class="keyword">as</span> $a) </span><br><span class="line">&#123;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> memory_get_usage() - $startMemory, <span class="string">" bytes\n"</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">echo</span> microtime(<span class="keyword">true</span>) - $startTime. <span class="string">" ms\n"</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">xrange</span><span class="params">($start,$end,$step=<span class="number">1</span>)</span> </span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">for</span>($i=$start;$i&lt;$end;$i+=$step) </span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">yield</span> $i;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$startTime = microtime(<span class="keyword">true</span>);</span><br><span class="line">$startMemory = memory_get_usage();</span><br><span class="line">$g = xrange(<span class="number">1</span>,$n);</span><br><span class="line"></span><br><span class="line"><span class="keyword">foreach</span>($g <span class="keyword">as</span> $i) </span><br><span class="line">&#123;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">echo</span> memory_get_usage() - $startMemory, <span class="string">" bytes\n"</span>;</span><br><span class="line"><span class="keyword">echo</span> microtime(<span class="keyword">true</span>) - $startTime. <span class="string">" ms\n"</span>;</span><br></pre></td></tr></table></figure></p>
+<p>这段代码的输出为：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">14649152 bytes</span><br><span class="line">0.017426013946533 ms</span><br><span class="line">408 bytes</span><br><span class="line">0.012494802474976 ms</span><br></pre></td></tr></table></figure></p>
+<p>我的php版本是5.5.14，从这个测试可以看出，使用range函数生成一个含有100000个整数的数组，然后对这个数据进行遍历，它需要的存储空间为14649152个字节，大概为14M。而使用Generator则不需要生成出包含所有元素的数组，所以它的空间开销为408个字节，这个差别是非常惊人的，而且在运行时间上也更优，不过这一点上两种方式相差不多。</p>
+<h1 id="练习"><a href="#练习" class="headerlink" title="练习"></a><span style="color:#339AFF;">练习</span></h1><p>最后给大家留一个练习，使用Generator写一个Fibonacci序列生成器，因为Fibonacci数是无穷的，所以请考虑终止的问题。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/设计模式/" rel="tag"># 设计模式</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/03/04/PHP反射机制实现自动依赖注入/" rel="next" title="PHP反射机制实现自动依赖注入">
+                <i class="fa fa-chevron-left"></i> PHP反射机制实现自动依赖注入
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/03/05/PHP算法学习之分治法/" rel="prev" title="PHP算法学习之分治法">
+                PHP算法学习之分治法 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">371</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">60</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2020/03/06/Python的函数式编程/" title="Python的函数式编程" target="_blank">Python的函数式编程</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/03/06/C-动态代理方式实现AOP/" title="C#动态代理方式实现AOP" target="_blank">C#动态代理方式实现AOP</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/03/06/PHP中钩子函数的实现与认识/" title="PHP中钩子函数的实现与认识" target="_blank">PHP中钩子函数的实现与认识</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/03/06/代理和动态代理/" title="代理和动态代理" target="_blank">代理和动态代理</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/03/05/利用php数组函数进行函数式编程/" title="利用php数组函数进行函数式编程" target="_blank">利用php数组函数进行函数式编程</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Iterator接口"><span class="nav-number">1.</span> <span class="nav-text">Iterator接口</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Generator对象"><span class="nav-number">2.</span> <span class="nav-text">Generator对象</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#yield"><span class="nav-number">3.</span> <span class="nav-text">yield</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#多个yield语句"><span class="nav-number">4.</span> <span class="nav-text">多个yield语句</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#send方法"><span class="nav-number">5.</span> <span class="nav-text">send方法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Generator对象和generator函数的通信"><span class="nav-number">6.</span> <span class="nav-text">Generator对象和generator函数的通信</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Generator的作用"><span class="nav-number">7.</span> <span class="nav-text">Generator的作用</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#练习"><span class="nav-number">8.</span> <span class="nav-text">练习</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">3.9m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">58:28</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

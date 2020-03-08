@@ -117,7 +117,7 @@
 <meta property="og:image" content="http://chebincarl.github.io/2019/09/21/状态模式-2/4.png">
 <meta property="og:image" content="http://chebincarl.github.io/2019/09/21/状态模式-2/5.png">
 <meta property="og:image" content="http://chebincarl.github.io/2019/09/21/状态模式-2/6.png">
-<meta property="og:updated_time" content="2019-10-22T11:46:35.847Z">
+<meta property="og:updated_time" content="2020-03-08T06:48:26.048Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="状态模式">
 <meta name="twitter:description" content="思考并回答以下问题：  有些对象也像水一样具有多种状态，这些状态在某些情况下能够相互转换。游戏中是什么对象？ 统一由环境类来负责状态之间的转换和由具体状态类来负责状态之间的转换有什么不同？">
@@ -450,7 +450,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-10-22 19:46:35" itemprop="dateModified" datetime="2019-10-22T19:46:35+08:00">2019-10-22</time>
+                <time title="修改时间：2020-03-08 14:48:26" itemprop="dateModified" datetime="2020-03-08T14:48:26+08:00">2020-03-08</time>
               
             
           </span>
@@ -536,12 +536,10 @@
 <li>统一由环境类来负责状态之间的转换和由具体状态类来负责状态之间的转换有什么不同？</li>
 </ul>
 <a id="more"></a>
-<font size="3">**本章导学**</font>
-
+<p><strong><font size="3">本章导学</font></strong></p>
 <p>状态模式是一种较为复杂的设计模式，用于解决系统中复杂对象的状态转换以及不同状态下行为的封装问题。当系统中的某个对象存在多个状态，这些状态之间可以进行转换，而且对象在不同状态下行为不相同时可以使用状态模式。  </p>
 <p>本章将学习状态模式的定义与结构，分析状态模式的特点，并结合实例学习状态模式的实现过程，学会如何在实际软件项目开发中应用状态模式。</p>
-<font size="3">**本章知识点**</font>
-
+<p><strong><font size="3">本章知识点</font></strong></p>
 <ul>
 <li>状态模式的定义 </li>
 <li>状态模式的结构 </li>
@@ -578,13 +576,11 @@
 <p>(1)统一由环境类来负责状态之间的转换，此时，环境类还充当了状态管理器（StateManager）角色，在环境类的业务方法中通过对某些属性值的判断实现状态转换，也可以提供一个专门的方法用于实现属性判断和状态转换，代码片段如下：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ChangeState</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// 判断属性值，根据属性值进行状态转换</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">value</span> == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">this</span>.SetState(<span class="keyword">new</span> ConcreteStateA());</span><br><span class="line">    &#125; </span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (<span class="keyword">value</span> == <span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">this</span>.SetState(<span class="keyword">new</span> ConcreteStateB());</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
 <p>(2)由具体状态类来负责状态之间的转换，可以在具体状态类的业务方法中判断环境类的某些属性值，再根据情况为环境类设置新的状态对象，实现状态变换。同样，也可以提供一个专门的方法来负责属性值的判断和状态转换。此时，状态类与环境类之间将存在依赖或关联关系，因为状态类需要访问环境类中的属性值，具体状态类ConcreteStateA的代码片段如下：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">ChangeState</span>(<span class="params">Context ctx</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">// 根据环境对象中的属性值进行状态转换</span></span><br><span class="line">    <span class="keyword">if</span> (ctx.<span class="keyword">value</span> == <span class="number">1</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        ctx.SetState(<span class="keyword">new</span> ConcreteStateB());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (ctx.<span class="keyword">value</span> == <span class="number">2</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        ctx.SetState(<span class="keyword">new</span> ConcreteStateC());</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br><span class="line">...</span><br></pre></td></tr></table></figure></p>
 <h1 id="状态模式的应用实例"><a href="#状态模式的应用实例" class="headerlink" title="状态模式的应用实例"></a><span style="color:#339AFF;">状态模式的应用实例</span></h1><p>下面通过一个应用实例来进一步学习和理解状态模式。  </p>
-<font size="3">**1.实例说明**</font>
-
+<p><strong><font size="3">1.实例说明</font></strong></p>
 <blockquote>
 <p>某软件公司要为一银行开发一套信用卡业务系统，银行账户（Account）是该系统的核心类之一，通过分析，该软件公司开发人员发现在系统中账户存在3种状态，且在不同状态下账户存在不同的行为，具体说明如下：<br><br>(1)如果账户中余额大于等于0，则账户的状态为正常状态（NormalState），此时用户既可以向该账户存款也可以从该账户取款。<br><br>(2)如果账户中余额小于0，并且大于-2000，则账户的状态为透支状态（OverdraftState），此时用户既可以向该账户存款也可以从该账户取款，但需要按天计算利息。<br><br>(3)如果账户中余额等于-2000，那么账户的状态为受限状态（RestrictedState），此时用户只能向该账户存款，不能再从中取款，同时也将按天计算利息。<br><br>(4)根据余额的不同，以上3种状态可发生相互转换。<br><br>现使用状态模式设计并实现银行账户状态的转换。</p>
 </blockquote>
-<font size="3">**2.实例类图**</font>
-
+<p><strong><font size="3">2.实例类图</font></strong></p>
 <p>通过对银行账户类进行分析，可以绘制出图3所示的UML状态图。</p>
 <blockquote>
 <p>图3 银行账户状态图</p>
@@ -597,8 +593,7 @@
 </blockquote>
 <img src="/2019/09/21/状态模式-2/4.png">
 <p>在图4中，Account充当环境类角色，AccountState充当抽象状态类角色，NormalState、OverdraftState和RestrictedState充当具体状态类角色。</p>
-<font size="3">**3.实例代码**</font>
-
+<p><strong><font size="3">3.实例代码</font></strong></p>
 <p>(1)Account：银行账户，充当环境类。</p>
 <blockquote>
 <p>Account.cs</p>
@@ -629,8 +624,7 @@
 <p>Program.cs</p>
 </blockquote>
 <figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">StateSample</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="keyword">string</span>[] args</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            Account acc = <span class="keyword">new</span> Account(<span class="string">"段誉"</span>, <span class="number">0.0</span>);</span><br><span class="line">            acc.Deposit(<span class="number">1000</span>);</span><br><span class="line">            acc.Withdraw(<span class="number">2000</span>); <span class="comment">// ①</span></span><br><span class="line">            acc.Deposit(<span class="number">3000</span>);</span><br><span class="line">            acc.Withdraw(<span class="number">4000</span>); <span class="comment">// ②</span></span><br><span class="line">            acc.Withdraw(<span class="number">1000</span>); <span class="comment">// ③</span></span><br><span class="line">            acc.ComputeInterest();</span><br><span class="line"></span><br><span class="line">            Console.Read();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<font size="3">**4.结果及分析**</font>
-
+<p><strong><font size="3">4.结果及分析</font></strong></p>
 <p>编译并运行程序，输出结果如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">段誉开户，初始金额为0</span><br><span class="line">---------------------------------------------</span><br><span class="line">段誉存款1000</span><br><span class="line">现在余额为1000</span><br><span class="line">现在账户状态为StateSample.NormalState</span><br><span class="line">---------------------------------------------</span><br><span class="line">①段誉取款2000</span><br><span class="line">现在余额为-1000</span><br><span class="line">现在账户状态为StateSample.OverdraftState</span><br><span class="line">---------------------------------------------</span><br><span class="line">段誉存款3000</span><br><span class="line">现在余额为2000</span><br><span class="line">现在账户状态为StateSample.NormalState</span><br><span class="line">---------------------------------------------</span><br><span class="line">②段誉取款4000</span><br><span class="line">现在余额为-2000</span><br><span class="line">现在账户状态为StateSample.RestrictedState</span><br><span class="line">---------------------------------------------</span><br><span class="line">③段誉取款1000</span><br><span class="line">账号受限，取款失败</span><br><span class="line">现在余额为-2000</span><br><span class="line">现在账户状态为StateSample.RestrictedState</span><br><span class="line">---------------------------------------------</span><br><span class="line">计算利息！</span><br></pre></td></tr></table></figure></p>
 <p>①②③部分对应客户端代码中3次调用取款方法Withdraw()的输出结果，由于对象状态不一样，因此这3次输出结果有所差异。第一次取款后账户状态由正常状态（NormalState）变为透支状态（OverdraftState）；第二次取款后账户状态由正常状态（NormalState）变为受限状态（RestrictedState）；在第三次取款时，由于账户状态已经为受限状态，因此取款失败。这3次取款操作体现了对象在不同状态下具有不同的行为，而且对象的转换是自动的，客户端无须关心其转换细节。</p>
 <h1 id="共享状态"><a href="#共享状态" class="headerlink" title="共享状态"></a><span style="color:#339AFF;">共享状态</span></h1><p>在有些情况下，多个环境对象可能需要共享同一个状态，如果希望在系统中实现多个环境对象共享一个或多个状态对象，那么需要将这些状态对象定义为环境类的静态成员对象。下面通过一个简单实例来说明如何实现共享状态。</p>
@@ -710,30 +704,21 @@
 <h1 id="状态模式的优缺点与适用环境"><a href="#状态模式的优缺点与适用环境" class="headerlink" title="状态模式的优缺点与适用环境"></a><span style="color:#339AFF;">状态模式的优缺点与适用环境</span></h1><p>状态模式将一个对象在不同状态下的不同行为封装在一个个状态类中，通过设置不同的状态对象可以让环境对象拥有不同的行为，而状态转换的细节对于客户端而言是透明的，方便了客户端的使用。在实际开发中，状态模式具有较高的使用频率，在工作流、游戏等软件中状态模式都得到了广泛的应用，例如公文状态的转换、游戏中角色的升级等。</p>
 <h2 id="状态模式的优点"><a href="#状态模式的优点" class="headerlink" title="状态模式的优点"></a><span style="color:#00ACC1;">状态模式的优点</span></h2><p>状态模式的主要优点如下：</p>
 <ul>
-<li><p>(1)状态模式封装了状态的转换规则，在状态模式中可以将状态的转换代码封装在环境类或者具体状态类中，可以对状态转换代码进行集中管理，而不是分散在一个个业务方法中。  </p>
-</li>
-<li><p>(2)状态模式将所有与某个状态有关的行为放到一个类中，只需注入一个不同的状态对象即可使环境对象拥有不同的行为。  </p>
-</li>
-<li><p>(3)状态模式允许状态转换逻辑与状态对象合成一体，而不是提供一个巨大的条件语句块，状态模式可以避免使用庞大的条件语句将业务方法和状态转换代码交织在一起。</p>
-</li>
-<li><p>(4)状态模式可以让多个环境对象共享一个状态对象，从而减少系统中对象的个数。</p>
-</li>
+<li>(1)状态模式封装了状态的转换规则，在状态模式中可以将状态的转换代码封装在环境类或者具体状态类中，可以对状态转换代码进行集中管理，而不是分散在一个个业务方法中。  </li>
+<li>(2)状态模式将所有与某个状态有关的行为放到一个类中，只需注入一个不同的状态对象即可使环境对象拥有不同的行为。  </li>
+<li>(3)状态模式允许状态转换逻辑与状态对象合成一体，而不是提供一个巨大的条件语句块，状态模式可以避免使用庞大的条件语句将业务方法和状态转换代码交织在一起。</li>
+<li>(4)状态模式可以让多个环境对象共享一个状态对象，从而减少系统中对象的个数。</li>
 </ul>
 <h2 id="状态模式的缺点"><a href="#状态模式的缺点" class="headerlink" title="状态模式的缺点"></a><span style="color:#00ACC1;">状态模式的缺点</span></h2><p>状态模式的主要缺点如下：</p>
 <ul>
-<li><p>(1)状态模式会增加系统中类和对象的个数，导致系统运行开销增大。  </p>
-</li>
-<li><p>(2)其结构与实现都较为复杂，如果使用不当将导致程序结构和代码混乱，增加系统设计的难度。</p>
-</li>
-<li><p>(3)状态模式对开闭原则的支持并不太好，增加新的状态类需要修改负责状态转换的源代码，否则无法转换到新增状态，而且修改某个状态类的行为也需要修改对应类的源代码。</p>
-</li>
+<li>(1)状态模式会增加系统中类和对象的个数，导致系统运行开销增大。  </li>
+<li>(2)其结构与实现都较为复杂，如果使用不当将导致程序结构和代码混乱，增加系统设计的难度。</li>
+<li>(3)状态模式对开闭原则的支持并不太好，增加新的状态类需要修改负责状态转换的源代码，否则无法转换到新增状态，而且修改某个状态类的行为也需要修改对应类的源代码。</li>
 </ul>
 <h2 id="状态模式的适用环境"><a href="#状态模式的适用环境" class="headerlink" title="状态模式的适用环境"></a><span style="color:#00ACC1;">状态模式的适用环境</span></h2><p>在以下情况下可以考虑使用状态模式：</p>
 <ul>
-<li><p>(1)对象的行为依赖于它的状态（例如某些属性值），状态的改变将导致行为的变化。</p>
-</li>
-<li><p>(2)在代码中包含大量与对象状态有关的条件语句，这些条件语句的出现会导致代码的可维护性和灵活性变差，不能方便地增加和删除状态，并且导致客户类与类库之间的耦合增强。</p>
-</li>
+<li>(1)对象的行为依赖于它的状态（例如某些属性值），状态的改变将导致行为的变化。</li>
+<li>(2)在代码中包含大量与对象状态有关的条件语句，这些条件语句的出现会导致代码的可维护性和灵活性变差，不能方便地增加和删除状态，并且导致客户类与类库之间的耦合增强。</li>
 </ul>
 <h1 id="本章小结"><a href="#本章小结" class="headerlink" title="本章小结"></a><span style="color:#339AFF;">本章小结</span></h1><p>(1)在状态模式中，允许一个对象在其内部状态改变时改变它的行为，对象看起来似乎修改了它的类。状态模式是一种对象行为型模式。  </p>
 <p>(2)状态模式包含环境类、抽象状态类和具体状态类3个角色。其中，环境类是拥有多种状态的对象；抽象状态类用于定义一个接口以封装与环境类的一个特定状态相关的行为，在抽象状态类中声明了各种不同状态对应的方法，而在其子类中实现了这些方法；具体状态类是抽象状态类的子类，每一个具体状态类实现一个与环境类的一个状态相关的行为，对应环境类的一个具体状态，不同的具体状态类其行为有所不同。  </p>
@@ -777,8 +762,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/09/20/外观模式-2/" rel="next" title="外观模式">
-                <i class="fa fa-chevron-left"></i> 外观模式
+              <a href="/2019/09/21/观察者模式-1/" rel="next" title="观察者模式">
+                <i class="fa fa-chevron-left"></i> 观察者模式
               </a>
             
           </div>
@@ -860,7 +845,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">355</span>
+                    <span class="site-state-item-count">371</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -893,7 +878,11 @@
                     
                       
                     
-                    <span class="site-state-item-count">8</span>
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">10</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -1022,7 +1011,15 @@
                     
                       
                     
-                    <span class="site-state-item-count">56</span>
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">60</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -1053,23 +1050,23 @@
                 
                 
                   <li>
-                    <a href="/2020/02/22/游戏设计信条：从创意到制作的设计原则/" title="游戏设计信条：从创意到制作的设计原则" target="_blank">游戏设计信条：从创意到制作的设计原则</a>
+                    <a href="/2020/03/06/Python的函数式编程/" title="Python的函数式编程" target="_blank">Python的函数式编程</a>
                   </li>
                 
                   <li>
-                    <a href="/2020/02/16/游戏设计快乐之道（第2版）/" title="游戏设计快乐之道（第2版）" target="_blank">游戏设计快乐之道（第2版）</a>
+                    <a href="/2020/03/06/C-动态代理方式实现AOP/" title="C#动态代理方式实现AOP" target="_blank">C#动态代理方式实现AOP</a>
                   </li>
                 
                   <li>
-                    <a href="/2020/02/14/游戏剧本怎么写/" title="游戏剧本怎么写" target="_blank">游戏剧本怎么写</a>
+                    <a href="/2020/03/06/PHP中钩子函数的实现与认识/" title="PHP中钩子函数的实现与认识" target="_blank">PHP中钩子函数的实现与认识</a>
                   </li>
                 
                   <li>
-                    <a href="/2020/02/04/通关！游戏设计之道（第2版）/" title="通关！游戏设计之道（第2版）" target="_blank">通关！游戏设计之道（第2版）</a>
+                    <a href="/2020/03/06/代理和动态代理/" title="代理和动态代理" target="_blank">代理和动态代理</a>
                   </li>
                 
                   <li>
-                    <a href="/2020/01/26/游戏设计艺术（第2版）/" title="游戏设计艺术（第2版）" target="_blank">游戏设计艺术（第2版）</a>
+                    <a href="/2020/03/05/利用php数组函数进行函数式编程/" title="利用php数组函数进行函数式编程" target="_blank">利用php数组函数进行函数式编程</a>
                   </li>
                 
               </ul>
@@ -1130,7 +1127,7 @@
     
       <span class="post-meta-item-text">站点总字数：</span>
     
-    <span title="站点总字数">3.7m</span>
+    <span title="站点总字数">3.9m</span>
   
 
   
@@ -1141,7 +1138,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">56:30</span>
+    <span title="站点阅读时长">58:28</span>
   
 </div>
 

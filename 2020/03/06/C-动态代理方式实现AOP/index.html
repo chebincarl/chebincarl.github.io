@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="思考并回答以下问题：">
+<meta name="keywords" content="设计模式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="C#动态代理方式实现AOP">
+<meta property="og:url" content="http://chebincarl.github.io/2020/03/06/C-动态代理方式实现AOP/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="思考并回答以下问题：">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://chebincarl.github.io/2020/03/06/C-动态代理方式实现AOP/1.png">
+<meta property="og:updated_time" content="2020-03-07T00:24:23.029Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="C#动态代理方式实现AOP">
+<meta name="twitter:description" content="思考并回答以下问题：">
+<meta name="twitter:image" content="http://chebincarl.github.io/2020/03/06/C-动态代理方式实现AOP/1.png">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2020/03/06/C-动态代理方式实现AOP/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>C#动态代理方式实现AOP | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">专注，重复10遍</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2020/03/06/C-动态代理方式实现AOP/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">C#动态代理方式实现AOP
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2020-03-06 11:55:54" itemprop="dateCreated datePublished" datetime="2020-03-06T11:55:54+08:00">2020-03-06</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2020-03-07 08:24:23" itemprop="dateModified" datetime="2020-03-07T08:24:23+08:00">2020-03-07</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/设计模式/" itemprop="url" rel="index"><span itemprop="name">设计模式</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">12k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">11 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>思考并回答以下问题：</p>
+<a id="more"></a>
+<p>本章涵盖：</p>
+<ul>
+<li>AOP简述</li>
+<li>利用动态代理实现AOP</li>
+<li>总结</li>
+</ul>
+<p>面向对象的思想强调”一切皆是对象”，在面向对象的程序中我们使用真实概念的模型思考问题，使得整个软件系统开发可以像搭建房屋一样有条不紊。然而面向对象也并非完美无缺的，它更注重于对象层次结构方面的东西，对于如何更好的管理对象行为内部结构，还存在着些许不足。那么我们如何使这个问题的得到更完美的解决呢？答案就是AOP。</p>
+<h1 id="AOP简述"><a href="#AOP简述" class="headerlink" title="AOP简述"></a>AOP简述</h1><p>AOP的概念早在上个世纪九十年代初就已经出现了，当时的研究人员通过对面向对象思想局限性的分析研究出了一种新的编程思想来帮助开发者减少代码重复提高开发效率，那就是AOP，Aspect-Oriented Programming。AOP是OOP的补充，是GOF的延续。我们知道设计模式是对于面向对象设计中经验的总结，它孜孜不断追求的就是调用者与被调用者之间的解耦。有了设计模式我们可以更有效的利用面向对象的特性，使得整个软件设计更加灵活、优雅。但是设计模式是基于面向对象的思想而形成的，更多的时候关注的是对象层次的东西，在解决对象行为内部问题方面却有些不足。AOP的出现恰恰就是对面向对象思想做出了完美的补充。</p>
+<img src="/2020/03/06/C-动态代理方式实现AOP/1.png">
+<p>上图显示了软件的纵向和横向结构，从纵向结构来看就是我们软件系统的各个模块，它主要负责处理我们的核心业务（例如商品订购、购物车查看）；而从横向结构来看，我们几乎每个系统又包含一些公共模块（例如权限、日志模块等）。这些公共模块分布于我们各个核心业务之中（例如订购和查看商品明细的过程都需要检查用户权限、记录系统日志等）。这样一来不仅在开发过程中要处处关注公共模块的处理而且开发后维护起来也是十分麻烦。而有了AOP之后将应用程序中的商业逻辑同对其提供支持的通用服务进行分离，使得开发人员可以更多的关注核心业务开发。</p>
+<h1 id="利用动态代理实现AOP"><a href="#利用动态代理实现AOP" class="headerlink" title="利用动态代理实现AOP"></a>利用动态代理实现AOP</h1><p>上面我们说了一些关于AOP所要解决的问题以及这样做的好处，下面我们主要看一下如何实现AOP。<br>AOP的实现一般分为：动态代理（DynamicProxy）和静态织入（StaticWeave）两种方式。这里我们主要说的是如何利用Emit来自己实现动态代理方式的AOP，以此来帮助大家更深入的理解AOP。<br>在开始动态代理之前假设我们有这样一个类，它是负责处理我们的业务逻辑的。<br>先看对应接口<br><figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> System.Linq;</span><br><span class="line"><span class="keyword">using</span> System.Text;</span><br><span class="line"></span><br><span class="line">namespaceDanymicProxy</span><br><span class="line">&#123;</span><br><span class="line">   interfaceIBusinessLogic</span><br><span class="line">   &#123;</span><br><span class="line">       voidShowMessage(<span class="keyword">string</span> msg);</span><br><span class="line">       intCalculate();</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>相应的类<br><figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> System.Linq;</span><br><span class="line"><span class="keyword">using</span> System.Text;</span><br><span class="line"></span><br><span class="line">namespaceDanymicProxy</span><br><span class="line">&#123;</span><br><span class="line">   publicclass MyBusinessLogic:IBusinessLogic</span><br><span class="line">   &#123;</span><br><span class="line">       <span class="function">publicvirtualvoid <span class="title">ShowMessage</span>(<span class="params"><span class="keyword">string</span> msg</span>)</span></span><br><span class="line"><span class="function"></span>       &#123;</span><br><span class="line">           Console.WriteLine(msg);</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="function">publicvirtualint <span class="title">Calculate</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>       &#123;</span><br><span class="line">           <span class="keyword">int</span> sum=<span class="number">0</span>;</span><br><span class="line">           <span class="keyword">for</span> (<span class="keyword">int</span> i =<span class="number">1</span>; i &lt;=<span class="number">100</span>; ++i)</span><br><span class="line">           &#123;</span><br><span class="line">               sum +=+ i;</span><br><span class="line">           &#125;</span><br><span class="line">           Console.WriteLine(sum);</span><br><span class="line">           <span class="keyword">return</span> sum;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>现在我们需要给所有的核心业务添加日志记录功能，此时大概会有下面几种选择：<br>1.在ShowMessage和Calculate内部都添加上记录日志的代码 。<br><figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> System.Linq;</span><br><span class="line"><span class="keyword">using</span> System.Text;</span><br><span class="line"></span><br><span class="line">namespaceDanymicProxy</span><br><span class="line">&#123;</span><br><span class="line">   publicclass MyBusinessLogic:IBusinessLogic</span><br><span class="line">   &#123;</span><br><span class="line">       <span class="function">publicvirtualvoid <span class="title">ShowMessage</span>(<span class="params"><span class="keyword">string</span> msg</span>)</span></span><br><span class="line"><span class="function"></span>       &#123;</span><br><span class="line">           Console.WriteLine(DateTime.Now.ToString() +“:DanymicProxy.MyBusinessLogic ShowMessage <span class="keyword">is</span> called!”);</span><br><span class="line">           Console.WriteLine(msg);</span><br><span class="line">           Console.WriteLine(DateTime.Now.ToString() +“:DanymicProxy.MyBusinessLogic ShowMessage has finished!”);</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="function">publicvirtualint <span class="title">Calculate</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>       &#123;</span><br><span class="line">           Console.WriteLine(DateTime.Now.ToString() +“:DanymicProxy.Calculate ShowMessage <span class="keyword">is</span> called!”);</span><br><span class="line">           <span class="keyword">int</span> sum=<span class="number">0</span>;</span><br><span class="line">           <span class="keyword">for</span> (<span class="keyword">int</span> i =<span class="number">1</span>; i &lt;=<span class="number">100</span>; ++i)</span><br><span class="line">           &#123;</span><br><span class="line">               sum +=+ i;</span><br><span class="line">           &#125;</span><br><span class="line">           Console.WriteLine(sum);</span><br><span class="line">           Console.WriteLine(DateTime.Now.ToString() +“:DanymicProxy.Calculate ShowMessage has finished!”);</span><br><span class="line">           <span class="keyword">return</span> sum;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>2.重新写一个类继承于MyBusinessLogic并对其中的方法重写。<br><figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> System.Linq;</span><br><span class="line"><span class="keyword">using</span> System.Text;</span><br><span class="line"></span><br><span class="line">namespaceDanymicProxy</span><br><span class="line">&#123;</span><br><span class="line">   classMyBusinessLogicDecoration:MyBusinessLogic</span><br><span class="line">   &#123;</span><br><span class="line">       <span class="function">publicoverridevoid <span class="title">ShowMessage</span>(<span class="params"><span class="keyword">string</span> msg</span>)</span></span><br><span class="line"><span class="function"></span>       &#123;</span><br><span class="line">           Console.WriteLine(DateTime.Now.ToString() +“:DanymicProxy.MyBusinessLogic ShowMessage <span class="keyword">is</span> called!”);</span><br><span class="line">           <span class="keyword">base</span>.ShowMessage(msg);</span><br><span class="line">           Console.WriteLine(DateTime.Now.ToString() +“:DanymicProxy.MyBusinessLogic ShowMessage has finished!”);</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="function">publicoverrideint <span class="title">Calculate</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>       &#123;</span><br><span class="line">           Console.WriteLine(DateTime.Now.ToString() +“:DanymicProxy.Calculate ShowMessage <span class="keyword">is</span> called!”);</span><br><span class="line">           <span class="keyword">int</span> t=<span class="keyword">base</span>.Calculate();</span><br><span class="line">           Console.WriteLine(DateTime.Now.ToString() +“:DanymicProxy.Calculate ShowMessage has finished!”);</span><br><span class="line">           <span class="keyword">return</span> t;</span><br><span class="line"></span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>3.写一个静态代理类。<br>首先看一下代理中用到的拦截器接口<br><figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> System.Linq;</span><br><span class="line"><span class="keyword">using</span> System.Text;</span><br><span class="line"></span><br><span class="line">namespaceDanymicProxy</span><br><span class="line">&#123;</span><br><span class="line">   publicinterface IInterceptor</span><br><span class="line">   &#123;</span><br><span class="line">       objectInvoke(<span class="keyword">object</span> obj,<span class="keyword">string</span> methodName,<span class="keyword">object</span>[] parameters);</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>然后编写一个操作日志的拦截器<br><figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> System.Linq;</span><br><span class="line"><span class="keyword">using</span> System.Text;</span><br><span class="line"></span><br><span class="line">namespaceDanymicProxy</span><br><span class="line">&#123;</span><br><span class="line">   publicclass LogInterceptor:IInterceptor</span><br><span class="line">   &#123;</span><br><span class="line"></span><br><span class="line">       <span class="function">publicobject <span class="title">Invoke</span>(<span class="params"><span class="keyword">object</span> obj, <span class="keyword">string</span> methodName, <span class="keyword">object</span>[] parameters</span>)</span></span><br><span class="line"><span class="function"></span>       &#123;</span><br><span class="line">           Console.WriteLine(DateTime.Now.ToString()+“:”+obj.ToString()+“‘s “+methodName+” <span class="keyword">is</span> called!”);</span><br><span class="line">           <span class="keyword">object</span> rst= obj.GetType().GetMethod(methodName).Invoke(obj,parameters);</span><br><span class="line">           Console.WriteLine(DateTime.Now.ToString() +“:”+ obj.ToString() +“‘s “+ methodName +” has finished!”);</span><br><span class="line">           <span class="keyword">return</span> rst;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>再看静态代理类<br><figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> System.Linq;</span><br><span class="line"><span class="keyword">using</span> System.Text;</span><br><span class="line"><span class="keyword">using</span> DanymicProxy;</span><br><span class="line"></span><br><span class="line">namespaceDanymicProxy</span><br><span class="line">&#123;</span><br><span class="line">   classMyBusinessLogicProxy</span><br><span class="line">   &#123;</span><br><span class="line">       <span class="keyword">private</span> IInterceptor _interceptor =<span class="literal">null</span>;</span><br><span class="line">       publicMyBusinessLogicProxy(IInterceptor interceptor)</span><br><span class="line">       &#123;</span><br><span class="line">           _interceptor = interceptor;</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="function">publicvirtualvoid <span class="title">ShowMessage</span>(<span class="params"><span class="keyword">string</span> msg</span>)</span></span><br><span class="line"><span class="function"></span>       &#123;</span><br><span class="line">           _interceptor.Invoke(<span class="keyword">new</span> MyBusinessLogic(), “ShowMessage”, newobject[] &#123; msg &#125;);</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       <span class="function">publicvirtualint <span class="title">Calculate</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>       &#123;</span><br><span class="line">           <span class="keyword">return</span> Convert.ToInt32(_interceptor.Invoke(<span class="keyword">new</span> MyBusinessLogic(), “Calculate”, <span class="literal">null</span>));</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>接着我们可以使用下面的代码做测试<br><figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> System.Linq;</span><br><span class="line"><span class="keyword">using</span> System.Text;</span><br><span class="line"></span><br><span class="line">namespaceDanymicProxy</span><br><span class="line">&#123;</span><br><span class="line">   classProgram</span><br><span class="line">   &#123;</span><br><span class="line">       <span class="function">staticvoid <span class="title">Main</span>(<span class="params"><span class="keyword">string</span>[] args</span>)</span></span><br><span class="line"><span class="function"></span>       &#123;</span><br><span class="line">           (<span class="keyword">new</span> MyBusinessLogicProxy(<span class="keyword">new</span> LogInterceptor())).ShowMessage(“Hello World!”);</span><br><span class="line">           (<span class="keyword">new</span> MyBusinessLogicProxy(<span class="keyword">new</span> LogInterceptor())).Calculate();;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>4.使用动态代理<br>相对于前两种方法，第三种方法应该算是比较好的方法了，可是做起来比较麻烦。不仅必须给每个业务类都重新写一个包含日志处理的代理类，而且如果我有其他类似日志处理的模块（例如权限模块）需要添加还要再写包含其他功能的代理类。这样做起来不仅工作量大，而且再维护起来也十分麻烦。怎么办?方法就是使用动态代理。<br>我们下面要实现的动态代理，其运行机制和上面说的静态代理可以说是完全相同的（事实上我们编写Emit的时候就是仿照静态代理类来写的），只不过重复写代理类的工作交给程序来做了而已。<br>具体过程：首先根据泛型类型创建名字为”泛型+Proxy”的类；在类中声明一个IInterceptor型的私有变量_interceptor赋值为null；接着创建构造函数，其参数为IInterceptor类型；然后我们遍历泛型中的方法，创建名称、返回类型、参数均与泛型方法一致的方法，然后在方法中使用interceptor的Invoke方法调用对应的方法（参数分别为泛型对象、方法名和参数）；最后实例化此类，并将其返回。<br><figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> System.Linq;</span><br><span class="line"><span class="keyword">using</span> System.Text;</span><br><span class="line"><span class="keyword">using</span> System.Reflection;</span><br><span class="line"><span class="keyword">using</span> System.Reflection.Emit;</span><br><span class="line"></span><br><span class="line">namespaceDanymicProxy</span><br><span class="line">&#123;</span><br><span class="line">   publicclass Proxy&lt;T&gt;<span class="keyword">where</span> T:<span class="keyword">class</span></span><br><span class="line">   &#123;</span><br><span class="line">       <span class="function">publicstatic T <span class="title">CreateProxy</span>(<span class="params">IInterceptor interceptor</span>)</span></span><br><span class="line"><span class="function"></span>       &#123;</span><br><span class="line">           <span class="comment">//构建程序集</span></span><br><span class="line">           AssemblyName aName =<span class="keyword">new</span> AssemblyName(“Cmj.DotNet”);</span><br><span class="line">           AppDomain aDomain = AppDomain.CurrentDomain;<span class="comment">//应用程序域，这里设为当前域</span></span><br><span class="line">           AssemblyBuilder aBuidler = aDomain.DefineDynamicAssembly(aName, AssemblyBuilderAccess.RunAndSave);</span><br><span class="line">           <span class="comment">//定义模块</span></span><br><span class="line">           ModuleBuilder mBuidler = aBuidler.DefineDynamicModule(“MyModule”,“Cmj.DotNet.dll”);</span><br><span class="line">           <span class="comment">//创建类型(其实就是一个类)</span></span><br><span class="line">           StringBuilder sbClassName =<span class="keyword">new</span> StringBuilder(“Cmj.DotNet.”);</span><br><span class="line">           sbClassName.Append(<span class="keyword">typeof</span>(T).Name);</span><br><span class="line">           sbClassName.Append(“Proxy”);</span><br><span class="line">           TypeBuilder tBuidler = mBuidler.DefineType(sbClassName.ToString(), TypeAttributes.Public | TypeAttributes.Class,<span class="keyword">typeof</span>(T));<span class="comment">//继承于T</span></span><br><span class="line"></span><br><span class="line">           <span class="comment">//–实现类–//</span></span><br><span class="line">           <span class="comment">//定义私有字段</span></span><br><span class="line">           FieldBuilder fbInterceptor = tBuidler.DefineField(“_interceptor”, <span class="keyword">typeof</span>(IInterceptor), FieldAttributes.Private);</span><br><span class="line">           <span class="comment">//为私有变量赋值</span></span><br><span class="line">           fbInterceptor.SetConstant(<span class="literal">null</span>);</span><br><span class="line">           <span class="comment">//定义构造函数</span></span><br><span class="line">           ConstructorBuilder ctstBuilder = tBuidler.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, <span class="keyword">new</span> Type[] &#123; <span class="keyword">typeof</span>(IInterceptor)&#125;);</span><br><span class="line">           ILGenerator ctstGenerator = ctstBuilder.GetILGenerator();</span><br><span class="line">           ctstGenerator.Emit(OpCodes.Ldarg_0);</span><br><span class="line">           ctstGenerator.Emit(OpCodes.Ldarg_1);</span><br><span class="line">           ctstGenerator.Emit(OpCodes.Stfld, fbInterceptor);<span class="comment">//给字段赋值</span></span><br><span class="line">           ctstGenerator.Emit(OpCodes.Ret);</span><br><span class="line">           <span class="comment">//定义方法</span></span><br><span class="line">           MethodInfo[] methods =<span class="keyword">typeof</span>(T).GetMethods(BindingFlags.Instance | BindingFlags.Public);</span><br><span class="line">           Type retType=<span class="literal">null</span>;</span><br><span class="line">           Type[] paramsType=<span class="literal">null</span>;</span><br><span class="line">           ParameterInfo[] parameters=<span class="literal">null</span>;</span><br><span class="line">           MethodBuilder mtdBuidler=<span class="literal">null</span>;</span><br><span class="line">           ILGenerator mtdGenerator =<span class="literal">null</span>;</span><br><span class="line">           <span class="keyword">foreach</span> (MethodInfo method <span class="keyword">in</span> methods)</span><br><span class="line">           &#123;</span><br><span class="line">               <span class="keyword">if</span> (method.Name !=“ToString”&amp;&amp; method.Name !=“Equals”&amp;&amp; method.Name !=“GetHashCode”&amp;&amp; method.Name !=“GetType”)</span><br><span class="line">               &#123;</span><br><span class="line">                   <span class="comment">//获得返回值类型</span></span><br><span class="line">                   retType = method.ReturnType;</span><br><span class="line">                   <span class="comment">//获得参数类型</span></span><br><span class="line">                   parameters = method.GetParameters();</span><br><span class="line">                   paramsType =<span class="keyword">new</span> Type[parameters.Length];</span><br><span class="line">                   <span class="keyword">for</span> (<span class="keyword">int</span> i =<span class="number">0</span>; i &lt; parameters.Length; ++i)</span><br><span class="line">                   &#123;</span><br><span class="line">                       paramsType[i] = parameters[i].ParameterType;</span><br><span class="line">                   &#125;</span><br><span class="line">                   <span class="comment">//实现方法体</span></span><br><span class="line">                   mtdBuidler = tBuidler.DefineMethod(method.Name, MethodAttributes.Public|MethodAttributes.Virtual, CallingConventions.Standard, retType, paramsType);</span><br><span class="line">                   mtdGenerator = mtdBuidler.GetILGenerator();</span><br><span class="line">                   mtdGenerator.Emit(OpCodes.Ldarg_0);</span><br><span class="line">                   mtdGenerator.Emit(OpCodes.Ldfld, fbInterceptor);</span><br><span class="line">                   mtdGenerator.Emit(OpCodes.Newobj, <span class="keyword">typeof</span>(T).GetConstructor(<span class="keyword">new</span> Type[<span class="number">0</span>]));</span><br><span class="line">                   mtdGenerator.Emit(OpCodes.Ldstr, method.Name);</span><br><span class="line">                   <span class="keyword">if</span> (paramsType.Length ==<span class="number">0</span>)</span><br><span class="line">                   &#123;</span><br><span class="line">                       mtdGenerator.Emit(OpCodes.Ldnull);</span><br><span class="line">                   &#125;</span><br><span class="line">                   <span class="keyword">else</span></span><br><span class="line">                   &#123;</span><br><span class="line">                       LocalBuilder paras = mtdGenerator.DeclareLocal(<span class="keyword">typeof</span>(<span class="keyword">object</span>[]));</span><br><span class="line">                       mtdGenerator.Emit(OpCodes.Ldc_I4, paramsType.Length);</span><br><span class="line">                       mtdGenerator.Emit(OpCodes.Newarr, <span class="keyword">typeof</span>(<span class="keyword">object</span>));</span><br><span class="line">                       mtdGenerator.Emit(OpCodes.Stloc, paras);</span><br><span class="line"></span><br><span class="line">                       <span class="keyword">for</span> (<span class="keyword">var</span> j =<span class="number">0</span>; j &lt; paramsType.Length; j++)</span><br><span class="line">                       &#123;</span><br><span class="line">                           mtdGenerator.Emit(OpCodes.Ldloc, paras);</span><br><span class="line">                           mtdGenerator.Emit(OpCodes.Ldc_I4, j);</span><br><span class="line">                           mtdGenerator.Emit(OpCodes.Ldarg, j +<span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">                           mtdGenerator.Emit(OpCodes.Stelem_Ref);</span><br><span class="line">                       &#125;</span><br><span class="line">                       mtdGenerator.Emit(OpCodes.Ldloc, paras);</span><br><span class="line">                   &#125;</span><br><span class="line">                   mtdGenerator.Emit(OpCodes.Callvirt, <span class="keyword">typeof</span>(IInterceptor).GetMethod(“Invoke”));</span><br><span class="line">                   <span class="keyword">if</span> (retType ==<span class="keyword">typeof</span>(<span class="keyword">void</span>))</span><br><span class="line">                   &#123;</span><br><span class="line">                       mtdGenerator.Emit(OpCodes.Pop);</span><br><span class="line">                   &#125;</span><br><span class="line">                   mtdGenerator.Emit(OpCodes.Ret);</span><br><span class="line">               &#125;</span><br><span class="line">           &#125;</span><br><span class="line"></span><br><span class="line">           <span class="comment">//创建引用、调用方法</span></span><br><span class="line">           Type proxyType = tBuidler.CreateType();</span><br><span class="line">           aBuidler.Save(“Cmj.DotNet.dll”);</span><br><span class="line">           <span class="keyword">object</span> proxy = Activator.CreateInstance(proxyType, newobject[]&#123; interceptor&#125;);<span class="comment">//实例化</span></span><br><span class="line"><span class="keyword">return</span> proxy <span class="keyword">as</span> T;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>最后我们测试一下<br><figure class="highlight c#"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line"><span class="keyword">using</span> System.Linq;</span><br><span class="line"><span class="keyword">using</span> System.Text;</span><br><span class="line"></span><br><span class="line">namespaceDanymicProxy</span><br><span class="line">&#123;</span><br><span class="line">   classProgram</span><br><span class="line">   &#123;</span><br><span class="line">       <span class="function">staticvoid <span class="title">Main</span>(<span class="params"><span class="keyword">string</span>[] args</span>)</span></span><br><span class="line"><span class="function"></span>       &#123;</span><br><span class="line">           Proxy&lt;MyBusinessLogic&gt;.CreateProxy(<span class="keyword">new</span> LogInterceptor()).ShowMessage(“Hello World!”);</span><br><span class="line">           Proxy&lt;MyBusinessLogic&gt;.CreateProxy(<span class="keyword">new</span> LogInterceptor()).Calculate();</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>运行效果</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>上面简单的介绍了如何用动态代理的方式实现AOP，主要是帮助大家理解动态代理AOP的大致思路。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/设计模式/" rel="tag"># 设计模式</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/03/06/PHP中钩子函数的实现与认识/" rel="next" title="PHP中钩子函数的实现与认识">
+                <i class="fa fa-chevron-left"></i> PHP中钩子函数的实现与认识
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/03/06/Python的函数式编程/" rel="prev" title="Python的函数式编程">
+                Python的函数式编程 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">371</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">10</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">60</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2020/03/06/Python的函数式编程/" title="Python的函数式编程" target="_blank">Python的函数式编程</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/03/06/C-动态代理方式实现AOP/" title="C#动态代理方式实现AOP" target="_blank">C#动态代理方式实现AOP</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/03/06/PHP中钩子函数的实现与认识/" title="PHP中钩子函数的实现与认识" target="_blank">PHP中钩子函数的实现与认识</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/03/06/代理和动态代理/" title="代理和动态代理" target="_blank">代理和动态代理</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/03/05/利用php数组函数进行函数式编程/" title="利用php数组函数进行函数式编程" target="_blank">利用php数组函数进行函数式编程</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#AOP简述"><span class="nav-number">1.</span> <span class="nav-text">AOP简述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#利用动态代理实现AOP"><span class="nav-number">2.</span> <span class="nav-text">利用动态代理实现AOP</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">3.9m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">58:28</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

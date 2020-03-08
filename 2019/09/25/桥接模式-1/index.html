@@ -117,7 +117,7 @@
 <meta property="og:image" content="http://chebincarl.github.io/2019/09/25/桥接模式-1/4.png">
 <meta property="og:image" content="http://chebincarl.github.io/2019/09/25/桥接模式-1/5.png">
 <meta property="og:image" content="http://chebincarl.github.io/2019/09/25/桥接模式-1/6.png">
-<meta property="og:updated_time" content="2019-10-30T11:00:40.269Z">
+<meta property="og:updated_time" content="2020-03-08T07:16:01.010Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="桥接模式">
 <meta name="twitter:description" content="思考并回答以下问题：  桥接模式为什么是结构型模式？ 某个类存在两个独立变化的维度，用毛笔和蜡笔怎么举例？ 型号可认为是毛笔的抽象部分，而颜色是毛笔的实现部分。怎么理解？ 任意组合子类，从而获得多维度组合对象。怎么理解？ 桥接模式和适配器模式用于设计的不同阶段，桥接模式用于系统的初步设计，对于存在两个独立变化维度的类可以将其分为抽象化和实现化两个角色，使它们可以分别进行变化；而在初步设计完成之后，">
@@ -450,7 +450,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-10-30 19:00:40" itemprop="dateModified" datetime="2019-10-30T19:00:40+08:00">2019-10-30</time>
+                <time title="修改时间：2020-03-08 15:16:01" itemprop="dateModified" datetime="2020-03-08T15:16:01+08:00">2020-03-08</time>
               
             
           </span>
@@ -542,12 +542,10 @@
 <li>可以针对两个维度的抽象层编程，在程序运行时再动态地确定两个维度的子类，动态地组合对象。怎么理解？</li>
 </ul>
 <a id="more"></a>
-<font size="3">**本章导学**</font>
-
+<p><strong><font size="3">本章导学</font></strong></p>
 <p>桥接模式是一种很实用的结构型设计模式，如果系统中某个类存在两个独立变化的维度，通过桥接模式可以将这两个维度分离出来，使两者可以独立扩展。桥接模式用一种巧妙的方式处理多层继承存在的问题，用抽象关联来取代传统的多层继承，将类之间的静态继承关系转换为动态的对象组合关系，使得系统更加灵活，并易于扩展，同时有效控制了系统中类的个数。  </p>
 <p>本章将学习桥接模式的定义与结构，通过实例来加深对桥接模式的理解，并学习如何将其应用于实际项目的开发，还将学习如何实现桥接模式和适配器模式的联用。</p>
-<font size="3">**本章知识点**</font>
-
+<p><strong><font size="3">本章知识点</font></strong></p>
 <ul>
 <li>桥接模式的定义 </li>
 <li>桥接模式的结构</li>
@@ -593,21 +591,18 @@
 <p>在抽象类Abstraction中定义了一个实现类接口类型的成员对象impl，再通过Setter方法或者构造方法以注入的方式给该对象赋值，一般将该对象的可见性定义为protected，以便在其子类中访问Implementor的方法，其子类一般称为扩充抽象类或细化抽象类（RefinedAbstraction），典型的RefinedAbstraction类代码如下：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title">RefinedAbstraction</span> : <span class="title">Abstraction</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">void</span> <span class="title">Operation</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="comment">// 业务代码</span></span><br><span class="line">        impl.OperationImpl(); <span class="comment">// 调用实现类的方法</span></span><br><span class="line">        <span class="comment">// 业务代码</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>对于客户端而言，可以针对两个维度的抽象层编程，在程序运行时再动态地确定两个维度的子类，动态地组合对象，将两个独立变化的维度完全解耦，以便能够灵活地扩充任一维度而对另一维度不造成任何影响。</p>
 <h1 id="桥接模式的应用实例"><a href="#桥接模式的应用实例" class="headerlink" title="桥接模式的应用实例"></a><span style="color:#339AFF;">桥接模式的应用实例</span></h1><p>下面通过一个应用实例来进一步学习和理解桥接模式。  </p>
-<font size="3">**1.实例说明**</font>
-
+<p><strong><font size="3">1.实例说明</font></strong></p>
 <blockquote>
 <p>某软件公司要开发一个跨平台图像浏览系统，要求该系统能够显示BMP、JPG、GIF、PNG等多种格式的文件，并且能够在Windows、Linux、UNIX等多个操作系统上运行。系统首先将各种格式的文件解析为像素矩阵（Matrix），然后将像素矩阵显示在屏幕上，在不同的操作系统中可以调用不同的绘制函数来绘制像素矩阵。另外，系统需具有较好的扩展性，以便在将来支持新的文件格式和操作系统。试使用桥接模式设计该跨平台图像浏览系统。</p>
 </blockquote>
-<font size="3">**2.实例类图**</font>  
-
+<p><strong><font size="3">2.实例类图</font></strong>  </p>
 <p>通过分析，本实例的结构如图5所示。</p>
 <blockquote>
 <p>图5 跨平台图像浏览系统结构图</p>
 </blockquote>
 <img src="/2019/09/25/桥接模式-1/5.png">
 <p>在图5中，Image充当抽象类，其子类JPGImage、PNGImage、BMPImage和GIFImage充当扩充抽象类；Imagelmp充当实现类接口，其子类WindowsImp、LinuxImp和UnixImp充当具体实现类。</p>
-<font size="3">**3.实例代码**</font>  
-
+<p><strong><font size="3">3.实例代码</font></strong>  </p>
 <p>(1)Matrix：像素矩阵类，它是一个辅助类，各种格式的图像文件最终都会被转化为像素矩阵，不同的操作系统提供不同的方式显示像素矩阵。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> <span class="title">BridgeSample</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title">Matrix</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 代码省略</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>(2)ImageImp：抽象操作系统实现类，充当实现类接口。</p>
 <figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> <span class="title">BridgeSample</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">interface</span> <span class="title">ImageImp</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">void</span> <span class="title">DoPaint</span>(<span class="params">Matrix m</span>)</span>;  <span class="comment">// 显示像素矩阵m</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -631,8 +626,7 @@
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="utf-8" ?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">appSettings</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!--RefinedAbstraction--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">add</span> <span class="attr">key</span>=<span class="string">"image"</span> <span class="attr">value</span>=<span class="string">"BridgeSample.JPGImage"</span>/&gt;</span></span><br><span class="line">    <span class="comment">&lt;!--ConcreteImplementor--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">add</span> <span class="attr">key</span>=<span class="string">"os"</span> <span class="attr">value</span>=<span class="string">"BridgeSample.WindowsImp"</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">appSettings</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br></pre></td></tr></table></figure>
 <p>(12)Program：客户端测试类。</p>
 <figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">using</span> System;</span><br><span class="line"><span class="keyword">using</span> System.Configuration;</span><br><span class="line"><span class="keyword">using</span> System.Reflection;</span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">BridgeSample</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">class</span> <span class="title">Program</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="function"><span class="keyword">static</span> <span class="keyword">void</span> <span class="title">Main</span>(<span class="params"><span class="keyword">string</span>[] args</span>)</span></span><br><span class="line"><span class="function"></span>        &#123;</span><br><span class="line">            Image image;</span><br><span class="line">            ImageImp imp;</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 读取配置文件</span></span><br><span class="line">            <span class="keyword">string</span> imageType = ConfigurationManager.AppSettings[<span class="string">"image"</span>];</span><br><span class="line">            <span class="keyword">string</span> osType = ConfigurationManager.AppSettings[<span class="string">"os"</span>];</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 反射生成对象</span></span><br><span class="line">            image = (Image)Assembly.Load(<span class="string">"BridgeSample"</span>).CreateInstance(imageType);</span><br><span class="line">            imp = (ImageImp)Assembly.Load(<span class="string">"BridgeSample"</span>).CreateInstance(osType);</span><br><span class="line">            </span><br><span class="line">            image.SetImageImp(imp);</span><br><span class="line">            image.ParseFile(<span class="string">"中国地图"</span>);</span><br><span class="line">            Console.Read();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<font size="3">**4.结果及分析**</font>
-
+<p><strong><font size="3">4.结果及分析</font></strong></p>
 <p>编译并运行程序，输出结果如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">在Windows操作系统中显示图像：中国地图，格式为JPG。</span><br></pre></td></tr></table></figure></p>
 <p>如果需要更换图像文件格式或者更换操作系统，只需修改配置文件即可。例如将配置文件App.config改为：<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version="1.0" encoding="utf-8" ?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">appSettings</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!--RefinedAbstraction--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">add</span> <span class="attr">key</span>=<span class="string">"image"</span> <span class="attr">value</span>=<span class="string">"BridgeSample.BMPImage"</span>/&gt;</span></span><br><span class="line">    <span class="comment">&lt;!--ConcreteImplementor--&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">add</span> <span class="attr">key</span>=<span class="string">"os"</span> <span class="attr">value</span>=<span class="string">"BridgeSample.LinuxImp"</span>/&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">appSettings</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br></pre></td></tr></table></figure></p>
 <p>再次运行程序，输出结果为:<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">在Linux操作系统中显示图像：中国地图，格式为BMP。</span><br></pre></td></tr></table></figure></p>
@@ -648,30 +642,21 @@
 <h1 id="桥接模式的优缺点与适用环境"><a href="#桥接模式的优缺点与适用环境" class="headerlink" title="桥接模式的优缺点与适用环境"></a><span style="color:#339AFF;">桥接模式的优缺点与适用环境</span></h1><p>桥接模式的应用很广泛，在软件开发中如果一个类或一个系统有多个变化维度，都可以尝试使用桥接模式对其进行设计。<span style="color:red">桥接模式为多维度变化的系统提供了一套完整的解决方案，并且降低了系统的复杂度。</span></p>
 <h2 id="桥接模式的优点"><a href="#桥接模式的优点" class="headerlink" title="桥接模式的优点"></a><span style="color:#00ACC1;">桥接模式的优点</span></h2><p>桥接模式的主要优点如下： </p>
 <ul>
-<li><p>(1)分离抽象接口及其实现部分。桥接模式使用“对象间的关联关系”解耦了抽象和实现之间固有的绑定关系，使得抽象和实现可以沿着各自的维度来变化。所谓抽象和实现沿着各自维度的变化，也就是说抽象和实现不再在同一个继承层次结构中，而是“子类化”它们，使它们各自具有自己的子类，<span style="color:red">以便任意组合子类，从而获得多维度组合对象</span>。  </p>
-</li>
-<li><p>(2)在很多情况下，桥接模式可以取代多层继承方案，多层继承方案违背了单一职责原则，复用性较差，且类的个数非常多。桥接模式是比多层继承方案更好的解决方法，它极大地减少了子类的个数。  </p>
-</li>
-<li><p>(3)桥接模式提高了系统的可扩展性，在两个变化维度中任意扩展一个维度，不需要修改原有系统，符合开闭原则。</p>
-</li>
+<li>(1)分离抽象接口及其实现部分。桥接模式使用“对象间的关联关系”解耦了抽象和实现之间固有的绑定关系，使得抽象和实现可以沿着各自的维度来变化。所谓抽象和实现沿着各自维度的变化，也就是说抽象和实现不再在同一个继承层次结构中，而是“子类化”它们，使它们各自具有自己的子类，<span style="color:red">以便任意组合子类，从而获得多维度组合对象</span>。  </li>
+<li>(2)在很多情况下，桥接模式可以取代多层继承方案，多层继承方案违背了单一职责原则，复用性较差，且类的个数非常多。桥接模式是比多层继承方案更好的解决方法，它极大地减少了子类的个数。  </li>
+<li>(3)桥接模式提高了系统的可扩展性，在两个变化维度中任意扩展一个维度，不需要修改原有系统，符合开闭原则。</li>
 </ul>
 <h2 id="桥接模式的缺点"><a href="#桥接模式的缺点" class="headerlink" title="桥接模式的缺点"></a><span style="color:#00ACC1;">桥接模式的缺点</span></h2><p>桥接模式的主要缺点如下：  </p>
 <ul>
-<li><p>(1)桥接模式的使用会增加系统的理解与设计难度，由于关联关系建立在抽象层，要求开发者一开始就针对抽象层进行设计与编程。</p>
-</li>
-<li><p>(2)桥接模式要求正确识别出系统中两个独立变化的维度，因此其使用范围具有一定的局限性，如何正确识别两个独立维度也需要一定的经验积累。</p>
-</li>
+<li>(1)桥接模式的使用会增加系统的理解与设计难度，由于关联关系建立在抽象层，要求开发者一开始就针对抽象层进行设计与编程。</li>
+<li>(2)桥接模式要求正确识别出系统中两个独立变化的维度，因此其使用范围具有一定的局限性，如何正确识别两个独立维度也需要一定的经验积累。</li>
 </ul>
-<h2 id="桥接模式的适用环境"><a href="#桥接模式的适用环境" class="headerlink" title="桥接模式的适用环境"></a><span style="color:#00ACC1;">桥接模式的适用环境</span></h2><p>在以下情况下可以考虑使用桥接模式：  </p>
+<h2 id="桥接模式的适用环境"><a href="#桥接模式的适用环境" class="headerlink" title="桥接模式的适用环境"></a><span style="color:#00ACC1;">桥接模式的适用环境</span></h2><p>在以下情况下可以考虑使用桥接模式： </p>
 <ul>
-<li><p>(1)如果一个系统需要在抽象化和具体化之间增加更多的灵活性，避免在两个层次之间建立静态的继承关系，通过桥接模式可以使它们在抽象层建立一个关联关系。  </p>
-</li>
-<li><p>(2)抽象部分和实现部分可以以继承的方式独立扩展而互不影响，在程序运行时可以动态地将一个抽象化子类的对象和一个实现化子类的对象进行组合，即系统需要对抽象化角色和实现化角色进行动态耦合。  </p>
-</li>
-<li><p>(3)一个类存在两个（或多个）独立变化的维度，且这两个（或多个）维度都需要独立地进行扩展。</p>
-</li>
-<li><p>(4)对于不希望使用继承或因为多层继承导致系统类的个数急剧增加的系统，桥接模式尤为适用。</p>
-</li>
+<li>(1)如果一个系统需要在抽象化和具体化之间增加更多的灵活性，避免在两个层次之间建立静态的继承关系，通过桥接模式可以使它们在抽象层建立一个关联关系。  </li>
+<li>(2)抽象部分和实现部分可以以继承的方式独立扩展而互不影响，在程序运行时可以动态地将一个抽象化子类的对象和一个实现化子类的对象进行组合，即系统需要对抽象化角色和实现化角色进行动态耦合。  </li>
+<li>(3)一个类存在两个（或多个）独立变化的维度，且这两个（或多个）维度都需要独立地进行扩展。</li>
+<li>(4)对于不希望使用继承或因为多层继承导致系统类的个数急剧增加的系统，桥接模式尤为适用。</li>
 </ul>
 <h1 id="本章小结"><a href="#本章小结" class="headerlink" title="本章小结"></a><span style="color:#339AFF;">本章小结</span></h1><p>(1)桥接模式将抽象部分与它的实现部分解耦，使得两者都能够独立变化。桥接模式是一种对象结构型模式。  </p>
 <p>(2)桥接模式包含抽象类、扩充抽象类、实现类接口和具体实现类4个角色。其中，抽象类定义了一个实现类接口类型的对象并维护该对象；扩充抽象类扩充由抽象类定义的接口，实现了在抽象类中声明的抽象业务方法；实现类接口声明了一些基本操作，而将具体实现交给其子类完成；具体实现类具体实现了实现类接口，在不同的具体实现类中提供基本操作的不同实现。  </p>
@@ -797,7 +782,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">355</span>
+                    <span class="site-state-item-count">371</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -830,7 +815,11 @@
                     
                       
                     
-                    <span class="site-state-item-count">8</span>
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">10</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -959,7 +948,15 @@
                     
                       
                     
-                    <span class="site-state-item-count">56</span>
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">60</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -990,23 +987,23 @@
                 
                 
                   <li>
-                    <a href="/2020/02/22/游戏设计信条：从创意到制作的设计原则/" title="游戏设计信条：从创意到制作的设计原则" target="_blank">游戏设计信条：从创意到制作的设计原则</a>
+                    <a href="/2020/03/06/Python的函数式编程/" title="Python的函数式编程" target="_blank">Python的函数式编程</a>
                   </li>
                 
                   <li>
-                    <a href="/2020/02/16/游戏设计快乐之道（第2版）/" title="游戏设计快乐之道（第2版）" target="_blank">游戏设计快乐之道（第2版）</a>
+                    <a href="/2020/03/06/C-动态代理方式实现AOP/" title="C#动态代理方式实现AOP" target="_blank">C#动态代理方式实现AOP</a>
                   </li>
                 
                   <li>
-                    <a href="/2020/02/14/游戏剧本怎么写/" title="游戏剧本怎么写" target="_blank">游戏剧本怎么写</a>
+                    <a href="/2020/03/06/PHP中钩子函数的实现与认识/" title="PHP中钩子函数的实现与认识" target="_blank">PHP中钩子函数的实现与认识</a>
                   </li>
                 
                   <li>
-                    <a href="/2020/02/04/通关！游戏设计之道（第2版）/" title="通关！游戏设计之道（第2版）" target="_blank">通关！游戏设计之道（第2版）</a>
+                    <a href="/2020/03/06/代理和动态代理/" title="代理和动态代理" target="_blank">代理和动态代理</a>
                   </li>
                 
                   <li>
-                    <a href="/2020/01/26/游戏设计艺术（第2版）/" title="游戏设计艺术（第2版）" target="_blank">游戏设计艺术（第2版）</a>
+                    <a href="/2020/03/05/利用php数组函数进行函数式编程/" title="利用php数组函数进行函数式编程" target="_blank">利用php数组函数进行函数式编程</a>
                   </li>
                 
               </ul>
@@ -1067,7 +1064,7 @@
     
       <span class="post-meta-item-text">站点总字数：</span>
     
-    <span title="站点总字数">3.7m</span>
+    <span title="站点总字数">3.9m</span>
   
 
   
@@ -1078,7 +1075,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">56:30</span>
+    <span title="站点阅读时长">58:28</span>
   
 </div>
 

@@ -123,7 +123,7 @@
 <meta property="og:image" content="http://chebincarl.github.io/2019/08/18/成就系统-观察者模式/10.png">
 <meta property="og:image" content="http://chebincarl.github.io/2019/08/18/成就系统-观察者模式/11.png">
 <meta property="og:image" content="http://chebincarl.github.io/2019/08/18/成就系统-观察者模式/12.png">
-<meta property="og:updated_time" content="2020-01-23T02:09:01.966Z">
+<meta property="og:updated_time" content="2020-03-08T06:03:40.790Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="成就系统--观察者模式">
 <meta name="twitter:description" content="思考并回答以下问题：  观察者模式的官方定义是什么？ 观察者模式的关键词是“一对多”怎么理解？ 观察者模式为什么属于行为型模式？ 理解行为型设计模式的关键是通信怎么理解？ “事件发生”与“功能执行”之间不要有太多的依赖性，所以在客户端控制怎么理解？ 动手画观察者模式设计图。 观察者模式需要list、foreach怎么理解？ 主题通知观察者的是主题自身的状态。不是一个单纯的触发flag让观察者去执行">
@@ -456,7 +456,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2020-01-23 10:09:01" itemprop="dateModified" datetime="2020-01-23T10:09:01+08:00">2020-01-23</time>
+                <time title="修改时间：2020-03-08 14:03:40" itemprop="dateModified" datetime="2020-03-08T14:03:40+08:00">2020-03-08</time>
               
             
           </span>
@@ -737,8 +737,7 @@
 </ul>
 <p><span style="color:red">同一个游戏事件可以提供给不同的系统一起订阅，并能同时接收到更新信息。</span></p>
 <h2 id="实现说明"><a href="#实现说明" class="headerlink" title="实现说明"></a><span style="color:#00ACC1;">实现说明</span></h2><p>接下来，按结构图和实现流程来完成成就系统的重构：</p>
-<font size="3">**实现游戏事件系统**</font>
-
+<p><strong><font size="3">实现游戏事件系统</font></strong></p>
 <p>游戏事件系统（GameEventSystem）用来管理游戏当中发生的事件，并针对每一个游戏事件，产生一个“游戏事件主题（Subject）”：</p>
 <blockquote>
 <p>Listing9 游戏事件系统的实现（GameEventSystem.cs）</p>
@@ -752,8 +751,7 @@
 </blockquote>
 <figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">IGameEventSubject</span> </span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">private</span> List&lt;IGameEventObserver&gt; m_Observers = <span class="keyword">new</span> List&lt;IGameEventObserver&gt;(); <span class="comment">// 观察者</span></span><br><span class="line">    <span class="keyword">private</span> System.Object m_Param = <span class="literal">null</span>;   <span class="comment">// 发生事件时附加的参数</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 加入</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Attach</span>(<span class="params">IGameEventObserver theObserver</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_Observers.Add( theObserver );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 取消</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Detach</span>(<span class="params">IGameEventObserver theObserver</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_Observers.Remove( theObserver );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 通知</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">Notify</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        <span class="keyword">foreach</span>( IGameEventObserver theObserver  <span class="keyword">in</span> m_Observers)</span><br><span class="line">            theObserver.Update();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 设置参数</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">virtual</span> <span class="keyword">void</span> <span class="title">SetParam</span>(<span class="params"> System.Object Param </span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_Param = Param;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>类中定义了一个List泛型容器m_Observers，用来管理订阅主题的观察者，类提供了基本的新增、取消及通知方法来管理订阅者，并提供设置参数（SetParam）方法来设置每一个游戏事件所需提供的内容。</p>
-<font size="3">**完成各个游戏事件主题及其观察者**</font>
-
+<p><strong><font size="3">完成各个游戏事件主题及其观察者</font></strong></p>
 <p>以下是4个《P级阵地》定义的游戏事件主题。</p>
 <p><strong>①敌人角色阵亡</strong></p>
 <p>敌人角色阵亡时会发出通知，并将阵亡的敌人角色IEnemy使用SetParam方法传入，传入后再增加内部的计数器，提供给观察者查询：</p>
@@ -825,8 +823,7 @@
 <p>图11 重构后的新成就系统（AchievementSystem）</p>
 </blockquote>
 <img src="/2019/08/18/成就系统-观察者模式/11.png">
-<font size="3">**实现成就系统及订阅游戏事件**</font>
-
+<p><strong><font size="3">实现成就系统及订阅游戏事件</font></strong></p>
 <p>上图中，有许多的观察者们，这些观察者们在成就系统初始化时就会被加入到游戏事件系统中，而重构后的类也较为简单、清楚：</p>
 <p>首先在PBaseDefenseGame中封装相关方法：<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title">PBaseDefenseGame</span></span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="comment">// 注册游戏事件</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">RegisterGameEvent</span>(<span class="params"> ENUM_GameEvent emGameEvent, IGameEventObserver Observer</span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_GameEventSystem.RegisterObserver( emGameEvent , Observer );</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 通知游戏事件</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">NotifyGameEvent</span>(<span class="params"> ENUM_GameEvent emGameEvent, System.Object Param </span>)</span></span><br><span class="line"><span class="function"></span>    &#123;</span><br><span class="line">        m_GameEventSystem.NotifySubject( emGameEvent, Param);</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <blockquote>
@@ -845,7 +842,7 @@
 </blockquote>
 <img src="/2019/08/18/成就系统-观察者模式/12.png">
 <h2 id="使用观察者模式的优点"><a href="#使用观察者模式的优点" class="headerlink" title="使用观察者模式的优点"></a><span style="color:#00ACC1;">使用观察者模式的优点</span></h2><p>成就系统以“游戏事件”为基础，记录每个游戏事件发生的次数及时间点，作为成就项目的判断依据。但是当同一个游戏事件被触发后，可能不只是只有一个成就系统会被触发，系统中也可能存在着其他系统需要使用同一个游戏事件。因此，加入了以观察者模式为基础的游戏事件系统，就可以有效地解除“游戏事件的发生”与有关的“系统功能调用”之间的绑定。这样在游戏事件发生时，不必理会后续的处理工作，而是交给游戏事件主题负责调用观察者/订阅者。此外，也能同时调用多个系统同时处理这个事件引发的后续操作。</p>
-<h2 id="实现观察者模式时的注意事项-lt-span-gt"><a href="#实现观察者模式时的注意事项-lt-span-gt" class="headerlink" title="实现观察者模式时的注意事项&lt;/span&gt;"></a><span style="color:#00ACC1;"><span id="jump">实现观察者模式时的注意事项</span>&lt;/span&gt;</span></h2><p><strong><font size="3">双向与单向信息通知</font></strong></p>
+<h2 id="实现观察者模式时的注意事项"><a href="#实现观察者模式时的注意事项" class="headerlink" title="实现观察者模式时的注意事项"></a><span style="color:#00ACC1;"><span id="jump">实现观察者模式时的注意事项</span></span></h2><p><strong><font size="3">双向与单向信息通知</font></strong></p>
 <p>社交网页上的“粉丝团”比较像是观察者模式：当粉丝团上发布了一则新的动态后，所有订阅的用户都可以看到新增的动态，而用户与用户之间则是同时扮演“主题”与“观察者”的角色，除了同时收到其他好友的动态信息，当自己有任何的动态消息时，也会同时广播给好友们（观察者）。</p>
 <p><strong><font size="3">类过多的问题</font></strong></p>
 <p>“游戏事件”“游戏事件主题（IGameEventSubject）”会随着项目的开发不断地增加，与此同时，这些主题的观察者的数量也会随之上升。从当前的《P级阵地》内容来看，已经产生了7个游戏事件观察者类（IGameEventObserver），所以不难想象，在大型项目可能会产生非常多的观察者类。当然，在某些情况下类过多，反而是个缺点。因此，<span style="color:red">如果想要减少类的产生，可以考虑向游戏的主题注册时，不要使用“类对象”而是使用“回调函数”，之后再将功能相似的“回调函数”以同一个类来管理，就能减少过多类的问题</span>。这一部分的解决方式与<a href="/2019/08/16/兵营训练单位-命令模式/" title="兵营训练单位-命令模式">兵营训练单位-命令模式</a>解决大量请求命令时的想法是一样的，读者可以回顾相关的内容。</p>
@@ -988,7 +985,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">355</span>
+                    <span class="site-state-item-count">371</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -1021,7 +1018,11 @@
                     
                       
                     
-                    <span class="site-state-item-count">8</span>
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">10</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -1150,7 +1151,15 @@
                     
                       
                     
-                    <span class="site-state-item-count">56</span>
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">60</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -1181,23 +1190,23 @@
                 
                 
                   <li>
-                    <a href="/2020/02/22/游戏设计信条：从创意到制作的设计原则/" title="游戏设计信条：从创意到制作的设计原则" target="_blank">游戏设计信条：从创意到制作的设计原则</a>
+                    <a href="/2020/03/06/Python的函数式编程/" title="Python的函数式编程" target="_blank">Python的函数式编程</a>
                   </li>
                 
                   <li>
-                    <a href="/2020/02/16/游戏设计快乐之道（第2版）/" title="游戏设计快乐之道（第2版）" target="_blank">游戏设计快乐之道（第2版）</a>
+                    <a href="/2020/03/06/C-动态代理方式实现AOP/" title="C#动态代理方式实现AOP" target="_blank">C#动态代理方式实现AOP</a>
                   </li>
                 
                   <li>
-                    <a href="/2020/02/14/游戏剧本怎么写/" title="游戏剧本怎么写" target="_blank">游戏剧本怎么写</a>
+                    <a href="/2020/03/06/PHP中钩子函数的实现与认识/" title="PHP中钩子函数的实现与认识" target="_blank">PHP中钩子函数的实现与认识</a>
                   </li>
                 
                   <li>
-                    <a href="/2020/02/04/通关！游戏设计之道（第2版）/" title="通关！游戏设计之道（第2版）" target="_blank">通关！游戏设计之道（第2版）</a>
+                    <a href="/2020/03/06/代理和动态代理/" title="代理和动态代理" target="_blank">代理和动态代理</a>
                   </li>
                 
                   <li>
-                    <a href="/2020/01/26/游戏设计艺术（第2版）/" title="游戏设计艺术（第2版）" target="_blank">游戏设计艺术（第2版）</a>
+                    <a href="/2020/03/05/利用php数组函数进行函数式编程/" title="利用php数组函数进行函数式编程" target="_blank">利用php数组函数进行函数式编程</a>
                   </li>
                 
               </ul>
@@ -1223,7 +1232,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#成就系统"><span class="nav-number">1.</span> <span class="nav-text">成就系统</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#观察者模式"><span class="nav-number">2.</span> <span class="nav-text">观察者模式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#观察者模式的定义"><span class="nav-number">2.1.</span> <span class="nav-text">观察者模式的定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#观察者模式的说明"><span class="nav-number">2.2.</span> <span class="nav-text">观察者模式的说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#观察者模式的实现范例"><span class="nav-number">2.3.</span> <span class="nav-text">观察者模式的实现范例</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用观察者模式实现成就系统"><span class="nav-number">3.</span> <span class="nav-text">使用观察者模式实现成就系统</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#成就系统的新架构"><span class="nav-number">3.1.</span> <span class="nav-text">成就系统的新架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现说明"><span class="nav-number">3.2.</span> <span class="nav-text">实现说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用观察者模式的优点"><span class="nav-number">3.3.</span> <span class="nav-text">使用观察者模式的优点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现观察者模式时的注意事项-lt-span-gt"><span class="nav-number">3.4.</span> <span class="nav-text">实现观察者模式时的注意事项&lt;/span&gt;</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#观察者模式面对变化时"><span class="nav-number">4.</span> <span class="nav-text">观察者模式面对变化时</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#结论"><span class="nav-number">5.</span> <span class="nav-text">结论</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#成就系统"><span class="nav-number">1.</span> <span class="nav-text">成就系统</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#观察者模式"><span class="nav-number">2.</span> <span class="nav-text">观察者模式</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#观察者模式的定义"><span class="nav-number">2.1.</span> <span class="nav-text">观察者模式的定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#观察者模式的说明"><span class="nav-number">2.2.</span> <span class="nav-text">观察者模式的说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#观察者模式的实现范例"><span class="nav-number">2.3.</span> <span class="nav-text">观察者模式的实现范例</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#使用观察者模式实现成就系统"><span class="nav-number">3.</span> <span class="nav-text">使用观察者模式实现成就系统</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#成就系统的新架构"><span class="nav-number">3.1.</span> <span class="nav-text">成就系统的新架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现说明"><span class="nav-number">3.2.</span> <span class="nav-text">实现说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用观察者模式的优点"><span class="nav-number">3.3.</span> <span class="nav-text">使用观察者模式的优点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#实现观察者模式时的注意事项"><span class="nav-number">3.4.</span> <span class="nav-text">实现观察者模式时的注意事项</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#观察者模式面对变化时"><span class="nav-number">4.</span> <span class="nav-text">观察者模式面对变化时</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#结论"><span class="nav-number">5.</span> <span class="nav-text">结论</span></a></li></ol></div>
             
 
           </div>
@@ -1258,7 +1267,7 @@
     
       <span class="post-meta-item-text">站点总字数：</span>
     
-    <span title="站点总字数">3.7m</span>
+    <span title="站点总字数">3.9m</span>
   
 
   
@@ -1269,7 +1278,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">56:30</span>
+    <span title="站点阅读时长">58:28</span>
   
 </div>
 
