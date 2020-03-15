@@ -124,7 +124,7 @@
 <meta property="og:image" content="http://chebincarl.github.io/2019/09/18/在Unity中实现游戏命令模式/10.jpg">
 <meta property="og:image" content="http://chebincarl.github.io/2019/09/18/在Unity中实现游戏命令模式/11.gif">
 <meta property="og:image" content="http://chebincarl.github.io/2019/09/18/在Unity中实现游戏命令模式/12.gif">
-<meta property="og:updated_time" content="2019-10-18T11:12:03.148Z">
+<meta property="og:updated_time" content="2020-03-15T01:19:43.634Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="在Unity中实现游戏命令模式">
 <meta name="twitter:description" content="思考并回答以下问题：  暂时不执行，等之后一起执行。原先的做不到，命令模式可以做到。怎么理解？ Invoker中分别使用List、Queue、Stack可以实现对多个命令的不同管理。怎么理解？ 有这种游戏，先输入好几个移动命令，然后按Enter执行，角色按照之前输入的一系列命令顺序执行，还支持撤销和恢复撤销以及重做。玩过吗？ 命令模式的Invoker和备忘录模式的Caretaker作用相似，怎么理">
@@ -461,7 +461,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-10-18 19:12:03" itemprop="dateModified" datetime="2019-10-18T19:12:03+08:00">2019-10-18</time>
+                <time title="修改时间：2020-03-15 09:19:43" itemprop="dateModified" datetime="2020-03-15T09:19:43+08:00">2020-03-15</time>
               
             
           </span>
@@ -543,7 +543,7 @@
 <li>对输入命令进行排队，并推迟执行。</li>
 <li>在执行前，撤销和重做已发出的命令。</li>
 </ul>
-<p>本教程使用Unity 2019.1和C# 7，学习本文你需要熟悉Unity的使用，并且对C#有一定的了解。</p>
+<p>本教程使用Unity 2019.1和C# 7。</p>
 <h1 id="学习准备"><a href="#学习准备" class="headerlink" title="学习准备"></a><span style="color:#339AFF;">学习准备</span></h1><p><a href="https://pan.baidu.com/s/1lJ06XnP2nN13Gq7yaJEiOQ" title="[点击下载项目文件和素材]" target="_blank" rel="noopener">点击下载项目文件和素材</a></p>
 <p>下载完成项目素材后，请解压文件，并在Unity中打开Starter项目。然后打开RW/Scenes文件夹，打开主场景。</p>
 <img src="/2019/09/18/在Unity中实现游戏命令模式/0.png">
@@ -574,15 +574,15 @@
 <p>参数化其它对象：封装的方法可以根据输入参数来处理多个对象。</p>
 <p>请求的队列：得到的“命令”可以在执行前和其它命令一起存储。</p>
 <blockquote>
-<p>命令队列<br><img src="/2019/09/18/在Unity中实现游戏命令模式/10.jpg"></p>
+<p>命令队列</p>
 </blockquote>
+<img src="/2019/09/18/在Unity中实现游戏命令模式/10.jpg">
 <p>“Undoable”（可撤销）指可以通过撤销功能恢复的操作。那么这些内容怎么用代码表示呢？</p>
 <p>简单来说，Command类会有Execute方法，该方法可以接收一个名为Receiver的对象作为输入参数。因此，Execute方法会由Command类进行封装。</p>
 <p>Command类的多个实例可以作为常规对象来传递，这表示它们可以存储在数据结构中，例如：队列，栈等。</p>
 <p>为了执行命令，Execute方法需要进行调用。触发执行过程的类叫作Invoker。</p>
 <p>我们的项目中已包含一个名叫BotCommand的空类。下面我们将完成要求，让Bot对象可以使用命令模式执行动作。</p>
-<h1 id="移动机器人Bot对象"><a href="#移动机器人Bot对象" class="headerlink" title="移动机器人Bot对象"></a><span style="color:#339AFF;">移动机器人Bot对象</span></h1><font size="3">**实现命令模式**</font>
-
+<h1 id="移动机器人Bot对象"><a href="#移动机器人Bot对象" class="headerlink" title="移动机器人Bot对象"></a><span style="color:#339AFF;">移动机器人Bot对象</span></h1><p><strong><font size="3">实现命令模式</font></strong></p>
 <p>首先，打开RW/Scripts文件夹，在编辑器打开BotCommand脚本，并加入下面的代码。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//1</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">readonly</span> <span class="keyword">string</span> commandName;</span><br><span class="line"></span><br><span class="line"><span class="comment">//2</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">BotCommand</span>(<span class="params">ExecuteCallback executeMethod, <span class="keyword">string</span> name</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Execute = executeMethod;</span><br><span class="line">    commandName = name;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//3</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">delegate</span> <span class="keyword">void</span> <span class="title">ExecuteCallback</span>(<span class="params">Bot bot</span>)</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//4</span></span><br><span class="line"><span class="keyword">public</span> ExecuteCallback Execute &#123; <span class="keyword">get</span>; <span class="keyword">private</span> <span class="keyword">set</span>; &#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//5</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">override</span> <span class="keyword">string</span> <span class="title">ToString</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> commandName;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>代码解读：</p>
 <ul>
@@ -593,8 +593,7 @@
 <li>5.ToString方法会被重写，返回commandName字符串，该方法主要在UI中使用。</li>
 </ul>
 <p>保存改动，现在我们已经实现了命令模式。</p>
-<font size="3">**创建命令**</font>
-
+<p><strong><font size="3">创建命令</font></strong></p>
 <p>我们从RW/Scripts文件夹中打开BotInputHandler脚本。</p>
 <p>我们将创建BotCommand的5个实例，这些实例会分别封装方法，从而让Bot对象向上、下、左、右移动，以及让机器人发射炮弹。</p>
 <p>添加下列代码到BotCommand类中。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//1</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">readonly</span> BotCommand MoveUp =</span><br><span class="line">    <span class="keyword">new</span> BotCommand(<span class="keyword">delegate</span> (Bot bot) &#123; bot.Move(CardinalDirection.Up); &#125;, <span class="string">"moveUp"</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//2</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">readonly</span> BotCommand MoveDown =</span><br><span class="line">    <span class="keyword">new</span> BotCommand(<span class="keyword">delegate</span> (Bot bot) &#123; bot.Move(CardinalDirection.Down); &#125;, <span class="string">"moveDown"</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//3</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">readonly</span> BotCommand MoveLeft =</span><br><span class="line">    <span class="keyword">new</span> BotCommand(<span class="keyword">delegate</span> (Bot bot) &#123; bot.Move(CardinalDirection.Left); &#125;, <span class="string">"moveLeft"</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//4</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">readonly</span> BotCommand MoveRight =</span><br><span class="line">    <span class="keyword">new</span> BotCommand(<span class="keyword">delegate</span> (Bot bot) &#123; bot.Move(CardinalDirection.Right); &#125;, <span class="string">"moveRight"</span>);</span><br><span class="line"></span><br><span class="line"><span class="comment">//5</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">readonly</span> BotCommand Shoot =</span><br><span class="line">    <span class="keyword">new</span> BotCommand(<span class="keyword">delegate</span> (Bot bot) &#123; bot.Shoot(); &#125;, <span class="string">"shoot"</span>);</span><br></pre></td></tr></table></figure></p>
@@ -605,8 +604,7 @@
 <p>在第5个实例上，匿名方法在Bot对象调用Shoot方法。这将在执行该命令时，让机器人发射炮弹。</p>
 <p>现在我们创建了命令，这些命令需要在用户发出输入时进行访问。请将下面的代码添加到BotInputHandler中。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> BotCommand <span class="title">HandleInput</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (Input.GetKeyDown(KeyCode.W))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> MoveUp;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (Input.GetKeyDown(KeyCode.S))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> MoveDown;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (Input.GetKeyDown(KeyCode.D))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> MoveRight;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (Input.GetKeyDown(KeyCode.A))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> MoveLeft;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (Input.GetKeyDown(KeyCode.F))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span> Shoot;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>HandleInput方法会根据用户的按键，返回单个命令实例。继续下一步前，保存改动内容。</p>
-<font size="3">**使用命令**</font>
-
+<p><strong><font size="3">使用命令</font></strong></p>
 <p>现在我们要使用创建好的命令。打开RW/Scripts文件夹，在代码编辑器打开SceneManager脚本。在该类中，我们会发现有UIManager类型的uiManager变量的引用。</p>
 <p>UIManager类为场景中的终端UI提供了实用的功能性方法。此外，Bot变量引用了附加到Bot对象的Bot组件。</p>
 <blockquote>
@@ -617,51 +615,32 @@
 <figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> <span class="title">RayWenderlich.CommandPatternInUnity</span></span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">using</span> System.Collections;</span><br><span class="line">    <span class="keyword">using</span> System.Collections.Generic;</span><br><span class="line">    <span class="keyword">using</span> UnityEngine;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">class</span> <span class="title">SceneManager</span> : <span class="title">MonoBehaviour</span></span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">const</span> <span class="keyword">float</span> CommandPauseTime = <span class="number">0.5f</span>;</span><br><span class="line"></span><br><span class="line">        [<span class="meta">Header(<span class="meta-string">"Set In Inspector"</span>)</span>]</span><br><span class="line">        [<span class="meta">SerializeField</span>]</span><br><span class="line">        <span class="keyword">private</span> Bot bot = <span class="literal">null</span>;</span><br><span class="line">        [<span class="meta">SerializeField</span>]</span><br><span class="line">        <span class="keyword">private</span> UIManager uiManager = <span class="literal">null</span>;</span><br><span class="line">        <span class="comment">//1</span></span><br><span class="line"></span><br><span class="line">        <span class="comment">//2</span></span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//1</span></span><br><span class="line"><span class="keyword">private</span> List&lt;BotCommand&gt; botCommands = <span class="keyword">new</span> List&lt;BotCommand&gt;();</span><br><span class="line"><span class="keyword">private</span> Coroutine executeRoutine;</span><br><span class="line"></span><br><span class="line"><span class="comment">//2</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">Update</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (Input.GetKeyDown(KeyCode.Return))</span><br><span class="line">    &#123;</span><br><span class="line">        ExecuteCommands();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        CheckForBotCommands();</span><br><span class="line">    &#125;          </span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//3</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">CheckForBotCommands</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">var</span> botCommand = BotInputHandler.HandleInput();</span><br><span class="line">    <span class="keyword">if</span> (botCommand != <span class="literal">null</span> &amp;&amp; executeRoutine == <span class="literal">null</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        AddToCommands(botCommand);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//4</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">AddToCommands</span>(<span class="params">BotCommand botCommand</span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    botCommands.Add(botCommand);</span><br><span class="line">    <span class="comment">//5</span></span><br><span class="line">    uiManager.InsertNewText(botCommand.ToString());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//6</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">ExecuteCommands</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (executeRoutine != <span class="literal">null</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    executeRoutine = StartCoroutine(ExecuteCommandsRoutine());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> IEnumerator <span class="title">ExecuteCommandsRoutine</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    Debug.Log(<span class="string">"Executing..."</span>);</span><br><span class="line">    <span class="comment">//7</span></span><br><span class="line">    uiManager.ResetScrollToTop();</span><br><span class="line"></span><br><span class="line">    <span class="comment">//8</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>, count = botCommands.Count; i &lt; count; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">var</span> command = botCommands[i];</span><br><span class="line">        command.Execute(bot);</span><br><span class="line">        <span class="comment">//9</span></span><br><span class="line">        uiManager.RemoveFirstTextLine();</span><br><span class="line">        <span class="function"><span class="keyword">yield</span> return new <span class="title">WaitForSeconds</span>(<span class="params">CommandPauseTime</span>)</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//10</span></span><br><span class="line">    botCommands.Clear();</span><br><span class="line"></span><br><span class="line">    bot.ResetToLastCheckpoint();</span><br><span class="line"></span><br><span class="line">    executeRoutine = <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>保存代码，通过使用这些代码，我们可以在游戏视图正常运行项目。</p>
-<font size="3">**运行游戏并测试命令模式**</font>
-
+<p><strong><font size="3">运行游戏并测试命令模式</font></strong></p>
 <p>现在要构建所有内容，在Unity编辑器按下Play按钮。</p>
 <p>我们可以使用W，A，S，D按键输入方向命令。输入射击模式时，使用F键。最后按下回车键执行命令。</p>
 <img src="/2019/09/18/在Unity中实现游戏命令模式/11.gif">
 <p>现在观察代码添加到终端UI的方式。命令会通过它们在UI中的名称表示，该效果通过commandName变量实现。</p>
 <p>在执行前，UI会滚动到顶部，执行后的代码行会被移除。</p>
-<font size="3">**详解命令代码**</font>
-
+<p><strong><font size="3">详解命令代码</font></strong></p>
 <p>现在我们详解在使用命令部分添加的代码。</p>
-<ul>
-<li><p>1.botCommands列表存储了BotCommand实例的引用。考虑到内存，我们只可以创建5个命令实例，但有多个引用指向相同的命令。此外，executeCoroutine变量引用了ExecuteCommandsRoutine，后者会处理命令的执行过程。</p>
-</li>
-<li><p>2.如果用户按下回车键，更新检查结果，此时它会调用ExecuteCommands，否则会调用CheckForBotCommands。</p>
-</li>
-<li><p>3.CheckForBotCommands使用来自BotInputHandler的HandleInput静态方法，检查用户是否发出输入信息，此时会返回命令。返回的命令会传递到AddToCommands。然而，如果命令被执行的话，即如果executeRoutine不是空的话，它会直接返回，不把任何内容传递给AddToCommands。因此，用户必须等待执行过程完成。</p>
-</li>
-<li><p>4.AddToCommands给返回的命令实例添加了新引用，返回到botCommands。</p>
-</li>
-<li><p>5.UIManager类的InsertNewText方法会给终端UI添加新一行文字。该行文字是作为输入参数传给方法的字符串。我们会在此给它传入commandName。</p>
-</li>
-<li><p>6.ExecuteCommands方法会启动ExecuteCommandsRoutine。</p>
-</li>
-<li><p>7.UIManager类的ResetScrollToTop会向上滚动终端UI，它会在执行过程开始前完成。</p>
-</li>
-<li><p>8.ExecuteCommandsRoutine有一个for循环，它会迭代botCommands列表中的命令，通过把Bot对象传给Execute属性返回的方法，逐个执行这些命令。在每次执行后，我们会添加CommandPauseTimeseconds时长的暂停。</p>
-</li>
-<li><p>9.UIManager类的RemoveFirstTextLine方法会移除终端UI里的第一行文字，只要那里仍有文字。因此，每个命令执行后，它的相应名称会从终端UI移除。</p>
-</li>
-<li><p>10.执行所有命令后，botCommands会清空，机器人会使用ResetToLastCheckpoint，重置到最后检查点。接着，executeRoutine会设为null，用户可以继续发出更多输入信息。</p>
-</li>
-</ul>
+<p>1.botCommands列表存储了BotCommand实例的引用。考虑到内存，我们只可以创建5个命令实例，但有多个引用指向相同的命令。此外，executeCoroutine变量引用了ExecuteCommandsRoutine，后者会处理命令的执行过程。</p>
+<p>2.如果用户按下回车键，更新检查结果，此时它会调用ExecuteCommands，否则会调用CheckForBotCommands。</p>
+<p>3.CheckForBotCommands使用来自BotInputHandler的HandleInput静态方法，检查用户是否发出输入信息，此时会返回命令。返回的命令会传递到AddToCommands。然而，如果命令被执行的话，即如果executeRoutine不是空的话，它会直接返回，不把任何内容传递给AddToCommands。因此，用户必须等待执行过程完成。</p>
+<p>4.AddToCommands给返回的命令实例添加了新引用，返回到botCommands。</p>
+<p>5.UIManager类的InsertNewText方法会给终端UI添加新一行文字。该行文字是作为输入参数传给方法的字符串。我们会在此给它传入commandName。</p>
+<p>6.ExecuteCommands方法会启动ExecuteCommandsRoutine。</p>
+<p>7.UIManager类的ResetScrollToTop会向上滚动终端UI，它会在执行过程开始前完成。</p>
+<p>8.ExecuteCommandsRoutine有一个for循环，它会迭代botCommands列表中的命令，通过把Bot对象传给Execute属性返回的方法，逐个执行这些命令。在每次执行后，我们会添加CommandPauseTimeseconds时长的暂停。</p>
+<p>9.UIManager类的RemoveFirstTextLine方法会移除终端UI里的第一行文字，只要那里仍有文字。因此，每个命令执行后，它的相应名称会从终端UI移除。</p>
+<p>10.执行所有命令后，botCommands会清空，机器人会使用ResetToLastCheckpoint，重置到最后检查点。接着，executeRoutine会设为null，用户可以继续发出更多输入信息。</p>
 <h1 id="实现撤销和重做功能"><a href="#实现撤销和重做功能" class="headerlink" title="实现撤销和重做功能"></a><span style="color:#339AFF;">实现撤销和重做功能</span></h1><p>我们再运行一次场景，尝试到达绿色检查点。现在无法撤销输入的命令，这意味着如果犯了错，我们无法后退，除非执行完所有命令。</p>
 <p>我们可以通过添加撤销功能和重做功能来解决该问题。返回SceneManager.cs脚本，在botCommands的List声明后添加以下变量声明。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> Stack &lt;BotCommand&gt; undoStack = <span class="keyword">new</span> Stack &lt;BotCommand&gt;（）;</span><br></pre></td></tr></table></figure></p>
 <p>undoStack变量属于来自Collections命名空间的Stack类，它会存储撤销的命令引用。</p>
-<p>现在，我们要分别为撤销和重做添加UndoCommandEntry和RedoCommandEntry两个方法。在SceneManager类中，添加下面代码到ExecuteCommandsRoutine后。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">UndoCommandEntry</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//1</span></span><br><span class="line">    <span class="keyword">if</span> (executeRoutine != <span class="literal">null</span> || botCommands.Count == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    undoStack.Push(botCommands[botCommands.Count - <span class="number">1</span>]);</span><br><span class="line">    botCommands.RemoveAt(botCommands.Count - <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//2</span></span><br><span class="line">    uiManager.RemoveLastTextLine();</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">RedoCommandEntry</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//3`</span></span><br><span class="line">    <span class="keyword">if</span> (undoStack.Count == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> botCommand = undoStack.Pop();</span><br><span class="line">    AddToCommands(botCommand);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>现在，我们要分别为撤销和重做添加UndoCommandEntry和RedoCommandEntry两个方法。在SceneManager类中，添加下面代码到ExecuteCommandsRoutine后。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">UndoCommandEntry</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//1</span></span><br><span class="line">    <span class="keyword">if</span> (executeRoutine != <span class="literal">null</span> || botCommands.Count == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    undoStack.Push(botCommands[botCommands.Count - <span class="number">1</span>]);</span><br><span class="line">    botCommands.RemoveAt(botCommands.Count - <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">//2</span></span><br><span class="line">    uiManager.RemoveLastTextLine();</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">RedoCommandEntry</span>(<span class="params"></span>)</span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//3</span></span><br><span class="line">    <span class="keyword">if</span> (undoStack.Count == <span class="number">0</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">var</span> botCommand = undoStack.Pop();</span><br><span class="line">    AddToCommands(botCommand);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>解读这部分代码：</p>
-<ul>
-<li><p>1.如果命令正在执行，或botCommands列表是空的，UndoCommandEntry方法不执行任何操作。否则，它会把最后输入的命令引用推送到undoStack上。这部分代码也会从botCommands列表移除命令引用。</p>
-</li>
-<li><p>2.UIManager类的RemoveLastTextLine方法会移除终端UI的最后一行文字，这样在发生撤销时，终端UI内容符合botCommands的内容。</p>
-</li>
-<li><p>3.如果undoStack为空，RedoCommandEntry不执行任何操作。否则，它会把最后的命令从undoStack移出，然后通过AddToCommands把命令添加到botCommands列表。</p>
-</li>
-</ul>
+<p>1.如果命令正在执行，或botCommands列表是空的，UndoCommandEntry方法不执行任何操作。否则，它会把最后输入的命令引用推送到undoStack上。这部分代码也会从botCommands列表移除命令引用。</p>
+<p>2.UIManager类的RemoveLastTextLine方法会移除终端UI的最后一行文字，这样在发生撤销时，终端UI内容符合botCommands的内容。</p>
+<p>3.如果undoStack为空，RedoCommandEntry不执行任何操作。否则，它会把最后的命令从undoStack移出，然后通过AddToCommands把命令添加到botCommands列表。</p>
 <p>现在我们添加键盘输入来使用这些方法。在SceneManager类中，把Update方法的主体替换为下列代码。<br><figure class="highlight cs"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (Input.GetKeyDown(KeyCode.Return))</span><br><span class="line">&#123;</span><br><span class="line">    ExecuteCommands();</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">else</span> <span class="keyword">if</span> (Input.GetKeyDown(KeyCode.U)) <span class="comment">//1</span></span><br><span class="line">&#123;</span><br><span class="line">    UndoCommandEntry();</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">else</span> <span class="keyword">if</span> (Input.GetKeyDown(KeyCode.R)) <span class="comment">//2</span></span><br><span class="line">&#123;</span><br><span class="line">    RedoCommandEntry();</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">&#123;</span><br><span class="line">    CheckForBotCommands();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <p>现在按下U键会调用UndoCommandEntry方法，按下R键会调用RedoCommandEntry方法。</p>
 <h1 id="处理边缘情况"><a href="#处理边缘情况" class="headerlink" title="处理边缘情况"></a><span style="color:#339AFF;">处理边缘情况</span></h1><p>现在我们快要完成该教程了，在完成前，我们要确定二件事：</p>
@@ -794,7 +773,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">364</span>
+                    <span class="site-state-item-count">369</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -966,7 +945,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">59</span>
+                      
+                    
+                    <span class="site-state-item-count">60</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
@@ -997,23 +978,23 @@
                 
                 
                   <li>
-                    <a href="/2020/03/06/Python的函数式编程/" title="Python的函数式编程" target="_blank">Python的函数式编程</a>
+                    <a href="/2020/03/14/Unity打包Android最全攻略/" title="Unity打包Android最全攻略" target="_blank">Unity打包Android最全攻略</a>
                   </li>
                 
                   <li>
-                    <a href="/2020/03/06/C-动态代理方式实现AOP/" title="C#动态代理方式实现AOP" target="_blank">C#动态代理方式实现AOP</a>
+                    <a href="/2020/03/14/Aseprite/" title="Aseprite" target="_blank">Aseprite</a>
                   </li>
                 
                   <li>
-                    <a href="/2020/03/06/PHP中钩子函数的实现与认识/" title="PHP中钩子函数的实现与认识" target="_blank">PHP中钩子函数的实现与认识</a>
+                    <a href="/2020/03/14/为什么我们要面向接口编程？！/" title="为什么我们要面向接口编程？！" target="_blank">为什么我们要面向接口编程？！</a>
                   </li>
                 
                   <li>
-                    <a href="/2020/03/06/代理和动态代理/" title="代理和动态代理" target="_blank">代理和动态代理</a>
+                    <a href="/2020/03/12/PHP中的闭包/" title="PHP中的闭包" target="_blank">PHP中的闭包</a>
                   </li>
                 
                   <li>
-                    <a href="/2020/03/05/利用php数组函数进行函数式编程/" title="利用php数组函数进行函数式编程" target="_blank">利用php数组函数进行函数式编程</a>
+                    <a href="/2020/03/10/Laravel源码-Facade/" title="Laravel-Facade" target="_blank">Laravel-Facade</a>
                   </li>
                 
               </ul>
@@ -1074,7 +1055,7 @@
     
       <span class="post-meta-item-text">站点总字数：</span>
     
-    <span title="站点总字数">3.8m</span>
+    <span title="站点总字数">3.9m</span>
   
 
   
@@ -1085,7 +1066,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">57:43</span>
+    <span title="站点阅读时长">58:30</span>
   
 </div>
 
