@@ -103,18 +103,18 @@
 
 
 
-  <meta name="description" content="记录自己的学习过程">
+  <meta name="description" content="思考并回答以下问题：">
 <meta name="keywords" content="Unity">
 <meta property="og:type" content="article">
 <meta property="og:title" content="使用Unity粒子系统实现2D人物足迹效果">
 <meta property="og:url" content="http://chebincarl.github.io/2020/04/06/使用Unity粒子系统实现2D人物足迹效果/index.html">
 <meta property="og:site_name" content="车斌的博客">
-<meta property="og:description" content="记录自己的学习过程">
+<meta property="og:description" content="思考并回答以下问题：">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2020-04-06T13:16:23.527Z">
+<meta property="og:updated_time" content="2020-04-07T14:47:11.360Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用Unity粒子系统实现2D人物足迹效果">
-<meta name="twitter:description" content="记录自己的学习过程">
+<meta name="twitter:description" content="思考并回答以下问题：">
 
 
 
@@ -426,16 +426,46 @@
                 
               
 
-              <time title="创建时间：2020-04-06 08:49:52 / 修改时间：21:16:23" itemprop="dateCreated datePublished" datetime="2020-04-06T08:49:52+08:00">2020-04-06</time>
+              <time title="创建时间：2020-04-06 08:49:52" itemprop="dateCreated datePublished" datetime="2020-04-06T08:49:52+08:00">2020-04-06</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2020-04-07 22:47:11" itemprop="dateModified" datetime="2020-04-07T22:47:11+08:00">2020-04-07</time>
               
             
           </span>
 
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Unity/" itemprop="url" rel="index"><span itemprop="name">Unity</span></a></span>
+
+                
+                
+              
+            </span>
           
 
           
@@ -459,7 +489,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">0</span>
+                <span title="本文字数">1.7k</span>
               
 
               
@@ -473,7 +503,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">1 分钟</span>
+                <span title="阅读时长">2 分钟</span>
               
             </div>
           
@@ -493,7 +523,36 @@
       
 
       
-        
+        <p>思考并回答以下问题：</p>
+<a id="more"></a>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>项目中使用的基本角色控制脚本是由 Unity Learn 中的官方教程 John Lemon’s Haunted Jaunt（很不错的教程）中的示例控制脚本改进而来。其基本思路是根据输入计算一个 2 维向量 lookDirection 作为角色的“面向”，并根据这一向量移动刚体以及播放动画。</p>
+<p>它能够保证对于任意角度，角色的移动速度都保持一致，并且这一向量对于脚印效果的实现很重要。</p>
+<p>如有疑问可以查阅底部的教程链接或直接下载脚本。</p>
+<p>部分脚本参考<br>基本思路：</p>
+<p>首先来梳理一下想要的人物足迹的特性：</p>
+<p>在人物移动时生成，并在一段特定时间后消失，最好有个淡出效果<br>足迹会沿人物移动轨迹左右交互排列<br>足迹的指向与人物移动方向相同，也就是说在人物转向时，足迹也应旋转对应的角度<br>第一反应：建一个脚印的 prefab，利用动画器实现淡出效果，用脚本实现脚印的生成、销毁、镜像与旋转。之后深入一想脚本大概要怎么写，感觉头大的不行，又想到了 Hierarchy 里面被 FootStep12345678 塞得满满当当的壮丽场面..还是换个方法吧</p>
+<p>转念一想：unity 的粒子系统似乎可以满足所有特性：生成淡出销毁全自动，跟随人物也是基本操作，比较存疑的就是用脚本控制粒子的镜像与旋转。</p>
+<p>之后当然就是搜索有没有现成的轮子可以用，别说，还真在 unity forums 找到了一个官方比较完美的粒子系统足迹效果。唯一的问题就是它是一个 3D 示例，而我的游戏则是纯 2D。</p>
+<p>所以现在的问题就是如何将这一方案转换在 2D 中实现。</p>
+<p>先来分析一下它的实现脚本：</p>
+<p>用来生成脚印粒子的核心代码是 Update() 中的这一部分：</p>
+<p>其中比较重要的有两个量：transform.right 与 transform.rotation</p>
+<p>transform.right：物体 X 轴的方向，垂直于物体的面向。脚印需要在此方向上左右偏移。transform.rotation.eulerAngles.y：物体 Y 轴方向上的的旋转角度，在这个示例中也是它的移动方向旋转的角度。<br>俯视角的 2D 游戏中并不经常直接操作角色对象的旋转，所以这两个量在脚本中没有意义，需要找一个与它们类似的变量来替代它们的功能。</p>
+<p>而在之前的角色控制脚本中，恰恰有一个很重要的二维向量：lookDirection，从某种意义上它就是角色的“面向”，能够起到与 3D 中的 transform.front 类似的效果。</p>
+<p>果断使用 lookDirection 向量进行等效替换：</p>
+<p>transform.right 与 transform.front 垂直，也就是说我们需要一个与 lookDirection 垂直的向量。</p>
+<p>而两向量垂直怎么算来着？X1X2+Y1Y2 = 0 嘛。</p>
+<p>transform.right <em> gap </em> dir 等效替换为 new Vector3(lookDirection.y <em> gap </em> dir, -lookDirection.x <em> gap </em> dir, -5)<br>transform.rotation.eulerAngles.y 为物体面向旋转的角度，那么直接计算 lookDirection 与 Vector2(0, 1) 向量的夹角就完事了。</p>
+<p>transform.rotation.eulerAngles.y 等效替换为 Vector2.Angle(new Vector2(0, 1), lookDirection)<br>OK！脚本的基本思路完成了，之后就是设置粒子系统了。</p>
+<p>创建足迹系统使用的脚印材质：</p>
+<p>创建一个默认材质，然后将它的 shader 更改为 Legacy Shaders / Particles / Alpha Blended，将脚印的 sprite 拖拽到选框中。重命名为 footPrint。</p>
+<p>设置粒子系统</p>
+<p>在 Player 对象下新建一个粒子系统，并命名为 FootStep</p>
+<p>如图设置粒子系统：</p>
+<p>最后，根据情况修改角色控制脚本并调整参数</p>
+<p>之后就是快乐的测试 -&gt; 改代码 -&gt; 测试 -&gt; 改代码循环往复…</p>
+<p>最终效果：</p>
+
       
     </div>
 
@@ -513,6 +572,12 @@
     
 
     <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Unity/" rel="tag"># Unity</a>
+          
+        </div>
       
 
       
@@ -579,8 +644,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <div class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -840,6 +914,23 @@
       </div>
 
       
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
 
       
 
@@ -879,7 +970,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">61:49</span>
+    <span title="站点阅读时长">61:53</span>
   
 </div>
 
