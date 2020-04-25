@@ -1,0 +1,1522 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+  
+  
+    
+    
+  <script src="/lib/pace/pace.min.js?v=1.0.2"></script>
+  <link rel="stylesheet" href="/lib/pace/pace-theme-minimal.min.css?v=1.0.2">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.0.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.0.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.0.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.0.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.0.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="思考并回答以下问题：">
+<meta name="keywords" content="Laravel">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Container make解析机制">
+<meta property="og:url" content="http://chebincarl.github.io/2020/04/25/Container-make解析机制/index.html">
+<meta property="og:site_name" content="车斌的博客">
+<meta property="og:description" content="思考并回答以下问题：">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-04-25T14:15:41.876Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Container make解析机制">
+<meta name="twitter:description" content="思考并回答以下问题：">
+
+
+
+
+
+
+  <link rel="canonical" href="http://chebincarl.github.io/2020/04/25/Container-make解析机制/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Container make解析机制 | 车斌的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">车斌的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <p class="site-subtitle">专注，重复10遍</p>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2020/04/25/Container-make解析机制/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Chebin">
+      <meta itemprop="description" content="记录自己的学习过程">
+      <meta itemprop="image" content="/images/avatar.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="车斌的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Container make解析机制
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2020-04-25 19:51:03 / 修改时间：22:15:41" itemprop="dateCreated datePublished" datetime="2020-04-25T19:51:03+08:00">2020-04-25</time>
+            
+
+            
+              
+
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/PHP/" itemprop="url" rel="index"><span itemprop="name">PHP</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-symbolscount">
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">本文字数：</span>
+                
+                <span title="本文字数">10k</span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">9 分钟</span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>思考并回答以下问题：</p>
+<a id="more"></a>
+<p>resolve解析是容器中最复杂的部分，有很多小细节只有通读整个流程反复试验后才能领略作者的设计的目的。</p>
+<p>Make 和 Resolve 都是从容器中解析实例 (这个实例是指 concrete) 出来。简单说就是从容器中把前面 bind 进去的东西拿出来用。</p>
+<p>这里需要明确的是，make解析的时候会调用build函数实例化对象，就是说理论上如果绑定的是一个字符串，laravel 默认这是一个可以实例化对象的类路径。</p>
+<p>那我们如果想要绑定一个纯粹的字符串或者数字，我们可以使用闭包函数。让闭包返回我们需要的类型。具体看下面的源码</p>
+<p>把resolve和make放在一起是因为其实上在Container类中，make就是resolve的一个包装。</p>
+<p>我们看看make方法：很简单直接调用了resolve方法，类似的还有makeWith方法，有兴趣的可以看看。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">make</span><span class="params">($abstract, array $parameters = [])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;resolve($abstract, $parameters);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>先整体看下resolve函数源码：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">resolve</span><span class="params">($abstract, $parameters = [])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    $abstract = <span class="keyword">$this</span>-&gt;getAlias($abstract);</span><br><span class="line"></span><br><span class="line">    $needsContextualBuild = ! <span class="keyword">empty</span>($parameters) || ! is_null(</span><br><span class="line">        <span class="keyword">$this</span>-&gt;getContextualConcrete($abstract)</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    <span class="comment">// If an instance of the type is currently being managed as a singleton we'll</span></span><br><span class="line">    <span class="comment">// just return an existing instance instead of instantiating new instances</span></span><br><span class="line">    <span class="comment">// so the developer can keep using the same objects instance every time.</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">isset</span>(<span class="keyword">$this</span>-&gt;instances[$abstract]) &amp;&amp; ! $needsContextualBuild) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;instances[$abstract];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">$this</span>-&gt;with[] = $parameters;</span><br><span class="line"></span><br><span class="line">    $concrete = <span class="keyword">$this</span>-&gt;getConcrete($abstract);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// We're ready to instantiate an instance of the concrete type registered for</span></span><br><span class="line">    <span class="comment">// the binding. This will instantiate the types, as well as resolve any of</span></span><br><span class="line">    <span class="comment">// its "nested" dependencies recursively until all have gotten resolved.</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">$this</span>-&gt;isBuildable($concrete, $abstract)) &#123;</span><br><span class="line">        $object = <span class="keyword">$this</span>-&gt;build($concrete);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        $object = <span class="keyword">$this</span>-&gt;make($concrete);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// If we defined any extenders for this type, we'll need to spin through them</span></span><br><span class="line">    <span class="comment">// and apply them to the object being built. This allows for the extension</span></span><br><span class="line">    <span class="comment">// of services, such as changing configuration or decorating the object.</span></span><br><span class="line">    <span class="keyword">foreach</span> (<span class="keyword">$this</span>-&gt;getExtenders($abstract) <span class="keyword">as</span> $extender) &#123;</span><br><span class="line">        $object = $extender($object, <span class="keyword">$this</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// If the requested type is registered as a singleton we'll want to cache off</span></span><br><span class="line">    <span class="comment">// the instances in "memory" so we can return it later without creating an</span></span><br><span class="line">    <span class="comment">// entirely new instance of an object on each subsequent request for it.</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">$this</span>-&gt;isShared($abstract) &amp;&amp; ! $needsContextualBuild) &#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;instances[$abstract] = $object;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">$this</span>-&gt;fireResolvingCallbacks($abstract, $object);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Before returning, we will also set the resolved flag to "true" and pop off</span></span><br><span class="line">    <span class="comment">// the parameter overrides for this build. After those two things are done</span></span><br><span class="line">    <span class="comment">// we will be ready to return back the fully constructed class instance.</span></span><br><span class="line">    <span class="keyword">$this</span>-&gt;resolved[$abstract] = <span class="keyword">true</span>;</span><br><span class="line"></span><br><span class="line">    array_pop(<span class="keyword">$this</span>-&gt;with);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> $object;</span><br><span class="line">&#125;</span><br><span class="line">```    </span><br><span class="line">还是从参数说起</span><br><span class="line"></span><br><span class="line"><span class="number">0.1</span>. 参数 $abstruct, 获取在容器中的服务的名字，或者叫 id <span class="comment">// 不多说都知道</span></span><br><span class="line"><span class="number">0.2</span>. 参数 $parameters, 有些实例对象实例化的时候会需要参数，这个 $parametters 就是我们传入的参数。</span><br><span class="line"></span><br><span class="line">举例：看代码，上一章我们知道，bind 只是绑定一个闭包，啥也不干，所以不用传入参数，因为压根没有实例化对象。但是当我们这里要 make 解析的时候，即实例化 Boss.class 的时候，我们要把这个 Object 类型的对象传进去。Boss.class 才能实例化。</span><br><span class="line">```php</span><br><span class="line">app()-&gt;bind(<span class="string">'Boss'</span>, Boss.class);</span><br><span class="line"></span><br><span class="line">class Boss()&#123;</span><br><span class="line">    <span class="keyword">private</span> $obj;</span><br><span class="line">    <span class="comment">//这里构造函数需要一个对象才能实例化。</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">(Object $obj)</span></span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;obj = $obj;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">app()-&gt;make(<span class="string">'Boss'</span>，[<span class="keyword">new</span> Object()]);</span><br></pre></td></tr></table></figure></p>
+<p>1.获取 $abstract 的别名。请参看・别名・那章。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$abstract = <span class="keyword">$this</span>-&gt;getAlias($abstract);</span><br></pre></td></tr></table></figure></p>
+<p>2.设置一个变量 $needsContextualBuild 来做标记，标记当前这个解析的实例需不需要上下文绑定。在上下文绑定那章我们也说了，上下文绑定其实就是依赖绑定，就是判断当前的 make 的实例需不需要依赖。满足下面两个条件中的任意一个就需要：<br>a. 传入的参数不为空。很好理解，你都传入参数了，这个参数上面刚刚讲了就是为了当前实例化的时候传入作为依赖的。<br>b. 通过函数 getContextualConcrete，获取到了当前解析的这个类，是否已经有了上下文绑定的依赖。(就是事先已经使用上下文绑定过了)，这个其实虚 的没有任何作用，往下细看<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$needsContextualBuild = ! <span class="keyword">empty</span>($parameters) || ! is_null(</span><br><span class="line">            <span class="keyword">$this</span>-&gt;getContextualConcrete($abstract)</span><br><span class="line">        );</span><br></pre></td></tr></table></figure></p>
+<p>2.1. 那让我们看看 getContextualConcrete($abstract) 方法如何获取事先绑定的上下文依赖的：<br>2.1.1. 首先判断是否在上下文绑定的数组中存在 abstruct 的实例 concrete，如果有就返回。// 直接从数组中找。<br>2.1.2. 如果没有，看看这个 $abstractAliases 数组里面有没有 $abstruct 别名，这个数组前面” 别名” 章节我们提过，和 $aliases 数据保存相反格式，保存 abstruct 和 alias 关系的数组。注意，后面的数组 value 值才是别名，键值‘app’是 abstruct<br>格式如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$abstractAliases = [</span><br><span class="line">  app = &#123;array&#125; [3]</span><br><span class="line">  0 = &quot;Illuminate\Foundation\Application&quot;</span><br><span class="line">  1 = &quot;Illuminate\Contracts\Container\Container&quot;</span><br><span class="line">  2 = &quot;Illuminate\Contracts\Foundation\Application&quot;</span><br><span class="line">  blade.compiler = &#123;array&#125; [1]</span><br><span class="line">  0 = &quot;Illuminate\View\Compilers\BladeCompiler&quot;</span><br><span class="line">  ...</span><br><span class="line">]</span><br></pre></td></tr></table></figure></p>
+<p>继续看源代码。如果这个数组是空的，直接返回了。<br>2.1.3. 如果这个数组不是空的，遍历所有 abstruct 的别名，这个别名在 binding 数组中是否存在。</p>
+<p>简单说就是 abstruct 如果不在上下文绑定的数组中，那么看看 abstruct 的别名是否在上下文绑定数组中。最后判断一下返回。</p>
+<p>getContextualConcrete 代码入下：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">getContextualConcrete</span><span class="params">($abstract)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (! is_null($binding = <span class="keyword">$this</span>-&gt;findInContextualBindings($abstract))) &#123;</span><br><span class="line">        <span class="keyword">return</span> $binding;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">empty</span>(<span class="keyword">$this</span>-&gt;abstractAliases[$abstract])) &#123;</span><br><span class="line">        <span class="keyword">return</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">foreach</span> (<span class="keyword">$this</span>-&gt;abstractAliases[$abstract] <span class="keyword">as</span> $alias) &#123;</span><br><span class="line">        <span class="keyword">if</span> (! is_null($binding = <span class="keyword">$this</span>-&gt;findInContextualBindings($alias))) &#123;</span><br><span class="line">            <span class="keyword">return</span> $binding;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>2.1.3.1 重点来了，我们去看看 findInContextualBindings 源码:<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">findInContextualBindings</span><span class="params">($abstract)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">isset</span>(<span class="keyword">$this</span>-&gt;contextual[end(<span class="keyword">$this</span>-&gt;buildStack)][$abstract])) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;contextual[end(<span class="keyword">$this</span>-&gt;buildStack)][$abstract];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>还记得上下文绑定那章的存储结构就是这样:contextual[when][give] = implement。这里就是取对应的值。<br>但是我们发现他在取 [give] 值的时候它使用了 end ($this-&gt;buildStack) buildStack 是 build 的实例的堆栈，我们上下文绑定的流程中完全没有这个绑定。也就是说我们从 resolve 进来你是找不到这个值的，这完全是虚的没有任何作用，getContextualConcrete 不会取得任何值。他的存在其实是给 build 函数创建依赖对象的时候，会递归再次回来 make 解析依赖类用的。看下一章 build 方法解析</p>
+<p>总结第二点，其实我们这里主要判断是就是有没有 parameters，getContextualConcrete 似乎完全不会取得任何值。</p>
+<p>3.回到主线 resolve 函数，如果在数组 instances 中已经存才这个 abstruct 的对象了并且不需要上下文绑定，直接调用这个 instances 中的值返回。我们前面章节知道 instances 数组是保存可以 shared 的实体对象。既然有了，并且没有依赖，就直接返回。<br>这里有个问题，如果有依赖，instances 中的值为什么不能直接返回，因为依赖可能会变化，仔细想想是不是。你前面使用 instance传入的有依赖的对象的参数，和这次我们要求的对象传入的依赖参数，可能是不同的。比如 以前存储的 new A(‘1’), 这次需要的 new A(‘2’)，一个对象参数不同。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="keyword">isset</span>(<span class="keyword">$this</span>-&gt;instances[$abstract]) &amp;&amp; ! $needsContextualBuild) </span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;instances[$abstract];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里有一个问题，通过 instance() 方法是可以保存任何类型数据的。但是如果 instances 数组中没有事先存在的值，那么make解析的字符串默认被当做一个类路径的。（后面章节有 instace 绑定源码分析）举例如下：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//使用instance存入字符串绑定。成功</span></span><br><span class="line"><span class="keyword">$this</span>-&gt;app-&gt;instance(<span class="string">'money'</span>,<span class="string">"11"</span>);</span><br><span class="line">$re = <span class="keyword">$this</span>-&gt;app-&gt;make(<span class="string">'money'</span>);<span class="comment">//success</span></span><br><span class="line"><span class="comment">//通过闭包绑定字符串类型的值 成功</span></span><br><span class="line"><span class="keyword">$this</span>-&gt;app-&gt;bind(<span class="string">'money'</span>, <span class="function"><span class="keyword">function</span><span class="params">()</span></span>&#123;<span class="keyword">return</span> <span class="string">"11"</span>;&#125;);</span><br><span class="line">$re = <span class="keyword">$this</span>-&gt;app-&gt;make(<span class="string">'money'</span>);<span class="comment">//success</span></span><br><span class="line"><span class="comment">//直接绑定字符串，同时instances数组中不存在任何值，11被当做一个类路径处理。失败</span></span><br><span class="line"><span class="keyword">$this</span>-&gt;app-&gt;bind(<span class="string">'money'</span>, <span class="string">'11'</span>);</span><br><span class="line">$re = <span class="keyword">$this</span>-&gt;app-&gt;make(<span class="string">'money'</span>);<span class="comment">//fail</span></span><br></pre></td></tr></table></figure></p>
+<p>4.1 前面的条件没成立的话，接下来，把参数parameters存入with数组，前面讲过了，parameters 是实例化的时候需要的依赖，所以暂存于 with 数组。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">$this</span>-&gt;with[] = $parameters;</span><br></pre></td></tr></table></figure></p>
+<p>4.2. 接来下通过函数 getConcrete ($abstract) 获取 concrete<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$concrete = <span class="keyword">$this</span>-&gt;getConcrete($abstract);</span><br></pre></td></tr></table></figure></p>
+<p>我们看 getConcrete 源代码:<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">getConcrete</span><span class="params">($abstract)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (! is_null($concrete = <span class="keyword">$this</span>-&gt;getContextualConcrete($abstract))) &#123;</span><br><span class="line">        <span class="keyword">return</span> $concrete;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">isset</span>(<span class="keyword">$this</span>-&gt;bindings[$abstract])) &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;bindings[$abstract][<span class="string">'concrete'</span>];</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> $abstract;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>主要的思路是：<br>a. 看看上下文绑定数组中有没有 $abstruct 对应的 concrete 值，如果有，太好了，最复杂的情况就是上下文绑定。直接返回就好了。连依赖都已经添加了。（参看山下文绑定存储结构和使用方法）<br>这里要特别注意，上下文绑定获取的 concrete 值可以是一个类路径，也可以是一个闭包（看看文档如何使用上下文绑定就知道了，可以传入类路径也可以是闭包。）。但是在后面的处理对两个情况是不一样的</p>
+<p>和上面情况雷同，其实这里getConcrete还是调用了getContextualConcrete，但buildstack 中没有值，所以这个是虚的。暂时是没有值的。build 解析依赖类的时候递归回来才有这个 buildstack 值</p>
+<p>b. 如果没找到上下文绑定，就是一个普通绑定，就去bindings的数组中看看有没有$abstruct 对应的 concrete 值，从而确认是不是以前有绑定过。同样的$concrete可以是一个闭包，也可以是一个类路径。<br>c. 都没有，说明没有绑定！！直接返回 $abstruct。</p>
+<p>这里说明什么呢，我猜想我们是可以不用绑定bind函数，而直接make的，这样的话可以直接把 $abstruct 当做 $concrete 来解析.<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//实测有效，直接返回Money::class 对象。</span></span><br><span class="line">$boss= app()-&gt;make(Money::class);</span><br></pre></td></tr></table></figure></p>
+<p>这个方法处理的结果也有三种可能：<br>a. 上下文绑定的 concrete (这个其实没有)<br>b.binding 数组中的 concrete<br>c. 把 $concrete === $abstruct 相等。<br>这里的 c 步骤到底做了什么，怎么处理的？我们往下看代码。第五步。</p>
+<p>5.获取解析的对象了。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="keyword">$this</span>-&gt;isBuildable($concrete, $abstract)) &#123;</span><br><span class="line">    $object = <span class="keyword">$this</span>-&gt;build($concrete);</span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    $object = <span class="keyword">$this</span>-&gt;make($concrete);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>5.1 首先，我们要看下函数 isBuildable 函数是什么要求。<br>如果 $concrete === $abstract 或者 concrete 是一个闭包，好办返回 true。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">isBuildable</span><span class="params">($concrete, $abstract)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> $concrete === $abstract || $concrete <span class="keyword">instanceof</span> Closure;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>5.2 如果是 true，那么使用 build 函数处理这个 object<br>我们在这里简单说下 build 具体的会在下一章 build 源码中分析。build的作用是这样的：<br>a. 如果 concrete 是闭包，build 执行闭包函数。<br>b. 不是闭包，build 函数会使用反射产生当前 $concrete 类的对象。和前面我们的猜想一样。既然 $abstruct===$concrete，那么直接解析，都不用绑定。</p>
+<p>5.3 如果 isBuildable 返回的是 false呢？就是$concrete的值是・类路径・的情况，调用 make 进入递归。如下 give 给的不是一个闭包是一个类路径。则进入 make。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">$container</span><br><span class="line">    -&gt;when(VideoController::class)</span><br><span class="line">    -&gt;needs(Filesystem::class)</span><br><span class="line">    -&gt;give(S3Filesystem::class);</span><br><span class="line">```    </span><br><span class="line">make再去getConcrete函数，去上下文绑定数组和binding数组，查询这个时候这个・类路径下・（就是 abstruct）有没有对应的闭包或类路径。但不管怎么样。最后下来要么闭包，要么相等，他都会进入 build 函数创建对象。</span><br><span class="line"></span><br><span class="line"><span class="number">6.</span>到此，我们得到了解析出来的 object 对象。</span><br><span class="line"></span><br><span class="line">然后第六步我们要看看是否有扩展绑定 entend 的处理，参看 <span class="number">0.2</span> 章节，执行</span><br><span class="line">```php</span><br><span class="line"><span class="keyword">foreach</span> (<span class="keyword">$this</span>-&gt;getExtenders($abstract) <span class="keyword">as</span> $extender) &#123;</span><br><span class="line">    $object = $extender($object, <span class="keyword">$this</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>7.是否是单例分享的，如果是的话就存入 instance，参看 0.4 章节<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="keyword">$this</span>-&gt;isShared($abstract) &amp;&amp; ! $needsContextualBuild) &#123;</span><br><span class="line">    <span class="keyword">$this</span>-&gt;instances[$abstract] = $object;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>8.接着触发各个回调函数，参看0.3章节，执行回调，这个函数就是触发3个地方的回调函数。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">$this</span>-&gt;fireResolvingCallbacks($abstract, $object);</span><br></pre></td></tr></table></figure></p>
+<p>9.标记已经解析了。并且把参数从with中pop掉，没用了。这个with在build方法中使用了，在make方法中没有用到。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">$this</span>-&gt;resolved[$abstract] = <span class="keyword">true</span>;</span><br><span class="line">array_pop(<span class="keyword">$this</span>-&gt;with);</span><br></pre></td></tr></table></figure></p>
+<p>最后返回对象。</p>
+<h1 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h1><p>make（解析）相对复杂。但是主要关注几个大步骤就能明白流程。</p>
+<ul>
+<li>1.首先获取最终的别名。</li>
+<li>2.设置是否是・上下文绑定・的标记</li>
+<li>3.如果在shared的instances数组中找到了，同时又不是有上下文绑定需求的。直接返回对象。结束程序。</li>
+<li>4.否则，把实例化对象所依赖的参数parameters暂存with数组</li>
+<li>5.通过getConcrete方法获取$concrete.注意这里的concrete还不是对象，是类路径或者是一个闭包函数</li>
+<li>6.有了$concrete，如果是闭包，我们利用 build 函数生成对象。</li>
+<li>7.如果是类路径，我们要再递归，看看这个路径下是否还有$concrete的绑定。如果有再递归，像别名一样，找到真正那个。如果没有，使用build函数反射原理生成对象返回，with 数组将在 build 反射中使用。</li>
+<li>8.完成对象生成，看看有没有extend扩展</li>
+<li>9.看看是否需要 shard，把对象存入instance中</li>
+<li>10.触发各个回调函数</li>
+<li>11.记录这个abstruct已经解析过了。</li>
+<li>12.把with数组中parameters清空掉。</li>
+<li>13.返回对象</li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Laravel/" rel="tag"># Laravel</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2020/04/25/Container-Bind机制/" rel="next" title="Container Bind机制">
+                <i class="fa fa-chevron-left"></i> Container Bind机制
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2020/04/25/build解析机制/" rel="prev" title="build解析机制">
+                build解析机制 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="/images/avatar.jpg" alt="Chebin">
+            
+              <p class="site-author-name" itemprop="name">Chebin</p>
+              <div class="site-description motion-element" itemprop="description">记录自己的学习过程</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">419</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">12</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">65</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+
+          
+            <div class="links-of-blogroll motion-element links-of-blogroll-block">
+              <div class="links-of-blogroll-title">
+                <!-- modify icon to fire by szw -->
+                <i class="fa fa-history fa-" aria-hidden="true"></i>
+                近期文章
+              </div>
+              <ul class="links-of-blogroll-list">
+                
+                
+                  <li>
+                    <a href="/2020/04/25/tag解析机制/" title="tag解析机制" target="_blank">tag解析机制</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/04/25/build解析机制/" title="build解析机制" target="_blank">build解析机制</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/04/25/Container-make解析机制/" title="Container make解析机制" target="_blank">Container make解析机制</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/04/25/Container-Bind机制/" title="Container Bind机制" target="_blank">Container Bind机制</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/04/25/Share机制与Alias别名/" title="Share机制与Alias别名" target="_blank">Share机制与Alias别名</a>
+                  </li>
+                
+              </ul>
+            </div>
+        
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#总结："><span class="nav-number">1.</span> <span class="nav-text">总结：</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; 2018 – <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Chebin</span>
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点总字数：</span>
+    
+    <span title="站点总字数">4.3m</span>
+  
+
+  
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+    
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    
+    <span title="站点阅读时长">65:49</span>
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a></div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+          <span id="scrollpercent"><span>0</span>%</span>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=7.0.1"></script>
+
+  <script src="/js/src/motion.js?v=7.0.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=7.0.1"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=7.0.1"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=7.0.1"></script>
+<script src="/js/src/post-details.js?v=7.0.1"></script>
+
+
+
+  
+
+
+  <script src="/js/src/next-boot.js?v=7.0.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<script>
+  $('.highlight').each(function(i, e) {
+    var $wrap = $('<div>').addClass('highlight-wrap');
+    $(e).after($wrap);
+    $wrap.append($('<button>').addClass('copy-btn').append('复制').on('click', function(e) {
+      var code = $(this).parent().find('.code').find('.line').map(function(i, e) {
+        return $(e).text();
+      }).toArray().join('\n');
+      var ta = document.createElement('textarea');
+      var yPosition = window.pageYOffset || document.documentElement.scrollTop;
+      ta.style.top = yPosition + 'px'; // Prevent page scroll
+      ta.style.position = 'absolute';
+      ta.style.opacity = '0';
+      ta.readOnly = true;
+      ta.value = code;
+      document.body.appendChild(ta);
+      ta.select();
+      ta.setSelectionRange(0, code.length);
+      ta.readOnly = false;
+      var result = document.execCommand('copy');
+      
+        if (result) $(this).text('复制成功');
+        else $(this).text('复制失败');
+      
+      ta.blur(); // For iOS
+      $(this).blur();
+    })).on('mouseleave', function(e) {
+      var $b = $(this).find('.copy-btn');
+      setTimeout(function() {
+        $b.text('复制');
+      }, 300);
+    }).append(e);
+  })
+</script>
+
+
+  
+
+  
+
+</body>
+</html>

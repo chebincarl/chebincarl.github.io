@@ -111,7 +111,7 @@
 <meta property="og:site_name" content="车斌的博客">
 <meta property="og:description" content="思考并回答以下问题：">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2020-03-30T15:17:04.153Z">
+<meta property="og:updated_time" content="2020-04-23T12:42:47.759Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Laravel-Provider">
 <meta name="twitter:description" content="思考并回答以下问题：">
@@ -443,7 +443,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2020-03-30 23:17:04" itemprop="dateModified" datetime="2020-03-30T23:17:04+08:00">2020-03-30</time>
+                <time title="修改时间：2020-04-23 20:42:47" itemprop="dateModified" datetime="2020-04-23T20:42:47+08:00">2020-04-23</time>
               
             
           </span>
@@ -525,7 +525,7 @@
       
         <p>思考并回答以下问题：</p>
 <a id="more"></a>
-<h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>服务提供者是Laravel应用启动的中心，你自己的应用以及所有Laravel的核心服务都是通过服务提供者启动。</p>
+<h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a><span style="color:#339AFF;">简介</span></h1><p>服务提供者是Laravel应用启动的中心，你自己的应用以及所有Laravel的核心服务都是通过服务提供者启动。</p>
 <p>但是，我们所谓的「启动」指的是什么？通常，这意味着注册服务，包括注册服务容器绑定、事件监听器、中间件甚至路由。服务提供者是应用配置的中心。</p>
 <p>如果你打开Laravel自带的config/app.php文件，将会看到一个providers数组，这里就是应用所要加载的所有服务提供者类，当然，其中很多是延迟加载的，也就是说不是每次请求都会被加载，只有真的用到它们的时候才会加载。</p>
 <p>通过本文档，你将会学习如何编写自己的服务提供者并在Laravel应用中注册它们。</p>
@@ -534,7 +534,7 @@
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php artisan make:provider RiakServiceProvider</span><br></pre></td></tr></table></figure>
 <p><strong>register方法</strong></p>
 <p>正如前面所提到的，在register方法中只绑定服务到服务容器，而不要做其他事情，否则，一不小心就可能用到一个尚未被加载的服务提供者提供的服务。</p>
-<p>现在让我们来看看一个基本的服务提供者长什么样，在任何服务提供者方法中，都可以通过$app 属性来访问服务容器：</p>
+<p>现在让我们来看看一个基本的服务提供者长什么样，在任何服务提供者方法中，都可以通过$app属性来访问服务容器：</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">namespace</span> <span class="title">App</span>\<span class="title">Providers</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">use</span> <span class="title">Riak</span>\<span class="title">Connection</span>;</span><br><span class="line"><span class="keyword">use</span> <span class="title">Illuminate</span>\<span class="title">Support</span>\<span class="title">ServiceProvider</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">RiakServiceProvider</span> <span class="keyword">extends</span> <span class="title">ServiceProvider</span></span>&#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 在容器中注册绑定.</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> void</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">register</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;app-&gt;singleton(Connection::class, <span class="function"><span class="keyword">function</span> <span class="params">($app)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> Connection(config(<span class="string">'riak'</span>));</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>该服务提供者只定义了一个register方法，并使用该方法在服务容器中定义了一个Riak\Connection的实现。如果你不知道服务容器是如何工作的，请参考其文档。</p>
 <p>bindings和singletons属性</p>
@@ -672,7 +672,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">407</span>
+                    <span class="site-state-item-count">419</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -891,23 +891,23 @@
                 
                 
                   <li>
-                    <a href="/2020/04/19/第9关-关卡设计/" title="第9关 关卡设计" target="_blank">第9关 关卡设计</a>
+                    <a href="/2020/04/25/tag解析机制/" title="tag解析机制" target="_blank">tag解析机制</a>
                   </li>
                 
                   <li>
-                    <a href="/2020/04/18/第3章-体验发生于场景/" title="第3章-体验发生于场景" target="_blank">第3章-体验发生于场景</a>
+                    <a href="/2020/04/25/build解析机制/" title="build解析机制" target="_blank">build解析机制</a>
                   </li>
                 
                   <li>
-                    <a href="/2020/04/18/第7章-确定操作感/" title="第7章-确定操作感" target="_blank">第7章-确定操作感</a>
+                    <a href="/2020/04/25/Container-make解析机制/" title="Container make解析机制" target="_blank">Container make解析机制</a>
                   </li>
                 
                   <li>
-                    <a href="/2020/04/17/Laravel-Throttle/" title="Laravel-Throttle" target="_blank">Laravel-Throttle</a>
+                    <a href="/2020/04/25/Container-Bind机制/" title="Container Bind机制" target="_blank">Container Bind机制</a>
                   </li>
                 
                   <li>
-                    <a href="/2020/04/16/Unity-责任链模式/" title="Unity-责任链模式" target="_blank">Unity-责任链模式</a>
+                    <a href="/2020/04/25/Share机制与Alias别名/" title="Share机制与Alias别名" target="_blank">Share机制与Alias别名</a>
                   </li>
                 
               </ul>
@@ -979,7 +979,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">65:35</span>
+    <span title="站点阅读时长">65:49</span>
   
 </div>
 
