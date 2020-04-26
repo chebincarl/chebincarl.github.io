@@ -111,7 +111,7 @@
 <meta property="og:site_name" content="车斌的博客">
 <meta property="og:description" content="思考并回答以下问题：">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2020-04-25T14:18:56.498Z">
+<meta property="og:updated_time" content="2020-04-26T12:34:48.167Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="build解析机制">
 <meta name="twitter:description" content="思考并回答以下问题：">
@@ -426,12 +426,24 @@
                 
               
 
-              <time title="创建时间：2020-04-25 19:51:19 / 修改时间：22:18:56" itemprop="dateCreated datePublished" datetime="2020-04-25T19:51:19+08:00">2020-04-25</time>
+              <time title="创建时间：2020-04-25 19:51:19" itemprop="dateCreated datePublished" datetime="2020-04-25T19:51:19+08:00">2020-04-25</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2020-04-26 20:34:48" itemprop="dateModified" datetime="2020-04-26T20:34:48+08:00">2020-04-26</time>
               
             
           </span>
@@ -477,7 +489,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">11k</span>
+                <span title="本文字数">10k</span>
               
 
               
@@ -491,7 +503,7 @@
                 
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
-                <span title="阅读时长">10 分钟</span>
+                <span title="阅读时长">9 分钟</span>
               
             </div>
           
@@ -513,84 +525,88 @@
       
         <p>思考并回答以下问题：</p>
 <a id="more"></a>
-<p>build 的作用就是生成对象，具体他是怎么根据不同情况生成对象的，看源代码。</p>
+<p>build的作用就是生成对象，具体他是怎么根据不同情况生成对象的，看源代码。</p>
 <p>源代码：</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//0 -&gt; 参数</span></span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">build</span><span class="params">($concrete)</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="comment">//1 </span></span><br><span class="line">    <span class="keyword">if</span> ($concrete <span class="keyword">instanceof</span> Closure) &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> $concrete(<span class="keyword">$this</span>, <span class="keyword">$this</span>-&gt;getLastParameterOverride());</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//2</span></span><br><span class="line">    $reflector = <span class="keyword">new</span> ReflectionClass($concrete);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (! $reflector-&gt;isInstantiable()) &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;notInstantiable($concrete);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">//3</span></span><br><span class="line">    <span class="keyword">$this</span>-&gt;buildStack[] = $concrete;</span><br><span class="line"></span><br><span class="line">    $constructor = $reflector-&gt;getConstructor();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (is_null($constructor)) &#123;</span><br><span class="line"></span><br><span class="line">        array_pop(<span class="keyword">$this</span>-&gt;buildStack);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> $concrete;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">//4</span></span><br><span class="line">    $dependencies = $constructor-&gt;getParameters();</span><br><span class="line"></span><br><span class="line">    $instances = <span class="keyword">$this</span>-&gt;resolveDependencies(</span><br><span class="line"></span><br><span class="line">        $dependencies</span><br><span class="line"></span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    array_pop(<span class="keyword">$this</span>-&gt;buildStack);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> $reflector-&gt;newInstanceArgs($instances);</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <ol>
-<li><p>还是从参数说起，传入的实例 concrete, 可以是闭包函数，可以是一个类路径。还是重新提一下，concrete 并不是实体类对象，而是可以产生对象的类或者闭包。和实体对象集合 instance 有区别。</p>
-</li>
-<li><p>如果这个 concrete 是一个闭包函数，我们就直接执行这个闭包。</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ($concrete <span class="keyword">instanceof</span> Closure) &#123;</span><br><span class="line">    <span class="keyword">return</span> $concrete(<span class="keyword">$this</span>, <span class="keyword">$this</span>-&gt;getLastParameterOverride());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
+<li>还是从参数说起，传入的实例concrete，可以是闭包函数，可以是一个类路径。还是重新提一下，concrete并不是实体类对象，而是可以产生对象的类或者闭包。和实体对象集合instance有区别。</li>
 </ol>
-<p>这里的闭包的形式为：<br>$concrete($this, $this&gt;getLastParameterOverride());</p>
+<p>1.如果这个concrete是一个闭包函数，我们就直接执行这个闭包。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> ($concrete <span class="keyword">instanceof</span> Closure) &#123;</span><br><span class="line">    <span class="keyword">return</span> $concrete(<span class="keyword">$this</span>, <span class="keyword">$this</span>-&gt;getLastParameterOverride());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里的闭包的形式为：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$concrete(<span class="keyword">$this</span>, <span class="keyword">$this</span>&gt;getLastParameterOverride());</span><br></pre></td></tr></table></figure></p>
 <p>有两个参数，但是不传参数也是可以的。</p>
-<p>1.1 第二个参数 $this-&gt;getLastParameterOverride(), 我们看下源代码：make 解析那章，解析的时候把 parameters 存入了 with 数组，这个时候就是使用 getLastParameterOverride 获取 with 数组的最后一个值，也就是我们 make 时候刚刚放入的对象的 parameters。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">getLastParameterOverride</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> count(<span class="keyword">$this</span>-&gt;with) ? end(<span class="keyword">$this</span>-&gt;with) : [];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<ol>
-<li>创建一个 php 的 ReflectionClass 对象，包含类的信息（参考 php 文档），ReflectionClass 针对类，ReflectionObject 则是对对象。</li>
-</ol>
-<p>所以这里 concrete 是一个类路径。正如前面提到的。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$reflector = <span class="keyword">new</span> ReflectionClass($concrete);</span><br></pre></td></tr></table></figure></p>
-<p>2.1 如果这不是一个可以初始化的类，那么 notInstantiable 方法会抛出一个异常。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (! $reflector-&gt;isInstantiable()) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;notInstantiable($concrete);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>notInstantiable 方法源代码：发现他无非就是组织一个 message，然后抛出了一个异常。</p>
-<p>他返回的异常提示是 Targe … is not instantiable.</p>
+<p>第二个参数$this-&gt;getLastParameterOverride()，我们看下源代码：make解析那章，解析的时候把parameters存入了with数组，这个时候就是使用getLastParameterOverride获取with数组的最后一个值，也就是我们 make 时候刚刚放入的对象的 parameters。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">getLastParameterOverride</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> count(<span class="keyword">$this</span>-&gt;with) ? end(<span class="keyword">$this</span>-&gt;with) : [];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>2.创建一个php的ReflectionClass对象，包含类的信息，ReflectionClass针对类，ReflectionObject则是对对象。</p>
+<p>所以这里concrete是一个类路径。正如前面提到的。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$reflector = <span class="keyword">new</span> ReflectionClass($concrete);</span><br></pre></td></tr></table></figure></p>
+<p>2.1如果这不是一个可以初始化的类，那么notInstantiable方法会抛出一个异常。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (! $reflector-&gt;isInstantiable()) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;notInstantiable($concrete);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>notInstantiable方法源代码：发现他无非就是组织一个message，然后抛出了一个异常。</p>
+<p>他返回的异常提示是Targe … is not instantiable.</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">notInstantiable</span><span class="params">($concrete)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (! <span class="keyword">empty</span>(<span class="keyword">$this</span>-&gt;buildStack)) &#123;</span><br><span class="line"></span><br><span class="line">        $previous = implode(<span class="string">', '</span>, <span class="keyword">$this</span>-&gt;buildStack);</span><br><span class="line"></span><br><span class="line">        $message = <span class="string">"Target [$concrete] is not instantiable while building [$previous]."</span>;</span><br><span class="line"></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line"></span><br><span class="line">        $message = <span class="string">"Target [$concrete] is not instantiable."</span>;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> BindingResolutionException($message);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <ol>
-<li>这里通过 php 反射机制，用 concrete 类产生对象。如何实现呢？如下步骤</li>
+<li>这里通过php反射机制，用Concrete类产生对象。如何实现呢？如下步骤</li>
 </ol>
-<p>3.1 首先把 concrete 存入数组 buildStack 中，等下用。为什么一定要先存入一个数组呢？下面会讲。如果细看上一章，也许你知道。</p>
+<p>3.1 首先把concrete存入数组buildStack中，等下用。为什么一定要先存入一个数组呢？下面会讲。如果细看上一章，也许你知道。</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">$this</span>-&gt;buildStack[] = $concrete;</span><br></pre></td></tr></table></figure>
-<p>3.2 然后利用前面得到的反射对象通过 getConstructor 方法得到他的构造函数，</p>
-<p>如果构造函数是空的，就是默认没有参数的构造函数，从 buildStack 取出 concrete 使用 new 创建这个对象返回。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$constructor = $reflector-&gt;getConstructor();</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (is_null($constructor)) &#123;</span><br><span class="line"></span><br><span class="line">    array_pop(<span class="keyword">$this</span>-&gt;buildStack);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> $concrete;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>3.2 然后利用前面得到的反射对象通过getConstructor方法得到他的构造函数，</p>
+<p>如果构造函数是空的，就是默认没有参数的构造函数，从buildStack取出concrete使用new创建这个对象返回。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$constructor = $reflector-&gt;getConstructor();</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (is_null($constructor)) &#123;</span><br><span class="line"></span><br><span class="line">    array_pop(<span class="keyword">$this</span>-&gt;buildStack);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> $concrete;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
 <ol>
 <li>否则就是类里有自定义构造函数，或者说可能构造函数存在依赖的情况。我们要先获取依赖再去创建对象。</li>
 </ol>
 <p>4.1 通过构造函数我们获取参数依赖。就是构造函数中的参数，如果没有，返回一个空的数组。</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$dependencies = $constructor-&gt;getParameters();</span><br></pre></td></tr></table></figure>
-<p>在进行下面的分析前，先明确 getParameters () 会返回的数组的形式，帮助后面的分析，下面为一个例子：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">dollar</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">($import)</span></span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">getAmount</span><span class="params">()</span></span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="number">100</span>;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$reflect = <span class="keyword">new</span> ReflectionClass(<span class="string">'dollar'</span>);</span><br><span class="line"></span><br><span class="line">$constructor = $reflect-&gt;getConstructor();</span><br><span class="line"></span><br><span class="line">var_dump($constructor-&gt;getParameters());</span><br></pre></td></tr></table></figure></p>
+<p>在进行下面的分析前，先明确getParameters()会返回的数组的形式，帮助后面的分析，下面为一个例子：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">dollar</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">($import)</span></span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">getAmount</span><span class="params">()</span></span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="number">100</span>;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">$reflect = <span class="keyword">new</span> ReflectionClass(<span class="string">'dollar'</span>);</span><br><span class="line"></span><br><span class="line">$constructor = $reflect-&gt;getConstructor();</span><br><span class="line"></span><br><span class="line">var_dump($constructor-&gt;getParameters());</span><br></pre></td></tr></table></figure></p>
 <p>最后他输出的结构是：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">array(1) &#123;</span><br><span class="line">    [0] =&gt; object(ReflectionParameter)#3 (1) &#123;</span><br><span class="line">        [&quot;name&quot;]=&gt;string(6) &quot;import&quot;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>4.2 有了上面的例子。使用 resolveDependencies 方法解析然后获取这个依赖。（不想看具体实现可以跳过到 4.3）<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$instances = <span class="keyword">$this</span>-&gt;resolveDependencies($dependencies);</span><br></pre></td></tr></table></figure></p>
+<p>4.2 有了上面的例子。使用resolveDependencies方法解析然后获取这个依赖。（不想看具体实现可以跳过到4.3）<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$instances = <span class="keyword">$this</span>-&gt;resolveDependencies($dependencies);</span><br></pre></td></tr></table></figure></p>
 <p>看下整个源码，然后再一步一步看。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">resolveDependencies</span><span class="params">(array $dependencies)</span></span></span><br><span class="line"><span class="function"></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line"></span><br><span class="line">    $results = [];</span><br><span class="line"></span><br><span class="line">    <span class="keyword">foreach</span> ($dependencies <span class="keyword">as</span> $dependency) &#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">$this</span>-&gt;hasParameterOverride($dependency)) &#123;</span><br><span class="line"></span><br><span class="line">            $results[] = <span class="keyword">$this</span>-&gt;getParameterOverride($dependency);</span><br><span class="line"></span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        $results[] = is_null($dependency-&gt;getClass()) ? </span><br><span class="line">        <span class="keyword">$this</span>-&gt;resolvePrimitive($dependency) : </span><br><span class="line">        <span class="keyword">$this</span>-&gt;resolveClass($dependency);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> $results;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>4.2.1 首先遍历这个依赖，然后使用方法 $this-&gt;hasParameterOverride($dependency) 判断是否参数有覆盖。什么意思呢，看 hasParameterOverride 源码，如下：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">hasParameterOverride</span><span class="params">($dependency)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> array_key_exists(</span><br><span class="line"></span><br><span class="line">        $dependency-&gt;name, <span class="keyword">$this</span>-&gt;getLastParameterOverride()</span><br><span class="line"></span><br><span class="line">    );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>$this-&gt;getLastParameterOverride()上面提到过，获取make时候存入with数组的参数。$dependency-&gt;name是什么，就是构造函数中参数的名字，上面的例子中，就是‘import’。简单说就是我们在 make 解析的时候是不是传递了这个依赖的值（就是 make 方法的第二个参数 parameters）。</p>
-<p>4.2.2 继续，如果有这个覆盖，使用 getParameterOverride 获取这个依赖的值，存入 result 数组中。</p>
+<p>4.2.1 首先遍历这个依赖，然后使用方法$this-&gt;hasParameterOverride($dependency)判断是否参数有覆盖。什么意思呢，看hasParameterOverride源码，如下：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">hasParameterOverride</span><span class="params">($dependency)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> array_key_exists(</span><br><span class="line"></span><br><span class="line">        $dependency-&gt;name, <span class="keyword">$this</span>-&gt;getLastParameterOverride()</span><br><span class="line"></span><br><span class="line">    );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>$this-&gt;getLastParameterOverride()上面提到过，获取make时候存入with数组的参数。$dependency-&gt;name是什么，就是构造函数中参数的名字，上面的例子中，就是‘import’。简单说就是我们在make解析的时候是不是传递了这个依赖的值（就是make方法的第二个参数parameters）。</p>
+<p>4.2.2继续，如果有这个覆盖，使用getParameterOverride获取这个依赖的值，存入result数组中。</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$results[] = <span class="keyword">$this</span>-&gt;getParameterOverride($dependency);</span><br></pre></td></tr></table></figure>
 <p>严谨的再看下 getParameterOverride 怎么实现的：</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">getParameterOverride</span><span class="params">($dependency)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;getLastParameterOverride()[$dependency-&gt;name];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>很简单还是通过getLastParameterOverride获取with数组，然后在数组中通过name（这里就是 import）获取</p>
-<p>4.2.3 然后 continue 循环下一个依赖。</p>
-<p>4.2.4 如果在 with 数组中找不到对应的依赖。也就是这个依赖不是我们 make 时候设定的，故意要传入的parameters，可能是其他的类。那么我们先判断这个依赖类是不是存在于当前代码中。</p>
-<p>I. 如果不存在，则使用 resolvePrimitive 方法，看看上下文绑定中有没有对应的值，再看看依赖自己有没有默认值（具体看下面4.2.5 resolvePrimitive方法源码分析）。</p>
-<p>II. 如果存在使用resolveClass方法，就是使用make函数解析这个依赖（具体看下面4.2.6 resolveClass方法源码）。</p>
+<p>很简单还是通过getLastParameterOverride获取with数组，然后在数组中通过name（这里就是import）获取</p>
+<p>4.2.3 然后continue循环下一个依赖。</p>
+<p>4.2.4 如果在with数组中找不到对应的依赖。也就是这个依赖不是我们make时候设定的，故意要传入的parameters，可能是其他的类。那么我们先判断这个依赖类是不是存在于当前代码中。</p>
+<p>I. 如果不存在，则使用resolvePrimitive方法，看看上下文绑定中有没有对应的值，再看看依赖自己有没有默认值（具体看下面4.2.5resolvePrimitive方法源码分析）。</p>
+<p>II. 如果存在使用resolveClass方法，就是使用make函数解析这个依赖（具体看下面4.2.6resolveClass方法源码）。</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$results[] = is_null($dependency-&gt;getClass())</span><br><span class="line"></span><br><span class="line">? <span class="keyword">$this</span>-&gt;resolvePrimitive($dependency)</span><br><span class="line"></span><br><span class="line">: <span class="keyword">$this</span>-&gt;resolveClass($dependency);</span><br></pre></td></tr></table></figure>
-<p>4.2.5 resolvePrimitive 方法源码：</p>
+<p>4.2.5 resolvePrimitive方法源码：</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">resolvePrimitive</span><span class="params">(ReflectionParameter $parameter)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (! is_null($concrete = <span class="keyword">$this</span>-&gt;getContextualConcrete(<span class="string">'$'</span>.$parameter-&gt;name))) &#123;</span><br><span class="line">        <span class="keyword">return</span> $concrete <span class="keyword">instanceof</span> Closure ? $concrete(<span class="keyword">$this</span>) : $concrete;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> ($parameter-&gt;isDefaultValueAvailable()) &#123;</span><br><span class="line">        <span class="keyword">return</span> $parameter-&gt;getDefaultValue();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">$this</span>-&gt;unresolvablePrimitive($parameter);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>a. 首先判断这个依赖的 name 是不是在上下文绑定中 (又来了)。</p>
+<p>a. 首先判断这个依赖的name是不是在上下文绑定中（又来了）。</p>
 <p>b. 如果这个依赖在上下文绑定中，再次提醒，我们记得上下文绑定有两个类型，一个是闭包，一个是类路径。这里如果是闭包直接执行，如果是类路径，返回类路径。</p>
 <p>c. 否则是否存在依赖有默认值，有默认值直接返回默认值。什么意思呢，这里的例子，如果是 $import=”100” 是这个情况。</p>
 <p>d. 都没有那说明没办法解析，执行unresolvablePrimitive方法，直接排除一个无法解析的异常。源码：</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">unresolvablePrimitive</span><span class="params">(ReflectionParameter $parameter)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    $message = <span class="string">"Unresolvable dependency resolving [$parameter] in class &#123;$parameter-&gt;getDeclaringClass()-&gt;getName()&#125;"</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> BindingResolutionException($message);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>4.2.6 resolveClass 方法源码：</p>
+<p>4.2.6 resolveClass方法源码：</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">resolveClass</span><span class="params">(ReflectionParameter $parameter)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;make($parameter-&gt;getClass()-&gt;name);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">catch</span> (BindingResolutionException $e) &#123;</span><br><span class="line">        <span class="keyword">if</span> ($parameter-&gt;isOptional()) &#123;</span><br><span class="line">            <span class="keyword">return</span> $parameter-&gt;getDefaultValue();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">throw</span> $e;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>a.很明显，既然在代码中存在这个类，使用make函数解析这个类。（又进入解析了，又会调用 build。）这个时候才是 buildstack 有值的时候，就是说在 resolve 函数中，getContextualConcrete 才起到了真正的作用，会检查上下文绑定。回看上一章</p>
-<p>b.有一个情况我们要考虑，如果这个类不能被解析，就是解析失败了，（比如：这个类是抽象类）。怎么办，我们上面提过，他会抛出一个BindingResolutionException异常吧，这里捕获这个异常，判断这个依赖$import是不是一个optional的参数，什么意思，还是这个情况 ($import == 100) 有没有默认值，如果有则取他的默认值(100)返回，不解析了，有默认值先用下再说。如果不是，没办法继续抛这个异常。</p>
-<p>4.2.7 最后返回包含了所有依赖的result数组，我们前面有种情况，如果有自定义构造方法但是没有传入参数，就是 result [] 是空，不影响结果。往下看。</p>
-<p>4.3 得到了依赖了，我们使用newInstanceArgs方法创建对象不再使用new了，依赖$instances为参数.</p>
-<p>4.3.1 这里再次使用array_pop从buildStack取出类。我们一开始为什么要存到buildStack 这个数组中，这个时候可以总结了：</p>
-<p>逻辑上来说：就是为了给不一样的逻辑情况提供未污染的变量。简单说就是把这个变量放起来，谁先来谁先用。具体情况来说，为了给解析依赖的时候提供一个及时的当前 build 的 concretion</p>
+<p>a.很明显，既然在代码中存在这个类，使用make函数解析这个类。（又进入解析了，又会调用 build。）这个时候才是buildstack有值的时候，就是说在resolve函数中，getContextualConcrete 才起到了真正的作用，会检查上下文绑定。回看上一章</p>
+<p>b.有一个情况我们要考虑，如果这个类不能被解析，就是解析失败了，（比如：这个类是抽象类）。怎么办，我们上面提过，他会抛出一个BindingResolutionException异常吧，这里捕获这个异常，判断这个依赖$import是不是一个optional的参数，什么意思，还是这个情况 ($import == 100) 有没有默认值，如果有则取他的默认值（100）返回，不解析了，有默认值先用下再说。如果不是，没办法继续抛这个异常。</p>
+<p>4.2.7 最后返回包含了所有依赖的result数组，我们前面有种情况，如果有自定义构造方法但是没有传入参数，就是result[]是空，不影响结果。往下看。</p>
+<p>4.3得到了依赖了，我们使用newInstanceArgs方法创建对象不再使用new了，依赖$instances为参数.</p>
+<p>4.3.1 这里再次使用array_pop从buildStack取出类。我们一开始为什么要存到buildStack这个数组中，这个时候可以总结了：</p>
+<p>逻辑上来说：就是为了给不一样的逻辑情况提供未污染的变量。简单说就是把这个变量放起来，谁先来谁先用。具体情况来说，为了给解析依赖的时候提供一个及时的当前build的concretion</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">array_pop(<span class="keyword">$this</span>-&gt;buildStack);</span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span> $reflector-&gt;newInstanceArgs($instances);</span><br></pre></td></tr></table></figure>
 <p>这就是整个流程：</p>
-<p>总结：build 方法主要是这样的流程</p>
-<p>1.是不是闭包，闭包就执行不啰嗦。</p>
-<p>2.如果不是闭包，利用 php 反射，生成 php 反射对象</p>
-<p>3.这个类有没有自己定义构造函数，如果没有（构造函数默认的），就直接 new 返回。</p>
-<p>4.如果有自定义构造函数</p>
-<p>4.1 我们先看看有没有在 make 的时候传入第二个参数，有的话获取返回这个依赖。</p>
-<p>4.2 没有传入的话，说明不是我们故意要的，有其他的依赖。</p>
-<p>a. 看看这个依赖能不能解析，不能解析，我们看看上下文绑定有没有，这个依赖的默认值有没有，都没有，没办法抛出异常。</p>
-<p>b. 要是能解析，就直接解析。返回。</p>
-<p>4.3有了依赖了，使用反射通过依赖生成对象。</p>
-<p>实例测试：</p>
-<ol>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>build 方法主要是这样的流程</p>
+<ul>
+<li><p>1.是不是闭包，闭包就执行不啰嗦。</p>
+</li>
+<li><p>2.如果不是闭包，利用 php 反射，生成 php 反射对象</p>
+</li>
+<li><p>3.这个类有没有自己定义构造函数，如果没有（构造函数默认的），就直接new返回。</p>
+</li>
+<li><p>4.如果有自定义构造函数</p>
+<ul>
+<li>4.1.我们先看看有没有在 make 的时候传入第二个参数，有的话获取返回这个依赖。</li>
+<li>4.2.没有传入的话，说明不是我们故意要的，有其他的依赖。<ul>
+<li>a.看看这个依赖能不能解析，不能解析，我们看看上下文绑定有没有，这个依赖的默认值有没有，都没有，没办法抛出异常。</li>
+<li>b.要是能解析，就直接解析。返回。</li>
+</ul>
+</li>
+<li>4.3有了依赖了，使用反射通过依赖生成对象。</li>
+</ul>
+</li>
+</ul>
+<h1 id="实例测试"><a href="#实例测试" class="headerlink" title="实例测试"></a>实例测试</h1><ol>
 <li>直接使用 build，没有依赖的闭包函数</li>
 </ol>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ExampleTest</span> <span class="keyword">extends</span> <span class="title">TestCase</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">testClosure</span><span class="params">()</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    $boss= app()-&gt;build(<span class="function"><span class="keyword">function</span><span class="params">()</span></span>&#123;<span class="keyword">return</span> <span class="keyword">new</span> Money();&#125;);</span><br><span class="line"></span><br><span class="line">    $output = $boss-&gt;getAmount();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">$this</span>-&gt;assertEquals($output, <span class="number">100</span>);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Money</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">getAmount</span><span class="params">()</span></span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="number">100</span>;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dollar</span> <span class="keyword">extends</span> <span class="title">Money</span></span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">getAmount</span><span class="params">()</span></span>&#123;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -701,8 +717,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <div class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <div class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -970,6 +995,23 @@
       </div>
 
       
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">1.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实例测试"><span class="nav-number">2.</span> <span class="nav-text">实例测试</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
 
       
 
@@ -1009,7 +1051,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">65:49</span>
+    <span title="站点阅读时长">65:51</span>
   
 </div>
 
