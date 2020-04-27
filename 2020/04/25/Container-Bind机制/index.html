@@ -111,7 +111,7 @@
 <meta property="og:site_name" content="车斌的博客">
 <meta property="og:description" content="思考并回答以下问题：">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2020-04-26T13:34:13.817Z">
+<meta property="og:updated_time" content="2020-04-27T14:43:42.248Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Container Bind机制">
 <meta name="twitter:description" content="思考并回答以下问题：">
@@ -443,7 +443,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2020-04-26 21:34:13" itemprop="dateModified" datetime="2020-04-26T21:34:13+08:00">2020-04-26</time>
+                <time title="修改时间：2020-04-27 22:43:42" itemprop="dateModified" datetime="2020-04-27T22:43:42+08:00">2020-04-27</time>
               
             
           </span>
@@ -489,7 +489,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">5.1k</span>
+                <span title="本文字数">5.2k</span>
               
 
               
@@ -525,7 +525,7 @@
       
         <p>思考并回答以下问题：</p>
 <a id="more"></a>
-<h1 id="bind绑定"><a href="#bind绑定" class="headerlink" title="bind绑定"></a>bind绑定</h1><p>Illuminate\Container\Container类的最重要的方法：bind。</p>
+<h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a><span style="color:#339AFF;">简介</span></h1><p>Illuminate\Container\Container类的最重要的方法：bind。</p>
 <p>绑定分为几种:</p>
 <ul>
 <li>1、bind把接口和其实现类绑定，当make解析接口的时候创建其实现类的实例对象。</li>
@@ -547,7 +547,7 @@
 <p><strong>方法体：</strong></p>
 <p>1、绑定前，先清空instances和aliases中存在的同名字的服务。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">$this</span>-&gt;dropStaleInstances($abstract);</span><br></pre></td></tr></table></figure></p>
 <p>dropStaleInstances($abstract)如下，就是清空当前instance中和aliases中存在的$abstract同名的服务。</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">dropStaleInstances</span><span class="params">($abstract)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">unset</span>(<span class="keyword">$this</span>-&gt;instances[$abstract], <span class="keyword">$this</span>-&gt;aliases[$abstract]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Drop all of the stale instances and aliases.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span>  string  $abstract</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span> void</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">dropStaleInstances</span><span class="params">($abstract)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">unset</span>(<span class="keyword">$this</span>-&gt;instances[$abstract], <span class="keyword">$this</span>-&gt;aliases[$abstract]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>2、然后判断第二个参数$concrete是不是空，如果是空，就视$abstract和$concrete一样。比如：app()-&gt;bind(Boss::class)。</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (is_null($concrete))</span><br><span class="line">&#123;</span><br><span class="line">    $concrete = $abstract;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>3、如果当前这个$concrete不是一个闭包。就调用getClosure，返回一个闭包便于后面的操作。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (! $concrete <span class="keyword">instanceof</span> Closure)</span><br><span class="line">&#123;</span><br><span class="line">    $concrete = <span class="keyword">$this</span>-&gt;getClosure($abstract, $concrete);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
@@ -567,13 +567,13 @@
 <p>5、接下来下一句，如果当前的抽象类曾经被解析过。那再次绑定的时候，我们要使用rebound函数触发reboundCallbacks数组中的回调函数。</p>
 <p>关于回调函数参看前面章节。</p>
 <figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (<span class="keyword">$this</span>-&gt;resolved($abstract))</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">$this</span>-&gt;rebound($abstract);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>如何判断当前的$abstract曾经被解析过呢，我们看下resolved函数。两个条件：</p>
+<p>如何判断当前的$abstract曾经被解析过呢，我们看下resolved函数。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Determine if the given abstract type has been resolved.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span>  string  $abstract</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span> bool</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">resolved</span><span class="params">($abstract)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">$this</span>-&gt;isAlias($abstract)) &#123;</span><br><span class="line">        $abstract = <span class="keyword">$this</span>-&gt;getAlias($abstract);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">isset</span>(<span class="keyword">$this</span>-&gt;resolved[$abstract]) ||</span><br><span class="line">           <span class="keyword">isset</span>(<span class="keyword">$this</span>-&gt;instances[$abstract]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>两个条件：</p>
 <ul>
 <li>1.简单判断当前resolved数组中是否存在$abstract。</li>
 <li>2.或者instances数组中是存在对应的值。但我们注意，先前在bind方法的第一句$this-&gt;dropStaleInstances($abstract);的时候我们清空了instances对应的$abstract的值，所以这边主要是考虑$abstract的别名在instances中是否存在残留的情况。</li>
 </ul>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Determine if the given abstract type has been resolved.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span>  string  $abstract</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span> bool</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">resolved</span><span class="params">($abstract)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">$this</span>-&gt;isAlias($abstract)) &#123;</span><br><span class="line">        $abstract = <span class="keyword">$this</span>-&gt;getAlias($abstract);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">isset</span>(<span class="keyword">$this</span>-&gt;resolved[$abstract]) ||</span><br><span class="line">           <span class="keyword">isset</span>(<span class="keyword">$this</span>-&gt;instances[$abstract]);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>在bind方法中：</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a><span style="color:#339AFF;">总结</span></h1><p>在bind方法中：</p>
 <ul>
 <li>1、首先移除旧的实例，如果参数$concrete不是闭包，是类名，会通过getClosure函数将类名封装进闭包中，返回这个闭包。总之container就要闭包。</li>
 </ul>
@@ -587,9 +587,9 @@
 <p>最简单的来说，就是原来在容器中，绑定的是一个id和一个闭包函数的组合。你传入闭包最好，不是闭包，Laravel会转成闭包存起来。</p>
 <p>暂时从代码来看，我们可以猜想，最后从容器解析出来的对象是运行这个闭包产生返回的。</p>
 <p>那我们就会有这样的猜想了，我们可以通过闭包绑定任何类型的值，因为只要在闭包中返回我们想要的任何类型的值就好了。</p>
-<h1 id="实例测试"><a href="#实例测试" class="headerlink" title="实例测试"></a>实例测试</h1><p>测试1：使用闭包函数返回有依赖的对象。</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Money</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> $amount = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">($amount)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;amount = $amount;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">getAmount</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;amount;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">//注意闭包的形式</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">$this</span>-&gt;app-&gt;bind(<span class="string">'money'</span>, <span class="function"><span class="keyword">function</span><span class="params">($app, $parameters)</span></span>&#123;<span class="keyword">return</span> <span class="keyword">new</span> Money($parameters[<span class="number">0</span>]);&#125;);</span><br></pre></td></tr></table></figure>
-<p>测试2：使用闭包函数返回没有依赖的对象<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dollar</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">getAmount</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">100</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">$this</span>-&gt;app-&gt;bind(<span class="string">'dollar'</span>, <span class="function"><span class="keyword">function</span><span class="params">()</span></span>&#123;<span class="keyword">return</span> <span class="keyword">new</span> Dollar();&#125;);</span><br></pre></td></tr></table></figure></p>
+<h1 id="实例测试"><a href="#实例测试" class="headerlink" title="实例测试"></a><span style="color:#339AFF;">实例测试</span></h1><p>测试1：使用闭包函数返回有依赖的对象。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Money</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> $amount = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">($amount)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;amount = $amount;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">getAmount</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;amount;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 注意闭包的形式</span></span><br><span class="line"><span class="keyword">$this</span>-&gt;app-&gt;bind(<span class="string">'money'</span>, <span class="function"><span class="keyword">function</span><span class="params">($app, $parameters)</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Money($parameters[<span class="number">0</span>]);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>测试2：使用闭包函数返回没有依赖的对象<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dollar</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">getAmount</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">100</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">$this</span>-&gt;app-&gt;bind(<span class="string">'dollar'</span>, <span class="function"><span class="keyword">function</span><span class="params">()</span></span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Dollar();</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
 
       
     </div>
@@ -709,7 +709,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">419</span>
+                    <span class="site-state-item-count">422</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -928,23 +928,23 @@
                 
                 
                   <li>
+                    <a href="/2020/04/27/array-column-recursive/" title="array_column_recursive" target="_blank">array_column_recursive</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/04/27/如何实现IoC容器和服务提供者是什么概念/" title="如何实现IoC容器和服务提供者是什么概念" target="_blank">如何实现IoC容器和服务提供者是什么概念</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/04/27/依赖注入、控制反转、反射各个概念的理解和使用/" title="依赖注入、控制反转、反射各个概念的理解和使用" target="_blank">依赖注入、控制反转、反射各个概念的理解和使用</a>
+                  </li>
+                
+                  <li>
                     <a href="/2020/04/25/tag解析机制/" title="tag解析机制" target="_blank">tag解析机制</a>
                   </li>
                 
                   <li>
                     <a href="/2020/04/25/build解析机制/" title="build解析机制" target="_blank">build解析机制</a>
-                  </li>
-                
-                  <li>
-                    <a href="/2020/04/25/Container-make解析机制/" title="Container make解析机制" target="_blank">Container make解析机制</a>
-                  </li>
-                
-                  <li>
-                    <a href="/2020/04/25/Container-Bind机制/" title="Container Bind机制" target="_blank">Container Bind机制</a>
-                  </li>
-                
-                  <li>
-                    <a href="/2020/04/25/Share机制与Alias别名/" title="Share机制与Alias别名" target="_blank">Share机制与Alias别名</a>
                   </li>
                 
               </ul>
@@ -970,7 +970,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#bind绑定"><span class="nav-number">1.</span> <span class="nav-text">bind绑定</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">2.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实例测试"><span class="nav-number">3.</span> <span class="nav-text">实例测试</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">2.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实例测试"><span class="nav-number">3.</span> <span class="nav-text">实例测试</span></a></li></ol></div>
             
 
           </div>
@@ -1005,7 +1005,7 @@
     
       <span class="post-meta-item-text">站点总字数：</span>
     
-    <span title="站点总字数">4.3m</span>
+    <span title="站点总字数">4.4m</span>
   
 
   
@@ -1016,7 +1016,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">65:51</span>
+    <span title="站点阅读时长">66:02</span>
   
 </div>
 
