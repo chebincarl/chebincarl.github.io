@@ -106,22 +106,24 @@
   <meta name="description" content="思考并回答以下问题：">
 <meta name="keywords" content="Laravel">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Extend扩展机制">
-<meta property="og:url" content="http://chebincarl.github.io/2020/04/25/Extend扩展机制/index.html">
+<meta property="og:title" content="一次Laravel请求的生命周期">
+<meta property="og:url" content="http://chebincarl.github.io/2020/04/29/一次Laravel请求的生命周期/index.html">
 <meta property="og:site_name" content="车斌的博客">
 <meta property="og:description" content="思考并回答以下问题：">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2020-04-27T13:59:41.377Z">
+<meta property="og:image" content="http://chebincarl.github.io/2020/04/29/一次Laravel请求的生命周期/1.png">
+<meta property="og:updated_time" content="2020-05-05T02:41:57.194Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Extend扩展机制">
+<meta name="twitter:title" content="一次Laravel请求的生命周期">
 <meta name="twitter:description" content="思考并回答以下问题：">
+<meta name="twitter:image" content="http://chebincarl.github.io/2020/04/29/一次Laravel请求的生命周期/1.png">
 
 
 
 
 
 
-  <link rel="canonical" href="http://chebincarl.github.io/2020/04/25/Extend扩展机制/">
+  <link rel="canonical" href="http://chebincarl.github.io/2020/04/29/一次Laravel请求的生命周期/">
 
 
 
@@ -131,7 +133,7 @@
   };
 </script>
 
-  <title>Extend扩展机制 | 车斌的博客</title>
+  <title>一次Laravel请求的生命周期 | 车斌的博客</title>
   
 
 
@@ -380,7 +382,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2020/04/25/Extend扩展机制/">
+    <link itemprop="mainEntityOfPage" href="http://chebincarl.github.io/2020/04/29/一次Laravel请求的生命周期/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Chebin">
@@ -397,7 +399,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">Extend扩展机制
+          <h1 class="post-title" itemprop="name headline">一次Laravel请求的生命周期
 
               
             
@@ -426,7 +428,7 @@
                 
               
 
-              <time title="创建时间：2020-04-25 19:46:58" itemprop="dateCreated datePublished" datetime="2020-04-25T19:46:58+08:00">2020-04-25</time>
+              <time title="创建时间：2020-04-29 14:39:51" itemprop="dateCreated datePublished" datetime="2020-04-29T14:39:51+08:00">2020-04-29</time>
             
 
             
@@ -443,7 +445,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2020-04-27 21:59:41" itemprop="dateModified" datetime="2020-04-27T21:59:41+08:00">2020-04-27</time>
+                <time title="修改时间：2020-05-05 10:41:57" itemprop="dateModified" datetime="2020-05-05T10:41:57+08:00">2020-05-05</time>
               
             
           </span>
@@ -525,28 +527,36 @@
       
         <p>思考并回答以下问题：</p>
 <a id="more"></a>
-<h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a><span style="color:#339AFF;">简介</span></h1><p>extend方法可以修改解析的服务。例如，当一个服务被解析后，你可以添加额外的代码去修饰或配置这个服务。extend方法接受一个闭包，闭包的唯一参数和返回值都是一个服务：</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">$this</span>-&gt;app-&gt;extend(Service::class, <span class="function"><span class="keyword">function</span><span class="params">($service)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> DecoratedService($service);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
-<p>extend主要的作用是在解析后，使用一个闭包函数产生的值（通常为当前实体类的子类）替换对应父实体类，从而对其产生扩展影响。这个闭包的参数和返回值都必须是对象。比如：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">app()-&gt;extend(<span class="string">'Service'</span>, <span class="function"><span class="keyword">function</span> <span class="params">($service, $app)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> DecoratedService($service);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure></p>
-<p>这里DecoratedService是Service的子类。</p>
-<p>更简单来说，当我们从Container容器中取出一个实例后，用这个类的子类实例替换掉当前这个父类实例，达到扩展的作用。</p>
-<p>当然这是一种用法。还有一些细节，我们去看下源代码。</p>
-<h1 id="源码"><a href="#源码" class="headerlink" title="源码"></a><span style="color:#339AFF;">源码</span></h1><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * "Extend" an abstract type in the container.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span>  string  $abstract</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span>  \Closure  $closure</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span> void</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@throws</span> \InvalidArgumentException</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">extend</span><span class="params">($abstract, Closure $closure)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    $abstract = <span class="keyword">$this</span>-&gt;getAlias($abstract);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">isset</span>(<span class="keyword">$this</span>-&gt;instances[$abstract])) &#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;instances[$abstract] = $closure(<span class="keyword">$this</span>-&gt;instances[$abstract], <span class="keyword">$this</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">$this</span>-&gt;rebound($abstract);</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;extenders[$abstract][] = $closure;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">$this</span>-&gt;resolved($abstract)) &#123;</span><br><span class="line">            <span class="keyword">$this</span>-&gt;rebound($abstract);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>1、先获取Container中这个id($abstract)的别名。</p>
-<p>2、查看容器已有的实例数组instance里面有没有对应的实例，如果有，直接执行我们extend的这个闭包方法，返回值存入这个数组中，就是替换了原来的实例。</p>
-<p>2.2.然后使用了rebound()，目的是看看有没有附带的回调函数，触发它，这个我们在回调函数中会提。</p>
-<p>这说明extend的时候会触发回调函数。</p>
-<p>3.如果instance中没有找到对应的实例，就把这个闭包函数存入extenders数组，做个记录，以后用。</p>
-<p>并且如果这个id已经被resolved过了，还要触发rebound函数，触发一些对应的回调函数。</p>
-<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a><span style="color:#339AFF;">总结</span></h1><p>extend的机制就是如果instance中存在实例，就用extend中的闭包执行结果替换掉。如果instances实例列表中不存在就存起来以后备用。</p>
-<p>某个适用场景可以是：用子类实例替换父类实例达到扩展的作用。</p>
-<p>但不管怎么样，都会触发当前存在的回调函数一次。下一章讲一下回调函数。</p>
-<h1 id="实测实例"><a href="#实测实例" class="headerlink" title="实测实例"></a><span style="color:#339AFF;">实测实例</span></h1><p>实例1：替换依赖的实例对象</p>
-<p>本来的Boss实例的依赖Money是一个Cheque对象，最后解析的时候，被替换成了Dollar对象。</p>
-<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">interface</span> <span class="title">Money</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">getAmount</span><span class="params">()</span></span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dollar</span> <span class="keyword">implements</span> <span class="title">Money</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">getAmount</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Cheque</span> <span class="keyword">implements</span> <span class="title">Money</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">getAmount</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">100000</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Worker</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> $money;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">(Money $money)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;money = $money; <span class="comment">// prints '1'</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">getA</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;money-&gt;getAmount();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Boss</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">private</span> $money;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">(Money $money)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;money = $money; <span class="comment">// prints '100000'</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">getA</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">$this</span>-&gt;money-&gt;getAmount();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">testClosure</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    app()-&gt;bind(<span class="string">'boss'</span>, Boss::class);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">$this</span>-&gt;app-&gt;when(Boss::class)</span><br><span class="line">                -&gt;needs(Money::class)</span><br><span class="line">                -&gt;give(Cheque::class);</span><br><span class="line"></span><br><span class="line">    app()-&gt;extend(Money::class, <span class="function"><span class="keyword">function</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Dollar();</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    $boss = app()-&gt;make(<span class="string">'boss'</span>);</span><br><span class="line">    $output = $boss-&gt;getA();</span><br><span class="line">    <span class="keyword">$this</span>-&gt;assertEquals($output, <span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p>实例2：子类替换父类，向下拓展<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Money</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">getAmount</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">100</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dollar</span> <span class="keyword">extends</span> <span class="title">Money</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">getAmount</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Cheque</span> <span class="keyword">extends</span> <span class="title">Money</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">getAmount</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">100000</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">testClosure</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    app()-&gt;extend(Money::class, <span class="function"><span class="keyword">function</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Dollar();</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    $money= app()-&gt;make(Money::class);</span><br><span class="line">    $output = $money-&gt;getAmount();</span><br><span class="line">    <span class="keyword">$this</span>-&gt;assertEquals($output, <span class="number">1</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-<p>实例3：向其他地方拓展，extend的第二个参数是闭包，闭包的第一个参数就是extend第一个参数的实例，在这里就是我们事先绑定的Money::class实例。<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Money</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">getAmount</span><span class="params">()</span></span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">100</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dollar</span> <span class="keyword">extends</span> <span class="title">Money</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">getAmount</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Cheque</span> <span class="keyword">extends</span> <span class="title">Money</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">getAmount</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="number">100000</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Currenty</span></span></span><br><span class="line"><span class="class"></span>&#123;</span><br><span class="line">    <span class="keyword">protected</span> $money;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">(Money $money)</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">$this</span>-&gt;money = $money;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">getAmount</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"harveynorman"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">testClosure</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    app()-&gt;bind(<span class="string">'money'</span>, Money::class);</span><br><span class="line"></span><br><span class="line">    app()-&gt;extend(<span class="string">'money'</span>, <span class="function"><span class="keyword">function</span><span class="params">($money)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Currenty($money);</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    $boss = app()-&gt;make(<span class="string">'money'</span>);</span><br><span class="line">    $output = $boss-&gt;getAmount();</span><br><span class="line">    <span class="keyword">$this</span>-&gt;assertEquals($output, <span class="string">"harveynorman"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
-
+<h1 id="生命周期概览"><a href="#生命周期概览" class="headerlink" title="生命周期概览"></a><span style="color:#339AFF;">生命周期概览</span></h1><h2 id="第一件事"><a href="#第一件事" class="headerlink" title="第一件事"></a>第一件事</h2><p>Laravel应用的所有请求入口都是public/index.php文件，所有请求都会被web服务器（Apache/Nginx）导向这个文件。index.php文件包含的代码并不多，但是，这里是加载框架其它部分的起点。</p>
+<p>index.php文件载入Composer生成的自动加载设置，然后从bootstrap/app.php脚本获取Laravel应用实例，<span style="color:red">Laravel的第一个动作就是创建服务容器实例。</span></p>
+<h2 id="HTTP-Console内核"><a href="#HTTP-Console内核" class="headerlink" title="HTTP/Console内核"></a>HTTP/Console内核</h2><p>接下来，请求被发送到HTTP内核或Console内核（分别用于处理Web请求和Artisan命令），这取决于进入应用的请求类型。这两个内核是所有请求都要经过的中央处理器，现在，就让我们聚焦在位于app/Http/Kernel.php的HTTP内核。</p>
+<p>HTTP内核继承自Illuminate\Foundation\Http\Kernel类，该类定义了一个bootstrappers数组，这个数组中的类在请求被执行前运行，这些bootstrappers配置了错误处理、日志、检测应用环境以及其它在请求被处理前需要执行的任务。</p>
+<p>HTTP内核还定义了一系列所有请求在处理前需要经过的HTTP中间件，这些中间件处理HTTP会话的读写、判断应用是否处于维护模式、验证CSRF令牌等等。</p>
+<p>HTTP内核的handle方法签名相当简单：获取一个Request，返回一个Response，可以把该内核想象作一个代表整个应用的大黑盒子，输入HTTP请求，返回HTTP响应。</p>
+<h2 id="服务提供者"><a href="#服务提供者" class="headerlink" title="服务提供者"></a>服务提供者</h2><p>内核启动过程中最重要的动作之一就是为应用载入服务提供者，应用的所有服务提供者都被配置在config/app.php配置文件的providers数组中。<span style="color:red">首先，所有提供者的register方法被调用，然后，所有提供者被注册之后，boot方法被调用。</span></p>
+<p>服务提供者负责启动框架的所有各种各样的组件，比如数据库、队列、验证器，以及路由组件等，正是因为他们启动并配置了框架提供的所有特性，所以服务提供者是整个Laravel启动过程中最重要的部分。</p>
+<h2 id="分发请求"><a href="#分发请求" class="headerlink" title="分发请求"></a>分发请求</h2><p>一旦应用被启动并且所有的服务提供者被注册，Request将会被交给路由器进行分发，路由器将会分发请求到路由或控制器，同时运行所有路由指定的中间件。</p>
+<h1 id="聚焦服务提供者"><a href="#聚焦服务提供者" class="headerlink" title="聚焦服务提供者"></a><span style="color:#339AFF;">聚焦服务提供者</span></h1><p>服务提供者是启动Laravel应用中最关键的部分，应用实例被创建后，服务提供者被注册，请求被交给启动后的应用进行处理，整个过程就是这么简单！</p>
+<p>对Laravel应用如何通过服务提供者构建和启动有一个牢固的掌握非常有价值，当然，应用默认的服务提供者存放在app/Providers目录下。</p>
+<p>默认情况下，AppServiceProvider是空的，这里是添加自定义启动和服务容器绑定的最佳位置，当然，对大型应用，你可能希望创建多个服务提供者，每一个都有着更加细粒度的启动。</p>
+<h1 id="总体流程"><a href="#总体流程" class="headerlink" title="总体流程"></a><span style="color:#339AFF;">总体流程</span></h1><img src="/2020/04/29/一次Laravel请求的生命周期/1.png">
+<p>Web服务器对HTTP请求的处理流程大体上都是这样的：在某个端口监听请求，请求进入后运行程序，然后将程序运行结果以响应的形式发送出去。</p>
+<p>基于Laravel框架构建的Web应用处理HTTP请求的流程也是如此。所有HTTP请求都会被转发到单入口文件public/index.php，处理HTTP请求的核心代码如下（忽略HTTP请求处理之外的代码）：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">$app = <span class="keyword">new</span> Illuminate\Foundation\Application(</span><br><span class="line">    realpath(<span class="keyword">__DIR__</span>.<span class="string">'/../'</span>)</span><br><span class="line">);    </span><br><span class="line"></span><br><span class="line"><span class="comment">// 绑定处理 HTTP 请求的接口实现到服务容器</span></span><br><span class="line">$app-&gt;singleton(</span><br><span class="line">    Illuminate\Contracts\Http\Kernel::class,</span><br><span class="line">    App\Http\Kernel::class</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 从服务容器中解析处理 HTTP 请求的 Kernel 实例</span></span><br><span class="line">$kernel = $app-&gt;make(Illuminate\Contracts\Http\Kernel::class);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 处理 HTTP 请求的核心代码</span></span><br><span class="line">$response = $kernel-&gt;handle(</span><br><span class="line">    $request = Illuminate\Http\Request::capture()</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 发送响应</span></span><br><span class="line">$response-&gt;send();</span><br><span class="line"></span><br><span class="line"><span class="comment">// 终止程序，做一些善后及清理工作</span></span><br><span class="line">$kernel-&gt;terminate($request, $response);</span><br></pre></td></tr></table></figure>
+<p>在上面这段程序中，首先会创建一个Application实例，作为全局的服务容器，然后将处理请求的核心类Kernel实现实例绑定到该容器中，以便后续通过它处理HTTP请求。我们通过服务器捕获请求并将其传递给Kernel实例进行处理，处理结果是准备好的响应实例，调用该响应实例的send() 方法即可将其发送给发起请求的客户端。最后，我们执行Kernel实例上的terminate()终止程序，退出脚本。</p>
+<p>以上就是Laravel框架处理HTTP请求的一般流程，所有核心逻辑都位于$kernel-&gt;handle()方法调用中。下面我们就来一探究竟。</p>
+<h1 id="服务容器"><a href="#服务容器" class="headerlink" title="服务容器"></a><span style="color:#339AFF;">服务容器</span></h1><p>Laravel框架提供了一个功能强大的服务容器，用于管理类之间的依赖关系，关于其底层原理还可以参考学徒到工匠系列中的介绍，这里我们就不深入展开了。服务容器封装了绑定到某个接口的对应实现类的实例化过程，你可以在需要对应实现实例的时候通过接口从容器中获取。</p>
+<p>在上面的代码中，$app对应的就是服务容器实例，并且在我们获取到该实例后就注册了Kernel接口及其实现类到容器中：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">$app-&gt;singleton(</span><br><span class="line">    Illuminate\Contracts\Http\Kernel::class,</span><br><span class="line">    App\Http\Kernel::class</span><br><span class="line">);</span><br></pre></td></tr></table></figure></p>
+<p>singleton方法会以单例方式在服务容器中将App\Http\Kernel实例绑定到Illuminate\Contracts\Http\Kernel接口，后续我们要获取App\Http\Kernel实例，就可以通过Illuminate\Contracts\Http\Kernel接口从服务容器中获取，获取方法是$app-&gt;make()：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$kernel = $app-&gt;make(Illuminate\Contracts\Http\Kernel::class);</span><br></pre></td></tr></table></figure></p>
+<h1 id="回到Kernel"><a href="#回到Kernel" class="headerlink" title="回到Kernel"></a><span style="color:#339AFF;">回到Kernel</span></h1><p>下面我们就正式进入$kernel-&gt;handle()方法内部看看HTTP请求是被如何处理的。打开Illuminate\Foundation\Http\Kernel（App\Http\Kernel的父类），查看handle方法，可以看到核心处理逻辑通过sendRequestThroughRouter方法实现：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> <span class="function"><span class="keyword">function</span> <span class="title">sendRequestThroughRouter</span><span class="params">($request)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">$this</span>-&gt;app-&gt;instance(<span class="string">'request'</span>, $request);</span><br><span class="line"></span><br><span class="line">    Facade::clearResolvedInstance(<span class="string">'request'</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">$this</span>-&gt;bootstrap();</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> (<span class="keyword">new</span> Pipeline(<span class="keyword">$this</span>-&gt;app))</span><br><span class="line">                -&gt;send($request)</span><br><span class="line">                -&gt;through(<span class="keyword">$this</span>-&gt;app-&gt;shouldSkipMiddleware() ? [] : <span class="keyword">$this</span>-&gt;middleware)</span><br><span class="line">                -&gt;then(<span class="keyword">$this</span>-&gt;dispatchToRouter());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>在发送请求到路由之前，先调用bootstrap()方法运用应用的启动类：<br><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">protected</span> $bootstrappers = [</span><br><span class="line">    \Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables::class,</span><br><span class="line">    \Illuminate\Foundation\Bootstrap\LoadConfiguration::class,</span><br><span class="line">    \Illuminate\Foundation\Bootstrap\HandleExceptions::class,</span><br><span class="line">    \Illuminate\Foundation\Bootstrap\RegisterFacades::class,</span><br><span class="line">    \Illuminate\Foundation\Bootstrap\RegisterProviders::class,</span><br><span class="line">    \Illuminate\Foundation\Bootstrap\BootProviders::class,</span><br><span class="line">];</span><br></pre></td></tr></table></figure></p>
+<p>这些个启动类在路由解析之前执行，相当于对整个应用进行初始化。通过类名就能窥探出对应的操作意图，分别是加载环境变量和全局配置、配置异常处理逻辑、注册门面和服务提供者（根据 config/app.php 中的providers和alias配置值）、以及执行所有已注册服务提供者的boot方法，具体的实现逻辑我这里就不一一展开的，你可以自己去看下。</p>
+<p>然后就是真正的HTTP请求处理了：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">return</span> (<span class="keyword">new</span> Pipeline(<span class="keyword">$this</span>-&gt;app))</span><br><span class="line">            -&gt;send($request)</span><br><span class="line">            -&gt;through(<span class="keyword">$this</span>-&gt;app-&gt;shouldSkipMiddleware() ? [] : <span class="keyword">$this</span>-&gt;middleware)</span><br><span class="line">            -&gt;then(<span class="keyword">$this</span>-&gt;dispatchToRouter());</span><br></pre></td></tr></table></figure>
+<p>Laravel框架以管道模式来处理HTTP请求，首先通过全局中间件对请求进行处理，如果返回false 直接退出，不会做路由解析处理。</p>
+<p>全局中间件都校验通过才会将请求分发到路由器进行处理，路由器会将请求URL路径与应用注册的所有路由进行匹配，如果有匹配的路由，则先收集该路由所分配的所有路由中间件，通过这些路由中间件对请求进行过滤，所有路由中间件校验通过才会运行对应的匿名函数或控制器方法，执行相应的请求处理逻辑，最后准备好待发送给客户端的响应。</p>
+<h1 id="终止Kernel"><a href="#终止Kernel" class="headerlink" title="终止Kernel"></a><span style="color:#339AFF;">终止Kernel</span></h1><p>响应准备就绪后，就会通过$response-&gt;send()发送给发起请求的客户端，之后还要运行$kernel-&gt;terminate()做一些善后清理工作，并最终退出脚本。这些善后清理工作主要包括运行终止中间件，以及注册到服务容器的一些终止回调：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="function"><span class="keyword">function</span> <span class="title">terminate</span><span class="params">($request, $response)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">$this</span>-&gt;terminateMiddleware($request, $response);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">$this</span>-&gt;app-&gt;terminate();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
       
     </div>
 
@@ -582,8 +592,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2020/04/25/Contextual上下文绑定机制/" rel="next" title="Contextual上下文绑定机制">
-                <i class="fa fa-chevron-left"></i> Contextual上下文绑定机制
+              <a href="/2020/04/28/Laravel的单元测试/" rel="next" title="Laravel的单元测试">
+                <i class="fa fa-chevron-left"></i> Laravel的单元测试
               </a>
             
           </div>
@@ -592,8 +602,8 @@
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2020/04/25/Callbacks回调函数机制/" rel="prev" title="Callbacks回调函数机制">
-                Callbacks回调函数机制 <i class="fa fa-chevron-right"></i>
+              <a href="/2020/04/30/为什么要使用索引？/" rel="prev" title="为什么要使用索引？">
+                为什么要使用索引？ <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -665,7 +675,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">423</span>
+                    <span class="site-state-item-count">427</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -884,23 +894,23 @@
                 
                 
                   <li>
+                    <a href="/2020/04/30/一个人逆袭最好的方式，就是每天花20分钟做这件事/" title="一个人逆袭最好的方式，就是每天花20分钟做这件事" target="_blank">一个人逆袭最好的方式，就是每天花20分钟做这件事</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/04/30/如何设计高性能的索引？/" title="如何设计高性能的索引？" target="_blank">如何设计高性能的索引？</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/04/30/为什么要使用索引？/" title="为什么要使用索引？" target="_blank">为什么要使用索引？</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/04/29/一次Laravel请求的生命周期/" title="一次Laravel请求的生命周期" target="_blank">一次Laravel请求的生命周期</a>
+                  </li>
+                
+                  <li>
                     <a href="/2020/04/28/Laravel的单元测试/" title="Laravel的单元测试" target="_blank">Laravel的单元测试</a>
-                  </li>
-                
-                  <li>
-                    <a href="/2020/04/27/array-column-recursive/" title="array_column_recursive" target="_blank">array_column_recursive</a>
-                  </li>
-                
-                  <li>
-                    <a href="/2020/04/27/如何实现IoC容器和服务提供者是什么概念/" title="如何实现IoC容器和服务提供者是什么概念" target="_blank">如何实现IoC容器和服务提供者是什么概念</a>
-                  </li>
-                
-                  <li>
-                    <a href="/2020/04/27/依赖注入、控制反转、反射各个概念的理解和使用/" title="依赖注入、控制反转、反射各个概念的理解和使用" target="_blank">依赖注入、控制反转、反射各个概念的理解和使用</a>
-                  </li>
-                
-                  <li>
-                    <a href="/2020/04/25/tag解析机制/" title="tag解析机制" target="_blank">tag解析机制</a>
                   </li>
                 
               </ul>
@@ -926,7 +936,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#简介"><span class="nav-number">1.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#源码"><span class="nav-number">2.</span> <span class="nav-text">源码</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实测实例"><span class="nav-number">4.</span> <span class="nav-text">实测实例</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#生命周期概览"><span class="nav-number">1.</span> <span class="nav-text">生命周期概览</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#第一件事"><span class="nav-number">1.1.</span> <span class="nav-text">第一件事</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#HTTP-Console内核"><span class="nav-number">1.2.</span> <span class="nav-text">HTTP/Console内核</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#服务提供者"><span class="nav-number">1.3.</span> <span class="nav-text">服务提供者</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#分发请求"><span class="nav-number">1.4.</span> <span class="nav-text">分发请求</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#聚焦服务提供者"><span class="nav-number">2.</span> <span class="nav-text">聚焦服务提供者</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总体流程"><span class="nav-number">3.</span> <span class="nav-text">总体流程</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#服务容器"><span class="nav-number">4.</span> <span class="nav-text">服务容器</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#回到Kernel"><span class="nav-number">5.</span> <span class="nav-text">回到Kernel</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#终止Kernel"><span class="nav-number">6.</span> <span class="nav-text">终止Kernel</span></a></li></ol></div>
             
 
           </div>
@@ -972,7 +982,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">66:21</span>
+    <span title="站点阅读时长">66:37</span>
   
 </div>
 
