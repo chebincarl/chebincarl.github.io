@@ -103,13 +103,13 @@
 
 
 
-  <meta name="description" content="思考并回答以下问题：  聚簇索引和非聚簇索引的区别在于主键。怎么理解？ 平衡二叉树又称AVL树。每个节点的左右子树的高度差不能超过1。怎么理解？ 为什么把尽量多的数据放进磁盘块中？ B+树索引按照存储方式的不同分为聚集索引和非聚集索引。为什么？">
+  <meta name="description" content="思考并回答以下问题：  聚簇索引和非聚簇索引的区别在于主键。怎么理解？ 平衡二叉树又称AVL树。每个节点的左右子树的高度差不能超过1。怎么理解？ 为什么把尽量多的数据放进磁盘块中？ B+树索引按照存储方式的不同分为聚集索引和非聚集索引。为什么？ 为什么要寻找一种单个节点可以存储多个键值和数据的平衡树？">
 <meta name="keywords" content="MySQL">
 <meta property="og:type" content="article">
 <meta property="og:title" content="为什么MySQL用B+树做索引？">
 <meta property="og:url" content="http://chebincarl.github.io/2020/05/07/为什么MySQL用B-树做索引？/index.html">
 <meta property="og:site_name" content="车斌的博客">
-<meta property="og:description" content="思考并回答以下问题：  聚簇索引和非聚簇索引的区别在于主键。怎么理解？ 平衡二叉树又称AVL树。每个节点的左右子树的高度差不能超过1。怎么理解？ 为什么把尽量多的数据放进磁盘块中？ B+树索引按照存储方式的不同分为聚集索引和非聚集索引。为什么？">
+<meta property="og:description" content="思考并回答以下问题：  聚簇索引和非聚簇索引的区别在于主键。怎么理解？ 平衡二叉树又称AVL树。每个节点的左右子树的高度差不能超过1。怎么理解？ 为什么把尽量多的数据放进磁盘块中？ B+树索引按照存储方式的不同分为聚集索引和非聚集索引。为什么？ 为什么要寻找一种单个节点可以存储多个键值和数据的平衡树？">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://chebincarl.github.io/2020/05/07/为什么MySQL用B-树做索引？/1.jpg">
 <meta property="og:image" content="http://chebincarl.github.io/2020/05/07/为什么MySQL用B-树做索引？/2.jpg">
@@ -121,10 +121,10 @@
 <meta property="og:image" content="http://chebincarl.github.io/2020/05/07/为什么MySQL用B-树做索引？/8.jpg">
 <meta property="og:image" content="http://chebincarl.github.io/2020/05/07/为什么MySQL用B-树做索引？/9.jpg">
 <meta property="og:image" content="http://chebincarl.github.io/2020/05/07/为什么MySQL用B-树做索引？/10.jpg">
-<meta property="og:updated_time" content="2020-05-09T15:54:53.271Z">
+<meta property="og:updated_time" content="2020-05-12T15:39:56.624Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="为什么MySQL用B+树做索引？">
-<meta name="twitter:description" content="思考并回答以下问题：  聚簇索引和非聚簇索引的区别在于主键。怎么理解？ 平衡二叉树又称AVL树。每个节点的左右子树的高度差不能超过1。怎么理解？ 为什么把尽量多的数据放进磁盘块中？ B+树索引按照存储方式的不同分为聚集索引和非聚集索引。为什么？">
+<meta name="twitter:description" content="思考并回答以下问题：  聚簇索引和非聚簇索引的区别在于主键。怎么理解？ 平衡二叉树又称AVL树。每个节点的左右子树的高度差不能超过1。怎么理解？ 为什么把尽量多的数据放进磁盘块中？ B+树索引按照存储方式的不同分为聚集索引和非聚集索引。为什么？ 为什么要寻找一种单个节点可以存储多个键值和数据的平衡树？">
 <meta name="twitter:image" content="http://chebincarl.github.io/2020/05/07/为什么MySQL用B-树做索引？/1.jpg">
 
 
@@ -454,7 +454,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2020-05-09 23:54:53" itemprop="dateModified" datetime="2020-05-09T23:54:53+08:00">2020-05-09</time>
+                <time title="修改时间：2020-05-12 23:39:56" itemprop="dateModified" datetime="2020-05-12T23:39:56+08:00">2020-05-12</time>
               
             
           </span>
@@ -500,7 +500,7 @@
                 
                   <span class="post-meta-item-text">本文字数：</span>
                 
-                <span title="本文字数">5k</span>
+                <span title="本文字数">5.1k</span>
               
 
               
@@ -540,6 +540,7 @@
 <li>平衡二叉树又称AVL树。每个节点的左右子树的高度差不能超过1。怎么理解？</li>
 <li>为什么把尽量多的数据放进磁盘块中？</li>
 <li>B+树索引按照存储方式的不同分为聚集索引和非聚集索引。为什么？</li>
+<li>为什么要寻找一种单个节点可以存储多个键值和数据的平衡树？</li>
 </ul>
 <a id="more"></a>
 <p>索引这个词，相信大多数人已经相当熟悉了，很多人都知道MySQL的索引主要以B+树为主，但是要问到为什么用B+树，恐怕很少有人能把前因后果讲述的很完整。本文就来从头到尾介绍下数据库的索引。</p>
@@ -568,7 +569,7 @@
 <p>下面是平衡二叉树和非平衡二叉树的对比：</p>
 <img src="/2020/05/07/为什么MySQL用B-树做索引？/3.jpg">
 <p>由平衡二叉树的构造我们可以发现第一张图中的二叉树其实就是一棵平衡二叉树。</p>
-<p>平衡二叉树保证了树的构造是平衡的，当我们插入或删除数据导致不满足平衡二叉树不平衡时，平衡二叉树会进行调整树上的节点来保持平衡。具体的调整方式这里就不介绍了。</p>
+<p>平衡二叉树保证了树的构造是平衡的，当我们插入或删除数据导致平衡二叉树不平衡时，平衡二叉树会进行调整树上的节点来保持平衡。具体的调整方式这里就不介绍了。</p>
 <p>平衡二叉树相比于二叉查找树来说，查找效率更稳定，总体的查找速度也更快。</p>
 <h1 id="B树"><a href="#B树" class="headerlink" title="B树"></a><span style="color:#339AFF;">B树</span></h1><p>因为内存的易失性。一般情况下，我们都会选择将user表中的数据和索引存储在磁盘这种外围设备中。</p>
 <p>但是和内存相比，从磁盘中读取数据的速度会慢上百倍千倍甚至万倍，所以，我们应当尽量<strong>减少从磁盘中读取数据的次数。另外，从磁盘中读取数据时，都是按照磁盘块来读取的，并不是一条一条的读</strong>。 </p>
@@ -785,7 +786,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">439</span>
+                    <span class="site-state-item-count">443</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -1012,23 +1013,23 @@
                 
                 
                   <li>
+                    <a href="/2020/05/15/Laravel-Queue-消息队列任务处理器源码剖析/" title="Laravel Queue-消息队列任务处理器源码剖析" target="_blank">Laravel Queue-消息队列任务处理器源码剖析</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/05/14/Laravel-Container-IoC服务容器/" title="Laravel Container-IoC服务容器" target="_blank">Laravel Container-IoC服务容器</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/05/13/Laravel-HTTP-Pipeline中间件处理源码分析/" title="Laravel HTTP-Pipeline中间件处理源码分析" target="_blank">Laravel HTTP-Pipeline中间件处理源码分析</a>
+                  </li>
+                
+                  <li>
+                    <a href="/2020/05/11/Laravel-Queue-消息队列任务与分发源码剖析/" title="Laravel Queue-消息队列任务与分发源码剖析" target="_blank">Laravel Queue-消息队列任务与分发源码剖析</a>
+                  </li>
+                
+                  <li>
                     <a href="/2020/05/10/Laravel-Redis/" title="Laravel-Redis" target="_blank">Laravel-Redis</a>
-                  </li>
-                
-                  <li>
-                    <a href="/2020/05/10/Laravel-Log/" title="Laravel-Log" target="_blank">Laravel-Log</a>
-                  </li>
-                
-                  <li>
-                    <a href="/2020/05/09/Redis实战之实现定时执行任务/" title="Redis实战之实现定时执行任务" target="_blank">Redis实战之实现定时执行任务</a>
-                  </li>
-                
-                  <li>
-                    <a href="/2020/05/09/Redis实战之限制操作频率/" title="Redis实战之限制操作频率" target="_blank">Redis实战之限制操作频率</a>
-                  </li>
-                
-                  <li>
-                    <a href="/2020/05/09/MySQL的又一神器-锁/" title="MySQL的又一神器-锁" target="_blank">MySQL的又一神器-锁</a>
                   </li>
                 
               </ul>
@@ -1089,7 +1090,7 @@
     
       <span class="post-meta-item-text">站点总字数：</span>
     
-    <span title="站点总字数">4.5m</span>
+    <span title="站点总字数">4.6m</span>
   
 
   
@@ -1100,7 +1101,7 @@
     
       <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
     
-    <span title="站点阅读时长">67:53</span>
+    <span title="站点阅读时长">69:13</span>
   
 </div>
 
